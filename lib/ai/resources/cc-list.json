@@ -1,0 +1,27 @@
+[
+  {
+    "cc": "Chest pain",
+    "hasTemplate": true,
+    "templateKey": "chest-pain"
+  },
+  {
+    "cc": "Dyspnea",
+    "hasTemplate": true,
+    "templateKey": "dyspnea"
+  },
+  {
+    "cc": "Hemoptysis",
+    "hasTemplate": true,
+    "templateKey": "hemoptysis"
+  },
+  {
+    "cc": "Abdominal pain",
+    "hasTemplate": true,
+    "templateKey": "abdominal-pain"
+  },
+  {
+    "cc": "GI bleeding",
+    "hasTemplate": true,
+    "templateKey": "gi-bleeding"
+  }
+]

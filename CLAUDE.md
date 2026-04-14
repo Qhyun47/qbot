@@ -86,6 +86,20 @@ import { Button } from "@/components/ui/button";
 - `styling-guide.md`: Tailwind CSS 스타일링 가이드
 - `forms-react-hook-form.md`: 폼 처리 패턴
 
+## AI 리소스 규칙 (`lib/ai/resources/`)
+
+### C.C. (Chief Complaint) 표기 규칙
+
+- **`cc` 필드**: Sentence case 적용 — 첫 단어의 첫 글자만 대문자, 나머지는 소문자
+  - ✅ `"Chest pain"`, `"Abdominal pain"`, `"GI bleeding"`
+  - ❌ `"Chest Pain"`, `"Abdominal Pain"`, `"GI Bleeding"` (Title Case 금지)
+- **예외**: 의학 약어/두문자어는 원형 그대로 유지
+  - ✅ `"GI bleeding"` (GI는 약어이므로 대문자 유지)
+  - ✅ `"IV access problem"` (IV는 약어)
+- **`templateKey` 필드**: 반드시 영어 kebab-case — 파일명으로 직접 사용됨
+  - ✅ `"chest-pain"`, `"gi-bleeding"`
+- **출력 언어**: 혼용 (한국어 문장 구조 + 영어 의학 용어)
+
 ## 작업 완료 체크리스트
 
 ```bash

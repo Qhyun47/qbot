@@ -1,293 +1,262 @@
 {
   "tasks": [
     {
-      "id": "26795b6b-70c7-4d9c-af06-3f23aeb89186",
-      "name": "(app) 라우트 그룹 레이아웃 및 껍데기 페이지 생성",
-      "description": "Next.js 15 App Router의 (app) 라우트 그룹을 생성하고, 6개 주요 페이지의 빈 껍데기 파일을 만든다. 실제 UI는 Task 004~008에서 구현하므로 여기서는 라우트 경로만 확보한다.\n\n생성할 파일:\n- app/(app)/layout.tsx — 공통 레이아웃 (헤더 placeholder + children)\n- app/(app)/dashboard/page.tsx — 대시보드 (TODO 문구)\n- app/(app)/cases/page.tsx — 케이스 목록 (TODO 문구)\n- app/(app)/cases/new/page.tsx — 새 케이스 입력 (TODO 문구)\n- app/(app)/cases/[id]/page.tsx — 케이스 결과 (async params 타입 선언 포함)\n- app/(app)/guidelines/page.tsx — 가이드라인 관리 (TODO 문구)\n- app/(app)/settings/page.tsx — 설정 (TODO 문구)",
-      "notes": "app/protected/layout.tsx가 참조 패턴. (app) 그룹은 URL에 노출되지 않으므로 /dashboard, /cases 등으로 접근됨. 기존 미들웨어가 새 경로를 자동 보호하므로 추가 설정 불필요.",
+      "id": "021ba057-2b60-4cd7-8bb0-985b68ba5e74",
+      "name": "Step 0: 차트 출력 언어 확정",
+      "description": "모든 AI 리소스 파일의 방향을 결정하는 언어 설정을 확정합니다. 한국어 전체 / 영어 전체 / 혼용(의학 용어 영어 + 서술 한국어) 중 하나를 선택합니다. 이 결정이 style_guide.md, templates, guides 등 모든 후속 파일의 작성 언어를 결정합니다.",
+      "notes": "파일 저장 불필요. 단순 결정 사항. 대부분의 한국 응급실 환경에서는 한국어 전체가 일반적.",
       "status": "completed",
       "dependencies": [],
-      "createdAt": "2026-04-14T08:47:34.940Z",
-      "updatedAt": "2026-04-14T08:48:44.513Z",
+      "createdAt": "2026-04-14T11:15:21.365Z",
+      "updatedAt": "2026-04-14T11:16:44.803Z",
       "relatedFiles": [
         {
-          "path": "app/(app)/layout.tsx",
-          "type": "CREATE",
-          "description": "ER 앱 전용 공통 레이아웃 (네비바 placeholder)"
-        },
-        {
-          "path": "app/(app)/dashboard/page.tsx",
-          "type": "CREATE",
-          "description": "대시보드 껍데기 페이지"
-        },
-        {
-          "path": "app/(app)/cases/page.tsx",
-          "type": "CREATE",
-          "description": "케이스 목록 껍데기 페이지"
-        },
-        {
-          "path": "app/(app)/cases/new/page.tsx",
-          "type": "CREATE",
-          "description": "새 케이스 입력 껍데기 페이지"
-        },
-        {
-          "path": "app/(app)/cases/[id]/page.tsx",
-          "type": "CREATE",
-          "description": "케이스 결과 껍데기 페이지 (async params)"
-        },
-        {
-          "path": "app/(app)/guidelines/page.tsx",
-          "type": "CREATE",
-          "description": "가이드라인 관리 껍데기 페이지"
-        },
-        {
-          "path": "app/(app)/settings/page.tsx",
-          "type": "CREATE",
-          "description": "설정 껍데기 페이지"
-        },
-        {
-          "path": "app/protected/layout.tsx",
+          "path": "docs/guide/ai-resource-preparation.md",
           "type": "REFERENCE",
-          "description": "레이아웃 구조 참조 패턴"
+          "description": "Step 0 언어 선택 가이드",
+          "lineStart": 30,
+          "lineEnd": 42
         }
       ],
-      "implementationGuide": "layout.tsx pseudocode:\n  export default function AppLayout({ children }: { children: React.ReactNode }) {\n    return (\n      <div className=\"min-h-screen flex flex-col\">\n        <header className=\"border-b h-14 flex items-center px-4\">\n          {/* TODO: Task 004 — AppNavbar 컴포넌트로 교체 */}\n          <span className=\"font-semibold text-sm\">ER Scribe</span>\n        </header>\n        <main className=\"flex-1 flex flex-col\">{children}</main>\n      </div>\n    )\n  }\n\n껍데기 페이지 공통 pseudocode (dashboard 예시):\n  // 대시보드 페이지 — TODO: Task 005에서 실제 UI 구현\n  export default function DashboardPage() {\n    return (\n      <div className=\"p-8\">\n        <h1 className=\"text-xl font-semibold\">대시보드</h1>\n        <p className=\"text-muted-foreground mt-2\">TODO: Task 005에서 구현 예정</p>\n      </div>\n    )\n  }\n\n[id] 동적 라우트 pseudocode:\n  // 케이스 결과 페이지 — TODO: Task 007에서 실제 UI 구현\n  export default async function CaseResultPage({\n    params,\n  }: {\n    params: Promise<{ id: string }>\n  }) {\n    const { id } = await params\n    return (\n      <div className=\"p-8\">\n        <h1 className=\"text-xl font-semibold\">케이스 결과: {id}</h1>\n        <p className=\"text-muted-foreground mt-2\">TODO: Task 007에서 구현 예정</p>\n      </div>\n    )\n  }",
-      "verificationCriteria": "npm run dev 후 로그인 상태에서 /dashboard, /cases, /cases/new, /guidelines, /settings 접속 시 각 TODO 페이지가 렌더됨. 비로그인 상태에서는 /auth/login으로 리다이렉트됨.",
-      "analysisResult": "ER Scribe MVP Phase 1 — Next.js 15 App Router 기반 라우트 구조 전체 설정. 기존 Supabase 인증 스타터 킷 위에 (app) 라우트 그룹과 빈 껍데기 페이지들을 생성한다. 미들웨어(proxy.ts)는 수정하지 않으며, 기존 패턴(createClient + getClaims + redirect)을 그대로 따른다.",
-      "summary": "app/(app)/layout.tsx + 6개 껍데기 페이지 모두 생성 완료. [id] 동적 라우트에 Next.js 15 async params 패턴 적용. npm run lint 에러 없음(기존 파일 warning만). 기존 미들웨어가 새 라우트를 자동 보호하며 protected/ 미수정. 각 페이지에 한국어 주석 + 담당 Task 번호 명시.",
-      "completedAt": "2026-04-14T08:48:44.510Z"
+      "implementationGuide": "1. 사용자에게 3가지 선택지 제시\\n   - 한국어 전체: HPI와 상용구 모두 한국어\\n   - 영어 전체: HPI와 상용구 모두 영어\\n   - 혼용: 의학 용어 영어, 서술 한국어\\n2. 사용자가 선택한 언어 설정을 확인\\n3. 선택 결과를 이후 모든 Task에 반영",
+      "verificationCriteria": "사용자가 한국어/영어/혼용 중 하나를 명확히 선택하고 확정함",
+      "analysisResult": "AI 리소스 파일 준비 작업 계획. 목표: lib/ai/resources/ 폴더에 실제 내용이 채워진 AI 파이프라인 리소스 파일들을 사용자와 협력하여 단계별로 준비. 현재 lib/ai/resources/ 폴더가 존재하지 않으며 Task 003 완성이 최종 목표. 각 단계는 사용자가 파일을 준비해오면 Claude가 검토 후 수정 제안 또는 승인하여 프로젝트에 저장하는 방식으로 진행.",
+      "summary": "사용자가 혼용(한국어 문장 구조 + 영어 의학 용어) 방식으로 언어를 확정함. 이후 모든 리소스 파일은 이 기준에 따라 작성됨.",
+      "completedAt": "2026-04-14T11:16:44.801Z"
     },
     {
-      "id": "eb75c839-2124-4683-a072-937be1a2b3e5",
-      "name": "홈 페이지 로그인 리다이렉트 로직 추가",
-      "description": "app/page.tsx를 async Server Component으로 변환하고, 로그인된 사용자는 /dashboard로 자동 리다이렉트하는 로직을 추가한다. 미인증 사용자는 기존 랜딩 페이지 UI를 그대로 본다.",
-      "notes": "기존 JSX(Hero, ConnectSupabaseSteps, SignUpUserSteps 등)는 삭제하지 않고 유지. async 함수로 변환만 하고 나머지 구조는 보존. hasEnvVars 체크 로직도 유지.",
+      "id": "e85f8fd0-303d-4490-9ca1-c99ad5c424d6",
+      "name": "Step 1: cc-list.json 준비 및 검토",
+      "description": "응급실에서 자주 보는 C.C.(Chief Complaint) 목록을 JSON 파일로 준비합니다. 이 파일은 앱의 C.C. 자동완성 기능의 기반이 되며, 어떤 템플릿 파일을 만들지도 결정합니다. 사용자가 ChatGPT 또는 직접 작성한 파일을 가져오면, 형식과 내용을 검토하고 수정이 필요하면 제안합니다.",
+      "notes": "hasTemplate:true 항목이 Step 4(templates)의 작업 범위를 결정함. 병원마다 실제 사용하는 C.C. 표현이 다를 수 있으므로 사용자 확인 필수.",
       "status": "completed",
       "dependencies": [
         {
-          "taskId": "26795b6b-70c7-4d9c-af06-3f23aeb89186"
+          "taskId": "021ba057-2b60-4cd7-8bb0-985b68ba5e74"
         }
       ],
-      "createdAt": "2026-04-14T08:47:34.940Z",
-      "updatedAt": "2026-04-14T08:49:11.922Z",
+      "createdAt": "2026-04-14T11:15:21.365Z",
+      "updatedAt": "2026-04-14T14:19:20.115Z",
       "relatedFiles": [
-        {
-          "path": "app/page.tsx",
-          "type": "TO_MODIFY",
-          "description": "홈 페이지 — async 변환 + 로그인 리다이렉트 추가",
-          "lineStart": 1,
-          "lineEnd": 58
-        },
-        {
-          "path": "app/protected/page.tsx",
-          "type": "REFERENCE",
-          "description": "createClient + getClaims + redirect 패턴 참조",
-          "lineStart": 1,
-          "lineEnd": 20
-        },
-        {
-          "path": "lib/supabase/server.ts",
-          "type": "DEPENDENCY",
-          "description": "createClient 함수"
-        }
-      ],
-      "implementationGuide": "pseudocode:\n  import { redirect } from 'next/navigation'\n  import { createClient } from '@/lib/supabase/server'\n  // ... 기존 import 유지\n\n  export default async function Home() {\n    // 로그인 사용자 감지 (토큰 기반, DB 조회 없음)\n    const supabase = await createClient()\n    const { data } = await supabase.auth.getClaims()\n    if (data?.claims) {\n      redirect('/dashboard')\n    }\n    // 기존 랜딩 페이지 JSX 그대로 반환\n    return <기존 JSX 유지>\n  }\n\n참조 패턴: app/protected/page.tsx의 createClient() + getClaims() + redirect() 흐름",
-      "verificationCriteria": "로그인 상태로 http://localhost:3000 접속 시 /dashboard로 즉시 리다이렉트됨. 비로그인 상태에서는 기존 스타터 랜딩 페이지가 정상 표시됨.",
-      "analysisResult": "ER Scribe MVP Phase 1 — Next.js 15 App Router 기반 라우트 구조 전체 설정. 기존 Supabase 인증 스타터 킷 위에 (app) 라우트 그룹과 빈 껍데기 페이지들을 생성한다. 미들웨어(proxy.ts)는 수정하지 않으며, 기존 패턴(createClient + getClaims + redirect)을 그대로 따른다.",
-      "summary": "app/page.tsx를 async Server Component으로 변환하고 getClaims() 기반 로그인 감지 후 /dashboard redirect 로직 추가. 기존 랜딩 JSX 및 hasEnvVars 체크 완전 보존. lint 에러 없음. protected/page.tsx의 createClient+getClaims+redirect 패턴 일관 적용.",
-      "completedAt": "2026-04-14T08:49:11.919Z"
-    },
-    {
-      "id": "3ce5ac7b-106b-4030-a5a8-01d2ba379408",
-      "name": "AI 생성 API Route 골격 생성",
-      "description": "케이스 AI 차팅 생성 트리거 엔드포인트와 생성 상태 폴링 엔드포인트의 골격 파일을 생성한다. 실제 AI 파이프라인은 Task 011에서 구현하므로 여기서는 라우트 등록과 Vercel 설정값만 포함한다.\n\n생성할 파일:\n- app/api/cases/[id]/generate/route.ts — POST 핸들러 (nodejs runtime, maxDuration 60)\n- app/api/cases/[id]/status/route.ts — GET 핸들러 (경량 폴링용)",
-      "notes": "Next.js 15에서 API Route params도 async Promise 타입. maxDuration = 60은 Vercel Pro 플랜에서만 유효하지만 코드에 미리 선언해도 로컬 개발에 무해함.",
-      "status": "completed",
-      "dependencies": [
-        {
-          "taskId": "26795b6b-70c7-4d9c-af06-3f23aeb89186"
-        }
-      ],
-      "createdAt": "2026-04-14T08:47:34.940Z",
-      "updatedAt": "2026-04-14T08:51:52.171Z",
-      "relatedFiles": [
-        {
-          "path": "app/api/cases/[id]/generate/route.ts",
-          "type": "CREATE",
-          "description": "AI 차팅 생성 POST 엔드포인트 골격"
-        },
-        {
-          "path": "app/api/cases/[id]/status/route.ts",
-          "type": "CREATE",
-          "description": "생성 상태 폴링 GET 엔드포인트 골격"
-        }
-      ],
-      "implementationGuide": "generate/route.ts pseudocode:\n  import { NextResponse } from 'next/server'\n\n  // Vercel Serverless 함수 설정 — Gemini 3회 호출 대비 60초 한도\n  export const runtime = 'nodejs'\n  export const maxDuration = 60\n\n  export async function POST(\n    _req: Request,\n    { params }: { params: Promise<{ id: string }> }\n  ) {\n    const { id } = await params\n    // TODO: Task 011 — AI 파이프라인 구현 (normalize -> HPI -> template)\n    return NextResponse.json({ caseId: id, status: 'todo' }, { status: 200 })\n  }\n\nstatus/route.ts pseudocode:\n  import { NextResponse } from 'next/server'\n\n  export async function GET(\n    _req: Request,\n    { params }: { params: Promise<{ id: string }> }\n  ) {\n    const { id } = await params\n    // TODO: Task 011 — Supabase에서 cases.status 조회 후 반환\n    return NextResponse.json({ caseId: id, status: 'todo' }, { status: 200 })\n  }",
-      "verificationCriteria": "npm run build 시 두 API Route가 에러 없이 빌드됨. curl 또는 브라우저로 GET /api/cases/test-id/status 요청 시 200 응답과 JSON 반환 확인.",
-      "analysisResult": "ER Scribe MVP Phase 1 — Next.js 15 App Router 기반 라우트 구조 전체 설정. 기존 Supabase 인증 스타터 킷 위에 (app) 라우트 그룹과 빈 껍데기 페이지들을 생성한다. 미들웨어(proxy.ts)는 수정하지 않으며, 기존 패턴(createClient + getClaims + redirect)을 그대로 따른다.",
-      "summary": "API Route 2개(generate POST, status GET) 골격 생성 완료. cacheComponents와 충돌하는 runtime export를 주석 처리하고 Task 011 주석으로 명시. 홈 페이지도 AuthRedirect를 Suspense로 분리해 cacheComponents 호환 처리. npm run build 에러 없이 통과. 전체 빌드 결과 21개 라우트 모두 정상.",
-      "completedAt": "2026-04-14T08:51:52.164Z"
-    },
-    {
-      "id": "066d3894-ed5b-4b78-bc7f-ab53f9c41202",
-      "name": "Supabase Database 타입 정의 확장 (cases, case_inputs, case_results, interview_guidelines)",
-      "description": "lib/supabase/types.ts의 Database 타입에 신규 테이블 4개와 enum 3개를 추가하고, profiles 테이블에 input_layout 컬럼을 추가한다. 기존 profiles 패턴(Row/Insert/Update + 편의 타입)을 그대로 따른다.\n\n추가할 Enum:\n- case_status: draft | generating | completed | failed\n- bed_zone: A | B | R\n- input_layout: single | split_vertical | split_horizontal\n\nprofiles 테이블 확장:\n- Row에 input_layout: string | null 추가\n- Insert/Update에 input_layout?: string | null 추가\n\n신규 테이블 (각각 Row/Insert/Update/Relationships):\n1. cases: id, user_id, bed_zone, bed_number, cc, cc_has_template, template_key, status, current_result_id, created_at, updated_at\n2. case_inputs: id, case_id, raw_text, time_tag, time_offset_minutes, display_order, created_at\n3. case_results: id, case_id, structured_json(Json타입 재사용), hpi_draft, hpi_edited, template_draft, template_edited, template_key_used, model_version, error_message, generated_at\n4. interview_guidelines: id, user_id(nullable), cc, content, created_at, updated_at\n\nConstants 업데이트:\n- Constants.public.Enums에 case_status, bed_zone, input_layout 값 추가\n\n파일 하단 편의 타입 export 추가:\n- Case, CaseInsert, CaseUpdate\n- CaseInput, CaseInputInsert\n- CaseResult, CaseResultInsert, CaseResultUpdate\n- Guideline, GuidelineInsert, GuidelineUpdate\n- CaseStatus, BedZone, InputLayout (enum 편의 타입)",
-      "notes": "cases.current_result_id → case_results.id 는 순환 참조. Relationships 배열에는 명시하되, SQL DDL에서는 ALTER TABLE로 나중에 FK 추가하는 방식으로 처리. profiles.updated_at은 기존 타입에 이미 있음을 확인 후 중복 추가 금지.",
-      "status": "completed",
-      "dependencies": [],
-      "createdAt": "2026-04-14T10:37:26.983Z",
-      "updatedAt": "2026-04-14T10:40:31.497Z",
-      "relatedFiles": [
-        {
-          "path": "lib/supabase/types.ts",
-          "type": "TO_MODIFY",
-          "description": "Database 타입 확장 대상 파일. 현재 profiles만 정의됨. Row 177~187줄에 편의 타입 패턴 있음.",
-          "lineStart": 1,
-          "lineEnd": 187
-        }
-      ],
-      "implementationGuide": "// 수정 위치: lib/supabase/types.ts\n\n// 1. Enums 섹션 (현재 [_ in never]: never 교체)\nEnums: {\n  case_status: 'draft' | 'generating' | 'completed' | 'failed'\n  bed_zone: 'A' | 'B' | 'R'\n  input_layout: 'single' | 'split_vertical' | 'split_horizontal'\n}\n\n// 2. profiles Row에 input_layout 컬럼 추가\ninput_layout: string | null\n\n// 3. Tables에 cases 추가 (순환 FK 주의: current_result_id는 nullable)\n// Relationships에 foreignKeyName, columns, referencedRelation, referencedColumns 명시\n\n// 4. Tables에 case_inputs 추가\n// raw_text는 NOT NULL (원본 보존 원칙)\n\n// 5. Tables에 case_results 추가\n// structured_json 타입은 파일 상단의 Json 타입 재사용\n\n// 6. Tables에 interview_guidelines 추가\n// user_id는 nullable (null = 시스템 기본)\n\n// 7. Constants 업데이트\nConstants = {\n  public: {\n    Enums: {\n      case_status: { draft: 'draft', generating: 'generating', completed: 'completed', failed: 'failed' },\n      bed_zone: { A: 'A', B: 'B', R: 'R' },\n      input_layout: { single: 'single', split_vertical: 'split_vertical', split_horizontal: 'split_horizontal' }\n    }\n  }\n}\n\n// 8. 파일 하단 편의 타입 export\nexport type Case = Database['public']['Tables']['cases']['Row']\nexport type CaseStatus = Database['public']['Enums']['case_status']\nexport type BedZone = Database['public']['Enums']['bed_zone']\nexport type InputLayout = Database['public']['Enums']['input_layout']\n// ... 나머지 동일 패턴",
-      "verificationCriteria": "1. npx tsc --noEmit 실행 시 타입 오류 없음\n2. Tables<'cases'>, Tables<'case_inputs'>, Tables<'case_results'>, Tables<'interview_guidelines'> 타입이 올바르게 추론됨\n3. Enums<'case_status'>, Enums<'bed_zone'>, Enums<'input_layout'> 타입이 올바르게 추론됨\n4. Case, CaseInput, CaseResult, Guideline, BedZone, CaseStatus, InputLayout 편의 타입이 export됨\n5. 기존 Profile, ProfileInsert, ProfileUpdate export가 유지됨",
-      "analysisResult": "Task 002 목표: ER Scribe 앱 전반에서 사용할 TypeScript 타입과 데이터베이스 스키마 뼈대를 설계한다. 실제 DB 마이그레이션은 Task 009에서 수행하며, 이 Task에서는 타입 정의(lib/supabase/types.ts 확장, lib/cases/bed-config.ts, lib/ai/types.ts)와 SQL DDL 초안(docs/schema.sql) 작성에 집중한다. 기존 profiles 테이블 패턴(Row/Insert/Update 3종 세트 + 편의 타입 export)을 재사용하여 일관성을 유지한다.",
-      "summary": "lib/supabase/types.ts에 신규 테이블 4개(cases, case_inputs, case_results, interview_guidelines)와 enum 3개(case_status, bed_zone, input_layout)를 추가했다. profiles 테이블에 input_layout 컬럼을 추가(Row/Insert/Update 모두). 기존 profiles 패턴(Row/Insert/Update + Relationships)을 그대로 따랐으며, cases.current_result_id 순환 FK는 Relationships에만 명시하고 DDL에서 ALTER TABLE로 후처리하도록 설계했다. Constants.public.Enums를 배열 방식으로 업데이트했으며, 파일 하단에 Case, CaseInput, CaseResult, Guideline, CaseStatus, BedZone, InputLayout 등 모든 편의 타입을 export했다. npx tsc --noEmit 타입 오류 없음 확인 완료.",
-      "completedAt": "2026-04-14T10:40:31.495Z"
-    },
-    {
-      "id": "45dd870c-c16f-468b-bc0a-bc9dcd817d3c",
-      "name": "베드번호 구성 상수 및 AI 타입 Placeholder 파일 생성",
-      "description": "lib/cases/bed-config.ts와 lib/ai/types.ts 두 개의 신규 파일을 생성한다.\n\nlib/cases/bed-config.ts:\n- BED_NUMBERS_BY_ZONE: 구역별 유효 베드번호 배열 상수 (A:1~8, B:1~11, R:1~4)\n- DEFAULT_BED_ZONE: 기본 구역 'A'\n- DEFAULT_BED_NUMBER: 기본 번호 1\n- BedZone 타입은 lib/supabase/types.ts에서 import\n\nlib/ai/types.ts:\n- StructuredCase placeholder 인터페이스\n- TODO(schema-v2) 주석으로 Task 010에서 확정 예정임을 명시",
-      "notes": "bed-config.ts는 이전 subtask(타입 정의 확장)에서 BedZone이 export된 이후에 작성해야 한다. lib/cases/ 및 lib/ai/ 폴더가 없으므로 파일 생성 시 폴더도 함께 생성된다.",
-      "status": "completed",
-      "dependencies": [
-        {
-          "taskId": "066d3894-ed5b-4b78-bc7f-ab53f9c41202"
-        }
-      ],
-      "createdAt": "2026-04-14T10:37:26.983Z",
-      "updatedAt": "2026-04-14T10:41:36.897Z",
-      "relatedFiles": [
-        {
-          "path": "lib/cases/bed-config.ts",
-          "type": "CREATE",
-          "description": "베드번호 구역별 유효 범위 상수 파일. lib/cases/ 폴더 신규 생성."
-        },
-        {
-          "path": "lib/ai/types.ts",
-          "type": "CREATE",
-          "description": "AI 파이프라인 타입 placeholder 파일. lib/ai/ 폴더 신규 생성."
-        },
-        {
-          "path": "lib/supabase/types.ts",
-          "type": "DEPENDENCY",
-          "description": "BedZone 타입 import 출처"
-        }
-      ],
-      "implementationGuide": "// lib/cases/bed-config.ts\nimport type { BedZone } from '@/lib/supabase/types'\n\nexport const BED_NUMBERS_BY_ZONE = {\n  A: [1,2,3,4,5,6,7,8],\n  B: [1,2,3,4,5,6,7,8,9,10,11],\n  R: [1,2,3,4],\n} as const satisfies Record<BedZone, readonly number[]>\n\nexport const DEFAULT_BED_ZONE: BedZone = 'A'\nexport const DEFAULT_BED_NUMBER = 1\n\n// lib/ai/types.ts\n// TODO(schema-v2): Task 010 AI 파이프라인 구현 시 Gemini Structured Output 스키마 확정 후 이 파일 전면 교체\nexport interface StructuredCase {\n  cc: string | null\n  inputs: Array<{\n    raw_text: string\n    time_tag: string | null\n    time_offset_minutes: number | null\n    normalized_text: string\n  }>\n  // TODO(schema-v2): 추가 필드는 Task 010 확정 후 반영\n}",
-      "verificationCriteria": "1. npx tsc --noEmit 실행 시 타입 오류 없음\n2. BED_NUMBERS_BY_ZONE.A가 readonly [1,2,3,4,5,6,7,8] 타입으로 추론됨\n3. BED_NUMBERS_BY_ZONE에 존재하지 않는 구역(예: 'C') 접근 시 TypeScript 오류 발생\n4. StructuredCase 인터페이스가 export되고 TODO(schema-v2) 주석 포함",
-      "analysisResult": "Task 002 목표: ER Scribe 앱 전반에서 사용할 TypeScript 타입과 데이터베이스 스키마 뼈대를 설계한다. 실제 DB 마이그레이션은 Task 009에서 수행하며, 이 Task에서는 타입 정의(lib/supabase/types.ts 확장, lib/cases/bed-config.ts, lib/ai/types.ts)와 SQL DDL 초안(docs/schema.sql) 작성에 집중한다. 기존 profiles 테이블 패턴(Row/Insert/Update 3종 세트 + 편의 타입 export)을 재사용하여 일관성을 유지한다.",
-      "summary": "lib/cases/bed-config.ts와 lib/ai/types.ts 두 파일을 신규 생성했다. bed-config.ts는 BedZone 타입을 lib/supabase/types.ts에서 import하고, BED_NUMBERS_BY_ZONE을 as const satisfies Record&lt;BedZone, readonly number[]&gt;로 선언해 존재하지 않는 구역 접근 시 TypeScript 오류가 발생하도록 타입 안전성을 확보했다. DEFAULT_BED_ZONE과 DEFAULT_BED_NUMBER 상수도 포함. ai/types.ts는 StructuredCase placeholder 인터페이스와 TODO(schema-v2) 주석을 포함해 Task 010에서 교체 예정임을 명시했다. npx tsc --noEmit 타입 오류 없음 확인 완료.",
-      "completedAt": "2026-04-14T10:41:36.895Z"
-    },
-    {
-      "id": "77083609-e483-4a67-b1b7-1c93090a08bc",
-      "name": "Supabase SQL DDL 초안 작성 (docs/schema.sql)",
-      "description": "Phase 3 Task 009에서 실제 실행할 Supabase SQL DDL 초안을 docs/schema.sql에 작성한다. 실제 DB에 적용하지 않고 문서로만 보관한다.\n\n포함 내용:\n1. Enum 타입 생성 (case_status, bed_zone, input_layout)\n2. profiles 테이블 input_layout 컬럼 추가 (ALTER TABLE)\n3. cases 테이블 생성 (bed_zone/bed_number CHECK 제약 포함, current_result_id는 nullable FK 없이 먼저 생성)\n4. case_inputs 테이블 생성\n5. case_results 테이블 생성\n6. interview_guidelines 테이블 생성\n7. cases.current_result_id FK 추가 (ALTER TABLE — 순환 참조 해결)\n8. updated_at 자동 갱신 트리거 함수 및 적용 (cases, case_results, interview_guidelines, profiles)\n9. RLS 활성화 (정책 작성은 Task 009에서 수행)\n\nCHECK 제약:\n(bed_zone='A' AND bed_number BETWEEN 1 AND 8) OR (bed_zone='B' AND bed_number BETWEEN 1 AND 11) OR (bed_zone='R' AND bed_number BETWEEN 1 AND 4)",
-      "notes": "이 파일은 실제 실행용이 아닌 참조/계획 문서다. Task 009에서 Supabase MCP(apply_migration 또는 execute_sql)로 실제 적용한다. Supabase 기본 uuid extension은 이미 활성화되어 있으므로 gen_random_uuid() 사용 가능.",
-      "status": "completed",
-      "dependencies": [
-        {
-          "taskId": "066d3894-ed5b-4b78-bc7f-ab53f9c41202"
-        }
-      ],
-      "createdAt": "2026-04-14T10:37:26.983Z",
-      "updatedAt": "2026-04-14T10:42:59.137Z",
-      "relatedFiles": [
-        {
-          "path": "docs/schema.sql",
-          "type": "CREATE",
-          "description": "Phase 3 Task 009에서 실행할 SQL DDL 초안. 실제 DB 적용 전 참조 문서."
-        },
-        {
-          "path": "docs/PRD.md",
-          "type": "REFERENCE",
-          "description": "데이터 모델 상세 명세 (테이블 컬럼, CHECK 제약 기준)"
-        }
-      ],
-      "implementationGuide": "-- 1. Enum 타입\nCREATE TYPE public.case_status AS ENUM ('draft','generating','completed','failed');\nCREATE TYPE public.bed_zone AS ENUM ('A','B','R');\nCREATE TYPE public.input_layout AS ENUM ('single','split_vertical','split_horizontal');\n\n-- 2. profiles 확장\nALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS input_layout public.input_layout NOT NULL DEFAULT 'single';\n\n-- 3. cases 테이블 (current_result_id FK 없이 먼저)\nCREATE TABLE public.cases (\n  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),\n  user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,\n  bed_zone public.bed_zone NOT NULL DEFAULT 'A',\n  bed_number integer NOT NULL DEFAULT 1,\n  cc text,\n  cc_has_template boolean NOT NULL DEFAULT false,\n  template_key text,\n  status public.case_status NOT NULL DEFAULT 'draft',\n  current_result_id uuid,\n  created_at timestamptz NOT NULL DEFAULT now(),\n  updated_at timestamptz NOT NULL DEFAULT now(),\n  CONSTRAINT valid_bed_number CHECK (\n    (bed_zone='A' AND bed_number BETWEEN 1 AND 8) OR\n    (bed_zone='B' AND bed_number BETWEEN 1 AND 11) OR\n    (bed_zone='R' AND bed_number BETWEEN 1 AND 4)\n  )\n);\n\n-- 4~6. case_inputs, case_results, interview_guidelines 순서대로 생성\n\n-- 7. 순환 FK 후처리\nALTER TABLE public.cases\n  ADD CONSTRAINT cases_current_result_id_fkey\n  FOREIGN KEY (current_result_id) REFERENCES public.case_results(id) ON DELETE SET NULL;\n\n-- 8. updated_at 트리거\nCREATE OR REPLACE FUNCTION public.handle_updated_at()\nRETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now(); RETURN NEW; END; $$ LANGUAGE plpgsql;\n-- 각 테이블마다 TRIGGER 적용\n\n-- 9. RLS 활성화 (정책은 Task 009에서)\nALTER TABLE public.cases ENABLE ROW LEVEL SECURITY;\n-- 나머지 테이블도 동일",
-      "verificationCriteria": "1. docs/schema.sql 파일이 생성됨\n2. Enum 3개(case_status, bed_zone, input_layout) CREATE TYPE 포함\n3. cases 테이블에 valid_bed_number CHECK 제약 포함\n4. current_result_id FK가 ALTER TABLE로 후처리됨 (순환 참조 해결)\n5. updated_at 트리거 함수 및 적용 구문 포함\n6. 모든 테이블에 ENABLE ROW LEVEL SECURITY 포함\n7. SQL 문법 오류 없음 (PostgreSQL 기준)",
-      "analysisResult": "Task 002 목표: ER Scribe 앱 전반에서 사용할 TypeScript 타입과 데이터베이스 스키마 뼈대를 설계한다. 실제 DB 마이그레이션은 Task 009에서 수행하며, 이 Task에서는 타입 정의(lib/supabase/types.ts 확장, lib/cases/bed-config.ts, lib/ai/types.ts)와 SQL DDL 초안(docs/schema.sql) 작성에 집중한다. 기존 profiles 테이블 패턴(Row/Insert/Update 3종 세트 + 편의 타입 export)을 재사용하여 일관성을 유지한다.",
-      "summary": "docs/schema.sql을 생성했다. Enum 3개(case_status, bed_zone, input_layout) CREATE TYPE, profiles ALTER TABLE, cases/case_inputs/case_results/interview_guidelines CREATE TABLE, cases.current_result_id 순환 FK ALTER TABLE 후처리, handle_updated_at 트리거 함수 및 3개 테이블 적용, 4개 테이블 ENABLE ROW LEVEL SECURITY, 4개 인덱스를 포함한다. valid_bed_number CHECK 제약(A:1~8, B:1~11, R:1~4)과 case_inputs.raw_text NOT NULL(원본 텍스트 보존 원칙)도 명시됐다. 실제 DB 적용은 Task 009에서 Supabase MCP로 수행한다.",
-      "completedAt": "2026-04-14T10:42:59.135Z"
-    },
-    {
-      "id": "2c7413dc-3986-49c3-b95d-3a1d70d84cc1",
-      "name": "AI 리소스 폴더 뼈대 및 Placeholder 파일 생성",
-      "description": "lib/ai/resources/ 폴더와 하위 폴더(templates/, examples/, guides/)를 생성하고, AI 파이프라인에서 사용할 리소스 파일들을 placeholder로 작성한다.\n\n생성할 파일 목록:\n1. lib/ai/resources/style_guide.md — HPI 차팅 스타일 가이드 placeholder (어투, 길이, 필수 요소 섹션 구조)\n2. lib/ai/resources/structured_schema.json — normalize 단계 Gemini Structured Output JSON 스키마 초안 (lib/ai/types.ts의 StructuredCase와 일치, TODO(schema-v2) 포함)\n3. lib/ai/resources/cc-list.json — C.C 목록 배열 placeholder (chest-pain, dyspnea 2개, hasTemplate/templateKey 필드 포함)\n4. lib/ai/resources/templates/chest-pain.json — 흉통 상용구 템플릿 placeholder\n5. lib/ai/resources/templates/dyspnea.json — 호흡곤란 상용구 템플릿 placeholder\n6. lib/ai/resources/examples/chest-pain.jsonl — few-shot 예시 빈 파일\n7. lib/ai/resources/examples/dyspnea.jsonl — few-shot 예시 빈 파일\n8. lib/ai/resources/guides/chest-pain.md — 흉통 시스템 기본 문진 가이드라인 placeholder\n9. lib/ai/resources/guides/dyspnea.md — 호흡곤란 시스템 기본 문진 가이드라인 placeholder\n10. lib/ai/load-resources.ts — 리소스 로딩 함수 스텁 (CC_TEMPLATE_MAP 명시적 맵 + loadTemplate/loadExamples/loadGuide 함수 시그니처)",
-      "notes": "examples/*.jsonl 파일은 완전히 빈 파일(0 bytes)로 생성. JSON Lines 포맷은 주석이 없으므로 힌트 라인 불가. style_guide.md와 guides/*.md는 섹션 구조만 잡고 내용은 TODO로 남김. load-resources.ts의 throw Error는 의도적 — Task 010 구현 전 실수로 호출 시 명확한 오류 발생시키기 위함.",
-      "status": "pending",
-      "dependencies": [],
-      "createdAt": "2026-04-14T10:49:14.552Z",
-      "updatedAt": "2026-04-14T10:49:14.552Z",
-      "relatedFiles": [
-        {
-          "path": "lib/ai/types.ts",
-          "type": "REFERENCE",
-          "description": "StructuredCase 인터페이스 — structured_schema.json과 구조 일치 필요"
-        },
-        {
-          "path": "lib/ai/load-resources.ts",
-          "type": "CREATE",
-          "description": "리소스 로딩 함수 스텁"
-        },
-        {
-          "path": "lib/ai/resources/style_guide.md",
-          "type": "CREATE",
-          "description": "HPI 차팅 스타일 가이드 placeholder"
-        },
-        {
-          "path": "lib/ai/resources/structured_schema.json",
-          "type": "CREATE",
-          "description": "normalize 단계 JSON 스키마 초안"
-        },
         {
           "path": "lib/ai/resources/cc-list.json",
           "type": "CREATE",
-          "description": "C.C 목록 + 상용구 존재 여부"
+          "description": "C.C. 자동완성 목록 파일 (최종 저장 위치)"
         },
         {
-          "path": "lib/ai/resources/templates/chest-pain.json",
-          "type": "CREATE",
-          "description": "흉통 상용구 템플릿 placeholder"
-        },
-        {
-          "path": "lib/ai/resources/templates/dyspnea.json",
-          "type": "CREATE",
-          "description": "호흡곤란 상용구 템플릿 placeholder"
-        },
-        {
-          "path": "lib/ai/resources/examples/chest-pain.jsonl",
-          "type": "CREATE",
-          "description": "흉통 few-shot 예시 빈 파일"
-        },
-        {
-          "path": "lib/ai/resources/examples/dyspnea.jsonl",
-          "type": "CREATE",
-          "description": "호흡곤란 few-shot 예시 빈 파일"
-        },
-        {
-          "path": "lib/ai/resources/guides/chest-pain.md",
-          "type": "CREATE",
-          "description": "흉통 시스템 기본 문진 가이드라인 placeholder"
-        },
-        {
-          "path": "lib/ai/resources/guides/dyspnea.md",
-          "type": "CREATE",
-          "description": "호흡곤란 시스템 기본 문진 가이드라인 placeholder"
+          "path": "docs/guide/ai-resource-preparation.md",
+          "type": "REFERENCE",
+          "description": "cc-list.json 형식 및 조건 가이드",
+          "lineStart": 44,
+          "lineEnd": 92
         }
       ],
-      "implementationGuide": "// lib/ai/resources/style_guide.md\n# HPI 차팅 스타일 가이드\n// TODO: Task 010 착수 전 실제 내용 채울 것\n## 어투 및 시제 / ## 문장 길이 / ## 필수 포함 요소 / ## 금지 표현\n\n// lib/ai/resources/structured_schema.json\n{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"title\": \"StructuredCase\",\n  \"description\": \"TODO(schema-v2): Task 010에서 Gemini Structured Output 스키마 확정 후 교체\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"cc\": { \"type\": [\"string\", \"null\"] },\n    \"inputs\": { \"type\": \"array\", \"items\": { ... } }\n  }\n}\n\n// lib/ai/resources/cc-list.json\n[\n  { \"cc\": \"chest pain\", \"hasTemplate\": true, \"templateKey\": \"chest-pain\" },\n  { \"cc\": \"dyspnea\", \"hasTemplate\": true, \"templateKey\": \"dyspnea\" }\n]\n// TODO: 실제 C.C 목록으로 교체 필요\n\n// lib/ai/resources/templates/chest-pain.json\n{\n  \"templateKey\": \"chest-pain\",\n  \"fields\": {\n    \"onset\": \"TODO: 발생 시점\",\n    \"character\": \"TODO: 양상\",\n    \"radiation\": \"TODO: 방사통\",\n    \"associated\": \"TODO: 동반증상\",\n    \"timing\": \"TODO: 시간 경과\",\n    \"exacerbating\": \"TODO: 악화 요인\",\n    \"relieving\": \"TODO: 완화 요인\",\n    \"severity\": \"TODO: 강도 (NRS)\"\n  }\n}\n\n// lib/ai/resources/examples/chest-pain.jsonl — 빈 파일\n\n// lib/ai/resources/guides/chest-pain.md\n# 흉통(Chest Pain) 문진 가이드라인\n// TODO: Task 010 착수 전 실제 내용 채울 것\n## 핵심 문진 항목 / ## 감별 진단 포인트 / ## 주의사항\n\n// lib/ai/load-resources.ts\nimport type { StructuredCase } from '@/lib/ai/types'\n\n// C.C → 리소스 파일 명시적 맵 (정적 번들링 및 Tree-shaking 대응)\nconst CC_TEMPLATE_MAP: Record<string, string> = {\n  'chest-pain': 'chest-pain',\n  'dyspnea': 'dyspnea',\n  // TODO: Task 010에서 실제 C.C 목록 추가\n}\n\n// TODO: Task 010 구현 시 실제 로직 작성\nexport async function loadTemplate(cc: string): Promise<unknown | null> {\n  // TODO: CC_TEMPLATE_MAP에서 templateKey 조회 후 templates/{key}.json 읽기\n  throw new Error('TODO: Task 010에서 구현 예정')\n}\n\nexport async function loadExamples(cc: string): Promise<string> {\n  // TODO: CC_TEMPLATE_MAP에서 key 조회 후 examples/{key}.jsonl 읽기\n  throw new Error('TODO: Task 010에서 구현 예정')\n}\n\nexport async function loadGuide(cc: string): Promise<string | null> {\n  // TODO: CC_TEMPLATE_MAP에서 key 조회 후 guides/{key}.md 읽기\n  // 커스텀 가이드라인(DB)이 없을 때 이 함수로 시스템 기본 반환\n  throw new Error('TODO: Task 010에서 구현 예정')\n}",
-      "verificationCriteria": "1. lib/ai/resources/ 폴더와 templates/, examples/, guides/ 하위 폴더 생성 확인\n2. 파일 10개 모두 존재 확인\n3. npx tsc --noEmit 타입 오류 없음\n4. load-resources.ts에서 StructuredCase import 정상 동작\n5. cc-list.json이 유효한 JSON 형식\n6. structured_schema.json이 유효한 JSON Schema 형식\n7. examples/*.jsonl 파일이 빈 파일임 확인",
-      "analysisResult": "Task 003 목표: AI 파이프라인(Task 010)에서 사용할 리소스 폴더 뼈대와 placeholder 파일들을 생성한다. 실제 내용(상용구, 예시, 스타일 가이드)은 Phase 3 Task 010 전에 사용자가 준비해야 한다. 모든 파일은 placeholder로 작성하며, load-resources.ts는 함수 시그니처만 포함한 스텁으로 작성한다."
+      "implementationGuide": "1. 사용자에게 cc-list.json 준비 요청\\n   - 응급실 C.C. 20~30개\\n   - 형식: [{cc, ccEnglish, hasTemplate, templateKey}]\\n2. 파일 수신 후 검토:\\n   - templateKey가 영어 kebab-case인지 확인\\n   - hasTemplate:true 항목 목록 추출 (Step 4 준비)\\n   - cc 필드가 실제 타이핑 단어인지 (흉통 vs 가슴통증)\\n3. 수정 필요 시 구체적 제안 후 재확인\\n4. 승인 후 lib/ai/resources/cc-list.json 에 저장",
+      "verificationCriteria": "cc 한국어/ccEnglish 영어/hasTemplate boolean/templateKey kebab-case 형식 준수. hasTemplate:true 항목에 대응하는 templateKey 목록이 확정됨",
+      "analysisResult": "AI 리소스 파일 준비 작업 계획. 목표: lib/ai/resources/ 폴더에 실제 내용이 채워진 AI 파이프라인 리소스 파일들을 사용자와 협력하여 단계별로 준비. 현재 lib/ai/resources/ 폴더가 존재하지 않으며 Task 003 완성이 최종 목표. 각 단계는 사용자가 파일을 준비해오면 Claude가 검토 후 수정 제안 또는 승인하여 프로젝트에 저장하는 방식으로 진행.",
+      "summary": "MVP 5개 C.C.(Chest Pain, Dyspnea, Hemoptysis, Abdominal Pain, GI Bleeding) 목록 확정. 모두 hasTemplate:true. cc는 Title Case 통일, templateKey는 kebab-case. lib/ai/resources/cc-list.json 저장 완료.",
+      "completedAt": "2026-04-14T14:19:20.112Z"
+    },
+    {
+      "id": "23ba7dcf-e25c-4324-9ab3-1ce6bc6e02a4",
+      "name": "Step 2: structured_schema.json 준비 및 검토",
+      "description": "AI Stage 1(normalize)에서 출력해야 하는 JSON 구조를 JSON Schema draft-07 형식으로 정의합니다. 이 스키마가 Stage 2(HPI 생성)와 Stage 3(상용구 채움)의 입력이 되므로 가장 중요한 파일입니다. 스키마를 잘못 설계하면 나중에 모든 프롬프트와 파일을 다시 만들어야 합니다.",
+      "notes": "가장 중요한 파일. 스키마 확정 전에 신중하게 검토 필요. 필드가 너무 적으면 HPI 품질 저하, 너무 많으면 AI 혼란. lib/ai/types.ts line 1에 TODO(schema-v2) 주석 있음.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "e85f8fd0-303d-4490-9ca1-c99ad5c424d6"
+        }
+      ],
+      "createdAt": "2026-04-14T11:15:21.365Z",
+      "updatedAt": "2026-04-14T11:15:21.365Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/resources/structured_schema.json",
+          "type": "CREATE",
+          "description": "AI 정규화 출력 스키마 (최종 저장 위치)"
+        },
+        {
+          "path": "lib/ai/types.ts",
+          "type": "TO_MODIFY",
+          "description": "StructuredCase 인터페이스 - 스키마 확정 후 TODO(schema-v2) 해소",
+          "lineStart": 1,
+          "lineEnd": 13
+        },
+        {
+          "path": "docs/guide/ai-resource-preparation.md",
+          "type": "REFERENCE",
+          "description": "structured_schema.json 형식 및 중요성 가이드",
+          "lineStart": 94,
+          "lineEnd": 213
+        }
+      ],
+      "implementationGuide": "1. cc-list.json 확정 후 진행\\n2. 사용자에게 structured_schema.json 준비 요청\\n   - JSON Schema draft-07 형식\\n   - 최소 필수 필드: cc, onset, inputs\\n3. 파일 수신 후 검토:\\n   - required 배열에 핵심 필드 포함 여부\\n   - inputs 배열의 category enum 완결성 (onset/location/character/severity/associated/history/medication/other)\\n   - onset_minutes 같은 정렬용 필드 포함 여부\\n   - lib/ai/types.ts의 StructuredCase와 일치 여부\\n4. 수정 제안 후 승인 시:\\n   - lib/ai/resources/structured_schema.json 저장\\n   - lib/ai/types.ts의 StructuredCase 인터페이스 실제 스키마로 교체 (TODO(schema-v2) 해소)",
+      "verificationCriteria": "JSON Schema draft-07 형식 준수. required 필드 포함. inputs.category enum 완결성 확인. lib/ai/types.ts StructuredCase가 실제 스키마 반영",
+      "analysisResult": "AI 리소스 파일 준비 작업 계획. 목표: lib/ai/resources/ 폴더에 실제 내용이 채워진 AI 파이프라인 리소스 파일들을 사용자와 협력하여 단계별로 준비. 현재 lib/ai/resources/ 폴더가 존재하지 않으며 Task 003 완성이 최종 목표. 각 단계는 사용자가 파일을 준비해오면 Claude가 검토 후 수정 제안 또는 승인하여 프로젝트에 저장하는 방식으로 진행."
+    },
+    {
+      "id": "4dbf447a-8ba6-4d08-8ff6-d6f0636402cc",
+      "name": "Step 3: style_guide.md 준비 및 검토",
+      "description": "AI Stage 2에서 HPI 문단을 생성할 때 참조하는 작성 스타일 가이드를 Markdown 파일로 준비합니다. AI가 어떤 말투로, 얼마나 길게, 무엇을 반드시 포함해야 하는지를 이 파일에서 배웁니다. 실제 본인이 쓰는 차팅 예시 문장을 포함하면 AI 품질이 크게 향상됩니다.",
+      "notes": "사용자가 실제로 쓰는 차팅 예시 문장 2~3개를 추가하면 AI 품질이 크게 향상됨. 이 점을 사용자에게 적극 안내할 것.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "23ba7dcf-e25c-4324-9ab3-1ce6bc6e02a4"
+        }
+      ],
+      "createdAt": "2026-04-14T11:15:21.365Z",
+      "updatedAt": "2026-04-14T11:15:21.365Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/resources/style_guide.md",
+          "type": "CREATE",
+          "description": "HPI 생성 AI 스타일 가이드 (최종 저장 위치)"
+        },
+        {
+          "path": "docs/guide/ai-resource-preparation.md",
+          "type": "REFERENCE",
+          "description": "style_guide.md 형식 및 예시 가이드",
+          "lineStart": 215,
+          "lineEnd": 265
+        }
+      ],
+      "implementationGuide": "1. 사용자에게 style_guide.md 준비 요청\\n   - Markdown 형식\\n   - 포함 항목: 언어/시제/어투, 문장 길이, 필수 포함 요소, 금지 사항, 예시 출력\\n2. 파일 수신 후 검토:\\n   - Step 0에서 결정한 언어 설정과 일치하는지\\n   - 예시 출력이 1개 이상 포함되는지\\n   - 금지 사항 명시 여부 (진단명 직접 언급 금지 등)\\n   - 문장 길이 가이드 포함 여부\\n3. 수정 필요 시 제안 후 승인\\n4. lib/ai/resources/style_guide.md 저장",
+      "verificationCriteria": "Step 0 언어 설정과 일치. 언어/시제/문장 길이/필수 포함 요소/금지 사항/예시 출력 섹션 모두 포함",
+      "analysisResult": "AI 리소스 파일 준비 작업 계획. 목표: lib/ai/resources/ 폴더에 실제 내용이 채워진 AI 파이프라인 리소스 파일들을 사용자와 협력하여 단계별로 준비. 현재 lib/ai/resources/ 폴더가 존재하지 않으며 Task 003 완성이 최종 목표. 각 단계는 사용자가 파일을 준비해오면 Claude가 검토 후 수정 제안 또는 승인하여 프로젝트에 저장하는 방식으로 진행."
+    },
+    {
+      "id": "e01f2165-cd0a-4522-97cb-df6e86fc521f",
+      "name": "Step 4: templates/{cc}.json 준비 및 검토",
+      "description": "AI Stage 3에서 구조화된 JSON을 받아 채워 넣어야 하는 상용구 틀을 C.C.별 JSON 파일로 준비합니다. Step 1에서 확정된 hasTemplate:true 항목들에 대응하는 파일이 각각 필요합니다. 현재 EMR에서 실제로 사용하는 상용구 형식을 기반으로 만들면 가장 정확합니다.",
+      "notes": "현재 EMR에서 실제로 쓰고 있는 상용구 1개를 복사해서 기준으로 삼으면 가장 정확. templateKey 오타 주의 (cc-list.json과 정확히 일치해야 함).",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "4dbf447a-8ba6-4d08-8ff6-d6f0636402cc"
+        }
+      ],
+      "createdAt": "2026-04-14T11:15:21.365Z",
+      "updatedAt": "2026-04-14T11:15:21.365Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/resources/templates",
+          "type": "CREATE",
+          "description": "상용구 템플릿 폴더 - {templateKey}.json 파일들"
+        },
+        {
+          "path": "lib/ai/resources/cc-list.json",
+          "type": "DEPENDENCY",
+          "description": "hasTemplate:true 항목 목록 참조"
+        },
+        {
+          "path": "docs/guide/ai-resource-preparation.md",
+          "type": "REFERENCE",
+          "description": "템플릿 형식 옵션 A/B 가이드",
+          "lineStart": 267,
+          "lineEnd": 313
+        }
+      ],
+      "implementationGuide": "1. Step 1의 hasTemplate:true 항목 목록 제시\\n2. 사용자에게 각 C.C.에 대한 template JSON 준비 요청\\n   - 옵션 A(필드 기반): {templateKey, label, fields: {onset, location, ...}}\\n   - 옵션 B(문장 블록): {templateKey, label, template: '...'}\\n   - 현재 EMR 상용구 형식 참고 권장\\n3. 파일 수신 후 검토:\\n   - templateKey가 cc-list.json의 templateKey와 정확히 일치\\n   - 필드명이 structured_schema.json 필드와 매핑 가능한지\\n   - 모든 hasTemplate:true 항목에 대응 파일 존재\\n4. lib/ai/resources/templates/{templateKey}.json 저장",
+      "verificationCriteria": "cc-list.json의 hasTemplate:true 항목 모두에 대응하는 templates/{templateKey}.json 존재. templateKey 일치 확인",
+      "analysisResult": "AI 리소스 파일 준비 작업 계획. 목표: lib/ai/resources/ 폴더에 실제 내용이 채워진 AI 파이프라인 리소스 파일들을 사용자와 협력하여 단계별로 준비. 현재 lib/ai/resources/ 폴더가 존재하지 않으며 Task 003 완성이 최종 목표. 각 단계는 사용자가 파일을 준비해오면 Claude가 검토 후 수정 제안 또는 승인하여 프로젝트에 저장하는 방식으로 진행."
+    },
+    {
+      "id": "01e3f004-2c89-4fe4-a427-879b4f2a7c98",
+      "name": "Step 5: guides/{cc}.md 준비 및 검토",
+      "description": "새 케이스 입력 화면에서 의사 옆에 표시되는 C.C.별 문진 체크리스트를 Markdown 파일로 준비합니다. AI가 사용하는 것이 아니라 의사가 문진 시 직접 참고하는 자료입니다. 주요 C.C. 5~10개부터 시작하면 충분합니다.",
+      "notes": "가이드라인 파일은 PRD에 따라 커스텀 DB와 분리됨. 시스템 기본은 이 파일로, 사용자 커스텀은 interview_guidelines 테이블로 관리. 5~10개면 충분하므로 과도한 작업 불필요.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "e01f2165-cd0a-4522-97cb-df6e86fc521f"
+        }
+      ],
+      "createdAt": "2026-04-14T11:15:21.365Z",
+      "updatedAt": "2026-04-14T11:15:21.365Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/resources/guides",
+          "type": "CREATE",
+          "description": "C.C.별 문진 가이드라인 폴더 - {cc}.md 파일들"
+        },
+        {
+          "path": "docs/guide/ai-resource-preparation.md",
+          "type": "REFERENCE",
+          "description": "guides/{cc}.md 형식 및 예시 가이드",
+          "lineStart": 315,
+          "lineEnd": 356
+        }
+      ],
+      "implementationGuide": "1. 사용자에게 주요 C.C. guides Markdown 파일 준비 요청\\n   - 우선순위: hasTemplate:true 항목 + 빈도 높은 C.C.\\n   - 5~10개 파일\\n   - 형식: 핵심 문진 항목(체크리스트) / 감별 진단 포인트 / 위험 신호\\n2. 파일 수신 후 검토:\\n   - 파일명 규칙 확인 (kebab-case 권장)\\n   - 핵심 문진 항목 체크리스트 포함 여부\\n   - 감별 진단 포인트 포함 여부\\n   - 위험 신호(Red Flags) 섹션 포함 여부\\n3. lib/ai/resources/guides/{cc}.md 저장",
+      "verificationCriteria": "5개 이상 C.C. 가이드라인 파일 존재. 각 파일에 핵심 문진 항목(체크리스트)/감별 진단 포인트/위험 신호 섹션 포함",
+      "analysisResult": "AI 리소스 파일 준비 작업 계획. 목표: lib/ai/resources/ 폴더에 실제 내용이 채워진 AI 파이프라인 리소스 파일들을 사용자와 협력하여 단계별로 준비. 현재 lib/ai/resources/ 폴더가 존재하지 않으며 Task 003 완성이 최종 목표. 각 단계는 사용자가 파일을 준비해오면 Claude가 검토 후 수정 제안 또는 승인하여 프로젝트에 저장하는 방식으로 진행."
+    },
+    {
+      "id": "1f9d9921-7739-4a1b-847a-d705a7826d29",
+      "name": "Step 6-prep: lib/ai/load-resources.ts 및 examples 폴더 생성",
+      "description": "모든 리소스 파일이 준비된 후, lib/ai/load-resources.ts 명시적 매핑 함수 스텁을 생성하고 examples/ 폴더와 빈 .jsonl 파일을 만들어 Task 003을 완성합니다. 이로써 AI 파이프라인 구현(Task 010)을 위한 폴더 구조와 파일 골격이 모두 준비됩니다.",
+      "notes": "load-resources.ts는 스텁(빈 함수 골격)만 작성. 실제 구현은 Task 010에서 진행. 명시적 맵 방식으로 런타임 동적 파일 로딩 최소화.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "01e3f004-2c89-4fe4-a427-879b4f2a7c98"
+        }
+      ],
+      "createdAt": "2026-04-14T11:15:21.366Z",
+      "updatedAt": "2026-04-14T11:15:21.366Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/load-resources.ts",
+          "type": "CREATE",
+          "description": "AI 리소스 파일 로딩 함수 스텁"
+        },
+        {
+          "path": "lib/ai/resources/examples",
+          "type": "CREATE",
+          "description": "Few-shot 예시 폴더 - 빈 .jsonl 파일"
+        },
+        {
+          "path": "docs/ROADMAP.md",
+          "type": "TO_MODIFY",
+          "description": "Task 003 완료 체크"
+        }
+      ],
+      "implementationGuide": "1. lib/ai/resources/examples/ 폴더 + 빈 chest-pain.jsonl 파일 생성\\n2. lib/ai/load-resources.ts 스텁 생성:\\n   - loadCcList(): cc-list.json 읽기\\n   - loadStructuredSchema(): structured_schema.json 읽기\\n   - loadStyleGuide(): style_guide.md 읽기\\n   - loadTemplate(templateKey): templates/{templateKey}.json 읽기\\n   - loadGuide(cc): guides/{cc}.md 읽기\\n   - loadExamples(templateKey): examples/{templateKey}.jsonl 읽기\\n3. ROADMAP.md에서 Task 003 완료 체크 (✅ 표시)",
+      "verificationCriteria": "lib/ai/resources/ 폴더 전체 구조 완성. load-resources.ts 스텁 함수 6개 존재. ROADMAP.md Task 003 완료 표시",
+      "analysisResult": "AI 리소스 파일 준비 작업 계획. 목표: lib/ai/resources/ 폴더에 실제 내용이 채워진 AI 파이프라인 리소스 파일들을 사용자와 협력하여 단계별로 준비. 현재 lib/ai/resources/ 폴더가 존재하지 않으며 Task 003 완성이 최종 목표. 각 단계는 사용자가 파일을 준비해오면 Claude가 검토 후 수정 제안 또는 승인하여 프로젝트에 저장하는 방식으로 진행."
+    },
+    {
+      "id": "0073b9f7-affa-411c-b402-c8a4aa80eea3",
+      "name": "Step 6: fixtures/ 케이스 샘플 준비 및 검토",
+      "description": "AI 품질 검증을 위한 테스트 케이스 샘플을 준비합니다. 실제 문진한 환자 사례를 익명화한 JSON 파일로, Task 010(AI 파이프라인 CLI 하네스) 착수 직전에 제공해야 합니다. 개인정보 완전 제거가 필수입니다.",
+      "notes": "개인정보 보호가 최우선. Task 010 착수 직전까지는 진행하지 않아도 됨. expectedHpi는 의사가 직접 작성한 이상적인 출력이어야 AI 품질 기준선이 됨.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "1f9d9921-7739-4a1b-847a-d705a7826d29"
+        }
+      ],
+      "createdAt": "2026-04-14T11:15:21.366Z",
+      "updatedAt": "2026-04-14T11:15:21.366Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/resources/fixtures",
+          "type": "CREATE",
+          "description": "AI 품질 검증용 테스트 케이스 폴더"
+        },
+        {
+          "path": "docs/guide/ai-resource-preparation.md",
+          "type": "REFERENCE",
+          "description": "fixtures 파일 형식 및 조건 가이드",
+          "lineStart": 358,
+          "lineEnd": 406
+        }
+      ],
+      "implementationGuide": "1. Task 010 착수 직전 시점에 진행\\n2. 사용자에게 익명화된 실제 ER 케이스 2~3개 JSON 요청\\n   - 형식: {case: {cc, bedZone, bedNumber}, inputs: [...], expectedHpi, expectedTemplate}\\n   - C.C. 다양하게: 흉통 1개, 호흡곤란 1개, 복통 1개 등\\n3. 파일 수신 후 검토:\\n   - 개인식별 정보 완전 제거 확인 (날짜/이름/나이/병록번호 등)\\n   - expectedHpi와 expectedTemplate이 의사가 직접 작성한 이상적 출력인지\\n   - inputs의 rawText가 실제 문진 키워드 형태인지\\n4. lib/ai/resources/fixtures/case-01.json 등으로 저장",
+      "verificationCriteria": "케이스 2개 이상 존재. 개인식별 정보 없음. expectedHpi/expectedTemplate 의사 직접 작성. 다양한 C.C. 커버",
+      "analysisResult": "AI 리소스 파일 준비 작업 계획. 목표: lib/ai/resources/ 폴더에 실제 내용이 채워진 AI 파이프라인 리소스 파일들을 사용자와 협력하여 단계별로 준비. 현재 lib/ai/resources/ 폴더가 존재하지 않으며 Task 003 완성이 최종 목표. 각 단계는 사용자가 파일을 준비해오면 Claude가 검토 후 수정 제안 또는 승인하여 프로젝트에 저장하는 방식으로 진행."
     }
   ]
 }

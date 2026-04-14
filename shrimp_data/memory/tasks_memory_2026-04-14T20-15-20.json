@@ -1,0 +1,223 @@
+{
+  "tasks": [
+    {
+      "id": "26795b6b-70c7-4d9c-af06-3f23aeb89186",
+      "name": "(app) 라우트 그룹 레이아웃 및 껍데기 페이지 생성",
+      "description": "Next.js 15 App Router의 (app) 라우트 그룹을 생성하고, 6개 주요 페이지의 빈 껍데기 파일을 만든다. 실제 UI는 Task 004~008에서 구현하므로 여기서는 라우트 경로만 확보한다.\n\n생성할 파일:\n- app/(app)/layout.tsx — 공통 레이아웃 (헤더 placeholder + children)\n- app/(app)/dashboard/page.tsx — 대시보드 (TODO 문구)\n- app/(app)/cases/page.tsx — 케이스 목록 (TODO 문구)\n- app/(app)/cases/new/page.tsx — 새 케이스 입력 (TODO 문구)\n- app/(app)/cases/[id]/page.tsx — 케이스 결과 (async params 타입 선언 포함)\n- app/(app)/guidelines/page.tsx — 가이드라인 관리 (TODO 문구)\n- app/(app)/settings/page.tsx — 설정 (TODO 문구)",
+      "notes": "app/protected/layout.tsx가 참조 패턴. (app) 그룹은 URL에 노출되지 않으므로 /dashboard, /cases 등으로 접근됨. 기존 미들웨어가 새 경로를 자동 보호하므로 추가 설정 불필요.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-14T08:47:34.940Z",
+      "updatedAt": "2026-04-14T08:48:44.513Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/layout.tsx",
+          "type": "CREATE",
+          "description": "ER 앱 전용 공통 레이아웃 (네비바 placeholder)"
+        },
+        {
+          "path": "app/(app)/dashboard/page.tsx",
+          "type": "CREATE",
+          "description": "대시보드 껍데기 페이지"
+        },
+        {
+          "path": "app/(app)/cases/page.tsx",
+          "type": "CREATE",
+          "description": "케이스 목록 껍데기 페이지"
+        },
+        {
+          "path": "app/(app)/cases/new/page.tsx",
+          "type": "CREATE",
+          "description": "새 케이스 입력 껍데기 페이지"
+        },
+        {
+          "path": "app/(app)/cases/[id]/page.tsx",
+          "type": "CREATE",
+          "description": "케이스 결과 껍데기 페이지 (async params)"
+        },
+        {
+          "path": "app/(app)/guidelines/page.tsx",
+          "type": "CREATE",
+          "description": "가이드라인 관리 껍데기 페이지"
+        },
+        {
+          "path": "app/(app)/settings/page.tsx",
+          "type": "CREATE",
+          "description": "설정 껍데기 페이지"
+        },
+        {
+          "path": "app/protected/layout.tsx",
+          "type": "REFERENCE",
+          "description": "레이아웃 구조 참조 패턴"
+        }
+      ],
+      "implementationGuide": "layout.tsx pseudocode:\n  export default function AppLayout({ children }: { children: React.ReactNode }) {\n    return (\n      <div className=\"min-h-screen flex flex-col\">\n        <header className=\"border-b h-14 flex items-center px-4\">\n          {/* TODO: Task 004 — AppNavbar 컴포넌트로 교체 */}\n          <span className=\"font-semibold text-sm\">ER Scribe</span>\n        </header>\n        <main className=\"flex-1 flex flex-col\">{children}</main>\n      </div>\n    )\n  }\n\n껍데기 페이지 공통 pseudocode (dashboard 예시):\n  // 대시보드 페이지 — TODO: Task 005에서 실제 UI 구현\n  export default function DashboardPage() {\n    return (\n      <div className=\"p-8\">\n        <h1 className=\"text-xl font-semibold\">대시보드</h1>\n        <p className=\"text-muted-foreground mt-2\">TODO: Task 005에서 구현 예정</p>\n      </div>\n    )\n  }\n\n[id] 동적 라우트 pseudocode:\n  // 케이스 결과 페이지 — TODO: Task 007에서 실제 UI 구현\n  export default async function CaseResultPage({\n    params,\n  }: {\n    params: Promise<{ id: string }>\n  }) {\n    const { id } = await params\n    return (\n      <div className=\"p-8\">\n        <h1 className=\"text-xl font-semibold\">케이스 결과: {id}</h1>\n        <p className=\"text-muted-foreground mt-2\">TODO: Task 007에서 구현 예정</p>\n      </div>\n    )\n  }",
+      "verificationCriteria": "npm run dev 후 로그인 상태에서 /dashboard, /cases, /cases/new, /guidelines, /settings 접속 시 각 TODO 페이지가 렌더됨. 비로그인 상태에서는 /auth/login으로 리다이렉트됨.",
+      "analysisResult": "ER Scribe MVP Phase 1 — Next.js 15 App Router 기반 라우트 구조 전체 설정. 기존 Supabase 인증 스타터 킷 위에 (app) 라우트 그룹과 빈 껍데기 페이지들을 생성한다. 미들웨어(proxy.ts)는 수정하지 않으며, 기존 패턴(createClient + getClaims + redirect)을 그대로 따른다.",
+      "summary": "app/(app)/layout.tsx + 6개 껍데기 페이지 모두 생성 완료. [id] 동적 라우트에 Next.js 15 async params 패턴 적용. npm run lint 에러 없음(기존 파일 warning만). 기존 미들웨어가 새 라우트를 자동 보호하며 protected/ 미수정. 각 페이지에 한국어 주석 + 담당 Task 번호 명시.",
+      "completedAt": "2026-04-14T08:48:44.510Z"
+    },
+    {
+      "id": "eb75c839-2124-4683-a072-937be1a2b3e5",
+      "name": "홈 페이지 로그인 리다이렉트 로직 추가",
+      "description": "app/page.tsx를 async Server Component으로 변환하고, 로그인된 사용자는 /dashboard로 자동 리다이렉트하는 로직을 추가한다. 미인증 사용자는 기존 랜딩 페이지 UI를 그대로 본다.",
+      "notes": "기존 JSX(Hero, ConnectSupabaseSteps, SignUpUserSteps 등)는 삭제하지 않고 유지. async 함수로 변환만 하고 나머지 구조는 보존. hasEnvVars 체크 로직도 유지.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "26795b6b-70c7-4d9c-af06-3f23aeb89186"
+        }
+      ],
+      "createdAt": "2026-04-14T08:47:34.940Z",
+      "updatedAt": "2026-04-14T08:49:11.922Z",
+      "relatedFiles": [
+        {
+          "path": "app/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "홈 페이지 — async 변환 + 로그인 리다이렉트 추가",
+          "lineStart": 1,
+          "lineEnd": 58
+        },
+        {
+          "path": "app/protected/page.tsx",
+          "type": "REFERENCE",
+          "description": "createClient + getClaims + redirect 패턴 참조",
+          "lineStart": 1,
+          "lineEnd": 20
+        },
+        {
+          "path": "lib/supabase/server.ts",
+          "type": "DEPENDENCY",
+          "description": "createClient 함수"
+        }
+      ],
+      "implementationGuide": "pseudocode:\n  import { redirect } from 'next/navigation'\n  import { createClient } from '@/lib/supabase/server'\n  // ... 기존 import 유지\n\n  export default async function Home() {\n    // 로그인 사용자 감지 (토큰 기반, DB 조회 없음)\n    const supabase = await createClient()\n    const { data } = await supabase.auth.getClaims()\n    if (data?.claims) {\n      redirect('/dashboard')\n    }\n    // 기존 랜딩 페이지 JSX 그대로 반환\n    return <기존 JSX 유지>\n  }\n\n참조 패턴: app/protected/page.tsx의 createClient() + getClaims() + redirect() 흐름",
+      "verificationCriteria": "로그인 상태로 http://localhost:3000 접속 시 /dashboard로 즉시 리다이렉트됨. 비로그인 상태에서는 기존 스타터 랜딩 페이지가 정상 표시됨.",
+      "analysisResult": "ER Scribe MVP Phase 1 — Next.js 15 App Router 기반 라우트 구조 전체 설정. 기존 Supabase 인증 스타터 킷 위에 (app) 라우트 그룹과 빈 껍데기 페이지들을 생성한다. 미들웨어(proxy.ts)는 수정하지 않으며, 기존 패턴(createClient + getClaims + redirect)을 그대로 따른다.",
+      "summary": "app/page.tsx를 async Server Component으로 변환하고 getClaims() 기반 로그인 감지 후 /dashboard redirect 로직 추가. 기존 랜딩 JSX 및 hasEnvVars 체크 완전 보존. lint 에러 없음. protected/page.tsx의 createClient+getClaims+redirect 패턴 일관 적용.",
+      "completedAt": "2026-04-14T08:49:11.919Z"
+    },
+    {
+      "id": "3ce5ac7b-106b-4030-a5a8-01d2ba379408",
+      "name": "AI 생성 API Route 골격 생성",
+      "description": "케이스 AI 차팅 생성 트리거 엔드포인트와 생성 상태 폴링 엔드포인트의 골격 파일을 생성한다. 실제 AI 파이프라인은 Task 011에서 구현하므로 여기서는 라우트 등록과 Vercel 설정값만 포함한다.\n\n생성할 파일:\n- app/api/cases/[id]/generate/route.ts — POST 핸들러 (nodejs runtime, maxDuration 60)\n- app/api/cases/[id]/status/route.ts — GET 핸들러 (경량 폴링용)",
+      "notes": "Next.js 15에서 API Route params도 async Promise 타입. maxDuration = 60은 Vercel Pro 플랜에서만 유효하지만 코드에 미리 선언해도 로컬 개발에 무해함.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "26795b6b-70c7-4d9c-af06-3f23aeb89186"
+        }
+      ],
+      "createdAt": "2026-04-14T08:47:34.940Z",
+      "updatedAt": "2026-04-14T08:51:52.171Z",
+      "relatedFiles": [
+        {
+          "path": "app/api/cases/[id]/generate/route.ts",
+          "type": "CREATE",
+          "description": "AI 차팅 생성 POST 엔드포인트 골격"
+        },
+        {
+          "path": "app/api/cases/[id]/status/route.ts",
+          "type": "CREATE",
+          "description": "생성 상태 폴링 GET 엔드포인트 골격"
+        }
+      ],
+      "implementationGuide": "generate/route.ts pseudocode:\n  import { NextResponse } from 'next/server'\n\n  // Vercel Serverless 함수 설정 — Gemini 3회 호출 대비 60초 한도\n  export const runtime = 'nodejs'\n  export const maxDuration = 60\n\n  export async function POST(\n    _req: Request,\n    { params }: { params: Promise<{ id: string }> }\n  ) {\n    const { id } = await params\n    // TODO: Task 011 — AI 파이프라인 구현 (normalize -> HPI -> template)\n    return NextResponse.json({ caseId: id, status: 'todo' }, { status: 200 })\n  }\n\nstatus/route.ts pseudocode:\n  import { NextResponse } from 'next/server'\n\n  export async function GET(\n    _req: Request,\n    { params }: { params: Promise<{ id: string }> }\n  ) {\n    const { id } = await params\n    // TODO: Task 011 — Supabase에서 cases.status 조회 후 반환\n    return NextResponse.json({ caseId: id, status: 'todo' }, { status: 200 })\n  }",
+      "verificationCriteria": "npm run build 시 두 API Route가 에러 없이 빌드됨. curl 또는 브라우저로 GET /api/cases/test-id/status 요청 시 200 응답과 JSON 반환 확인.",
+      "analysisResult": "ER Scribe MVP Phase 1 — Next.js 15 App Router 기반 라우트 구조 전체 설정. 기존 Supabase 인증 스타터 킷 위에 (app) 라우트 그룹과 빈 껍데기 페이지들을 생성한다. 미들웨어(proxy.ts)는 수정하지 않으며, 기존 패턴(createClient + getClaims + redirect)을 그대로 따른다.",
+      "summary": "API Route 2개(generate POST, status GET) 골격 생성 완료. cacheComponents와 충돌하는 runtime export를 주석 처리하고 Task 011 주석으로 명시. 홈 페이지도 AuthRedirect를 Suspense로 분리해 cacheComponents 호환 처리. npm run build 에러 없이 통과. 전체 빌드 결과 21개 라우트 모두 정상.",
+      "completedAt": "2026-04-14T08:51:52.164Z"
+    },
+    {
+      "id": "066d3894-ed5b-4b78-bc7f-ab53f9c41202",
+      "name": "Supabase Database 타입 정의 확장 (cases, case_inputs, case_results, interview_guidelines)",
+      "description": "lib/supabase/types.ts의 Database 타입에 신규 테이블 4개와 enum 3개를 추가하고, profiles 테이블에 input_layout 컬럼을 추가한다. 기존 profiles 패턴(Row/Insert/Update + 편의 타입)을 그대로 따른다.\n\n추가할 Enum:\n- case_status: draft | generating | completed | failed\n- bed_zone: A | B | R\n- input_layout: single | split_vertical | split_horizontal\n\nprofiles 테이블 확장:\n- Row에 input_layout: string | null 추가\n- Insert/Update에 input_layout?: string | null 추가\n\n신규 테이블 (각각 Row/Insert/Update/Relationships):\n1. cases: id, user_id, bed_zone, bed_number, cc, cc_has_template, template_key, status, current_result_id, created_at, updated_at\n2. case_inputs: id, case_id, raw_text, time_tag, time_offset_minutes, display_order, created_at\n3. case_results: id, case_id, structured_json(Json타입 재사용), hpi_draft, hpi_edited, template_draft, template_edited, template_key_used, model_version, error_message, generated_at\n4. interview_guidelines: id, user_id(nullable), cc, content, created_at, updated_at\n\nConstants 업데이트:\n- Constants.public.Enums에 case_status, bed_zone, input_layout 값 추가\n\n파일 하단 편의 타입 export 추가:\n- Case, CaseInsert, CaseUpdate\n- CaseInput, CaseInputInsert\n- CaseResult, CaseResultInsert, CaseResultUpdate\n- Guideline, GuidelineInsert, GuidelineUpdate\n- CaseStatus, BedZone, InputLayout (enum 편의 타입)",
+      "notes": "cases.current_result_id → case_results.id 는 순환 참조. Relationships 배열에는 명시하되, SQL DDL에서는 ALTER TABLE로 나중에 FK 추가하는 방식으로 처리. profiles.updated_at은 기존 타입에 이미 있음을 확인 후 중복 추가 금지.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-14T10:37:26.983Z",
+      "updatedAt": "2026-04-14T10:40:31.497Z",
+      "relatedFiles": [
+        {
+          "path": "lib/supabase/types.ts",
+          "type": "TO_MODIFY",
+          "description": "Database 타입 확장 대상 파일. 현재 profiles만 정의됨. Row 177~187줄에 편의 타입 패턴 있음.",
+          "lineStart": 1,
+          "lineEnd": 187
+        }
+      ],
+      "implementationGuide": "// 수정 위치: lib/supabase/types.ts\n\n// 1. Enums 섹션 (현재 [_ in never]: never 교체)\nEnums: {\n  case_status: 'draft' | 'generating' | 'completed' | 'failed'\n  bed_zone: 'A' | 'B' | 'R'\n  input_layout: 'single' | 'split_vertical' | 'split_horizontal'\n}\n\n// 2. profiles Row에 input_layout 컬럼 추가\ninput_layout: string | null\n\n// 3. Tables에 cases 추가 (순환 FK 주의: current_result_id는 nullable)\n// Relationships에 foreignKeyName, columns, referencedRelation, referencedColumns 명시\n\n// 4. Tables에 case_inputs 추가\n// raw_text는 NOT NULL (원본 보존 원칙)\n\n// 5. Tables에 case_results 추가\n// structured_json 타입은 파일 상단의 Json 타입 재사용\n\n// 6. Tables에 interview_guidelines 추가\n// user_id는 nullable (null = 시스템 기본)\n\n// 7. Constants 업데이트\nConstants = {\n  public: {\n    Enums: {\n      case_status: { draft: 'draft', generating: 'generating', completed: 'completed', failed: 'failed' },\n      bed_zone: { A: 'A', B: 'B', R: 'R' },\n      input_layout: { single: 'single', split_vertical: 'split_vertical', split_horizontal: 'split_horizontal' }\n    }\n  }\n}\n\n// 8. 파일 하단 편의 타입 export\nexport type Case = Database['public']['Tables']['cases']['Row']\nexport type CaseStatus = Database['public']['Enums']['case_status']\nexport type BedZone = Database['public']['Enums']['bed_zone']\nexport type InputLayout = Database['public']['Enums']['input_layout']\n// ... 나머지 동일 패턴",
+      "verificationCriteria": "1. npx tsc --noEmit 실행 시 타입 오류 없음\n2. Tables<'cases'>, Tables<'case_inputs'>, Tables<'case_results'>, Tables<'interview_guidelines'> 타입이 올바르게 추론됨\n3. Enums<'case_status'>, Enums<'bed_zone'>, Enums<'input_layout'> 타입이 올바르게 추론됨\n4. Case, CaseInput, CaseResult, Guideline, BedZone, CaseStatus, InputLayout 편의 타입이 export됨\n5. 기존 Profile, ProfileInsert, ProfileUpdate export가 유지됨",
+      "analysisResult": "Task 002 목표: ER Scribe 앱 전반에서 사용할 TypeScript 타입과 데이터베이스 스키마 뼈대를 설계한다. 실제 DB 마이그레이션은 Task 009에서 수행하며, 이 Task에서는 타입 정의(lib/supabase/types.ts 확장, lib/cases/bed-config.ts, lib/ai/types.ts)와 SQL DDL 초안(docs/schema.sql) 작성에 집중한다. 기존 profiles 테이블 패턴(Row/Insert/Update 3종 세트 + 편의 타입 export)을 재사용하여 일관성을 유지한다.",
+      "summary": "lib/supabase/types.ts에 신규 테이블 4개(cases, case_inputs, case_results, interview_guidelines)와 enum 3개(case_status, bed_zone, input_layout)를 추가했다. profiles 테이블에 input_layout 컬럼을 추가(Row/Insert/Update 모두). 기존 profiles 패턴(Row/Insert/Update + Relationships)을 그대로 따랐으며, cases.current_result_id 순환 FK는 Relationships에만 명시하고 DDL에서 ALTER TABLE로 후처리하도록 설계했다. Constants.public.Enums를 배열 방식으로 업데이트했으며, 파일 하단에 Case, CaseInput, CaseResult, Guideline, CaseStatus, BedZone, InputLayout 등 모든 편의 타입을 export했다. npx tsc --noEmit 타입 오류 없음 확인 완료.",
+      "completedAt": "2026-04-14T10:40:31.495Z"
+    },
+    {
+      "id": "45dd870c-c16f-468b-bc0a-bc9dcd817d3c",
+      "name": "베드번호 구성 상수 및 AI 타입 Placeholder 파일 생성",
+      "description": "lib/cases/bed-config.ts와 lib/ai/types.ts 두 개의 신규 파일을 생성한다.\n\nlib/cases/bed-config.ts:\n- BED_NUMBERS_BY_ZONE: 구역별 유효 베드번호 배열 상수 (A:1~8, B:1~11, R:1~4)\n- DEFAULT_BED_ZONE: 기본 구역 'A'\n- DEFAULT_BED_NUMBER: 기본 번호 1\n- BedZone 타입은 lib/supabase/types.ts에서 import\n\nlib/ai/types.ts:\n- StructuredCase placeholder 인터페이스\n- TODO(schema-v2) 주석으로 Task 010에서 확정 예정임을 명시",
+      "notes": "bed-config.ts는 이전 subtask(타입 정의 확장)에서 BedZone이 export된 이후에 작성해야 한다. lib/cases/ 및 lib/ai/ 폴더가 없으므로 파일 생성 시 폴더도 함께 생성된다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "066d3894-ed5b-4b78-bc7f-ab53f9c41202"
+        }
+      ],
+      "createdAt": "2026-04-14T10:37:26.983Z",
+      "updatedAt": "2026-04-14T10:41:36.897Z",
+      "relatedFiles": [
+        {
+          "path": "lib/cases/bed-config.ts",
+          "type": "CREATE",
+          "description": "베드번호 구역별 유효 범위 상수 파일. lib/cases/ 폴더 신규 생성."
+        },
+        {
+          "path": "lib/ai/types.ts",
+          "type": "CREATE",
+          "description": "AI 파이프라인 타입 placeholder 파일. lib/ai/ 폴더 신규 생성."
+        },
+        {
+          "path": "lib/supabase/types.ts",
+          "type": "DEPENDENCY",
+          "description": "BedZone 타입 import 출처"
+        }
+      ],
+      "implementationGuide": "// lib/cases/bed-config.ts\nimport type { BedZone } from '@/lib/supabase/types'\n\nexport const BED_NUMBERS_BY_ZONE = {\n  A: [1,2,3,4,5,6,7,8],\n  B: [1,2,3,4,5,6,7,8,9,10,11],\n  R: [1,2,3,4],\n} as const satisfies Record<BedZone, readonly number[]>\n\nexport const DEFAULT_BED_ZONE: BedZone = 'A'\nexport const DEFAULT_BED_NUMBER = 1\n\n// lib/ai/types.ts\n// TODO(schema-v2): Task 010 AI 파이프라인 구현 시 Gemini Structured Output 스키마 확정 후 이 파일 전면 교체\nexport interface StructuredCase {\n  cc: string | null\n  inputs: Array<{\n    raw_text: string\n    time_tag: string | null\n    time_offset_minutes: number | null\n    normalized_text: string\n  }>\n  // TODO(schema-v2): 추가 필드는 Task 010 확정 후 반영\n}",
+      "verificationCriteria": "1. npx tsc --noEmit 실행 시 타입 오류 없음\n2. BED_NUMBERS_BY_ZONE.A가 readonly [1,2,3,4,5,6,7,8] 타입으로 추론됨\n3. BED_NUMBERS_BY_ZONE에 존재하지 않는 구역(예: 'C') 접근 시 TypeScript 오류 발생\n4. StructuredCase 인터페이스가 export되고 TODO(schema-v2) 주석 포함",
+      "analysisResult": "Task 002 목표: ER Scribe 앱 전반에서 사용할 TypeScript 타입과 데이터베이스 스키마 뼈대를 설계한다. 실제 DB 마이그레이션은 Task 009에서 수행하며, 이 Task에서는 타입 정의(lib/supabase/types.ts 확장, lib/cases/bed-config.ts, lib/ai/types.ts)와 SQL DDL 초안(docs/schema.sql) 작성에 집중한다. 기존 profiles 테이블 패턴(Row/Insert/Update 3종 세트 + 편의 타입 export)을 재사용하여 일관성을 유지한다.",
+      "summary": "lib/cases/bed-config.ts와 lib/ai/types.ts 두 파일을 신규 생성했다. bed-config.ts는 BedZone 타입을 lib/supabase/types.ts에서 import하고, BED_NUMBERS_BY_ZONE을 as const satisfies Record&lt;BedZone, readonly number[]&gt;로 선언해 존재하지 않는 구역 접근 시 TypeScript 오류가 발생하도록 타입 안전성을 확보했다. DEFAULT_BED_ZONE과 DEFAULT_BED_NUMBER 상수도 포함. ai/types.ts는 StructuredCase placeholder 인터페이스와 TODO(schema-v2) 주석을 포함해 Task 010에서 교체 예정임을 명시했다. npx tsc --noEmit 타입 오류 없음 확인 완료.",
+      "completedAt": "2026-04-14T10:41:36.895Z"
+    },
+    {
+      "id": "77083609-e483-4a67-b1b7-1c93090a08bc",
+      "name": "Supabase SQL DDL 초안 작성 (docs/schema.sql)",
+      "description": "Phase 3 Task 009에서 실제 실행할 Supabase SQL DDL 초안을 docs/schema.sql에 작성한다. 실제 DB에 적용하지 않고 문서로만 보관한다.\n\n포함 내용:\n1. Enum 타입 생성 (case_status, bed_zone, input_layout)\n2. profiles 테이블 input_layout 컬럼 추가 (ALTER TABLE)\n3. cases 테이블 생성 (bed_zone/bed_number CHECK 제약 포함, current_result_id는 nullable FK 없이 먼저 생성)\n4. case_inputs 테이블 생성\n5. case_results 테이블 생성\n6. interview_guidelines 테이블 생성\n7. cases.current_result_id FK 추가 (ALTER TABLE — 순환 참조 해결)\n8. updated_at 자동 갱신 트리거 함수 및 적용 (cases, case_results, interview_guidelines, profiles)\n9. RLS 활성화 (정책 작성은 Task 009에서 수행)\n\nCHECK 제약:\n(bed_zone='A' AND bed_number BETWEEN 1 AND 8) OR (bed_zone='B' AND bed_number BETWEEN 1 AND 11) OR (bed_zone='R' AND bed_number BETWEEN 1 AND 4)",
+      "notes": "이 파일은 실제 실행용이 아닌 참조/계획 문서다. Task 009에서 Supabase MCP(apply_migration 또는 execute_sql)로 실제 적용한다. Supabase 기본 uuid extension은 이미 활성화되어 있으므로 gen_random_uuid() 사용 가능.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "066d3894-ed5b-4b78-bc7f-ab53f9c41202"
+        }
+      ],
+      "createdAt": "2026-04-14T10:37:26.983Z",
+      "updatedAt": "2026-04-14T10:42:59.137Z",
+      "relatedFiles": [
+        {
+          "path": "docs/schema.sql",
+          "type": "CREATE",
+          "description": "Phase 3 Task 009에서 실행할 SQL DDL 초안. 실제 DB 적용 전 참조 문서."
+        },
+        {
+          "path": "docs/PRD.md",
+          "type": "REFERENCE",
+          "description": "데이터 모델 상세 명세 (테이블 컬럼, CHECK 제약 기준)"
+        }
+      ],
+      "implementationGuide": "-- 1. Enum 타입\nCREATE TYPE public.case_status AS ENUM ('draft','generating','completed','failed');\nCREATE TYPE public.bed_zone AS ENUM ('A','B','R');\nCREATE TYPE public.input_layout AS ENUM ('single','split_vertical','split_horizontal');\n\n-- 2. profiles 확장\nALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS input_layout public.input_layout NOT NULL DEFAULT 'single';\n\n-- 3. cases 테이블 (current_result_id FK 없이 먼저)\nCREATE TABLE public.cases (\n  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),\n  user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,\n  bed_zone public.bed_zone NOT NULL DEFAULT 'A',\n  bed_number integer NOT NULL DEFAULT 1,\n  cc text,\n  cc_has_template boolean NOT NULL DEFAULT false,\n  template_key text,\n  status public.case_status NOT NULL DEFAULT 'draft',\n  current_result_id uuid,\n  created_at timestamptz NOT NULL DEFAULT now(),\n  updated_at timestamptz NOT NULL DEFAULT now(),\n  CONSTRAINT valid_bed_number CHECK (\n    (bed_zone='A' AND bed_number BETWEEN 1 AND 8) OR\n    (bed_zone='B' AND bed_number BETWEEN 1 AND 11) OR\n    (bed_zone='R' AND bed_number BETWEEN 1 AND 4)\n  )\n);\n\n-- 4~6. case_inputs, case_results, interview_guidelines 순서대로 생성\n\n-- 7. 순환 FK 후처리\nALTER TABLE public.cases\n  ADD CONSTRAINT cases_current_result_id_fkey\n  FOREIGN KEY (current_result_id) REFERENCES public.case_results(id) ON DELETE SET NULL;\n\n-- 8. updated_at 트리거\nCREATE OR REPLACE FUNCTION public.handle_updated_at()\nRETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now(); RETURN NEW; END; $$ LANGUAGE plpgsql;\n-- 각 테이블마다 TRIGGER 적용\n\n-- 9. RLS 활성화 (정책은 Task 009에서)\nALTER TABLE public.cases ENABLE ROW LEVEL SECURITY;\n-- 나머지 테이블도 동일",
+      "verificationCriteria": "1. docs/schema.sql 파일이 생성됨\n2. Enum 3개(case_status, bed_zone, input_layout) CREATE TYPE 포함\n3. cases 테이블에 valid_bed_number CHECK 제약 포함\n4. current_result_id FK가 ALTER TABLE로 후처리됨 (순환 참조 해결)\n5. updated_at 트리거 함수 및 적용 구문 포함\n6. 모든 테이블에 ENABLE ROW LEVEL SECURITY 포함\n7. SQL 문법 오류 없음 (PostgreSQL 기준)",
+      "analysisResult": "Task 002 목표: ER Scribe 앱 전반에서 사용할 TypeScript 타입과 데이터베이스 스키마 뼈대를 설계한다. 실제 DB 마이그레이션은 Task 009에서 수행하며, 이 Task에서는 타입 정의(lib/supabase/types.ts 확장, lib/cases/bed-config.ts, lib/ai/types.ts)와 SQL DDL 초안(docs/schema.sql) 작성에 집중한다. 기존 profiles 테이블 패턴(Row/Insert/Update 3종 세트 + 편의 타입 export)을 재사용하여 일관성을 유지한다.",
+      "summary": "docs/schema.sql을 생성했다. Enum 3개(case_status, bed_zone, input_layout) CREATE TYPE, profiles ALTER TABLE, cases/case_inputs/case_results/interview_guidelines CREATE TABLE, cases.current_result_id 순환 FK ALTER TABLE 후처리, handle_updated_at 트리거 함수 및 3개 테이블 적용, 4개 테이블 ENABLE ROW LEVEL SECURITY, 4개 인덱스를 포함한다. valid_bed_number CHECK 제약(A:1~8, B:1~11, R:1~4)과 case_inputs.raw_text NOT NULL(원본 텍스트 보존 원칙)도 명시됐다. 실제 DB 적용은 Task 009에서 Supabase MCP로 수행한다.",
+      "completedAt": "2026-04-14T10:42:59.135Z"
+    }
+  ]
+}

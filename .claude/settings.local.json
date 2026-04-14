@@ -1,0 +1,5 @@
+{
+  "permissions": {
+    "allow": ["mcp__shrimp-task-manager__list_tasks"]
+  }
+}
