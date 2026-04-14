@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { GoogleLoginButton } from "@/components/google-login-button";
 
 export function SignUpForm({
   className,
@@ -105,6 +106,21 @@ export function SignUpForm({
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Creating an account..." : "Sign up"}
               </Button>
+
+              {/* 이메일 가입과 소셜 로그인 구분선 */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">
+                    또는
+                  </span>
+                </div>
+              </div>
+
+              {/* Google 소셜 로그인 버튼 */}
+              <GoogleLoginButton />
             </div>
             <div className="mt-4 text-center text-sm">
               Already have an account?{" "}

@@ -38,18 +38,24 @@ Next.js 15 App Router + Supabase 인증 스타터 킷입니다.
 **Server Component 우선**: `'use client'`는 상태(`useState`)나 브라우저 이벤트가 필요한 경우에만 사용합니다.
 
 **Next.js 15 async params**: `params`와 `searchParams`는 반드시 `await`해서 사용합니다.
+
 ```tsx
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
 }
 ```
 
 **Supabase 클라이언트**: 요청마다 새로운 클라이언트 인스턴스를 생성합니다. 전역 변수에 저장하지 않습니다.
 
 **경로 별칭**: 상대 경로 대신 반드시 `@/` 별칭을 사용합니다.
+
 ```tsx
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 ```
 
 ### UI 컴포넌트
@@ -68,6 +74,7 @@ import { Button } from '@/components/ui/button'
 ## 가이드 문서
 
 `docs/guide/` 폴더에 상세 개발 가이드가 있습니다:
+
 - `nextjs-15.md`: Next.js 15 필수 규칙 및 새 기능
 - `component-patterns.md`: 컴포넌트 설계 패턴
 - `project-structure.md`: 폴더 구조 및 네이밍 컨벤션
