@@ -3,8 +3,9 @@
 
 import { NextResponse } from "next/server";
 
-// TODO: Task 011 — next.config.ts의 cacheComponents 설정과 호환성 확인 후
-// 아래 두 설정을 복원할 것 (Vercel Pro 플랜에서 Gemini 3회 호출 대비 60초 한도)
+// TODO: Task 011 — Gemini 3단계 파이프라인 구현 시 아래 두 설정 활성화
+// API Route는 cacheComponents 설정과 독립 번들로 처리되므로 충돌 없음
+// Vercel Pro 플랜에서 Gemini 3회 호출 대비 60초 한도 필요
 // export const runtime = "nodejs";
 // export const maxDuration = 60;
 

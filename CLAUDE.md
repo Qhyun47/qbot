@@ -85,3 +85,10 @@ import { Button } from "@/components/ui/button";
 - `project-structure.md`: 폴더 구조 및 네이밍 컨벤션
 - `styling-guide.md`: Tailwind CSS 스타일링 가이드
 - `forms-react-hook-form.md`: 폼 처리 패턴
+
+## 작업 완료 체크리스트
+
+```bash
+npm run check-all
+npm run build
+```

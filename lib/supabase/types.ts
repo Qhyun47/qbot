@@ -14,12 +14,188 @@ export type Database = {
   };
   public: {
     Tables: {
+      case_inputs: {
+        Row: {
+          case_id: string;
+          created_at: string;
+          display_order: number;
+          id: string;
+          raw_text: string;
+          time_offset_minutes: number | null;
+          time_tag: string | null;
+        };
+        Insert: {
+          case_id: string;
+          created_at?: string;
+          display_order: number;
+          id?: string;
+          raw_text: string;
+          time_offset_minutes?: number | null;
+          time_tag?: string | null;
+        };
+        Update: {
+          case_id?: string;
+          created_at?: string;
+          display_order?: number;
+          id?: string;
+          raw_text?: string;
+          time_offset_minutes?: number | null;
+          time_tag?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "case_inputs_case_id_fkey";
+            columns: ["case_id"];
+            referencedRelation: "cases";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      case_results: {
+        Row: {
+          case_id: string;
+          error_message: string | null;
+          generated_at: string;
+          hpi_draft: string;
+          hpi_edited: string | null;
+          id: string;
+          model_version: string;
+          structured_json: Json;
+          template_draft: string;
+          template_edited: string | null;
+          template_key_used: string;
+        };
+        Insert: {
+          case_id: string;
+          error_message?: string | null;
+          generated_at?: string;
+          hpi_draft: string;
+          hpi_edited?: string | null;
+          id?: string;
+          model_version: string;
+          structured_json: Json;
+          template_draft: string;
+          template_edited?: string | null;
+          template_key_used: string;
+        };
+        Update: {
+          case_id?: string;
+          error_message?: string | null;
+          generated_at?: string;
+          hpi_draft?: string;
+          hpi_edited?: string | null;
+          id?: string;
+          model_version?: string;
+          structured_json?: Json;
+          template_draft?: string;
+          template_edited?: string | null;
+          template_key_used?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "case_results_case_id_fkey";
+            columns: ["case_id"];
+            referencedRelation: "cases";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      cases: {
+        Row: {
+          bed_number: number;
+          bed_zone: string;
+          cc: string | null;
+          cc_has_template: boolean;
+          created_at: string;
+          current_result_id: string | null;
+          id: string;
+          status: string;
+          template_key: string | null;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          bed_number: number;
+          bed_zone?: string;
+          cc?: string | null;
+          cc_has_template?: boolean;
+          created_at?: string;
+          current_result_id?: string | null;
+          id?: string;
+          status?: string;
+          template_key?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          bed_number?: number;
+          bed_zone?: string;
+          cc?: string | null;
+          cc_has_template?: boolean;
+          created_at?: string;
+          current_result_id?: string | null;
+          id?: string;
+          status?: string;
+          template_key?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "cases_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "cases_current_result_id_fkey";
+            columns: ["current_result_id"];
+            referencedRelation: "case_results";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      interview_guidelines: {
+        Row: {
+          cc: string;
+          content: string;
+          created_at: string;
+          id: string;
+          updated_at: string;
+          user_id: string | null;
+        };
+        Insert: {
+          cc: string;
+          content: string;
+          created_at?: string;
+          id?: string;
+          updated_at?: string;
+          user_id?: string | null;
+        };
+        Update: {
+          cc?: string;
+          content?: string;
+          created_at?: string;
+          id?: string;
+          updated_at?: string;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "interview_guidelines_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       profiles: {
         Row: {
           avatar_url: string | null;
           created_at: string;
           full_name: string | null;
           id: string;
+          input_layout: string | null;
           updated_at: string;
         };
         Insert: {
@@ -27,6 +203,7 @@ export type Database = {
           created_at?: string;
           full_name?: string | null;
           id: string;
+          input_layout?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -34,6 +211,7 @@ export type Database = {
           created_at?: string;
           full_name?: string | null;
           id?: string;
+          input_layout?: string | null;
           updated_at?: string;
         };
         Relationships: [];
@@ -46,7 +224,9 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
-      [_ in never]: never;
+      bed_zone: "A" | "B" | "R";
+      case_status: "draft" | "generating" | "completed" | "failed";
+      input_layout: "single" | "split_vertical" | "split_horizontal";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -176,11 +356,45 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      bed_zone: ["A", "B", "R"] as const,
+      case_status: ["draft", "generating", "completed", "failed"] as const,
+      input_layout: ["single", "split_vertical", "split_horizontal"] as const,
+    },
   },
 } as const;
 
-// 편의 타입
+// 편의 타입 — profiles
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type ProfileInsert = Database["public"]["Tables"]["profiles"]["Insert"];
 export type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
+
+// 편의 타입 — cases
+export type Case = Database["public"]["Tables"]["cases"]["Row"];
+export type CaseInsert = Database["public"]["Tables"]["cases"]["Insert"];
+export type CaseUpdate = Database["public"]["Tables"]["cases"]["Update"];
+
+// 편의 타입 — case_inputs
+export type CaseInput = Database["public"]["Tables"]["case_inputs"]["Row"];
+export type CaseInputInsert =
+  Database["public"]["Tables"]["case_inputs"]["Insert"];
+
+// 편의 타입 — case_results
+export type CaseResult = Database["public"]["Tables"]["case_results"]["Row"];
+export type CaseResultInsert =
+  Database["public"]["Tables"]["case_results"]["Insert"];
+export type CaseResultUpdate =
+  Database["public"]["Tables"]["case_results"]["Update"];
+
+// 편의 타입 — interview_guidelines
+export type Guideline =
+  Database["public"]["Tables"]["interview_guidelines"]["Row"];
+export type GuidelineInsert =
+  Database["public"]["Tables"]["interview_guidelines"]["Insert"];
+export type GuidelineUpdate =
+  Database["public"]["Tables"]["interview_guidelines"]["Update"];
+
+// 편의 타입 — enum
+export type CaseStatus = Database["public"]["Enums"]["case_status"];
+export type BedZone = Database["public"]["Enums"]["bed_zone"];
+export type InputLayout = Database["public"]["Enums"]["input_layout"];

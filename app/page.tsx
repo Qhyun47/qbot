@@ -1,22 +1,17 @@
-import { DeployButton } from "@/components/deploy-button";
-import { EnvVarWarning } from "@/components/env-var-warning";
-import { AuthButton } from "@/components/auth-button";
-import { Hero } from "@/components/hero";
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import { ConnectSupabaseSteps } from "@/components/tutorial/connect-supabase-steps";
-import { SignUpUserSteps } from "@/components/tutorial/sign-up-user-steps";
-import { hasEnvVars } from "@/lib/utils";
 import Link from "next/link";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 // 로그인된 사용자를 대시보드로 리다이렉트하는 서버 컴포넌트
+// getUser()를 사용해 Supabase 서버에서 실제 토큰 유효성을 검증
 // cacheComponents 모드에서는 Suspense 안에서만 동적 데이터 접근 가능
 async function AuthRedirect() {
   const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
-  if (data?.claims) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
     redirect("/dashboard");
   }
   return null;
@@ -24,51 +19,28 @@ async function AuthRedirect() {
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-6">
       {/* 로그인 감지 후 /dashboard 리다이렉트 (Suspense로 cacheComponents 호환) */}
       <Suspense fallback={null}>
         <AuthRedirect />
       </Suspense>
-      <div className="flex w-full flex-1 flex-col items-center gap-20">
-        <nav className="flex h-16 w-full justify-center border-b border-b-foreground/10">
-          <div className="flex w-full max-w-5xl items-center justify-between p-3 px-5 text-sm">
-            <div className="flex items-center gap-5 font-semibold">
-              <Link href={"/"}>Next.js Supabase Starter</Link>
-              <div className="flex items-center gap-2">
-                <DeployButton />
-              </div>
-            </div>
-            {!hasEnvVars ? (
-              <EnvVarWarning />
-            ) : (
-              <Suspense>
-                <AuthButton />
-              </Suspense>
-            )}
-          </div>
-        </nav>
-        <div className="flex max-w-5xl flex-1 flex-col gap-20 p-5">
-          <Hero />
-          <main className="flex flex-1 flex-col gap-6 px-4">
-            <h2 className="mb-4 text-xl font-medium">Next steps</h2>
-            {hasEnvVars ? <SignUpUserSteps /> : <ConnectSupabaseSteps />}
-          </main>
-        </div>
-
-        <footer className="mx-auto flex w-full items-center justify-center gap-8 border-t py-16 text-center text-xs">
-          <p>
-            Powered by{" "}
-            <a
-              href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-              target="_blank"
-              className="font-bold hover:underline"
-              rel="noreferrer"
-            >
-              Supabase
-            </a>
-          </p>
-          <ThemeSwitcher />
-        </footer>
+      <h1 className="text-2xl font-bold">ER Scribe</h1>
+      <p className="text-muted-foreground">
+        응급실 의사를 위한 AI 차팅 어시스턴트
+      </p>
+      <div className="flex gap-4">
+        <Link
+          href="/auth/login"
+          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+        >
+          로그인
+        </Link>
+        <Link
+          href="/auth/sign-up"
+          className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-accent"
+        >
+          회원가입
+        </Link>
       </div>
     </main>
   );
