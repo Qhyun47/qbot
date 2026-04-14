@@ -1,0 +1,132 @@
+{
+  "tasks": [
+    {
+      "id": "26795b6b-70c7-4d9c-af06-3f23aeb89186",
+      "name": "(app) 라우트 그룹 레이아웃 및 껍데기 페이지 생성",
+      "description": "Next.js 15 App Router의 (app) 라우트 그룹을 생성하고, 6개 주요 페이지의 빈 껍데기 파일을 만든다. 실제 UI는 Task 004~008에서 구현하므로 여기서는 라우트 경로만 확보한다.\n\n생성할 파일:\n- app/(app)/layout.tsx — 공통 레이아웃 (헤더 placeholder + children)\n- app/(app)/dashboard/page.tsx — 대시보드 (TODO 문구)\n- app/(app)/cases/page.tsx — 케이스 목록 (TODO 문구)\n- app/(app)/cases/new/page.tsx — 새 케이스 입력 (TODO 문구)\n- app/(app)/cases/[id]/page.tsx — 케이스 결과 (async params 타입 선언 포함)\n- app/(app)/guidelines/page.tsx — 가이드라인 관리 (TODO 문구)\n- app/(app)/settings/page.tsx — 설정 (TODO 문구)",
+      "notes": "app/protected/layout.tsx가 참조 패턴. (app) 그룹은 URL에 노출되지 않으므로 /dashboard, /cases 등으로 접근됨. 기존 미들웨어가 새 경로를 자동 보호하므로 추가 설정 불필요.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-14T08:47:34.940Z",
+      "updatedAt": "2026-04-14T08:48:44.513Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/layout.tsx",
+          "type": "CREATE",
+          "description": "ER 앱 전용 공통 레이아웃 (네비바 placeholder)"
+        },
+        {
+          "path": "app/(app)/dashboard/page.tsx",
+          "type": "CREATE",
+          "description": "대시보드 껍데기 페이지"
+        },
+        {
+          "path": "app/(app)/cases/page.tsx",
+          "type": "CREATE",
+          "description": "케이스 목록 껍데기 페이지"
+        },
+        {
+          "path": "app/(app)/cases/new/page.tsx",
+          "type": "CREATE",
+          "description": "새 케이스 입력 껍데기 페이지"
+        },
+        {
+          "path": "app/(app)/cases/[id]/page.tsx",
+          "type": "CREATE",
+          "description": "케이스 결과 껍데기 페이지 (async params)"
+        },
+        {
+          "path": "app/(app)/guidelines/page.tsx",
+          "type": "CREATE",
+          "description": "가이드라인 관리 껍데기 페이지"
+        },
+        {
+          "path": "app/(app)/settings/page.tsx",
+          "type": "CREATE",
+          "description": "설정 껍데기 페이지"
+        },
+        {
+          "path": "app/protected/layout.tsx",
+          "type": "REFERENCE",
+          "description": "레이아웃 구조 참조 패턴"
+        }
+      ],
+      "implementationGuide": "layout.tsx pseudocode:\n  export default function AppLayout({ children }: { children: React.ReactNode }) {\n    return (\n      <div className=\"min-h-screen flex flex-col\">\n        <header className=\"border-b h-14 flex items-center px-4\">\n          {/* TODO: Task 004 — AppNavbar 컴포넌트로 교체 */}\n          <span className=\"font-semibold text-sm\">ER Scribe</span>\n        </header>\n        <main className=\"flex-1 flex flex-col\">{children}</main>\n      </div>\n    )\n  }\n\n껍데기 페이지 공통 pseudocode (dashboard 예시):\n  // 대시보드 페이지 — TODO: Task 005에서 실제 UI 구현\n  export default function DashboardPage() {\n    return (\n      <div className=\"p-8\">\n        <h1 className=\"text-xl font-semibold\">대시보드</h1>\n        <p className=\"text-muted-foreground mt-2\">TODO: Task 005에서 구현 예정</p>\n      </div>\n    )\n  }\n\n[id] 동적 라우트 pseudocode:\n  // 케이스 결과 페이지 — TODO: Task 007에서 실제 UI 구현\n  export default async function CaseResultPage({\n    params,\n  }: {\n    params: Promise<{ id: string }>\n  }) {\n    const { id } = await params\n    return (\n      <div className=\"p-8\">\n        <h1 className=\"text-xl font-semibold\">케이스 결과: {id}</h1>\n        <p className=\"text-muted-foreground mt-2\">TODO: Task 007에서 구현 예정</p>\n      </div>\n    )\n  }",
+      "verificationCriteria": "npm run dev 후 로그인 상태에서 /dashboard, /cases, /cases/new, /guidelines, /settings 접속 시 각 TODO 페이지가 렌더됨. 비로그인 상태에서는 /auth/login으로 리다이렉트됨.",
+      "analysisResult": "ER Scribe MVP Phase 1 — Next.js 15 App Router 기반 라우트 구조 전체 설정. 기존 Supabase 인증 스타터 킷 위에 (app) 라우트 그룹과 빈 껍데기 페이지들을 생성한다. 미들웨어(proxy.ts)는 수정하지 않으며, 기존 패턴(createClient + getClaims + redirect)을 그대로 따른다.",
+      "summary": "app/(app)/layout.tsx + 6개 껍데기 페이지 모두 생성 완료. [id] 동적 라우트에 Next.js 15 async params 패턴 적용. npm run lint 에러 없음(기존 파일 warning만). 기존 미들웨어가 새 라우트를 자동 보호하며 protected/ 미수정. 각 페이지에 한국어 주석 + 담당 Task 번호 명시.",
+      "completedAt": "2026-04-14T08:48:44.510Z"
+    },
+    {
+      "id": "eb75c839-2124-4683-a072-937be1a2b3e5",
+      "name": "홈 페이지 로그인 리다이렉트 로직 추가",
+      "description": "app/page.tsx를 async Server Component으로 변환하고, 로그인된 사용자는 /dashboard로 자동 리다이렉트하는 로직을 추가한다. 미인증 사용자는 기존 랜딩 페이지 UI를 그대로 본다.",
+      "notes": "기존 JSX(Hero, ConnectSupabaseSteps, SignUpUserSteps 등)는 삭제하지 않고 유지. async 함수로 변환만 하고 나머지 구조는 보존. hasEnvVars 체크 로직도 유지.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "26795b6b-70c7-4d9c-af06-3f23aeb89186"
+        }
+      ],
+      "createdAt": "2026-04-14T08:47:34.940Z",
+      "updatedAt": "2026-04-14T08:49:11.922Z",
+      "relatedFiles": [
+        {
+          "path": "app/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "홈 페이지 — async 변환 + 로그인 리다이렉트 추가",
+          "lineStart": 1,
+          "lineEnd": 58
+        },
+        {
+          "path": "app/protected/page.tsx",
+          "type": "REFERENCE",
+          "description": "createClient + getClaims + redirect 패턴 참조",
+          "lineStart": 1,
+          "lineEnd": 20
+        },
+        {
+          "path": "lib/supabase/server.ts",
+          "type": "DEPENDENCY",
+          "description": "createClient 함수"
+        }
+      ],
+      "implementationGuide": "pseudocode:\n  import { redirect } from 'next/navigation'\n  import { createClient } from '@/lib/supabase/server'\n  // ... 기존 import 유지\n\n  export default async function Home() {\n    // 로그인 사용자 감지 (토큰 기반, DB 조회 없음)\n    const supabase = await createClient()\n    const { data } = await supabase.auth.getClaims()\n    if (data?.claims) {\n      redirect('/dashboard')\n    }\n    // 기존 랜딩 페이지 JSX 그대로 반환\n    return <기존 JSX 유지>\n  }\n\n참조 패턴: app/protected/page.tsx의 createClient() + getClaims() + redirect() 흐름",
+      "verificationCriteria": "로그인 상태로 http://localhost:3000 접속 시 /dashboard로 즉시 리다이렉트됨. 비로그인 상태에서는 기존 스타터 랜딩 페이지가 정상 표시됨.",
+      "analysisResult": "ER Scribe MVP Phase 1 — Next.js 15 App Router 기반 라우트 구조 전체 설정. 기존 Supabase 인증 스타터 킷 위에 (app) 라우트 그룹과 빈 껍데기 페이지들을 생성한다. 미들웨어(proxy.ts)는 수정하지 않으며, 기존 패턴(createClient + getClaims + redirect)을 그대로 따른다.",
+      "summary": "app/page.tsx를 async Server Component으로 변환하고 getClaims() 기반 로그인 감지 후 /dashboard redirect 로직 추가. 기존 랜딩 JSX 및 hasEnvVars 체크 완전 보존. lint 에러 없음. protected/page.tsx의 createClient+getClaims+redirect 패턴 일관 적용.",
+      "completedAt": "2026-04-14T08:49:11.919Z"
+    },
+    {
+      "id": "3ce5ac7b-106b-4030-a5a8-01d2ba379408",
+      "name": "AI 생성 API Route 골격 생성",
+      "description": "케이스 AI 차팅 생성 트리거 엔드포인트와 생성 상태 폴링 엔드포인트의 골격 파일을 생성한다. 실제 AI 파이프라인은 Task 011에서 구현하므로 여기서는 라우트 등록과 Vercel 설정값만 포함한다.\n\n생성할 파일:\n- app/api/cases/[id]/generate/route.ts — POST 핸들러 (nodejs runtime, maxDuration 60)\n- app/api/cases/[id]/status/route.ts — GET 핸들러 (경량 폴링용)",
+      "notes": "Next.js 15에서 API Route params도 async Promise 타입. maxDuration = 60은 Vercel Pro 플랜에서만 유효하지만 코드에 미리 선언해도 로컬 개발에 무해함.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "26795b6b-70c7-4d9c-af06-3f23aeb89186"
+        }
+      ],
+      "createdAt": "2026-04-14T08:47:34.940Z",
+      "updatedAt": "2026-04-14T08:51:52.171Z",
+      "relatedFiles": [
+        {
+          "path": "app/api/cases/[id]/generate/route.ts",
+          "type": "CREATE",
+          "description": "AI 차팅 생성 POST 엔드포인트 골격"
+        },
+        {
+          "path": "app/api/cases/[id]/status/route.ts",
+          "type": "CREATE",
+          "description": "생성 상태 폴링 GET 엔드포인트 골격"
+        }
+      ],
+      "implementationGuide": "generate/route.ts pseudocode:\n  import { NextResponse } from 'next/server'\n\n  // Vercel Serverless 함수 설정 — Gemini 3회 호출 대비 60초 한도\n  export const runtime = 'nodejs'\n  export const maxDuration = 60\n\n  export async function POST(\n    _req: Request,\n    { params }: { params: Promise<{ id: string }> }\n  ) {\n    const { id } = await params\n    // TODO: Task 011 — AI 파이프라인 구현 (normalize -> HPI -> template)\n    return NextResponse.json({ caseId: id, status: 'todo' }, { status: 200 })\n  }\n\nstatus/route.ts pseudocode:\n  import { NextResponse } from 'next/server'\n\n  export async function GET(\n    _req: Request,\n    { params }: { params: Promise<{ id: string }> }\n  ) {\n    const { id } = await params\n    // TODO: Task 011 — Supabase에서 cases.status 조회 후 반환\n    return NextResponse.json({ caseId: id, status: 'todo' }, { status: 200 })\n  }",
+      "verificationCriteria": "npm run build 시 두 API Route가 에러 없이 빌드됨. curl 또는 브라우저로 GET /api/cases/test-id/status 요청 시 200 응답과 JSON 반환 확인.",
+      "analysisResult": "ER Scribe MVP Phase 1 — Next.js 15 App Router 기반 라우트 구조 전체 설정. 기존 Supabase 인증 스타터 킷 위에 (app) 라우트 그룹과 빈 껍데기 페이지들을 생성한다. 미들웨어(proxy.ts)는 수정하지 않으며, 기존 패턴(createClient + getClaims + redirect)을 그대로 따른다.",
+      "summary": "API Route 2개(generate POST, status GET) 골격 생성 완료. cacheComponents와 충돌하는 runtime export를 주석 처리하고 Task 011 주석으로 명시. 홈 페이지도 AuthRedirect를 Suspense로 분리해 cacheComponents 호환 처리. npm run build 에러 없이 통과. 전체 빌드 결과 21개 라우트 모두 정상.",
+      "completedAt": "2026-04-14T08:51:52.164Z"
+    }
+  ]
+}

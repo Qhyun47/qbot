@@ -8,10 +8,27 @@ import { SignUpUserSteps } from "@/components/tutorial/sign-up-user-steps";
 import { hasEnvVars } from "@/lib/utils";
 import Link from "next/link";
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+
+// 로그인된 사용자를 대시보드로 리다이렉트하는 서버 컴포넌트
+// cacheComponents 모드에서는 Suspense 안에서만 동적 데이터 접근 가능
+async function AuthRedirect() {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getClaims();
+  if (data?.claims) {
+    redirect("/dashboard");
+  }
+  return null;
+}
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center">
+      {/* 로그인 감지 후 /dashboard 리다이렉트 (Suspense로 cacheComponents 호환) */}
+      <Suspense fallback={null}>
+        <AuthRedirect />
+      </Suspense>
       <div className="flex w-full flex-1 flex-col items-center gap-20">
         <nav className="flex h-16 w-full justify-center border-b border-b-foreground/10">
           <div className="flex w-full max-w-5xl items-center justify-between p-3 px-5 text-sm">
