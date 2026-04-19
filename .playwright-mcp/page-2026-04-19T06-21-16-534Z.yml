@@ -1,0 +1,64 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - link "ER Scribe" [ref=e4] [cursor=pointer]:
+        - /url: /dashboard
+      - button "Logout" [ref=e6] [cursor=pointer]
+    - main [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - generic [ref=e10]: 새 케이스 입력
+          - button "차팅 생성" [ref=e12] [cursor=pointer]
+        - generic [ref=e14]:
+          - generic [ref=e16]:
+            - generic [ref=e17]:
+              - generic [ref=e18]: 베드 번호
+              - generic [ref=e19]: A-1
+            - group [ref=e20]:
+              - radio "A구역 선택" [checked] [ref=e21] [cursor=pointer]: A구역
+              - radio "B구역 선택" [ref=e22] [cursor=pointer]: B구역
+              - radio "R구역 선택" [ref=e23] [cursor=pointer]: R구역
+            - generic [ref=e24]:
+              - button "A구역 1번 베드 선택" [ref=e25] [cursor=pointer]: "1"
+              - button "A구역 2번 베드 선택" [ref=e26] [cursor=pointer]: "2"
+              - button "A구역 3번 베드 선택" [ref=e27] [cursor=pointer]: "3"
+              - button "A구역 4번 베드 선택" [ref=e28] [cursor=pointer]: "4"
+              - button "A구역 5번 베드 선택" [ref=e29] [cursor=pointer]: "5"
+              - button "A구역 6번 베드 선택" [ref=e30] [cursor=pointer]: "6"
+              - button "A구역 7번 베드 선택" [ref=e31] [cursor=pointer]: "7"
+              - button "A구역 8번 베드 선택" [ref=e32] [cursor=pointer]: "8"
+          - 'textbox "C.C. 입력 (예: Chest pain)" [ref=e35]'
+          - generic [ref=e37]:
+            - generic [ref=e38]:
+              - paragraph [ref=e39]: 시간 순
+              - generic [ref=e41]:
+                - generic [ref=e42]: 30분 전부터 diaphoresis 발생
+                - generic [ref=e43]: 30분 전
+              - generic [ref=e45]:
+                - generic [ref=e46]: 내원 1시간 전부터 hematemesis 3회
+                - generic [ref=e47]: 1시간 전
+              - generic [ref=e49]:
+                - generic [ref=e50]: 2시간 전부터 left arm radiation 동반
+                - generic [ref=e51]: 2시간 전
+              - generic [ref=e53]:
+                - generic [ref=e54]: 어제 저녁 NTG 투여 후에도 통증 지속
+                - generic [ref=e55]: 어제
+              - generic [ref=e57]:
+                - generic [ref=e58]: 어제부터 melena 지속
+                - generic [ref=e59]: 어제
+              - generic [ref=e61]:
+                - generic [ref=e62]: 3일 전부터 흉통 시작, 갑자기 발생
+                - generic [ref=e63]: 3일 전
+            - generic [ref=e64]:
+              - paragraph [ref=e65]: 시간 미상
+              - generic [ref=e67]: HTN, DM 기저질환 있음. 이전 PCI 이력
+              - generic [ref=e69]: NRS 8점, squeezing 양상, substernal
+              - generic [ref=e71]: HTN, ASA 복용 중
+          - generic [ref=e73]:
+            - textbox "문진 키워드를 입력하세요... (Enter 전송, Shift+Enter 줄바꿈)" [ref=e74]
+            - button "전송" [disabled]:
+              - img
+    - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e80] [cursor=pointer]:
+    - img [ref=e81]
+  - alert [ref=e84]

@@ -1,0 +1,162 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AbdominalPainCase",
+  "description": "복통(Abdominal pain) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history",
+    "family_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류. 아래 enum 값 중 가장 적합한 것 하나를 선택.",
+            "enum": [
+              "onset",
+              "location",
+              "character",
+              "severity",
+              "progression",
+              "aggravating_factor",
+              "relieving_factor",
+              "food_related",
+              "npo_status",
+              "bowel_habit",
+              "pregnancy_possibility",
+              "associated_symptom",
+              "prior_visit",
+              "gi_procedure_history",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "family_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. 카드-섹션 매핑 기준: onset/location/character/severity/progression/aggravating_factor/relieving_factor/food_related/associated_symptom → [hpi, template] | npo_status/bowel_habit/pregnancy_possibility/gi_procedure_history → [template] | prior_visit → [hpi] | past_history/medication_history/operation_history/family_history → [history] 전용 (HPI·상용구에 포함 금지)",
+            "items": {
+              "type": "string",
+              "enum": ["hpi", "template", "history"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "복통 발생 시점 (예: '전날 12:00', '점심 식사 후', '3일 전'). 없으면 null."
+    },
+    "location": {
+      "type": ["string", "null"],
+      "description": "복통 위치 (예: 'epigastric', 'RLQ', 'periumbilical', 'diffuse'). 없으면 null."
+    },
+    "character": {
+      "type": ["string", "null"],
+      "description": "통증 양상 (예: 'constant', 'colicky', 'cramping', 'sharp'). 없으면 null."
+    },
+    "severity_nrs": {
+      "type": ["string", "null"],
+      "description": "통증 강도 NRS 점수 (예: 'NRS 7'). 없으면 null."
+    },
+    "progression": {
+      "type": ["string", "null"],
+      "description": "증상 경과 및 변화 양상 (예: '점차 악화', '완화 없이 지속', '간헐적'). 없으면 null."
+    },
+    "aggravating_factor": {
+      "type": ["string", "null"],
+      "description": "복통 악화 요인 (예: '식사 후', '움직임', '촉진 시'). 없으면 null."
+    },
+    "relieving_factor": {
+      "type": ["string", "null"],
+      "description": "복통 완화 요인 (예: '앞으로 구부릴 때', '안정 시'). 없으면 null."
+    },
+    "food_related": {
+      "type": ["string", "null"],
+      "description": "최근 음식 섭취 이력 및 음식과의 연관성 (예: '볶음밥 섭취 후 발생, 접촉자 무증상', '소량 식사 지속'). 없으면 null."
+    },
+    "npo_solid": {
+      "type": ["string", "null"],
+      "description": "마지막 고형식 섭취 시점 (예: '어제 저녁', '6시간 전'). 없으면 null."
+    },
+    "npo_liquid": {
+      "type": ["string", "null"],
+      "description": "마지막 수분 섭취 시점 (예: '2시간 전'). 없으면 null."
+    },
+    "gas_out": {
+      "type": ["string", "null"],
+      "description": "마지막 방귀 여부 및 시점 (예: '없음', '2시간 전'). 없으면 null."
+    },
+    "last_defecation": {
+      "type": ["string", "null"],
+      "description": "마지막 배변 시점 및 성상 (예: '어제 아침', '2일 전 딱딱한 변'). 없으면 null."
+    },
+    "pregnancy_possibility": {
+      "type": ["string", "null"],
+      "description": "임신 가능성 — 가임기 여성 환자에게만 해당. '있음' 또는 '없음'으로 채움. 남성·폐경 이후·성별/연령 판단 불가 시 null → template 출력 시 해당 줄 생략."
+    },
+    "associated_symptoms": {
+      "type": ["array", "null"],
+      "description": "동반 증상 목록 (예: ['nausea', 'vomiting x4', 'fever', 'diarrhea', 'urinary symptom'] 등). 없으면 null.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "prior_visit_findings": {
+      "type": ["string", "null"],
+      "description": "내원 전 타원 진료 결과 (예: 'LMC CT — Enterocolitis, Reactive appendicitis, r/o paralytic ileus with ascites'). 없으면 null."
+    },
+    "gi_procedure_history": {
+      "type": ["string", "null"],
+      "description": "과거 위내시경(EGD)/대장내시경(Colonoscopy) 시행 이력 및 결과 (template 출력 필드). 없으면 null."
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력. HPI·상용구에 포함 금지.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력. HPI·상용구에 포함 금지.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력. HPI·상용구에 포함 금지.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "family_history": {
+      "type": ["array", "null"],
+      "description": "가족력 목록. null이면 History 출력 시 해당 항목 전체 생략. HPI·상용구에 포함 금지.",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

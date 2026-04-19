@@ -1,0 +1,1155 @@
+{
+  "tasks": [
+    {
+      "id": "021ba057-2b60-4cd7-8bb0-985b68ba5e74",
+      "name": "Step 0: 차트 출력 언어 확정",
+      "description": "모든 AI 리소스 파일의 방향을 결정하는 언어 설정을 확정합니다. 한국어 전체 / 영어 전체 / 혼용(의학 용어 영어 + 서술 한국어) 중 하나를 선택합니다. 이 결정이 style_guide.md, templates, guides 등 모든 후속 파일의 작성 언어를 결정합니다.",
+      "notes": "파일 저장 불필요. 단순 결정 사항. 대부분의 한국 응급실 환경에서는 한국어 전체가 일반적.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-14T11:15:21.365Z",
+      "updatedAt": "2026-04-14T11:16:44.803Z",
+      "relatedFiles": [
+        {
+          "path": "docs/guide/ai-resource-preparation.md",
+          "type": "REFERENCE",
+          "description": "Step 0 언어 선택 가이드",
+          "lineStart": 30,
+          "lineEnd": 42
+        }
+      ],
+      "implementationGuide": "1. 사용자에게 3가지 선택지 제시\\n   - 한국어 전체: HPI와 상용구 모두 한국어\\n   - 영어 전체: HPI와 상용구 모두 영어\\n   - 혼용: 의학 용어 영어, 서술 한국어\\n2. 사용자가 선택한 언어 설정을 확인\\n3. 선택 결과를 이후 모든 Task에 반영",
+      "verificationCriteria": "사용자가 한국어/영어/혼용 중 하나를 명확히 선택하고 확정함",
+      "analysisResult": "AI 리소스 파일 준비 작업 계획. 목표: lib/ai/resources/ 폴더에 실제 내용이 채워진 AI 파이프라인 리소스 파일들을 사용자와 협력하여 단계별로 준비. 현재 lib/ai/resources/ 폴더가 존재하지 않으며 Task 003 완성이 최종 목표. 각 단계는 사용자가 파일을 준비해오면 Claude가 검토 후 수정 제안 또는 승인하여 프로젝트에 저장하는 방식으로 진행.",
+      "summary": "사용자가 혼용(한국어 문장 구조 + 영어 의학 용어) 방식으로 언어를 확정함. 이후 모든 리소스 파일은 이 기준에 따라 작성됨.",
+      "completedAt": "2026-04-14T11:16:44.801Z"
+    },
+    {
+      "id": "e85f8fd0-303d-4490-9ca1-c99ad5c424d6",
+      "name": "Step 1: cc-list.json 준비 및 검토",
+      "description": "응급실에서 자주 보는 C.C.(Chief Complaint) 목록을 JSON 파일로 준비합니다. 이 파일은 앱의 C.C. 자동완성 기능의 기반이 되며, 어떤 템플릿 파일을 만들지도 결정합니다. 사용자가 ChatGPT 또는 직접 작성한 파일을 가져오면, 형식과 내용을 검토하고 수정이 필요하면 제안합니다.",
+      "notes": "hasTemplate:true 항목이 Step 4(templates)의 작업 범위를 결정함. 병원마다 실제 사용하는 C.C. 표현이 다를 수 있으므로 사용자 확인 필수.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "021ba057-2b60-4cd7-8bb0-985b68ba5e74"
+        }
+      ],
+      "createdAt": "2026-04-14T11:15:21.365Z",
+      "updatedAt": "2026-04-14T14:19:20.115Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/resources/cc-list.json",
+          "type": "CREATE",
+          "description": "C.C. 자동완성 목록 파일 (최종 저장 위치)"
+        },
+        {
+          "path": "docs/guide/ai-resource-preparation.md",
+          "type": "REFERENCE",
+          "description": "cc-list.json 형식 및 조건 가이드",
+          "lineStart": 44,
+          "lineEnd": 92
+        }
+      ],
+      "implementationGuide": "1. 사용자에게 cc-list.json 준비 요청\\n   - 응급실 C.C. 20~30개\\n   - 형식: [{cc, ccEnglish, hasTemplate, templateKey}]\\n2. 파일 수신 후 검토:\\n   - templateKey가 영어 kebab-case인지 확인\\n   - hasTemplate:true 항목 목록 추출 (Step 4 준비)\\n   - cc 필드가 실제 타이핑 단어인지 (흉통 vs 가슴통증)\\n3. 수정 필요 시 구체적 제안 후 재확인\\n4. 승인 후 lib/ai/resources/cc-list.json 에 저장",
+      "verificationCriteria": "cc 한국어/ccEnglish 영어/hasTemplate boolean/templateKey kebab-case 형식 준수. hasTemplate:true 항목에 대응하는 templateKey 목록이 확정됨",
+      "analysisResult": "AI 리소스 파일 준비 작업 계획. 목표: lib/ai/resources/ 폴더에 실제 내용이 채워진 AI 파이프라인 리소스 파일들을 사용자와 협력하여 단계별로 준비. 현재 lib/ai/resources/ 폴더가 존재하지 않으며 Task 003 완성이 최종 목표. 각 단계는 사용자가 파일을 준비해오면 Claude가 검토 후 수정 제안 또는 승인하여 프로젝트에 저장하는 방식으로 진행.",
+      "summary": "MVP 5개 C.C.(Chest Pain, Dyspnea, Hemoptysis, Abdominal Pain, GI Bleeding) 목록 확정. 모두 hasTemplate:true. cc는 Title Case 통일, templateKey는 kebab-case. lib/ai/resources/cc-list.json 저장 완료.",
+      "completedAt": "2026-04-14T14:19:20.112Z"
+    },
+    {
+      "id": "fd6cdf96-1d49-48af-837b-6d962a7fdc3a",
+      "name": "Step 3: style_guide.md 준비 및 검토",
+      "description": "AI Stage 2에서 HPI 문단을 생성할 때 참조하는 작성 스타일 가이드를 Markdown 파일로 준비합니다. AI가 어떤 말투로, 얼마나 길게, 무엇을 반드시 포함해야 하는지를 이 파일에서 배웁니다. 출력 언어는 혼용(한국어 문장 구조 + 영어 의학 용어)으로 확정된 상태입니다. 실제 본인이 쓰는 차팅 예시 문장을 2~3개 포함하면 AI 품질이 크게 향상됩니다.",
+      "notes": "ai-resource-preparation.md Step 3 참조. 이 파일은 schemas보다 먼저 완성되어야 합니다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "e85f8fd0-303d-4490-9ca1-c99ad5c424d6"
+        }
+      ],
+      "createdAt": "2026-04-14T15:19:37.058Z",
+      "updatedAt": "2026-04-19T02:03:37.952Z",
+      "relatedFiles": [
+        {
+          "path": "docs/guide/ai-resource-preparation.md",
+          "type": "REFERENCE",
+          "description": "Step 3: HPI 스타일 가이드 섹션 참조",
+          "lineStart": 243,
+          "lineEnd": 293
+        },
+        {
+          "path": "lib/ai/resources/style_guide.md",
+          "type": "CREATE",
+          "description": "생성할 HPI 스타일 가이드 파일"
+        }
+      ],
+      "implementationGuide": "1. ChatGPT에 요청: 응급실 의무기록 HPI 작성 스타일 가이드를 Markdown으로 작성해줘. 혼용(한국어 문장 + 영어 의학 용어) 기준, 3~5문장의 간결한 문체. 시제, 어투, 필수 포함 요소, 금지 표현, 예시 출력 섹션 포함.\\n2. 직접 사용하는 실제 차팅 예시 문장 2~3개를 파일 하단에 추가\\n3. 완성된 파일을 lib/ai/resources/style_guide.md 로 저장",
+      "verificationCriteria": "lib/ai/resources/style_guide.md 파일이 존재하고, 언어/시제/어투/필수 포함 요소/금지 사항/예시 출력 섹션이 포함되어 있으며, 실제 차팅 예시 문장이 1개 이상 포함되어 있는지 확인",
+      "analysisResult": "ai-resource-preparation.md 개정(4단계 파이프라인, C.C.별 schemas/ 분리, History 섹션 추가)에 따라 pending 태스크 6개를 재구성합니다. 올바른 의존성 체인: Step3(style_guide) → Step4(templates) → Step2(schemas) → Step5(guides) → Step6-prep → Step6(fixtures). 코드 작성 없이 의사가 ChatGPT를 활용해 실제 파일을 준비하는 작업 단위로 구성합니다.",
+      "summary": "lib/ai/resources/style_guide.md 생성 완료. 언어 규칙(혼용 원칙), 문장 구조·길이, 필수 포함 요소 7가지, 선택 포함 요소, 특수 표기 규칙(양음성 소견·수치·시간 표기), 톤·문체, C.C.별 특이사항(MVP 5개 + 향후 확장), 실제 차팅 예시 문장 3개 포함. 초안 대비 누락된 Hemoptysis 섹션 추가, GI bleeding hematochezia 구분 보완, 표기 통일 적용.",
+      "completedAt": "2026-04-19T02:03:37.940Z"
+    },
+    {
+      "id": "40ff99b5-af21-4b97-aa92-87de2a5f882c",
+      "name": "Step 4: templates/{cc}.json 5개 준비 및 검토",
+      "description": "AI Stage 3에서 구조화된 JSON을 받아 채워 넣어야 하는 상용구 틀을 C.C.별 JSON 파일로 준비합니다. MVP 5개 C.C.(Chest pain, Dyspnea, Hemoptysis, Abdominal pain, GI bleeding) 각각에 대응하는 파일이 필요합니다. 현재 EMR에서 실제로 사용하는 상용구 형식을 기반으로 만들면 가장 정확합니다. 이 파일은 schemas/{cc}.json 작성 시 ChatGPT에 함께 제공되므로 반드시 먼저 완성해야 합니다.",
+      "notes": "ai-resource-preparation.md Step 4 참조. EMR 상용구가 없으면 ChatGPT로 생성 가능하나, 실제 EMR 상용구 기반이 품질에 훨씬 유리합니다. 5개 파일 모두 완성 후 다음 단계로 진행하세요.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "fd6cdf96-1d49-48af-837b-6d962a7fdc3a"
+        }
+      ],
+      "createdAt": "2026-04-14T15:19:37.058Z",
+      "updatedAt": "2026-04-19T03:07:24.597Z",
+      "relatedFiles": [
+        {
+          "path": "docs/guide/ai-resource-preparation.md",
+          "type": "REFERENCE",
+          "description": "Step 4: 상용구 템플릿 섹션 참조",
+          "lineStart": 295,
+          "lineEnd": 341
+        },
+        {
+          "path": "lib/ai/resources/templates/chest-pain.json",
+          "type": "CREATE",
+          "description": "Chest pain 상용구 템플릿"
+        },
+        {
+          "path": "lib/ai/resources/templates/dyspnea.json",
+          "type": "CREATE",
+          "description": "Dyspnea 상용구 템플릿"
+        },
+        {
+          "path": "lib/ai/resources/templates/hemoptysis.json",
+          "type": "CREATE",
+          "description": "Hemoptysis 상용구 템플릿"
+        },
+        {
+          "path": "lib/ai/resources/templates/abdominal-pain.json",
+          "type": "CREATE",
+          "description": "Abdominal pain 상용구 템플릿"
+        },
+        {
+          "path": "lib/ai/resources/templates/gi-bleeding.json",
+          "type": "CREATE",
+          "description": "GI bleeding 상용구 템플릿"
+        }
+      ],
+      "implementationGuide": "각 C.C.별로:\\n1. 현재 EMR의 실제 상용구를 복사\\n2. ChatGPT에 요청: 이 상용구 형식을 JSON 템플릿으로 변환해줘. 필드 기반(필드명: 영어, 설명: 한국어) 또는 문장 블록 형식 선택\\n3. 저장 경로: lib/ai/resources/templates/{templateKey}.json\\n   - chest-pain.json, dyspnea.json, hemoptysis.json, abdominal-pain.json, gi-bleeding.json",
+      "verificationCriteria": "lib/ai/resources/templates/ 폴더에 5개 파일(chest-pain.json, dyspnea.json, hemoptysis.json, abdominal-pain.json, gi-bleeding.json)이 모두 존재하고, 각 파일에 templateKey와 label 필드, 그리고 필드 기반 또는 문장 블록 형식의 상용구 구조가 포함되어 있는지 확인",
+      "analysisResult": "ai-resource-preparation.md 개정(4단계 파이프라인, C.C.별 schemas/ 분리, History 섹션 추가)에 따라 pending 태스크 6개를 재구성합니다. 올바른 의존성 체인: Step3(style_guide) → Step4(templates) → Step2(schemas) → Step5(guides) → Step6-prep → Step6(fixtures). 코드 작성 없이 의사가 ChatGPT를 활용해 실제 파일을 준비하는 작업 단위로 구성합니다.",
+      "summary": "lib/ai/resources/templates/ 폴더에 5개 파일(chest-pain.json, dyspnea.json, hemoptysis.json, abdominal-pain.json, gi-bleeding.json) 모두 존재. 각 파일에 templateKey, cc(label 역할), instructions, fields 배열(open/symptom_check 타입), output_example 포함. 실제 EMR 상용구 형식을 반영한 필드 기반 구조로 AI Stage 3에서 바로 활용 가능한 수준. abdominal-pain.json에는 conditional 필드(임신 가능성)도 포함되어 있어 확장성 고려됨.",
+      "completedAt": "2026-04-19T03:07:24.594Z"
+    },
+    {
+      "id": "60a3c633-b2a9-48de-b904-8fdfa7b212bc",
+      "name": "Step 2: C.C.별 schemas/{cc}.json 5개 준비 및 검토",
+      "description": "AI Stage 1(normalize)에서 의사의 키워드 카드를 구조화된 JSON으로 변환할 때 사용하는 C.C.별 개별 스키마 파일 5개를 준비합니다. 기존의 단일 structured_schema.json 방식에서 C.C.별 개별 파일 방식으로 변경됩니다.\\n\\n각 스키마는 ChatGPT에 완성된 HPI 차트 텍스트 10~20개(익명화 필수)와 해당 C.C.의 상용구 템플릿을 함께 제공한 뒤 생성합니다. ChatGPT가 차트 데이터를 분석해 어떤 필드가 필요한지, 각 카드가 어느 섹션(HPI/상용구/History)에 해당하는지를 직접 판단합니다.\\n\\n각 파일에 반드시 포함되어야 하는 요소:\\n- inputs.sections 배열: 각 카드가 사용될 섹션 분류 (hpi / template / history, 복수 선택 가능)\\n- past_history, medication_history, operation_history (항상 포함, 없으면 null)\\n- family_history (조건부, 없으면 null — History 출력 시 제외)",
+      "notes": "ai-resource-preparation.md Step 2 참조. templates/{cc}.json 5개가 모두 완성된 후 이 단계를 시작하세요. C.C.마다 스키마가 다를 수 있으므로 5개를 각각 별도 ChatGPT 요청으로 처리하는 것을 권장합니다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "40ff99b5-af21-4b97-aa92-87de2a5f882c"
+        }
+      ],
+      "createdAt": "2026-04-14T15:19:37.058Z",
+      "updatedAt": "2026-04-19T03:55:30.564Z",
+      "relatedFiles": [
+        {
+          "path": "docs/guide/ai-resource-preparation.md",
+          "type": "REFERENCE",
+          "description": "Step 2: C.C.별 정규화 스키마 설계 섹션 참조",
+          "lineStart": 101,
+          "lineEnd": 241
+        },
+        {
+          "path": "lib/ai/resources/schemas/chest-pain.json",
+          "type": "CREATE",
+          "description": "Chest pain 정규화 스키마"
+        },
+        {
+          "path": "lib/ai/resources/schemas/dyspnea.json",
+          "type": "CREATE",
+          "description": "Dyspnea 정규화 스키마"
+        },
+        {
+          "path": "lib/ai/resources/schemas/hemoptysis.json",
+          "type": "CREATE",
+          "description": "Hemoptysis 정규화 스키마"
+        },
+        {
+          "path": "lib/ai/resources/schemas/abdominal-pain.json",
+          "type": "CREATE",
+          "description": "Abdominal pain 정규화 스키마"
+        },
+        {
+          "path": "lib/ai/resources/schemas/gi-bleeding.json",
+          "type": "CREATE",
+          "description": "GI bleeding 정규화 스키마"
+        },
+        {
+          "path": "lib/ai/resources/templates",
+          "type": "DEPENDENCY",
+          "description": "ChatGPT에 함께 제공할 상용구 템플릿 폴더"
+        },
+        {
+          "path": "lib/ai/types.ts",
+          "type": "REFERENCE",
+          "description": "StructuredCase placeholder 인터페이스 — Task 010에서 이 스키마와 맞춰 확정"
+        }
+      ],
+      "implementationGuide": "C.C. 하나씩 반복:\\nA. 해당 C.C. 완성된 HPI 차트 텍스트 10~20개 수집 (날짜/이름/나이/병록번호 삭제)\\nB. ChatGPT 프롬프트 구성:\\n   - 시스템 설명: 4단계 파이프라인, History 섹션 구성(Past/Med/Op 필수, Family 조건부) 포함\\n   - 데이터 1: 익명화된 HPI 차트 10~20개\\n   - 데이터 2: 해당 C.C.의 templates/{cc}.json 파일 내용\\n   - 요청: C.C.별 JSON Schema draft-07 생성, inputs.sections 포함, History 최상위 필드 포함\\nC. 저장 경로: lib/ai/resources/schemas/{templateKey}.json\\n   5개 파일: chest-pain.json, dyspnea.json, hemoptysis.json, abdominal-pain.json, gi-bleeding.json\\nD. 검토: inputs.sections 분류 타당성, History 필드 포함 여부 확인",
+      "verificationCriteria": "lib/ai/resources/schemas/ 폴더에 5개 파일이 존재하고, 각 파일이 JSON Schema draft-07 형식이며, inputs 배열 항목에 raw_text/normalized_text/category/sections 필드가 있고, 최상위에 past_history/medication_history/operation_history/family_history 필드가 포함되어 있는지 확인",
+      "analysisResult": "ai-resource-preparation.md 개정(4단계 파이프라인, C.C.별 schemas/ 분리, History 섹션 추가)에 따라 pending 태스크 6개를 재구성합니다. 올바른 의존성 체인: Step3(style_guide) → Step4(templates) → Step2(schemas) → Step5(guides) → Step6-prep → Step6(fixtures). 코드 작성 없이 의사가 ChatGPT를 활용해 실제 파일을 준비하는 작업 단위로 구성합니다.",
+      "summary": "lib/ai/resources/schemas/ 폴더에 5개 파일 모두 존재 확인: chest-pain.json, dyspnea.json, hemoptysis.json, abdominal-pain.json, gi-bleeding.json. 전체 JSON Schema draft-07 형식. 모든 파일에 inputs 배열(raw_text/normalized_text/category/sections), past_history/medication_history/operation_history/family_history 최상위 필드 포함. 각 C.C.별 특화 임상 필드 설계 완료. dyspnea/abdominal-pain/gi-bleeding은 실제 케이스 기반, chest-pain/hemoptysis는 응급의학 표준 기반으로 생성.",
+      "completedAt": "2026-04-19T03:55:30.562Z"
+    },
+    {
+      "id": "834a130d-d556-4011-8ca6-6c137c6e9ccb",
+      "name": "Step 5: guides/{cc}.md 5~10개 준비 및 검토",
+      "description": "새 케이스 입력 화면에서 의사 옆에 표시되는 C.C.별 문진 체크리스트를 Markdown 파일로 준비합니다. AI가 사용하는 것이 아니라 의사가 문진 시 직접 참고하는 자료입니다. MVP 5개 C.C. 우선으로 시작하고, 필요에 따라 추가할 수 있습니다.",
+      "notes": "ai-resource-preparation.md Step 5 참조. schemas/{cc}.json 완성 후 어떤 항목을 문진해야 할지 구조가 명확해지므로 schemas 이후에 작성하면 더 일관성 있는 체크리스트를 만들 수 있습니다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "60a3c633-b2a9-48de-b904-8fdfa7b212bc"
+        }
+      ],
+      "createdAt": "2026-04-14T15:19:37.058Z",
+      "updatedAt": "2026-04-19T03:57:16.443Z",
+      "relatedFiles": [
+        {
+          "path": "docs/guide/ai-resource-preparation.md",
+          "type": "REFERENCE",
+          "description": "Step 5: 문진 가이드라인 섹션 참조",
+          "lineStart": 343,
+          "lineEnd": 383
+        },
+        {
+          "path": "lib/ai/resources/guides/chest-pain.md",
+          "type": "CREATE",
+          "description": "Chest pain 문진 가이드라인"
+        },
+        {
+          "path": "lib/ai/resources/guides/dyspnea.md",
+          "type": "CREATE",
+          "description": "Dyspnea 문진 가이드라인"
+        },
+        {
+          "path": "lib/ai/resources/guides/hemoptysis.md",
+          "type": "CREATE",
+          "description": "Hemoptysis 문진 가이드라인"
+        },
+        {
+          "path": "lib/ai/resources/guides/abdominal-pain.md",
+          "type": "CREATE",
+          "description": "Abdominal pain 문진 가이드라인"
+        },
+        {
+          "path": "lib/ai/resources/guides/gi-bleeding.md",
+          "type": "CREATE",
+          "description": "GI bleeding 문진 가이드라인"
+        }
+      ],
+      "implementationGuide": "각 C.C.별로:\\n1. ChatGPT에 요청: 응급실 [C.C.명] 환자 문진 가이드라인을 Markdown 체크리스트로 만들어줘. 핵심 문진 항목, 주요 감별 진단 포인트, 위험 신호 3개 섹션 포함, 간결하고 실용적으로\\n2. 저장 경로: lib/ai/resources/guides/{templateKey}.md\\n   - chest-pain.md, dyspnea.md, hemoptysis.md, abdominal-pain.md, gi-bleeding.md",
+      "verificationCriteria": "lib/ai/resources/guides/ 폴더에 5개 파일(MVP C.C. 기준)이 존재하고, 각 파일에 핵심 문진 항목 체크리스트, 감별 진단 포인트, 위험 신호 섹션이 포함되어 있는지 확인",
+      "analysisResult": "ai-resource-preparation.md 개정(4단계 파이프라인, C.C.별 schemas/ 분리, History 섹션 추가)에 따라 pending 태스크 6개를 재구성합니다. 올바른 의존성 체인: Step3(style_guide) → Step4(templates) → Step2(schemas) → Step5(guides) → Step6-prep → Step6(fixtures). 코드 작성 없이 의사가 ChatGPT를 활용해 실제 파일을 준비하는 작업 단위로 구성합니다.",
+      "summary": "lib/ai/resources/guides/ 폴더에 MVP 5개 파일 생성 완료: chest-pain.md, dyspnea.md, hemoptysis.md, abdominal-pain.md, gi-bleeding.md. 각 파일에 3개 섹션 포함: (1) 핵심 문진 항목 체크리스트(체크박스 형식), (2) 감별 진단 포인트 표, (3) 위험 신호. 혼용 언어 원칙 준수. gi-bleeding.md에 Hematemesis/Melena/Hematochezia 변형 C.C. 안내 추가.",
+      "completedAt": "2026-04-19T03:57:16.441Z"
+    },
+    {
+      "id": "a5bc6f80-a307-483e-aabd-b42d4b53c6a3",
+      "name": "Step 6-prep: lib/ai/load-resources.ts 및 폴더 골격 생성",
+      "description": "모든 리소스 파일이 준비된 후, lib/ai/load-resources.ts 명시적 매핑 함수 스텁을 생성하고 examples/ 폴더와 빈 .jsonl 파일을 만들어 Task 003을 완성합니다. 이 파일은 C.C.의 templateKey를 기준으로 schemas/{cc}.json, templates/{cc}.json, guides/{cc}.md를 로드하는 매핑 함수입니다. 실제 AI 로직(Task 010)에서 이 함수를 호출합니다.",
+      "notes": "코드 작성이 포함되는 유일한 단계입니다. 단, 실제 AI 로직은 포함하지 않고 파일 로드 스텁만 생성합니다. schemas/ 폴더를 사용하므로 기존 structured_schema.json 관련 코드가 있다면 제거합니다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "834a130d-d556-4011-8ca6-6c137c6e9ccb"
+        }
+      ],
+      "createdAt": "2026-04-14T15:19:37.058Z",
+      "updatedAt": "2026-04-19T03:58:50.050Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/load-resources.ts",
+          "type": "CREATE",
+          "description": "C.C.별 리소스 파일 로드 매핑 함수 스텁"
+        },
+        {
+          "path": "lib/ai/resources/examples",
+          "type": "CREATE",
+          "description": "C.C.별 few-shot 예시 폴더 (빈 .jsonl 파일들)"
+        },
+        {
+          "path": "lib/ai/types.ts",
+          "type": "TO_MODIFY",
+          "description": "StructuredCase 타입을 schemas/{cc}.json과 연계되도록 주석 업데이트"
+        }
+      ],
+      "implementationGuide": "1. lib/ai/resources/schemas/ 폴더 생성 확인 (파일들이 이미 준비되어 있어야 함)\\n2. lib/ai/resources/examples/ 폴더 생성 + 5개 C.C.별 빈 .jsonl 파일 생성\\n   (chest-pain.jsonl, dyspnea.jsonl, hemoptysis.jsonl, abdominal-pain.jsonl, gi-bleeding.jsonl)\\n3. lib/ai/load-resources.ts 스텁 생성:\\n   - loadSchema(templateKey): schemas/{templateKey}.json 로드\\n   - loadTemplate(templateKey): templates/{templateKey}.json 로드\\n   - loadGuide(templateKey): guides/{templateKey}.md 로드\\n   - loadExamples(templateKey): examples/{templateKey}.jsonl 로드\\n   - CC_TEMPLATE_KEYS 상수: 5개 templateKey 목록\\n4. 실제 구현은 TODO(Task 010) 주석으로 표시",
+      "verificationCriteria": "lib/ai/load-resources.ts 파일이 존재하고, loadSchema/loadTemplate/loadGuide/loadExamples 함수 스텁이 있으며, lib/ai/resources/examples/ 폴더에 5개 .jsonl 파일이 존재하는지 확인",
+      "analysisResult": "ai-resource-preparation.md 개정(4단계 파이프라인, C.C.별 schemas/ 분리, History 섹션 추가)에 따라 pending 태스크 6개를 재구성합니다. 올바른 의존성 체인: Step3(style_guide) → Step4(templates) → Step2(schemas) → Step5(guides) → Step6-prep → Step6(fixtures). 코드 작성 없이 의사가 ChatGPT를 활용해 실제 파일을 준비하는 작업 단위로 구성합니다.",
+      "summary": "lib/ai/load-resources.ts 생성 완료. loadSchema/loadTemplate/loadGuide/loadExamples 4개 함수 스텁 + CC_TEMPLATE_KEYS 상수 + CcTemplateKey 타입 export. lib/ai/resources/examples/ 폴더에 5개 빈 .jsonl 파일(chest-pain/dyspnea/hemoptysis/abdominal-pain/gi-bleeding) 생성. lib/ai/types.ts의 StructuredCase 인터페이스에 category/sections/과거력 4종 필드 추가 및 schemas/{cc}.json 연계 주석 업데이트. Task 010에서 실제 AI 로직 연결 예정임을 TODO 주석으로 명시.",
+      "completedAt": "2026-04-19T03:58:50.045Z"
+    },
+    {
+      "id": "5dc69eaa-ee11-463e-9256-4bb10dd25673",
+      "name": "Step 6: fixtures/ 케이스 샘플 준비 및 검토",
+      "description": "AI 품질 검증을 위한 테스트 케이스 샘플을 준비합니다. 실제 문진한 환자 사례를 익명화한 JSON 파일로, Task 010(AI 파이프라인 CLI 하네스) 착수 직전에 제공해야 합니다. 개인정보 완전 제거가 필수입니다.\\n\\n파이프라인이 4단계로 확장되어 각 fixture에 expectedHistory 필드가 추가됩니다:\\n- expectedHpi: AI가 생성할 이상적인 HPI 줄글\\n- expectedTemplate: AI가 채울 이상적인 상용구 필드값\\n- expectedHistory: AI가 생성할 이상적인 History 섹션 텍스트 (Past/Med/Op Hx. 항상 포함, Family Hx. 조건부)",
+      "notes": "ai-resource-preparation.md Step 6 참조. Task 010 착수 직전에 제공하면 됩니다. expectedHistory의 Past/Med/Op Hx.는 내용이 없어도 (-) 로 반드시 포함하고, Family Hx.는 해당 내용이 없으면 아예 생략합니다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "a5bc6f80-a307-483e-aabd-b42d4b53c6a3"
+        }
+      ],
+      "createdAt": "2026-04-14T15:19:37.058Z",
+      "updatedAt": "2026-04-19T04:12:57.052Z",
+      "relatedFiles": [
+        {
+          "path": "docs/guide/ai-resource-preparation.md",
+          "type": "REFERENCE",
+          "description": "Step 6: fixtures 케이스 샘플 섹션 참조",
+          "lineStart": 386,
+          "lineEnd": 433
+        },
+        {
+          "path": "fixtures/case-01.json",
+          "type": "CREATE",
+          "description": "테스트 케이스 샘플 1번 (Chest pain 권장)"
+        },
+        {
+          "path": "fixtures/case-02.json",
+          "type": "CREATE",
+          "description": "테스트 케이스 샘플 2번 (Dyspnea 권장)"
+        },
+        {
+          "path": "fixtures/case-03.json",
+          "type": "CREATE",
+          "description": "테스트 케이스 샘플 3번 (Abdominal pain 권장, 선택)"
+        }
+      ],
+      "implementationGuide": "1. C.C. 다양하게 2~3개 케이스 선정 (Chest pain, Dyspnea, Abdominal pain 등)\\n2. 각 케이스별 JSON 구성:\\n   - case: cc, bedZone, bedNumber\\n   - inputs: 의사가 모바일로 입력할 키워드 카드 목록 (rawText, timeTag, timeOffsetMinutes)\\n   - expectedHpi: 이상적인 HPI 줄글 (직접 작성)\\n   - expectedTemplate: 이상적인 상용구 필드값 (직접 작성)\\n   - expectedHistory: 이상적인 History 텍스트 (직접 작성)\\n     예시: Past Hx. : 고혈압\\nMed Hx.  : amlodipine 5mg\\nOp Hx.   : (-)\\n     (Family Hx.는 내용 있을 때만 포함)\\n3. 저장 경로: fixtures/case-01.json, fixtures/case-02.json 등",
+      "verificationCriteria": "fixtures/ 폴더에 2~3개의 케이스 JSON 파일이 존재하고, 각 파일에 case/inputs/expectedHpi/expectedTemplate/expectedHistory 필드가 있으며, 개인식별 정보(날짜/이름/나이/병록번호)가 제거되어 있고, expectedHistory에 Past/Med/Op Hx.가 항상 포함되어 있는지 확인",
+      "analysisResult": "ai-resource-preparation.md 개정(4단계 파이프라인, C.C.별 schemas/ 분리, History 섹션 추가)에 따라 pending 태스크 6개를 재구성합니다. 올바른 의존성 체인: Step3(style_guide) → Step4(templates) → Step2(schemas) → Step5(guides) → Step6-prep → Step6(fixtures). 코드 작성 없이 의사가 ChatGPT를 활용해 실제 파일을 준비하는 작업 단위로 구성합니다.",
+      "summary": "fixtures/ 폴더에 2개 케이스 JSON 파일 생성 완료. case-01.json: Chest pain (12개 입력 카드, 시간 태그 포함, NTG 무반응 시나리오), case-02.json: GI bleeding (3개 입력 카드, hematemesis+melena 혼합, 시간 태그 포함). 각 파일에 case/inputs/expectedHpi/expectedTemplate/expectedHistory 필드 포함. 개인식별 정보 제거(날짜→상대 시간 변환). expectedHistory에 Past/Med/Op Hx. 항상 포함. C.C. 2종(심폐계+소화기계) 검증 가능.",
+      "completedAt": "2026-04-19T04:12:57.050Z"
+    },
+    {
+      "id": "105388bd-5a18-4525-aec7-cc44da00fd82",
+      "name": "Step 2-1: schemas/chest-pain.json 생성",
+      "description": "Chest pain C.C.에 대한 AI Stage 1 정규화 스키마를 생성합니다.\n\n사용자가 이 대화에서 익명화된 Chest pain HPI 차트 텍스트를 제공하면, Claude가 해당 텍스트와 templates/chest-pain.json을 분석하여 JSON Schema draft-07 파일을 생성하고 lib/ai/resources/schemas/chest-pain.json에 저장합니다.\n\n각 파일에 반드시 포함되어야 하는 요소:\n- inputs 배열: raw_text, normalized_text, category, sections (hpi/template/history 복수 가능)\n- 최상위 필드: past_history, medication_history, operation_history (항상 포함, 없으면 null)\n- 최상위 필드: family_history (조건부, 없으면 null)\n- Chest pain 특화 임상 필드 (onset, location, character, severity, radiation 등)",
+      "notes": "차트 텍스트가 없는 경우 Claude가 응급의학과 Chest pain 문진 표준을 기반으로 스키마를 초안 생성할 수 있으나, 실제 차트 데이터 기반이 품질에 유리합니다. 개인정보(날짜/이름/나이/병록번호) 제거 필수.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "40ff99b5-af21-4b97-aa92-87de2a5f882c"
+        }
+      ],
+      "createdAt": "2026-04-19T03:12:49.741Z",
+      "updatedAt": "2026-04-19T03:53:53.700Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/resources/schemas/chest-pain.json",
+          "type": "CREATE",
+          "description": "생성할 Chest pain 정규화 스키마"
+        },
+        {
+          "path": "lib/ai/resources/templates/chest-pain.json",
+          "type": "DEPENDENCY",
+          "description": "분석에 함께 사용할 상용구 템플릿"
+        },
+        {
+          "path": "docs/guide/ai-resource-preparation.md",
+          "type": "REFERENCE",
+          "description": "Step 2 스키마 설계 가이드"
+        }
+      ],
+      "implementationGuide": "1. 사용자에게 Chest pain HPI 차트 텍스트 제공 요청 (익명화 안내 포함)\n2. 제공된 차트 텍스트와 templates/chest-pain.json을 함께 분석\n3. 차트에서 반복 등장하는 임상 항목 → 스키마 필드로 추출\n4. inputs.category enum 값을 이 C.C.에 맞게 역으로 추론\n5. inputs.sections 분류: 증상 관련 → hpi+template, 과거력/복용약/수술력 → history\n6. JSON Schema draft-07 형식으로 작성 후 저장",
+      "verificationCriteria": "lib/ai/resources/schemas/chest-pain.json 파일이 존재하고, JSON Schema draft-07 형식이며, inputs 배열 항목에 raw_text/normalized_text/category/sections 필드가 있고, 최상위에 past_history/medication_history/operation_history/family_history 필드가 포함되어 있는지 확인",
+      "analysisResult": "Step 2(C.C.별 schemas/{cc}.json 5개 준비)를 C.C.별 5개 독립 서브태스크로 분리합니다. 기존 ChatGPT 활용 방식 대신, 사용자가 이 대화에서 직접 익명화된 HPI 차트 텍스트를 제공하면 Claude가 분석 후 스키마를 생성하고 파일로 저장하는 방식으로 진행합니다. 각 서브태스크는 C.C.별로 독립적이며, 5개 모두 완료되어야 Step 5(guides/)로 진행할 수 있습니다.",
+      "summary": "lib/ai/resources/schemas/chest-pain.json 생성 완료. JSON Schema draft-07 형식. inputs 배열에 raw_text/normalized_text/category/sections 포함. 18개 category enum. Chest pain 특화 최상위 필드: onset_character(acute/gradual), location, character, radiation, resting_pain(boolean), exertional_pain(boolean), ntg_response, ongoing(boolean), severity. past_history/medication_history/operation_history/family_history 모두 포함. 실제 차트 데이터 없이 응급의학 표준 기반으로 작성.",
+      "completedAt": "2026-04-19T03:53:53.698Z"
+    },
+    {
+      "id": "6b3b6377-5aea-4414-935b-f0416af7e7be",
+      "name": "Step 2-2: schemas/dyspnea.json 생성",
+      "description": "Dyspnea C.C.에 대한 AI Stage 1 정규화 스키마를 생성합니다.\n\n사용자가 이 대화에서 익명화된 Dyspnea HPI 차트 텍스트를 제공하면, Claude가 해당 텍스트와 templates/dyspnea.json을 분석하여 JSON Schema draft-07 파일을 생성하고 lib/ai/resources/schemas/dyspnea.json에 저장합니다.\n\n각 파일에 반드시 포함되어야 하는 요소:\n- inputs 배열: raw_text, normalized_text, category, sections (hpi/template/history 복수 가능)\n- 최상위 필드: past_history, medication_history, operation_history, family_history\n- Dyspnea 특화 임상 필드 (onset, orthopnea, aggravating_factor 등)",
+      "notes": "차트 텍스트 미제공 시 Claude가 응급의학과 Dyspnea 표준을 기반으로 초안 생성 가능.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "40ff99b5-af21-4b97-aa92-87de2a5f882c"
+        }
+      ],
+      "createdAt": "2026-04-19T03:12:49.741Z",
+      "updatedAt": "2026-04-19T03:43:10.159Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/resources/schemas/dyspnea.json",
+          "type": "CREATE",
+          "description": "생성할 Dyspnea 정규화 스키마"
+        },
+        {
+          "path": "lib/ai/resources/templates/dyspnea.json",
+          "type": "DEPENDENCY",
+          "description": "분석에 함께 사용할 상용구 템플릿"
+        }
+      ],
+      "implementationGuide": "1. 사용자에게 Dyspnea HPI 차트 텍스트 제공 요청\n2. 제공된 차트 텍스트와 templates/dyspnea.json을 함께 분석\n3. Dyspnea 특화 임상 항목 추출 (기좌호흡, 악화 요인, 동반 증상 등)\n4. inputs.category enum 값을 호흡곤란 문진 맥락에 맞게 추론\n5. JSON Schema draft-07 형식으로 작성 후 저장",
+      "verificationCriteria": "lib/ai/resources/schemas/dyspnea.json 파일이 존재하고, JSON Schema draft-07 형식이며, inputs 배열 항목에 raw_text/normalized_text/category/sections 필드가 있고, 최상위에 past_history/medication_history/operation_history/family_history 필드가 포함되어 있는지 확인",
+      "analysisResult": "Step 2(C.C.별 schemas/{cc}.json 5개 준비)를 C.C.별 5개 독립 서브태스크로 분리합니다. 기존 ChatGPT 활용 방식 대신, 사용자가 이 대화에서 직접 익명화된 HPI 차트 텍스트를 제공하면 Claude가 분석 후 스키마를 생성하고 파일로 저장하는 방식으로 진행합니다. 각 서브태스크는 C.C.별로 독립적이며, 5개 모두 완료되어야 Step 5(guides/)로 진행할 수 있습니다.",
+      "summary": "lib/ai/resources/schemas/dyspnea.json 생성 완료. JSON Schema draft-07 형식. inputs 배열에 raw_text/normalized_text/category/sections 필드 포함. category enum: onset, onset_character, severity, orthopnea, nocturnal_symptom, aggravating_factor, relieving_factor, prior_episode, associated_symptom, vital_sign, suspected_cause, past_history, medication_history, operation_history, family_history, other (3개 실제 차트 케이스 분석 기반 — 천식악화/HD fluid overload/심장판막질환). 최상위 임상 필드: onset, onset_character, orthopnea, nocturnal_symptom, aggravating_factor, relieving_factor, prior_episode, severity_description, associated_symptoms. History 필드: past_history/medication_history/operation_history 항상 포함, family_history 조건부.",
+      "completedAt": "2026-04-19T03:43:10.156Z"
+    },
+    {
+      "id": "323ce53b-c6cc-4525-81e6-7a76d958d576",
+      "name": "Step 2-3: schemas/hemoptysis.json 생성",
+      "description": "Hemoptysis C.C.에 대한 AI Stage 1 정규화 스키마를 생성합니다.\n\n사용자가 이 대화에서 익명화된 Hemoptysis HPI 차트 텍스트를 제공하면, Claude가 해당 텍스트와 templates/hemoptysis.json을 분석하여 JSON Schema draft-07 파일을 생성하고 lib/ai/resources/schemas/hemoptysis.json에 저장합니다.\n\nHemoptysis 특화 필드: color, amount, frequency, dyspnea, weight_loss 등",
+      "notes": "차트 텍스트 미제공 시 Claude가 응급의학과 Hemoptysis 표준을 기반으로 초안 생성 가능.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "40ff99b5-af21-4b97-aa92-87de2a5f882c"
+        }
+      ],
+      "createdAt": "2026-04-19T03:12:49.741Z",
+      "updatedAt": "2026-04-19T03:53:55.923Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/resources/schemas/hemoptysis.json",
+          "type": "CREATE",
+          "description": "생성할 Hemoptysis 정규화 스키마"
+        },
+        {
+          "path": "lib/ai/resources/templates/hemoptysis.json",
+          "type": "DEPENDENCY",
+          "description": "분석에 함께 사용할 상용구 템플릿"
+        }
+      ],
+      "implementationGuide": "1. 사용자에게 Hemoptysis HPI 차트 텍스트 제공 요청\n2. 제공된 차트 텍스트와 templates/hemoptysis.json을 함께 분석\n3. 각혈 특화 임상 항목 추출 (색깔, 양, 횟수, 기저 폐질환 등)\n4. inputs.category enum 값을 각혈 문진 맥락에 맞게 추론\n5. JSON Schema draft-07 형식으로 작성 후 저장",
+      "verificationCriteria": "lib/ai/resources/schemas/hemoptysis.json 파일이 존재하고, JSON Schema draft-07 형식이며, inputs 배열 항목에 raw_text/normalized_text/category/sections 필드가 있고, 최상위에 past_history/medication_history/operation_history/family_history 필드가 포함되어 있는지 확인",
+      "analysisResult": "Step 2(C.C.별 schemas/{cc}.json 5개 준비)를 C.C.별 5개 독립 서브태스크로 분리합니다. 기존 ChatGPT 활용 방식 대신, 사용자가 이 대화에서 직접 익명화된 HPI 차트 텍스트를 제공하면 Claude가 분석 후 스키마를 생성하고 파일로 저장하는 방식으로 진행합니다. 각 서브태스크는 C.C.별로 독립적이며, 5개 모두 완료되어야 Step 5(guides/)로 진행할 수 있습니다.",
+      "summary": "lib/ai/resources/schemas/hemoptysis.json 생성 완료. JSON Schema draft-07 형식. inputs 배열에 raw_text/normalized_text/category/sections 포함. 14개 category enum. Hemoptysis 특화 최상위 필드: color, amount, count, trigger, dyspnea(boolean), recent_weight_loss(boolean), tb_exposure(결핵 접촉/이력), associated_symptoms 배열. past_history/medication_history/operation_history/family_history 모두 포함. 실제 차트 데이터 없이 응급의학 표준 기반으로 작성.",
+      "completedAt": "2026-04-19T03:53:55.920Z"
+    },
+    {
+      "id": "477e9b49-84fd-4b38-9b46-d8579dbbfdb2",
+      "name": "Step 2-4: schemas/abdominal-pain.json 생성",
+      "description": "Abdominal pain C.C.에 대한 AI Stage 1 정규화 스키마를 생성합니다.\n\n사용자가 이 대화에서 익명화된 Abdominal pain HPI 차트 텍스트를 제공하면, Claude가 해당 텍스트와 templates/abdominal-pain.json을 분석하여 JSON Schema draft-07 파일을 생성하고 lib/ai/resources/schemas/abdominal-pain.json에 저장합니다.\n\nAbdominal pain 특화 필드: character, location, intensity, NPO, gas_out, last_defecation, 임신 가능성(조건부) 등",
+      "notes": "차트 텍스트 미제공 시 Claude가 응급의학과 Abdominal pain 표준을 기반으로 초안 생성 가능. 조건부 필드 처리에 주의.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "40ff99b5-af21-4b97-aa92-87de2a5f882c"
+        }
+      ],
+      "createdAt": "2026-04-19T03:12:49.741Z",
+      "updatedAt": "2026-04-19T03:47:40.132Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/resources/schemas/abdominal-pain.json",
+          "type": "CREATE",
+          "description": "생성할 Abdominal pain 정규화 스키마"
+        },
+        {
+          "path": "lib/ai/resources/templates/abdominal-pain.json",
+          "type": "DEPENDENCY",
+          "description": "분석에 함께 사용할 상용구 템플릿"
+        }
+      ],
+      "implementationGuide": "1. 사용자에게 Abdominal pain HPI 차트 텍스트 제공 요청\n2. 제공된 차트 텍스트와 templates/abdominal-pain.json을 함께 분석\n3. 복통 특화 임상 항목 추출 (위치, 양상, NPO, 배변 등)\n4. 가임기 여성 조건부 필드(임신 가능성) 처리 방식 스키마에 반영\n5. JSON Schema draft-07 형식으로 작성 후 저장",
+      "verificationCriteria": "lib/ai/resources/schemas/abdominal-pain.json 파일이 존재하고, JSON Schema draft-07 형식이며, inputs 배열 항목에 raw_text/normalized_text/category/sections 필드가 있고, 최상위에 past_history/medication_history/operation_history/family_history 필드가 포함되어 있는지 확인",
+      "analysisResult": "Step 2(C.C.별 schemas/{cc}.json 5개 준비)를 C.C.별 5개 독립 서브태스크로 분리합니다. 기존 ChatGPT 활용 방식 대신, 사용자가 이 대화에서 직접 익명화된 HPI 차트 텍스트를 제공하면 Claude가 분석 후 스키마를 생성하고 파일로 저장하는 방식으로 진행합니다. 각 서브태스크는 C.C.별로 독립적이며, 5개 모두 완료되어야 Step 5(guides/)로 진행할 수 있습니다.",
+      "summary": "lib/ai/resources/schemas/abdominal-pain.json 생성 완료. 3개 실제 케이스(Enterocolitis/야간 복통 식사연관/Epigastric pain) 분석 기반. inputs.category enum: onset/location/character/severity/progression/aggravating_factor/relieving_factor/food_related/npo_status/bowel_habit/pregnancy_possibility/associated_symptom/prior_visit/gi_procedure_history/history 4개. 복통 특화 최상위 필드: npo_solid/npo_liquid/gas_out/last_defecation/pregnancy_possibility/gi_procedure_history 포함. past_history/medication_history/operation_history/family_history는 [history] 전용으로 명확히 분리.",
+      "completedAt": "2026-04-19T03:47:40.130Z"
+    },
+    {
+      "id": "4a42e6fd-8249-4619-82e5-440420438089",
+      "name": "Step 2-5: schemas/gi-bleeding.json 생성",
+      "description": "GI bleeding C.C.에 대한 AI Stage 1 정규화 스키마를 생성합니다.\n\n사용자가 이 대화에서 익명화된 GI bleeding HPI 차트 텍스트를 제공하면, Claude가 해당 텍스트와 templates/gi-bleeding.json을 분석하여 JSON Schema draft-07 파일을 생성하고 lib/ai/resources/schemas/gi-bleeding.json에 저장합니다.\n\nGI bleeding 특화 필드: bleeding_type(hematemesis/melena/hematochezia), color, amount, count, NPO, 내시경 이력 등",
+      "notes": "차트 텍스트 미제공 시 Claude가 응급의학과 GI bleeding 표준을 기반으로 초안 생성 가능.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "40ff99b5-af21-4b97-aa92-87de2a5f882c"
+        }
+      ],
+      "createdAt": "2026-04-19T03:12:49.741Z",
+      "updatedAt": "2026-04-19T03:51:01.460Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/resources/schemas/gi-bleeding.json",
+          "type": "CREATE",
+          "description": "생성할 GI bleeding 정규화 스키마"
+        },
+        {
+          "path": "lib/ai/resources/templates/gi-bleeding.json",
+          "type": "DEPENDENCY",
+          "description": "분석에 함께 사용할 상용구 템플릿"
+        }
+      ],
+      "implementationGuide": "1. 사용자에게 GI bleeding HPI 차트 텍스트 제공 요청\n2. 제공된 차트 텍스트와 templates/gi-bleeding.json을 함께 분석\n3. 위장관 출혈 특화 임상 항목 추출 (출혈 형태, 양, 내시경 이력 등)\n4. inputs.category enum 값을 GI bleeding 문진 맥락에 맞게 추론\n5. JSON Schema draft-07 형식으로 작성 후 저장",
+      "verificationCriteria": "lib/ai/resources/schemas/gi-bleeding.json 파일이 존재하고, JSON Schema draft-07 형식이며, inputs 배열 항목에 raw_text/normalized_text/category/sections 필드가 있고, 최상위에 past_history/medication_history/operation_history/family_history 필드가 포함되어 있는지 확인",
+      "analysisResult": "Step 2(C.C.별 schemas/{cc}.json 5개 준비)를 C.C.별 5개 독립 서브태스크로 분리합니다. 기존 ChatGPT 활용 방식 대신, 사용자가 이 대화에서 직접 익명화된 HPI 차트 텍스트를 제공하면 Claude가 분석 후 스키마를 생성하고 파일로 저장하는 방식으로 진행합니다. 각 서브태스크는 C.C.별로 독립적이며, 5개 모두 완료되어야 Step 5(guides/)로 진행할 수 있습니다.",
+      "summary": "lib/ai/resources/schemas/gi-bleeding.json 생성 완료. JSON Schema draft-07 형식. inputs 배열에 raw_text/normalized_text/category/sections 필드 포함. 15개 category enum(onset/bleeding_type/amount/count/trigger/npo_status/associated_symptom/prior_episode/endoscopy_history/vital_sign/과거력 4종/other). 최상위에 past_history/medication_history/operation_history/family_history 포함. GI bleeding 특화 필드: bleeding_types 배열, hematemesis_detail/melena_detail/hematochezia_detail 각각 세분화. cc-list.json에 Hematemesis/Melena/Hematochezia 3개 항목 추가(templateKey: gi-bleeding). Case 1 케이스(hematemesis 2차례 + melena 3차례 + 재발 hematemesis)를 기반으로 출혈 형태별 상세 필드 구조 설계.",
+      "completedAt": "2026-04-19T03:51:01.456Z"
+    },
+    {
+      "id": "84781230-6154-48a3-bcc8-d9dc74ee0b42",
+      "name": "004-1: npm 패키지 및 shadcn 컴포넌트 설치",
+      "description": "Phase 2~3 전반에 필요한 npm 패키지와 shadcn/ui 컴포넌트를 설치합니다.\n\n설치 대상:\n- npm 패키지: react-hook-form zod date-fns @google/genai tsx\n- shadcn/ui 컴포넌트: textarea toast select tabs separator skeleton toggle-group\n\n수락 기준:\n- package.json dependencies에 react-hook-form, zod, date-fns, @google/genai가 추가됨\n- package.json devDependencies에 tsx가 추가됨\n- components/ui/ 아래에 textarea.tsx, select.tsx, tabs.tsx, separator.tsx, skeleton.tsx, toggle-group.tsx 파일 생성됨\n- toast 관련 컴포넌트(toaster.tsx 등) 생성됨",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-19T04:18:06.448Z",
+      "updatedAt": "2026-04-19T04:20:37.407Z",
+      "relatedFiles": [
+        {
+          "path": "package.json",
+          "type": "TO_MODIFY",
+          "description": "의존성 추가 확인"
+        },
+        {
+          "path": "components/ui/",
+          "type": "TO_MODIFY",
+          "description": "shadcn 컴포넌트 자동 생성 위치"
+        }
+      ],
+      "implementationGuide": "1. npm install react-hook-form zod date-fns @google/genai\n2. npm install -D tsx\n3. npx shadcn@latest add textarea\n4. npx shadcn@latest add toast (또는 sonner — shadcn 버전에 따라)\n5. npx shadcn@latest add select\n6. npx shadcn@latest add tabs\n7. npx shadcn@latest add separator\n8. npx shadcn@latest add skeleton\n9. npx shadcn@latest add toggle-group\n10. package.json과 components/ui/ 폴더를 확인해 설치 완료 검증",
+      "verificationCriteria": "package.json에 5개 패키지가 추가되고, components/ui/ 아래 7개 shadcn 컴포넌트 파일이 생성됨",
+      "analysisResult": "Task 004: 공통 컴포넌트 및 더미 데이터 유틸리티 구현\\n\\nPhase 2 UI 작업의 기반이 되는 공통 컴포넌트와 더미 데이터를 구축합니다.\\n기존 shadcn/ui 패턴(cva + cn + VariantProps)을 철저히 따르며, 기존 LogoutButton/Badge/Button 컴포넌트를 재활용합니다.\\n모든 파일은 @/ 경로 별칭, kebab-case 파일명, PascalCase 컴포넌트명을 사용합니다.",
+      "summary": "npm 패키지 4개(react-hook-form, zod, date-fns, @google/genai) + devDependency tsx 설치 완료. shadcn/ui 컴포넌트 8개(textarea, select, tabs, separator, skeleton, toggle, toggle-group, sonner) 설치 완료. package.json 확인됨.",
+      "completedAt": "2026-04-19T04:20:37.404Z"
+    },
+    {
+      "id": "c8818b70-1299-4732-95ac-097583e86f3b",
+      "name": "004-2: StatusBadge 컴포넌트 생성",
+      "description": "케이스 상태(draft/generating/completed/failed)를 색상과 아이콘으로 표시하는 배지 컴포넌트를 만듭니다.\n\n파일 위치: components/cases/status-badge.tsx\n\nProps 인터페이스:\n- status: CaseStatus ('draft' | 'generating' | 'completed' | 'failed')\n- className?: string\n\n상태별 표시:\n- draft: outline variant, Clock 아이콘, '초안' 텍스트\n- generating: secondary variant, Loader2 아이콘(animate-spin), '생성 중' 텍스트\n- completed: default variant, CheckCircle2 아이콘, '완료' 텍스트\n- failed: destructive variant, XCircle 아이콘, '실패' 텍스트\n\n수락 기준:\n- Server Component (use client 없음)\n- CaseStatus 타입을 @/lib/supabase/types에서 import\n- 기존 Badge(components/ui/badge.tsx)를 내부에서 활용\n- 4가지 상태가 올바르게 렌더링됨",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "84781230-6154-48a3-bcc8-d9dc74ee0b42"
+        }
+      ],
+      "createdAt": "2026-04-19T04:18:06.448Z",
+      "updatedAt": "2026-04-19T04:20:56.955Z",
+      "relatedFiles": [
+        {
+          "path": "components/cases/status-badge.tsx",
+          "type": "CREATE",
+          "description": "상태 배지 컴포넌트"
+        },
+        {
+          "path": "components/ui/badge.tsx",
+          "type": "REFERENCE",
+          "description": "기존 Badge 컴포넌트 재활용"
+        },
+        {
+          "path": "lib/supabase/types.ts",
+          "type": "DEPENDENCY",
+          "description": "CaseStatus 타입"
+        }
+      ],
+      "implementationGuide": "1. components/cases/ 폴더 생성\n2. status-badge.tsx 파일 생성\n3. STATUS_CONFIG 매핑 객체 정의:\n   { draft: { variant, label, Icon }, generating: {...}, ... }\n4. StatusBadge 함수형 컴포넌트:\n   - status와 className prop 받음\n   - STATUS_CONFIG[status]로 variant/label/Icon 조회\n   - Badge 컴포넌트에 variant 전달\n   - Icon 컴포넌트를 Badge 내부에 렌더링\n   - generating 상태의 Loader2에 className='animate-spin' 추가",
+      "verificationCriteria": "4가지 CaseStatus 값을 props로 받아 각각 다른 색상/아이콘으로 렌더링. TypeScript 오류 없음.",
+      "analysisResult": "Task 004: 공통 컴포넌트 및 더미 데이터 유틸리티 구현\\n\\nPhase 2 UI 작업의 기반이 되는 공통 컴포넌트와 더미 데이터를 구축합니다.\\n기존 shadcn/ui 패턴(cva + cn + VariantProps)을 철저히 따르며, 기존 LogoutButton/Badge/Button 컴포넌트를 재활용합니다.\\n모든 파일은 @/ 경로 별칭, kebab-case 파일명, PascalCase 컴포넌트명을 사용합니다.",
+      "summary": "StatusBadge 컴포넌트 생성 완료. STATUS_CONFIG 매핑 객체로 4가지 상태(draft/generating/completed/failed)별 variant/label/Icon 정의. Server Component로 구현. 기존 Badge 재활용. generating 상태에 animate-spin 클래스 적용.",
+      "completedAt": "2026-04-19T04:20:56.951Z"
+    },
+    {
+      "id": "fb8c4454-33f8-40f3-8d87-2d9754137db7",
+      "name": "004-3: BedBadge 컴포넌트 생성",
+      "description": "베드번호를 'A-3' 형식으로 표시하는 배지 컴포넌트를 만듭니다. sm/md/lg 크기 variant를 지원합니다.\n\n파일 위치: components/cases/bed-badge.tsx\n\nProps 인터페이스:\n- bedZone: BedZone ('A' | 'B' | 'R')\n- bedNumber: number\n- size?: 'sm' | 'md' | 'lg' (기본값: 'md')\n- className?: string\n\n크기별 스타일:\n- sm: text-xs, px-1.5 py-0.5, rounded\n- md: text-sm, px-2.5 py-0.5, rounded-md (기본값)\n- lg: text-base font-semibold, px-3 py-1, rounded-md\n\n표시 형식: 'A-3', 'B-11', 'R-4' 등\n\n수락 기준:\n- Server Component (use client 없음)\n- BedZone 타입을 @/lib/supabase/types에서 import\n- cva를 사용한 size variant\n- 기존 Badge(components/ui/badge.tsx)를 내부에서 활용",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-19T04:18:06.448Z",
+      "updatedAt": "2026-04-19T04:21:13.501Z",
+      "relatedFiles": [
+        {
+          "path": "components/cases/bed-badge.tsx",
+          "type": "CREATE",
+          "description": "베드번호 배지 컴포넌트"
+        },
+        {
+          "path": "components/ui/badge.tsx",
+          "type": "REFERENCE",
+          "description": "기존 Badge 컴포넌트 재활용"
+        },
+        {
+          "path": "lib/supabase/types.ts",
+          "type": "DEPENDENCY",
+          "description": "BedZone 타입"
+        }
+      ],
+      "implementationGuide": "1. components/cases/bed-badge.tsx 파일 생성\n2. cva로 bedBadgeVariants 정의:\n   variants: { size: { sm: '...', md: '...', lg: '...' } }\n3. BedBadgeProps 인터페이스 정의\n4. BedBadge 함수형 컴포넌트:\n   - bedZone, bedNumber, size='md', className prop 받음\n   - 표시 문자열: `${bedZone}-${bedNumber}`\n   - Badge 컴포넌트에 variant='outline' 및 cva 클래스 전달",
+      "verificationCriteria": "bedZone='A', bedNumber=3 → 'A-3' 렌더링. sm/md/lg 크기가 다르게 적용됨. TypeScript 오류 없음.",
+      "analysisResult": "Task 004: 공통 컴포넌트 및 더미 데이터 유틸리티 구현\\n\\nPhase 2 UI 작업의 기반이 되는 공통 컴포넌트와 더미 데이터를 구축합니다.\\n기존 shadcn/ui 패턴(cva + cn + VariantProps)을 철저히 따르며, 기존 LogoutButton/Badge/Button 컴포넌트를 재활용합니다.\\n모든 파일은 @/ 경로 별칭, kebab-case 파일명, PascalCase 컴포넌트명을 사용합니다.",
+      "summary": "BedBadge 컴포넌트 생성 완료. cva로 sm/md/lg size variant 정의. BedZone 타입 사용. \"A-3\" 형식으로 렌더링. Server Component로 구현. primary 색상 배경 적용.",
+      "completedAt": "2026-04-19T04:21:13.498Z"
+    },
+    {
+      "id": "4e5ca5e1-b643-4b38-ae1b-88e9c8d01d74",
+      "name": "004-4: CopyButton 컴포넌트 생성",
+      "description": "텍스트를 클립보드에 복사하는 버튼 컴포넌트를 만듭니다. 복사 완료 시 아이콘이 체크 표시로 바뀌고 2초 후 원상복귀됩니다.\n\n파일 위치: components/cases/copy-button.tsx\n\nProps 인터페이스:\n- text: string (복사할 텍스트)\n- className?: string\n\n동작:\n1. 버튼 클릭 시 navigator.clipboard.writeText(text) 실행\n2. 성공 시 copied 상태를 true로 변경\n3. 아이콘: Copy(기본) → Check(복사 완료)\n4. 2초 후 copied 상태를 false로 리셋\n\n수락 기준:\n- 'use client' 지시어 포함 (useState 필요)\n- 기존 Button(components/ui/button.tsx)을 variant='ghost' size='icon'으로 사용\n- Copy, Check 아이콘 사용 (lucide-react)\n- 클립보드 복사 완료 시 2초간 체크 아이콘 표시",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-19T04:18:06.448Z",
+      "updatedAt": "2026-04-19T04:21:28.685Z",
+      "relatedFiles": [
+        {
+          "path": "components/cases/copy-button.tsx",
+          "type": "CREATE",
+          "description": "클립보드 복사 버튼 컴포넌트"
+        },
+        {
+          "path": "components/ui/button.tsx",
+          "type": "REFERENCE",
+          "description": "기존 Button 컴포넌트 재활용"
+        }
+      ],
+      "implementationGuide": "1. components/cases/copy-button.tsx 파일 생성\n2. 'use client' 선언\n3. useState<boolean>(false) — copied 상태\n4. handleCopy 함수:\n   - navigator.clipboard.writeText(text)\n   - setCopied(true)\n   - setTimeout(() => setCopied(false), 2000)\n5. 렌더링:\n   - Button variant='ghost' size='icon'\n   - {copied ? <Check /> : <Copy />}",
+      "verificationCriteria": "버튼 클릭 시 text 내용이 클립보드에 복사되고, 체크 아이콘이 2초간 표시된 후 복사 아이콘으로 돌아옴",
+      "analysisResult": "Task 004: 공통 컴포넌트 및 더미 데이터 유틸리티 구현\\n\\nPhase 2 UI 작업의 기반이 되는 공통 컴포넌트와 더미 데이터를 구축합니다.\\n기존 shadcn/ui 패턴(cva + cn + VariantProps)을 철저히 따르며, 기존 LogoutButton/Badge/Button 컴포넌트를 재활용합니다.\\n모든 파일은 @/ 경로 별칭, kebab-case 파일명, PascalCase 컴포넌트명을 사용합니다.",
+      "summary": "CopyButton 컴포넌트 생성 완료. use client 선언, useState로 copied 상태 관리. navigator.clipboard.writeText 사용. 2초 후 상태 리셋. Copy/Check 아이콘 전환. aria-label 접근성 포함.",
+      "completedAt": "2026-04-19T04:21:28.681Z"
+    },
+    {
+      "id": "0a95362e-55d6-4f63-b0f3-a723c75fb06d",
+      "name": "004-5: AppNavbar 완성 및 더미 데이터 생성",
+      "description": "앱 공통 레이아웃의 네비바를 완성하고, Phase 2 UI 개발에 사용할 더미 케이스 데이터를 생성합니다.\n\n## AppNavbar (app/(app)/layout.tsx 수정)\n\n현재 TODO 주석이 있는 헤더를 실제 네비바로 교체합니다.\n\n구조:\n- 로고: 'ER Scribe' 텍스트 (좌측)\n- 데스크탑(md:) 네비 링크 (수평 배치): 대시보드(/dashboard), 케이스 목록(/cases), 가이드라인(/guidelines), 설정(/settings)\n- 모바일: 로고만 표시 (하단 탭바는 Task 005~006에서 구체화)\n- 우측: LogoutButton 컴포넌트 재활용\n\n## 더미 케이스 데이터 (lib/mock/cases.ts 생성)\n\nCase 타입 배열을 export합니다. 각 케이스에 bed_zone, bed_number 포함.\n\n더미 케이스 5개 (상태 다양화):\n1. completed, A-3, Chest pain\n2. completed, B-7, Dyspnea\n3. generating, R-2, GI bleeding\n4. failed, A-1, Abdominal pain\n5. draft, B-11, Hemoptysis\n\n각 케이스 필드:\n- id: UUID 형식 문자열\n- user_id: 더미 UUID\n- bed_zone: BedZone\n- bed_number: number\n- cc: string | null\n- cc_has_template: boolean\n- template_key: string | null\n- status: CaseStatus\n- current_result_id: null\n- created_at / updated_at: ISO 날짜 문자열",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-19T04:18:06.448Z",
+      "updatedAt": "2026-04-19T04:22:19.138Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/layout.tsx",
+          "type": "TO_MODIFY",
+          "description": "네비바 TODO 교체",
+          "lineStart": 1,
+          "lineEnd": 27
+        },
+        {
+          "path": "components/logout-button.tsx",
+          "type": "REFERENCE",
+          "description": "기존 로그아웃 버튼 재활용"
+        },
+        {
+          "path": "lib/mock/cases.ts",
+          "type": "CREATE",
+          "description": "더미 케이스 데이터"
+        },
+        {
+          "path": "lib/supabase/types.ts",
+          "type": "DEPENDENCY",
+          "description": "Case, CaseStatus, BedZone 타입"
+        }
+      ],
+      "implementationGuide": "## layout.tsx 수정\n1. 기존 header 내부 TODO 주석 제거\n2. 네비 링크 추가: next/link의 Link 컴포넌트 사용\n3. md: 이상에서만 네비 링크 표시 (hidden md:flex)\n4. LogoutButton import from @/components/logout-button\n5. 레이아웃 유지: Server Component 그대로 유지 (LogoutButton은 'use client'지만 import 가능)\n\n## cases.ts 생성\n1. lib/mock/ 폴더 생성\n2. cases.ts 파일 생성\n3. Case 타입 import from @/lib/supabase/types\n4. MOCK_CASES: Case[] 배열 export\n5. 5개 더미 케이스 데이터 하드코딩",
+      "verificationCriteria": "데스크탑에서 네비 링크 4개가 헤더에 표시되고 로그아웃 버튼이 우측에 위치함. MOCK_CASES 배열이 5개 케이스를 포함하고 TypeScript 오류 없음.",
+      "analysisResult": "Task 004: 공통 컴포넌트 및 더미 데이터 유틸리티 구현\\n\\nPhase 2 UI 작업의 기반이 되는 공통 컴포넌트와 더미 데이터를 구축합니다.\\n기존 shadcn/ui 패턴(cva + cn + VariantProps)을 철저히 따르며, 기존 LogoutButton/Badge/Button 컴포넌트를 재활용합니다.\\n모든 파일은 @/ 경로 별칭, kebab-case 파일명, PascalCase 컴포넌트명을 사용합니다.",
+      "summary": "AppNavbar 완성: NAV_LINKS 배열로 대시보드/케이스 목록/가이드라인/설정 링크 구성, 데스크탑(md:)에서만 표시, LogoutButton 우측 배치, Server Component 유지. lib/mock/cases.ts 생성: 5가지 상태 다양화 더미 케이스(A-3/B-7/R-2/A-1/B-11). TypeScript 오류 없음.",
+      "completedAt": "2026-04-19T04:22:19.134Z"
+    },
+    {
+      "id": "65547604-b37d-4960-af5c-4de75e1ccf10",
+      "name": "Task 005-1: CaseCard 공통 컴포넌트 생성",
+      "description": "대시보드와 케이스 목록 페이지에서 공통으로 사용할 케이스 카드 컴포넌트를 만든다.\n\n컴포넌트 역할: 하나의 케이스를 카드 형태로 표시하며, 클릭 시 해당 케이스 결과 페이지(/cases/[id])로 이동한다.\n\n표시 내용:\n- BedBadge(size=sm) — 베드 구역/번호 (예: A-3)\n- StatusBadge — 케이스 상태(초안/생성 중/완료/실패)\n- C.C 텍스트 — 주요 증상\n- 날짜 — date-fns의 format() 사용, 'MM/dd HH:mm' 형식\n\n수락 기준:\n- Case 타입을 props로 받아 렌더링\n- 카드 전체가 Link로 감싸져 클릭 가능\n- hover 시 시각적 피드백(shadow 또는 bg 변화)\n- Server Component (useState 없음)",
+      "notes": "date-fns locale은 한국어(ko) import하되, 날짜 포맷 자체는 숫자 기반('MM/dd HH:mm')이므로 locale 필수는 아님. 단순화를 위해 locale 없이 format만 사용해도 무방. cc가 null일 수 있으므로 null 대비 fallback 텍스트 포함.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-19T04:33:17.317Z",
+      "updatedAt": "2026-04-19T04:35:44.873Z",
+      "relatedFiles": [
+        {
+          "path": "components/cases/case-card.tsx",
+          "type": "CREATE",
+          "description": "케이스 카드 컴포넌트 (신규 생성)"
+        },
+        {
+          "path": "components/cases/bed-badge.tsx",
+          "type": "DEPENDENCY",
+          "description": "BedBadge 컴포넌트"
+        },
+        {
+          "path": "components/cases/status-badge.tsx",
+          "type": "DEPENDENCY",
+          "description": "StatusBadge 컴포넌트"
+        },
+        {
+          "path": "components/ui/card.tsx",
+          "type": "DEPENDENCY",
+          "description": "shadcn Card 컴포넌트"
+        },
+        {
+          "path": "lib/supabase/types.ts",
+          "type": "REFERENCE",
+          "description": "Case 타입 정의"
+        }
+      ],
+      "implementationGuide": "// components/cases/case-card.tsx\nimport Link from 'next/link'\nimport { format } from 'date-fns'\nimport { ko } from 'date-fns/locale'\nimport { Card, CardContent } from '@/components/ui/card'\nimport { BedBadge } from '@/components/cases/bed-badge'\nimport { StatusBadge } from '@/components/cases/status-badge'\nimport type { Case } from '@/lib/supabase/types'\n\ninterface CaseCardProps { case: Case }\n\nexport function CaseCard({ case: c }: CaseCardProps) {\n  return (\n    <Link href={`/cases/${c.id}`}>\n      <Card className=\"hover:shadow-md transition-shadow cursor-pointer h-full\">\n        <CardContent className=\"p-4 flex flex-col gap-2\">\n          // 상단 행: BedBadge + StatusBadge\n          <div className=\"flex items-center gap-2\">\n            <BedBadge bedZone={c.bed_zone} bedNumber={c.bed_number} size=\"sm\" />\n            <StatusBadge status={c.status} />\n          </div>\n          // C.C 텍스트\n          <p className=\"font-medium\">{c.cc ?? '(C.C 미입력)'}</p>\n          // 날짜\n          <p className=\"text-sm text-muted-foreground\">\n            {format(new Date(c.created_at), 'MM/dd HH:mm')}\n          </p>\n        </CardContent>\n      </Card>\n    </Link>\n  )\n}",
+      "verificationCriteria": "- CaseCard를 렌더하면 BedBadge, StatusBadge, C.C 텍스트, 날짜가 모두 표시됨\n- 카드 전체 클릭 시 /cases/[id]로 이동\n- TypeScript 컴파일 에러 없음\n- cc가 null인 케이스도 에러 없이 렌더됨",
+      "analysisResult": "Task 005 목표: 더미 데이터를 활용해 대시보드 페이지 UI를 모바일/데스크탑 반응형으로 완성한다. Server Component 우선, Tailwind md: 브레이크포인트 기반 분기, BedBadge/StatusBadge 재사용. 실제 DB 연동은 Task 012에서 수행.\n\n핵심 결정 사항:\n- CaseCard를 별도 컴포넌트(components/cases/case-card.tsx)로 분리 → Task 008(케이스 목록)에서 재사용 가능\n- 날짜 포맷: date-fns 사용(^4.1.0 설치 확인됨)\n- 모바일 CTA: md:hidden 영역에 w-full 대형 버튼\n- 데스크탑 [+ 새 케이스]: 페이지 헤더 우측에 hidden md:flex로 표시",
+      "summary": "components/cases/case-card.tsx 생성 완료. Case 타입을 props로 받아 BedBadge(size=sm), StatusBadge, C.C 텍스트(null 시 fallback), 날짜(MM/dd HH:mm 포맷)를 렌더링. 카드 전체를 Link로 감싸 /cases/[id]로 이동. hover:shadow-md로 시각적 피드백. bed_zone/status는 string→enum 타입 캐스팅 처리. Server Component(useState 없음).",
+      "completedAt": "2026-04-19T04:35:44.871Z"
+    },
+    {
+      "id": "6dd417ba-d62f-4717-9ffa-170c58499a7f",
+      "name": "Task 005-2: 대시보드 페이지 UI 구현 (반응형 분기)",
+      "description": "대시보드 페이지를 모바일/데스크탑 반응형으로 완성한다. 더미 데이터(MOCK_CASES)를 활용한 정적 UI.\n\n모바일 레이아웃(md 미만):\n- 최상단에 대형 [새 케이스 시작] CTA 버튼 (w-full, 눈에 띄는 크기)\n- 그 아래 '최근 케이스' 섹션: 케이스 3개 세로 목록\n- '전체 목록 보기' 링크\n\n데스크탑 레이아웃(md 이상):\n- 페이지 헤더: '대시보드' 제목 + 우측 [+ 새 케이스] 버튼\n- 케이스 그리드: grid-cols-2 (lg: grid-cols-3)\n- '전체 목록 보기' 링크\n\n빈 상태:\n- MOCK_CASES가 비었을 때 안내 메시지 + CTA 버튼 표시",
+      "notes": "Server Component이므로 async 키워드 불필요(더미 데이터 사용). 실제 DB 연동 시(Task 012)에서 async + supabase 쿼리로 교체. 모바일 CTA의 높이(h-16)와 텍스트 크기(text-lg)는 '큰 버튼' 요구사항 충족을 위한 최솟값.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "65547604-b37d-4960-af5c-4de75e1ccf10"
+        }
+      ],
+      "createdAt": "2026-04-19T04:33:17.317Z",
+      "updatedAt": "2026-04-19T04:36:14.184Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/dashboard/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "대시보드 페이지 (TODO 껍데기 → 실제 UI로 교체)"
+        },
+        {
+          "path": "components/cases/case-card.tsx",
+          "type": "DEPENDENCY",
+          "description": "Task 005-1에서 생성한 CaseCard"
+        },
+        {
+          "path": "lib/mock/cases.ts",
+          "type": "REFERENCE",
+          "description": "더미 케이스 데이터"
+        },
+        {
+          "path": "app/(app)/layout.tsx",
+          "type": "REFERENCE",
+          "description": "공통 헤더/레이아웃 확인용"
+        }
+      ],
+      "implementationGuide": "// app/(app)/dashboard/page.tsx\nimport Link from 'next/link'\nimport { Button } from '@/components/ui/button'\nimport { CaseCard } from '@/components/cases/case-card'\nimport { MOCK_CASES } from '@/lib/mock/cases'\nimport { Plus } from 'lucide-react'\n\nexport default function DashboardPage() {\n  const recentCases = MOCK_CASES.slice(0, 3)\n\n  return (\n    <div className=\"flex flex-col gap-6 p-4 md:p-8\">\n      // 페이지 헤더 (데스크탑: 제목 + 우측 버튼)\n      <div className=\"flex items-center justify-between\">\n        <h1 className=\"text-xl font-semibold\">대시보드</h1>\n        <Button asChild className=\"hidden md:flex\">\n          <Link href=\"/cases/new\"><Plus /> 새 케이스</Link>\n        </Button>\n      </div>\n\n      // 모바일 전용 대형 CTA (md 이상에서 숨김)\n      <Button asChild size=\"lg\" className=\"w-full text-lg h-16 md:hidden\">\n        <Link href=\"/cases/new\">새 케이스 시작</Link>\n      </Button>\n\n      // 최근 케이스 섹션\n      <section>\n        <h2 className=\"text-sm font-medium text-muted-foreground mb-3\">최근 케이스</h2>\n        if (recentCases.length === 0) {\n          // 빈 상태 UI\n        } else {\n          <div className=\"grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3\">\n            {recentCases.map(c => <CaseCard key={c.id} case={c} />)}\n          </div>\n        }\n        <Link href=\"/cases\" className=\"text-sm text-muted-foreground hover:text-foreground mt-3 inline-block\">\n          전체 목록 보기 →\n        </Link>\n      </section>\n    </div>\n  )\n}",
+      "verificationCriteria": "- 모바일 뷰포트(360px)에서 대형 CTA 버튼이 최상단에 표시되고 [+ 새 케이스]는 숨김\n- 데스크탑 뷰포트(1280px)에서 우측 상단 [+ 새 케이스]가 표시되고 모바일 CTA는 숨김\n- 케이스 카드 3개가 그리드/목록으로 표시됨\n- 각 카드에 BedBadge, StatusBadge, C.C, 날짜 포함\n- '전체 목록 보기' 클릭 시 /cases로 이동\n- TypeScript 컴파일 에러 없음",
+      "analysisResult": "Task 005 목표: 더미 데이터를 활용해 대시보드 페이지 UI를 모바일/데스크탑 반응형으로 완성한다. Server Component 우선, Tailwind md: 브레이크포인트 기반 분기, BedBadge/StatusBadge 재사용. 실제 DB 연동은 Task 012에서 수행.\n\n핵심 결정 사항:\n- CaseCard를 별도 컴포넌트(components/cases/case-card.tsx)로 분리 → Task 008(케이스 목록)에서 재사용 가능\n- 날짜 포맷: date-fns 사용(^4.1.0 설치 확인됨)\n- 모바일 CTA: md:hidden 영역에 w-full 대형 버튼\n- 데스크탑 [+ 새 케이스]: 페이지 헤더 우측에 hidden md:flex로 표시",
+      "summary": "app/(app)/dashboard/page.tsx 구현 완료. 모바일(md 미만): 대형 CTA 버튼(h-16, text-lg, w-full) 최상단 + 최근 케이스 3개 목록. 데스크탑(md 이상): 헤더 우측 [+ 새 케이스] 버튼 + grid-cols-2(lg:grid-cols-3) 그리드. 빈 상태 안내 메시지+CTA 포함. 전체 목록 보기 링크. TypeScript 컴파일 에러 없음. Server Component.",
+      "completedAt": "2026-04-19T04:36:14.179Z"
+    },
+    {
+      "id": "4c9e3069-24bf-4176-a04b-8a413105afa5",
+      "name": "Task 006-1: parse-time-tag.ts 및 더미 카드 데이터 추가",
+      "description": "시간 표현 파싱 순수 함수를 만들고, 카드 타임라인 UI 테스트용 더미 카드 데이터를 추가한다.\n\n1. lib/time/parse-time-tag.ts 신규 생성\n   - parseTimeTag(text: string): { timeTag: string | null, timeOffsetMinutes: number | null }\n   - 한국어 패턴: N일 전(N*1440분), N시간 전(N*60분), N분 전(N분), 어제(1440분), 그제(2880분), 오늘(0분)\n   - 영어 패턴: N days ago, N hours ago\n   - 매칭 없으면 { timeTag: null, timeOffsetMinutes: null } 반환\n   - 첫 매칭 패턴의 matched string을 timeTag로 반환\n\n2. lib/mock/cases.ts 수정\n   - MOCK_CASE_INPUTS: CaseInput[] 배열 추가 (export)\n   - 시간 태그 있는 카드 4개: { id, case_id: MOCK_CASES[0].id, raw_text, time_tag, time_offset_minutes, display_order, created_at }\n     예: { raw_text: '3일 전부터 흉통', time_tag: '3일 전', time_offset_minutes: 4320, display_order: 1 }\n   - 시간 태그 없는 카드 2개: { time_tag: null, time_offset_minutes: null }\n   - MOCK_GUIDE_CONTENT: string — chest-pain 가이드라인 Markdown 샘플 텍스트 (하드코딩)",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-19T04:48:15.508Z",
+      "updatedAt": "2026-04-19T04:54:13.370Z",
+      "relatedFiles": [
+        {
+          "path": "lib/time/parse-time-tag.ts",
+          "type": "CREATE",
+          "description": "시간 표현 파싱 순수 함수"
+        },
+        {
+          "path": "lib/mock/cases.ts",
+          "type": "TO_MODIFY",
+          "description": "MOCK_CASE_INPUTS, MOCK_GUIDE_CONTENT 추가"
+        },
+        {
+          "path": "lib/supabase/types.ts",
+          "type": "REFERENCE",
+          "description": "CaseInput 타입 참조"
+        }
+      ],
+      "implementationGuide": "parse-time-tag.ts pseudocode:\n  const PATTERNS = [\n    { regex: /(\\d+)일\\s*전/, unit: 1440 },\n    { regex: /(\\d+)시간\\s*전/, unit: 60 },\n    { regex: /(\\d+)분\\s*전/, unit: 1 },\n    { regex: /어제/, fixed: 1440 },\n    { regex: /그제/, fixed: 2880 },\n    { regex: /오늘/, fixed: 0 },\n    { regex: /(\\d+)\\s*days?\\s*ago/, unit: 1440 },\n    { regex: /(\\d+)\\s*hours?\\s*ago/, unit: 60 },\n  ]\n  for each pattern:\n    if match: return { timeTag: match[0], timeOffsetMinutes: pattern.fixed ?? Number(match[1]) * pattern.unit }\n  return { timeTag: null, timeOffsetMinutes: null }",
+      "verificationCriteria": "parseTimeTag('3일 전부터') → { timeTag: '3일 전', timeOffsetMinutes: 4320 }\nparseTimeTag('어제 저녁부터') → { timeTag: '어제', timeOffsetMinutes: 1440 }\nparseTimeTag('흉통 있음') → { timeTag: null, timeOffsetMinutes: null }\nMOCK_CASE_INPUTS에 시간 태그 있는 카드 4개 + 없는 카드 2개 존재\nTypeScript 오류 없음",
+      "analysisResult": "Task 006: 새 케이스 입력 페이지 UI 구현. 더미 데이터 기반으로 7개 파일을 새로 생성하고 1개(lib/mock/cases.ts)를 수정한다. 의존성 순서: 순수 함수 → 더미 데이터 → 하위 컴포넌트 → 페이지 통합. react-markdown 없으므로 pre+whitespace-pre-wrap으로 가이드라인 표시. 모든 신규 컴포넌트는 'use client'. 기존 BedBadge, ToggleGroup, Badge, Card, Button, Textarea 컴포넌트 최대한 재사용.",
+      "summary": "lib/time/parse-time-tag.ts 생성 완료: 한국어(N일 전/N시간 전/N분 전/어제/그제/오늘) + 영어(N days ago/N hours ago) 패턴 파싱. lib/mock/cases.ts에 MOCK_CASE_INPUTS(시간 태그 있는 카드 4개 + 없는 카드 2개)와 MOCK_GUIDE_CONTENT(chest-pain 가이드라인 텍스트) 추가. TypeScript 오류 없음.",
+      "completedAt": "2026-04-19T04:54:13.361Z"
+    },
+    {
+      "id": "c3293ae5-2b1e-425f-ada5-b6b73ad05474",
+      "name": "Task 006-2: BedPicker 컴포넌트",
+      "description": "베드번호를 2-탭(구역 토글 → 번호 그리드)으로 선택하는 컴포넌트를 만든다.\n\ncomponents/cases/bed-picker.tsx 신규 생성:\n- Props: bedZone: BedZone, bedNumber: number, onChange: (zone: BedZone, number: number) => void\n- 구역 토글: shadcn ToggleGroup(type=single)으로 A/B/R 단일 선택\n- 번호 그리드: BED_NUMBERS_BY_ZONE[bedZone] 배열 기반, grid-cols-4 flex-wrap\n- 선택된 번호: Button variant=default, 나머지: variant=outline size=sm\n- 구역 변경 시 번호를 1로 초기화 → onChange(newZone, 1)\n- 현재 선택 상태 BedBadge(size=sm)로 헤더에 표시\n- 접근성: 각 번호 버튼에 aria-label=\"{zone}구역 {number}번 베드 선택\"\n- 360px 모바일 대응: w-10 h-10 버튼, 4열 그리드로 A(8개 = 2행), B(11개 = 3행), R(4개 = 1행)",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "4c9e3069-24bf-4176-a04b-8a413105afa5"
+        }
+      ],
+      "createdAt": "2026-04-19T04:48:15.508Z",
+      "updatedAt": "2026-04-19T04:54:45.769Z",
+      "relatedFiles": [
+        {
+          "path": "components/cases/bed-picker.tsx",
+          "type": "CREATE",
+          "description": "베드번호 선택 컴포넌트"
+        },
+        {
+          "path": "components/cases/bed-badge.tsx",
+          "type": "DEPENDENCY",
+          "description": "BedBadge 재사용"
+        },
+        {
+          "path": "components/ui/toggle-group.tsx",
+          "type": "DEPENDENCY",
+          "description": "ToggleGroup 재사용"
+        },
+        {
+          "path": "components/ui/button.tsx",
+          "type": "DEPENDENCY",
+          "description": "Button 재사용"
+        },
+        {
+          "path": "lib/cases/bed-config.ts",
+          "type": "DEPENDENCY",
+          "description": "BED_NUMBERS_BY_ZONE 참조"
+        },
+        {
+          "path": "lib/supabase/types.ts",
+          "type": "REFERENCE",
+          "description": "BedZone 타입 참조"
+        }
+      ],
+      "implementationGuide": "pseudocode:\ncomponent BedPicker({ bedZone, bedNumber, onChange }):\n  'use client'\n  return:\n    div (flex flex-col gap-3 p-3 border rounded-lg)\n      div (flex items-center justify-between)\n        span '베드 번호'\n        BedBadge bedZone bedNumber size=sm\n      ToggleGroup type=single value=bedZone\n        onValueChange=(newZone) => if newZone: onChange(newZone, 1)\n        ToggleGroupItem 'A' / 'B' / 'R'\n      div (grid grid-cols-4 gap-1)\n        BED_NUMBERS_BY_ZONE[bedZone].map(num =>\n          Button\n            variant = num===bedNumber ? 'default' : 'outline'\n            size='sm' className='w-10 h-10'\n            aria-label='{bedZone}구역 {num}번 베드 선택'\n            onClick = () => onChange(bedZone, num)\n            {num}",
+      "verificationCriteria": "A 선택 시 번호 그리드 1~8 표시\nB 선택 시 번호 그리드 1~11 표시\nR 선택 시 번호 그리드 1~4 표시\n구역 변경 시 번호가 1로 초기화됨\n현재 선택된 번호 버튼이 primary 색상\nBedBadge에 현재 선택값 표시\n360px 뷰포트에서 버튼 잘림 없음\nTypeScript 오류 없음",
+      "analysisResult": "Task 006: 새 케이스 입력 페이지 UI 구현. 더미 데이터 기반으로 7개 파일을 새로 생성하고 1개(lib/mock/cases.ts)를 수정한다. 의존성 순서: 순수 함수 → 더미 데이터 → 하위 컴포넌트 → 페이지 통합. react-markdown 없으므로 pre+whitespace-pre-wrap으로 가이드라인 표시. 모든 신규 컴포넌트는 'use client'. 기존 BedBadge, ToggleGroup, Badge, Card, Button, Textarea 컴포넌트 최대한 재사용.",
+      "summary": "components/cases/bed-picker.tsx 생성 완료. ToggleGroup으로 A/B/R 구역 토글, BED_NUMBERS_BY_ZONE 기반 grid-cols-4 번호 그리드, 선택된 번호 primary 강조, 구역 변경 시 번호 1로 초기화, BedBadge로 현재 선택 표시, aria-label 접근성 적용. TypeScript 오류 없음.",
+      "completedAt": "2026-04-19T04:54:45.767Z"
+    },
+    {
+      "id": "53be90a7-d6e0-4b06-949a-153202ded999",
+      "name": "Task 006-3: CcAutocomplete 컴포넌트",
+      "description": "C.C.(Chief Complaint)를 cc-list.json 기반으로 자동완성 검색하는 입력 컴포넌트를 만든다.\n\ncomponents/cases/cc-autocomplete.tsx 신규 생성:\n- Props: value: string, onSelect: (cc: string, hasTemplate: boolean, templateKey: string | null) => void\n- 텍스트 입력 시 cc-list.json의 cc 필드를 포함(includes) 기준으로 필터링\n- 필터 결과 드롭다운 리스트 표시 (최대 8개)\n- 각 항목에 hasTemplate=true이면 '상용구 있음' Badge 표시 (variant=secondary, size=sm)\n- 항목 클릭 시 onSelect 호출 + 드롭다운 닫기 + 입력창에 cc 표시\n- 빈 입력이면 드롭다운 숨김\n- 키보드: ESC로 드롭다운 닫기\n- cc-list.json은 정적 import로 불러옴",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "4c9e3069-24bf-4176-a04b-8a413105afa5"
+        }
+      ],
+      "createdAt": "2026-04-19T04:48:15.508Z",
+      "updatedAt": "2026-04-19T04:55:15.882Z",
+      "relatedFiles": [
+        {
+          "path": "components/cases/cc-autocomplete.tsx",
+          "type": "CREATE",
+          "description": "C.C. 자동완성 입력 컴포넌트"
+        },
+        {
+          "path": "lib/ai/resources/cc-list.json",
+          "type": "DEPENDENCY",
+          "description": "C.C. 목록 정적 import"
+        },
+        {
+          "path": "components/ui/input.tsx",
+          "type": "DEPENDENCY",
+          "description": "Input 재사용"
+        },
+        {
+          "path": "components/ui/badge.tsx",
+          "type": "DEPENDENCY",
+          "description": "Badge '상용구 있음' 표시"
+        }
+      ],
+      "implementationGuide": "pseudocode:\nimport ccList from '@/lib/ai/resources/cc-list.json'\n\ncomponent CcAutocomplete({ value, onSelect }):\n  'use client'\n  state: inputValue=value, open=false\n  filtered = inputValue ? ccList.filter(item => item.cc.toLowerCase().includes(inputValue.toLowerCase())) : []\n  \n  return div (relative):\n    Input value=inputValue onChange=setInputValue onFocus=setOpen(true)\n         onKeyDown=(e) => if e.key==='Escape': setOpen(false)\n         placeholder='C.C. 입력 (예: Chest pain)'\n    if open && filtered.length > 0:\n      div (absolute top-full left-0 right-0 z-10 border rounded-md bg-background shadow-md)\n        filtered.slice(0,8).map(item =>\n          button (flex items-center justify-between p-2 hover:bg-accent)\n            onClick = () => { onSelect(item.cc, item.hasTemplate, item.templateKey); setInputValue(item.cc); setOpen(false) }\n            span item.cc\n            if item.hasTemplate: Badge '상용구 있음'",
+      "verificationCriteria": "'chest' 입력 시 'Chest pain' 항목 표시\n항목 선택 시 onSelect 콜백 호출 + 드롭다운 닫힘\nhasTemplate=true 항목에 '상용구 있음' 배지 표시\nESC 키로 드롭다운 닫힘\nTypeScript 오류 없음",
+      "analysisResult": "Task 006: 새 케이스 입력 페이지 UI 구현. 더미 데이터 기반으로 7개 파일을 새로 생성하고 1개(lib/mock/cases.ts)를 수정한다. 의존성 순서: 순수 함수 → 더미 데이터 → 하위 컴포넌트 → 페이지 통합. react-markdown 없으므로 pre+whitespace-pre-wrap으로 가이드라인 표시. 모든 신규 컴포넌트는 'use client'. 기존 BedBadge, ToggleGroup, Badge, Card, Button, Textarea 컴포넌트 최대한 재사용.",
+      "summary": "components/cases/cc-autocomplete.tsx 생성 완료. cc-list.json 정적 import, includes 기반 필터링, 최대 8개 드롭다운, hasTemplate=true 시 '상용구 있음' Badge 표시, ESC/외부 클릭으로 드롭다운 닫기, onSelect 콜백 연동. TypeScript 오류 없음.",
+      "completedAt": "2026-04-19T04:55:15.877Z"
+    },
+    {
+      "id": "97fe5744-e671-4812-b770-928e25d4382a",
+      "name": "Task 006-4: CardTimeline 및 GuidelinePanel 컴포넌트",
+      "description": "카드 타임라인 스택과 가이드라인 패널 컴포넌트를 만든다.\n\n1. components/cases/card-timeline.tsx 신규 생성:\n   - Props: cards: CaseInput[]\n   - 시간 태그 있는 카드: time_offset_minutes 오름차순 정렬 후 표시\n   - 시간 태그 없는 카드: 별도 '시간 미상' 섹션으로 표시\n   - 각 카드: Card 컴포넌트 안에 raw_text + time_tag Badge\n   - 섹션 레이블: '시간 순' / '시간 미상' (text-xs text-muted-foreground)\n   - 카드가 없으면 '입력된 카드가 없습니다' 안내 메시지\n\n2. components/cases/guideline-panel.tsx 신규 생성:\n   - Props: content: string | null, cc: string | null\n   - content가 있으면 pre 태그(whitespace-pre-wrap text-sm font-sans)로 표시\n   - content가 null이고 cc가 있으면 '가이드라인을 불러오는 중입니다...' 표시\n   - cc가 null이면 'C.C.를 입력하면 문진 가이드라인이 표시됩니다' 안내\n   - overflow-y-auto로 패널 내 스크롤",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "4c9e3069-24bf-4176-a04b-8a413105afa5"
+        }
+      ],
+      "createdAt": "2026-04-19T04:48:15.508Z",
+      "updatedAt": "2026-04-19T04:55:49.970Z",
+      "relatedFiles": [
+        {
+          "path": "components/cases/card-timeline.tsx",
+          "type": "CREATE",
+          "description": "카드 타임라인 스택 컴포넌트"
+        },
+        {
+          "path": "components/cases/guideline-panel.tsx",
+          "type": "CREATE",
+          "description": "가이드라인 Markdown 패널 컴포넌트"
+        },
+        {
+          "path": "lib/supabase/types.ts",
+          "type": "REFERENCE",
+          "description": "CaseInput 타입 참조"
+        },
+        {
+          "path": "components/ui/card.tsx",
+          "type": "DEPENDENCY",
+          "description": "Card 재사용"
+        },
+        {
+          "path": "components/ui/badge.tsx",
+          "type": "DEPENDENCY",
+          "description": "Badge 시간 태그 표시"
+        },
+        {
+          "path": "lib/mock/cases.ts",
+          "type": "REFERENCE",
+          "description": "MOCK_CASE_INPUTS 참조"
+        }
+      ],
+      "implementationGuide": "CardTimeline pseudocode:\ncomponent CardTimeline({ cards }):\n  timedCards = cards.filter(c => c.time_tag != null).sort((a,b) => (a.time_offset_minutes??0) - (b.time_offset_minutes??0))\n  untimedCards = cards.filter(c => c.time_tag == null)\n  if cards.length === 0: return '입력된 카드가 없습니다'\n  return div (flex flex-col gap-4):\n    if timedCards.length > 0:\n      p '시간 순'\n      timedCards.map(card =>\n        Card: CardContent: div(flex justify-between): span card.raw_text / Badge card.time_tag\n    if untimedCards.length > 0:\n      p '시간 미상'\n      untimedCards.map(card => Card: CardContent: span card.raw_text)\n\nGuidelinePanel pseudocode:\ncomponent GuidelinePanel({ content, cc }):\n  return div (h-full overflow-y-auto p-4):\n    if !cc: p 'C.C.를 입력하면 가이드라인이 표시됩니다'\n    else if !content: p '가이드라인을 불러오는 중...'\n    else: pre (whitespace-pre-wrap text-sm font-sans leading-relaxed) content",
+      "verificationCriteria": "MOCK_CASE_INPUTS 전달 시 시간 태그 카드 4개가 오름차순으로 상단, 시간 미상 카드 2개가 하단에 표시\n각 시간 태그 카드에 time_tag 배지 표시\ncontent=null, cc='Chest pain' 전달 시 '불러오는 중' 메시지 표시\ncc=null 전달 시 C.C. 입력 안내 메시지 표시\nTypeScript 오류 없음",
+      "analysisResult": "Task 006: 새 케이스 입력 페이지 UI 구현. 더미 데이터 기반으로 7개 파일을 새로 생성하고 1개(lib/mock/cases.ts)를 수정한다. 의존성 순서: 순수 함수 → 더미 데이터 → 하위 컴포넌트 → 페이지 통합. react-markdown 없으므로 pre+whitespace-pre-wrap으로 가이드라인 표시. 모든 신규 컴포넌트는 'use client'. 기존 BedBadge, ToggleGroup, Badge, Card, Button, Textarea 컴포넌트 최대한 재사용.",
+      "summary": "card-timeline.tsx: 시간 태그 카드 오름차순 정렬 후 '시간 순' 섹션, 시간 미상 카드 별도 섹션, 빈 상태 안내 메시지 구현. guideline-panel.tsx: cc null→안내, content null→로딩 중, content 있음→pre 태그 렌더링. TypeScript 오류 없음.",
+      "completedAt": "2026-04-19T04:55:49.968Z"
+    },
+    {
+      "id": "708a0c81-c3a1-49e4-aa3c-99efd4c90002",
+      "name": "Task 006-5: CardInputBar 컴포넌트",
+      "description": "하단 고정 카드 입력창 컴포넌트를 만든다.\n\ncomponents/cases/card-input-bar.tsx 신규 생성:\n- Props: onSubmit: (rawText: string, timeTag: string | null, timeOffsetMinutes: number | null) => void\n- Textarea(1행, 최대 4행 autoResize 또는 고정 2행)로 입력\n- Enter 키: 전송 (Shift+Enter는 줄바꿈)\n- 전송 버튼: Send 아이콘(lucide-react)\n- 입력 시 parseTimeTag(text)로 시간 태그 미리 감지 → 감지된 태그를 입력창 아래에 작은 배지로 표시\n- 전송 시 onSubmit(text, timeTag, timeOffsetMinutes) 호출 + 입력창 초기화\n- 빈 텍스트 전송 불가\n- 위치: sticky bottom-0 (fixed 대신 레이아웃 모드에 따라 부모가 제어)\n- 배경: bg-background border-t 패딩 p-3",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "4c9e3069-24bf-4176-a04b-8a413105afa5"
+        }
+      ],
+      "createdAt": "2026-04-19T04:48:15.508Z",
+      "updatedAt": "2026-04-19T04:56:14.052Z",
+      "relatedFiles": [
+        {
+          "path": "components/cases/card-input-bar.tsx",
+          "type": "CREATE",
+          "description": "하단 카드 입력창 컴포넌트"
+        },
+        {
+          "path": "lib/time/parse-time-tag.ts",
+          "type": "DEPENDENCY",
+          "description": "parseTimeTag 사용"
+        },
+        {
+          "path": "components/ui/textarea.tsx",
+          "type": "DEPENDENCY",
+          "description": "Textarea 재사용"
+        },
+        {
+          "path": "components/ui/button.tsx",
+          "type": "DEPENDENCY",
+          "description": "Button 재사용"
+        },
+        {
+          "path": "components/ui/badge.tsx",
+          "type": "DEPENDENCY",
+          "description": "시간 태그 미리보기 Badge"
+        }
+      ],
+      "implementationGuide": "pseudocode:\ncomponent CardInputBar({ onSubmit }):\n  'use client'\n  state: text=''\n  parsed = parseTimeTag(text)\n  \n  handleSubmit = () =>\n    if !text.trim(): return\n    onSubmit(text.trim(), parsed.timeTag, parsed.timeOffsetMinutes)\n    setText('')\n  \n  handleKeyDown = (e) =>\n    if e.key==='Enter' && !e.shiftKey:\n      e.preventDefault()\n      handleSubmit()\n  \n  return div (sticky bottom-0 bg-background border-t p-3 flex flex-col gap-1):\n    if parsed.timeTag:\n      div (flex items-center gap-1): span '시간 감지:' Badge parsed.timeTag\n    div (flex items-end gap-2):\n      Textarea value=text onChange=setText onKeyDown=handleKeyDown\n               rows=2 placeholder='문진 키워드를 입력하세요...' className='resize-none flex-1'\n      Button onClick=handleSubmit disabled=!text.trim() size='icon'\n        SendHorizontal icon",
+      "verificationCriteria": "'3일 전부터 흉통' 입력 시 '시간 감지: 3일 전' 배지 표시\nEnter 키로 onSubmit 호출 + 입력창 초기화\nShift+Enter로 줄바꿈\n빈 텍스트 전송 시 onSubmit 미호출\nTypeScript 오류 없음",
+      "analysisResult": "Task 006: 새 케이스 입력 페이지 UI 구현. 더미 데이터 기반으로 7개 파일을 새로 생성하고 1개(lib/mock/cases.ts)를 수정한다. 의존성 순서: 순수 함수 → 더미 데이터 → 하위 컴포넌트 → 페이지 통합. react-markdown 없으므로 pre+whitespace-pre-wrap으로 가이드라인 표시. 모든 신규 컴포넌트는 'use client'. 기존 BedBadge, ToggleGroup, Badge, Card, Button, Textarea 컴포넌트 최대한 재사용.",
+      "summary": "components/cases/card-input-bar.tsx 생성 완료. parseTimeTag로 시간 태그 실시간 감지 및 배지 표시, Enter 전송/Shift+Enter 줄바꿈, 빈 텍스트 전송 비활성화, sticky bottom-0 고정 레이아웃, 전송 후 입력창 초기화. TypeScript 오류 없음.",
+      "completedAt": "2026-04-19T04:56:14.048Z"
+    },
+    {
+      "id": "dad5862b-6077-4863-9602-c302c733acd9",
+      "name": "Task 006-6: 새 케이스 입력 페이지 통합 (3가지 레이아웃 모드)",
+      "description": "app/(app)/cases/new/page.tsx에 모든 하위 컴포넌트를 통합하고 3가지 레이아웃 모드를 구현한다.\n\n페이지 구성:\n- 'use client' 페이지\n- state: bedZone='A', bedNumber=1, cc=null, cards=MOCK_CASE_INPUTS, layout='single'\n- 헤더(상단 고정): 'ER Scribe — 새 케이스' 타이틀 + [차팅 생성] 버튼(Button variant=default) + 레이아웃 전환 토글(개발 편의용, 작은 ToggleGroup)\n- InputArea: BedPicker + Separator + CcAutocomplete + 구분선 + CardTimeline(flex-1 overflow-y-auto) + CardInputBar\n- GuideArea: GuidelinePanel\n- 레이아웃 모드:\n  - single: InputArea만 표시 (w-full)\n  - split_vertical: flex-col, 상단 GuideArea(h-64 shrink-0) + 하단 InputArea(flex-1)\n  - split_horizontal: flex-row, 좌측 InputArea(w-1/2) + 우측 GuideArea(w-1/2)\n- CardInputBar.onSubmit: 새 카드를 cards 배열 앞에 추가 (optimistic UI)\n- [차팅 생성]: 클릭 시 '/cases/{mock-id}' 이동 (더미, useRouter)\n- 가이드라인 content: cc 선택 시 MOCK_GUIDE_CONTENT 표시 (Task 013에서 실제 로딩으로 교체 예정)",
+      "notes": "h-[calc(100vh-3.5rem)]은 layout.tsx의 header h-14(3.5rem)을 뺀 값. 레이아웃 전환 토글은 개발 편의용으로 작게 표시. [차팅 생성] 클릭 시 MOCK_CASES[0].id로 이동.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "c3293ae5-2b1e-425f-ada5-b6b73ad05474"
+        },
+        {
+          "taskId": "53be90a7-d6e0-4b06-949a-153202ded999"
+        },
+        {
+          "taskId": "97fe5744-e671-4812-b770-928e25d4382a"
+        },
+        {
+          "taskId": "708a0c81-c3a1-49e4-aa3c-99efd4c90002"
+        }
+      ],
+      "createdAt": "2026-04-19T04:48:15.508Z",
+      "updatedAt": "2026-04-19T05:00:39.305Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/cases/new/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "새 케이스 입력 페이지 본체 구현"
+        },
+        {
+          "path": "components/cases/bed-picker.tsx",
+          "type": "DEPENDENCY",
+          "description": "BedPicker 컴포넌트"
+        },
+        {
+          "path": "components/cases/cc-autocomplete.tsx",
+          "type": "DEPENDENCY",
+          "description": "CcAutocomplete 컴포넌트"
+        },
+        {
+          "path": "components/cases/card-timeline.tsx",
+          "type": "DEPENDENCY",
+          "description": "CardTimeline 컴포넌트"
+        },
+        {
+          "path": "components/cases/card-input-bar.tsx",
+          "type": "DEPENDENCY",
+          "description": "CardInputBar 컴포넌트"
+        },
+        {
+          "path": "components/cases/guideline-panel.tsx",
+          "type": "DEPENDENCY",
+          "description": "GuidelinePanel 컴포넌트"
+        },
+        {
+          "path": "lib/mock/cases.ts",
+          "type": "DEPENDENCY",
+          "description": "MOCK_CASE_INPUTS, MOCK_GUIDE_CONTENT 사용"
+        },
+        {
+          "path": "app/(app)/layout.tsx",
+          "type": "REFERENCE",
+          "description": "헤더 h-14 높이 참조"
+        }
+      ],
+      "implementationGuide": "pseudocode:\n'use client'\ncomponent NewCasePage():\n  state: bedZone='A', bedNumber=1, cc=null, hasTemplate=false, cards=MOCK_CASE_INPUTS, layout='single'\n  router = useRouter()\n  guideContent = cc ? MOCK_GUIDE_CONTENT : null\n  \n  handleCardSubmit(text, timeTag, timeOffsetMinutes):\n    newCard = { id: uuid(), case_id: MOCK_CASES[0].id, raw_text: text, time_tag: timeTag, time_offset_minutes: timeOffsetMinutes, display_order: cards.length+1, created_at: new Date().toISOString() }\n    setCards(prev => [newCard, ...prev])\n  \n  InputArea = div(flex flex-col h-full):\n    BedPicker bedZone bedNumber onChange=setBed\n    Separator\n    CcAutocomplete value=cc??'' onSelect=(cc,ht) => { setCc(cc); setHasTemplate(ht) }\n    div(flex-1 overflow-y-auto p-4): CardTimeline cards\n    CardInputBar onSubmit=handleCardSubmit\n  \n  GuideArea = div(h-full border-l): GuidelinePanel content=guideContent cc=cc\n  \n  return div(flex flex-col h-[calc(100vh-3.5rem)]):\n    header(flex items-center justify-between p-3 border-b shrink-0):\n      span '새 케이스 입력'\n      div(flex gap-2):\n        LayoutToggle (ToggleGroup single, 개발용)\n        Button '차팅 생성' onClick=navigateToResult\n    div(flex flex-1 overflow-hidden [layout-based classes]):\n      InputArea\n      if layout !== 'single': GuideArea",
+      "verificationCriteria": "페이지 접근 시 BedPicker(A구역, 1번 기본선택), CcAutocomplete, 빈 카드 타임라인, CardInputBar 표시\n베드번호 변경 시 화면 상단 BedPicker 즉시 반영\nC.C. 선택 시 GuidelinePanel에 MOCK_GUIDE_CONTENT 표시 (split 모드)\n카드 입력 후 Enter 시 CardTimeline 상단에 새 카드 추가\n3가지 레이아웃 모드 토글 정상 동작\n[차팅 생성] 클릭 시 /cases/{mock-id} 이동\n360px 뷰포트에서 BedPicker 한 화면에 표시\nTypeScript 오류 없음",
+      "analysisResult": "Task 006: 새 케이스 입력 페이지 UI 구현. 더미 데이터 기반으로 7개 파일을 새로 생성하고 1개(lib/mock/cases.ts)를 수정한다. 의존성 순서: 순수 함수 → 더미 데이터 → 하위 컴포넌트 → 페이지 통합. react-markdown 없으므로 pre+whitespace-pre-wrap으로 가이드라인 표시. 모든 신규 컴포넌트는 'use client'. 기존 BedBadge, ToggleGroup, Badge, Card, Button, Textarea 컴포넌트 최대한 재사용.",
+      "summary": "app/(app)/cases/new/page.tsx 구현 완료. BedPicker/CcAutocomplete/CardTimeline/CardInputBar/GuidelinePanel 통합, 3가지 레이아웃 모드(single/split_vertical/split_horizontal) 구현, MOCK_CASE_INPUTS 초기 카드 데이터, 카드 추가 시 optimistic UI 반영, [차팅 생성] 클릭 시 mock 케이스로 이동. cases/[id] 페이지의 cacheComponents 관련 빌드 오류도 함께 수정. TypeScript 오류 없음, 프로덕션 빌드 성공. 브라우저 직접 확인은 인증 미들웨어로 인해 제한됨.",
+      "completedAt": "2026-04-19T05:00:39.302Z"
+    },
+    {
+      "id": "3cd3eb94-f80b-4086-ae6d-42488275efe5",
+      "name": "Task 007-1: MOCK_CASE_RESULTS 더미 데이터 추가",
+      "description": "lib/mock/cases.ts에 MOCK_CASE_RESULTS 배열을 추가합니다. CaseResult 타입(hpi_draft, hpi_edited, template_draft, template_edited, error_message, template_key_used)을 사용하여 completed 케이스용 결과 1개와 failed 케이스용 결과 1개(error_message 포함)를 생성합니다. 또한 MOCK_CASE_INPUTS에 case-02(GI bleeding)용 입력 카드 3개를 추가하여 generating 상태 케이스의 타임라인에도 카드가 표시되도록 합니다.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-19T05:12:30.261Z",
+      "updatedAt": "2026-04-19T05:51:31.570Z",
+      "relatedFiles": [
+        {
+          "path": "lib/mock/cases.ts",
+          "type": "TO_MODIFY",
+          "description": "MOCK_CASE_RESULTS 배열 추가 및 MOCK_CASE_INPUTS 보완",
+          "lineStart": 1,
+          "lineEnd": 127
+        },
+        {
+          "path": "lib/supabase/types.ts",
+          "type": "REFERENCE",
+          "description": "CaseResult 타입 확인",
+          "lineStart": 54,
+          "lineEnd": 102
+        }
+      ],
+      "implementationGuide": "1. CaseResult 타입 import 확인 (lib/supabase/types.ts)\n2. MOCK_CASE_RESULTS 배열 생성:\n   - result-01 (case-01용, id: r1b2c3d4-...0001):\n     - hpi_draft: Chest pain 환자의 HPI 샘플 텍스트 (3~5문장, 한국어+의학영어 혼용)\n     - template_draft: Chest pain 상용구 샘플 텍스트 (NRS, character, radiation 등 필드 포함)\n     - hpi_edited: null\n     - template_edited: null\n     - template_key_used: 'chest-pain'\n     - error_message: null\n   - result-04 (case-04용, id: r1b2c3d4-...0004):\n     - hpi_draft: '' (빈 문자열)\n     - template_draft: '' (빈 문자열)\n     - error_message: 'AI 생성 중 오류가 발생했습니다. API 응답 없음.'\n     - template_key_used: 'abdominal-pain'\n3. MOCK_CASE_INPUTS에 case-02용 카드 3개 추가:\n   - '내원 1시간 전부터 hematemesis 3회'\n   - '어제부터 melena 지속'\n   - 'HTN, ASA 복용 중'",
+      "verificationCriteria": "MOCK_CASE_RESULTS가 CaseResult 타입과 일치하며 TypeScript 에러 없음. case-01용 result에 실제처럼 보이는 HPI/상용구 텍스트 포함. case-04용 result에 error_message 포함.",
+      "analysisResult": "Task 007: /cases/[id] 케이스 결과 페이지 UI를 더미 데이터로 완성합니다. 실제 DB/API 연동은 Phase 3에서 하므로 이번에는 하드코딩된 더미 데이터로 completed/generating/failed/draft 4가지 상태를 모두 시뮬레이션합니다. Task 004 산출물(BedBadge, StatusBadge, CopyButton, CardTimeline)을 최대 재사용하며 데스크탑 우선 2컬럼 + 모바일 스택 반응형으로 구현합니다.",
+      "summary": "MOCK_CASE_RESULTS 배열을 CaseResult 타입으로 추가 완료. case-01용 result(hpi_draft, template_draft 실제 텍스트 포함)와 case-04용 result(error_message 포함) 각 1개 생성. MOCK_CASE_INPUTS에 case-02(GI bleeding)용 카드 3개 추가.",
+      "completedAt": "2026-04-19T05:51:31.566Z"
+    },
+    {
+      "id": "971b669b-49bc-4302-be77-bdd00500e3a6",
+      "name": "Task 007-2: ResultSection 컴포넌트 생성",
+      "description": "components/cases/result-section.tsx를 생성합니다. HPI 섹션과 상용구 섹션 양쪽에서 동일하게 사용할 수 있는 'use client' 컴포넌트입니다. 제목(title), 편집 가능한 Textarea, CopyButton을 묶어서 제공합니다.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-19T05:12:30.261Z",
+      "updatedAt": "2026-04-19T05:51:34.122Z",
+      "relatedFiles": [
+        {
+          "path": "components/cases/result-section.tsx",
+          "type": "CREATE",
+          "description": "편집 가능한 textarea + 복사 버튼 재사용 컴포넌트"
+        },
+        {
+          "path": "components/cases/copy-button.tsx",
+          "type": "REFERENCE",
+          "description": "CopyButton 컴포넌트 재사용",
+          "lineStart": 1,
+          "lineEnd": 34
+        },
+        {
+          "path": "components/ui/textarea.tsx",
+          "type": "DEPENDENCY",
+          "description": "shadcn Textarea 컴포넌트"
+        }
+      ],
+      "implementationGuide": "파일: components/cases/result-section.tsx\n'use client' 선언\n\nprops:\n- title: string (섹션 제목, 예: 'HPI', '상용구')\n- value: string (초기 텍스트값)\n- className?: string\n\n내부 상태: useState로 편집 중인 텍스트 관리\n\n렌더링 구조:\n<div class=\"flex flex-col gap-2\">\n  <div class=\"flex items-center justify-between\">\n    <h2 class=\"text-sm font-medium\">{title}</h2>\n    <CopyButton text={localValue} />\n  </div>\n  <Textarea\n    value={localValue}\n    onChange={e => setLocalValue(e.target.value)}\n    rows={8}\n    class=\"resize-none font-mono text-sm\"\n  />\n</div>\n\n사용: CopyButton, Textarea import. 자동저장은 Task 012에서 구현하므로 이번에는 로컬 state만.",
+      "verificationCriteria": "ResultSection 컴포넌트가 title, value props를 받아 textarea를 렌더링하고 편집 시 로컬 state 업데이트. CopyButton 클릭 시 현재 편집된 텍스트가 클립보드에 복사됨. TypeScript 에러 없음.",
+      "analysisResult": "Task 007: /cases/[id] 케이스 결과 페이지 UI를 더미 데이터로 완성합니다. 실제 DB/API 연동은 Phase 3에서 하므로 이번에는 하드코딩된 더미 데이터로 completed/generating/failed/draft 4가지 상태를 모두 시뮬레이션합니다. Task 004 산출물(BedBadge, StatusBadge, CopyButton, CardTimeline)을 최대 재사용하며 데스크탑 우선 2컬럼 + 모바일 스택 반응형으로 구현합니다.",
+      "summary": "ResultSection 컴포넌트 생성 완료. title, value, className props 지원. useState로 로컬 편집 상태 관리. CopyButton과 Textarea를 조합한 재사용 가능한 구조.",
+      "completedAt": "2026-04-19T05:51:34.118Z"
+    },
+    {
+      "id": "6477371c-2723-4b14-91d4-7a25554838a5",
+      "name": "Task 007-3: 케이스 결과 페이지 메인 구현",
+      "description": "app/(app)/cases/[id]/page.tsx를 완전히 재작성합니다. URL params에서 case id를 읽어 MOCK_CASES에서 케이스를 찾고, 상태(status)에 따라 completed/generating/failed/draft 4가지 UI를 렌더링합니다. 데스크탑에서는 좌측 차팅 섹션 + 우측 카드 타임라인 2컬럼, 모바일에서는 세로 스택으로 반응형 처리합니다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "3cd3eb94-f80b-4086-ae6d-42488275efe5"
+        },
+        {
+          "taskId": "971b669b-49bc-4302-be77-bdd00500e3a6"
+        }
+      ],
+      "createdAt": "2026-04-19T05:12:30.261Z",
+      "updatedAt": "2026-04-19T05:52:39.122Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/cases/[id]/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "케이스 결과 페이지 완전 재작성",
+          "lineStart": 1,
+          "lineEnd": 29
+        },
+        {
+          "path": "lib/mock/cases.ts",
+          "type": "DEPENDENCY",
+          "description": "MOCK_CASES, MOCK_CASE_INPUTS, MOCK_CASE_RESULTS 사용"
+        },
+        {
+          "path": "components/cases/result-section.tsx",
+          "type": "DEPENDENCY",
+          "description": "Task 007-2에서 생성한 ResultSection 컴포넌트"
+        },
+        {
+          "path": "components/cases/bed-badge.tsx",
+          "type": "DEPENDENCY",
+          "description": "BedBadge lg 사이즈"
+        },
+        {
+          "path": "components/cases/status-badge.tsx",
+          "type": "DEPENDENCY",
+          "description": "StatusBadge"
+        },
+        {
+          "path": "components/cases/card-timeline.tsx",
+          "type": "DEPENDENCY",
+          "description": "CardTimeline 읽기 전용 재사용"
+        },
+        {
+          "path": "components/ui/skeleton.tsx",
+          "type": "DEPENDENCY",
+          "description": "generating 상태 로딩 UI"
+        },
+        {
+          "path": "components/ui/select.tsx",
+          "type": "DEPENDENCY",
+          "description": "수동 상용구 선택 드롭다운"
+        }
+      ],
+      "implementationGuide": "파일: app/(app)/cases/[id]/page.tsx (Server Component)\n\n1. CaseContent async 컴포넌트:\n   - const { id } = await params\n   - const caseData = MOCK_CASES.find(c => c.id === id) ?? MOCK_CASES[0]\n   - const inputs = MOCK_CASE_INPUTS.filter(i => i.case_id === caseData.id)\n   - const result = caseData.current_result_id ? MOCK_CASE_RESULTS.find(r => r.id === caseData.current_result_id) : null\n\n2. 공통 헤더 (모든 상태에서 렌더링):\n   <div class=\"flex items-center gap-3 flex-wrap\">\n     <BedBadge bedZone={...} bedNumber={...} size=\"lg\" />\n     <h1 class=\"text-xl font-semibold\">{caseData.cc ?? '(C.C 미입력)'}</h1>\n     <StatusBadge status={...} />\n     <Button variant=\"outline\" size=\"sm\" class=\"ml-auto gap-1\" disabled>\n       <RefreshCw size={14} /> 재생성\n     </Button>\n   </div>\n\n3. 메인 그리드:\n   <div class=\"grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6\">\n     <div class=\"flex flex-col gap-6\"> {/* 좌: 차팅 섹션 */}\n       {status === 'generating' → GeneratingSkeleton}\n       {status === 'failed' → FailedState}\n       {status === 'completed' && result → ResultSection(HPI) + ResultSection(상용구)}\n       {status === 'draft' → DraftState}\n     </div>\n     <aside class=\"flex flex-col gap-3\"> {/* 우: 원본 카드 타임라인 */}\n       <h2 class=\"text-sm font-medium text-muted-foreground\">원본 입력 카드</h2>\n       <CardTimeline cards={inputs} />\n     </aside>\n   </div>\n\n4. 상태별 UI:\n   - generating: Skeleton 3개 (h-40, h-40, h-20)\n   - failed: AlertCircle 아이콘 + result?.error_message + [재시도] Button(variant=destructive, disabled)\n   - completed: ResultSection(title='HPI', value=result.hpi_edited ?? result.hpi_draft) + ResultSection(title='상용구', value=result.template_edited ?? result.template_draft)\n   - draft: 안내 텍스트 + [차팅 생성] Link→ /cases/new\n\n5. 상용구 없는 C.C 분기 (cc_has_template=false인 경우):\n   ResultSection 대신 Select 드롭다운 + 안내 메시지 렌더링\n   cc-list.json의 templateKey 목록을 options로 표시 (하드코딩 가능)\n\n6. 전체 페이지 패딩: class=\"flex flex-col gap-6 p-4 md:p-8\"",
+      "verificationCriteria": "1. /cases/a1b2c3d4-e5f6-4a7b-8c9d-000000000001 접근 시 completed UI(HPI+상용구 textarea) 렌더링\n2. /cases/a1b2c3d4-e5f6-4a7b-8c9d-000000000003 접근 시 generating UI(Skeleton) 렌더링, BedBadge 헤더 표시\n3. /cases/a1b2c3d4-e5f6-4a7b-8c9d-000000000004 접근 시 failed UI(에러 메시지+재시도 버튼) 렌더링\n4. 우측에 원본 카드 타임라인 표시\n5. 데스크탑(lg 이상) 2컬럼, 모바일 1컬럼 반응형 확인\n6. TypeScript 에러 없음 및 npm run build 통과",
+      "analysisResult": "Task 007: /cases/[id] 케이스 결과 페이지 UI를 더미 데이터로 완성합니다. 실제 DB/API 연동은 Phase 3에서 하므로 이번에는 하드코딩된 더미 데이터로 completed/generating/failed/draft 4가지 상태를 모두 시뮬레이션합니다. Task 004 산출물(BedBadge, StatusBadge, CopyButton, CardTimeline)을 최대 재사용하며 데스크탑 우선 2컬럼 + 모바일 스택 반응형으로 구현합니다.",
+      "summary": "케이스 결과 페이지 완전 구현. completed/generating/failed/draft 4가지 상태 UI 분기, BedBadge(lg)+StatusBadge 헤더, 데스크탑 2컬럼+모바일 1컬럼 반응형, ResultSection 재사용, CardTimeline 우측 패널. npm run build 통과.",
+      "completedAt": "2026-04-19T05:52:39.118Z"
+    }
+  ]
+}

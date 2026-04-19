@@ -23,5 +23,20 @@
     "cc": "GI bleeding",
     "hasTemplate": true,
     "templateKey": "gi-bleeding"
+  },
+  {
+    "cc": "Hematemesis",
+    "hasTemplate": true,
+    "templateKey": "gi-bleeding"
+  },
+  {
+    "cc": "Melena",
+    "hasTemplate": true,
+    "templateKey": "gi-bleeding"
+  },
+  {
+    "cc": "Hematochezia",
+    "hasTemplate": true,
+    "templateKey": "gi-bleeding"
   }
 ]

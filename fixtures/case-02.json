@@ -1,0 +1,27 @@
+{
+  "case": {
+    "cc": "GI bleeding",
+    "bedZone": "A",
+    "bedNumber": 2
+  },
+  "inputs": [
+    {
+      "rawText": "2일 전 새벽에 2차례 hematemesis (합쳐서 종이컵 1컵 분량)",
+      "timeTag": "2일 전 새벽",
+      "timeOffsetMinutes": -2880
+    },
+    {
+      "rawText": "어제 아침, 저녁으로 3차례 melena, 양은 꽤 많았다고 함",
+      "timeTag": "어제",
+      "timeOffsetMinutes": -1440
+    },
+    {
+      "rawText": "금일 아침 요구르트 마신 후 피 섞인 토혈 재발",
+      "timeTag": "금일 아침",
+      "timeOffsetMinutes": -180
+    }
+  ],
+  "expectedHpi": "2일 전 새벽부터 hematemesis가 2차례 발생하였으며 합쳐서 종이컵 1컵 분량이었다고 함.\n어제 아침과 저녁으로 3차례 melena를 보았으며 양은 꽤 많았다고 함.\n금일 아침 요구르트 섭취 후 피 섞인 hematemesis가 재발하여 본원 응급실 내원함.",
+  "expectedTemplate": "* GI bleeding\nonset : 2일 전 새벽\ncolor : hematemesis, melena\namount : hematemesis 종이컵 1컵, melena 대량\n횟수 : hematemesis 3회 (2일 전 2차례, 금일 1차례), melena 3차례\nNPO : Solid - \n        Liquid - 금일 아침 요구르트\n\nF/C(-/-)  C/S/R(-/-/-)  A/N/V/D/C(-/-/-/-/-)\nDizziness (-) Dyspnea (-) Abd.pain (-)\n\nEGDS, Colonoscopy Hx. :",
+  "expectedHistory": "Past Hx. : (-)\nMed Hx.  : (-)\nOp Hx.   : (-)"
+}

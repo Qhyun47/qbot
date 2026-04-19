@@ -1,0 +1,72 @@
+{
+  "case": {
+    "cc": "Chest pain",
+    "bedZone": "A",
+    "bedNumber": 1
+  },
+  "inputs": [
+    {
+      "rawText": "3일 전부터 시작",
+      "timeTag": "3일 전",
+      "timeOffsetMinutes": -4320
+    },
+    {
+      "rawText": "오늘 10시",
+      "timeTag": "오늘 10시",
+      "timeOffsetMinutes": 0
+    },
+    {
+      "rawText": "협심증 과거력 있어 NTG 들고 다님",
+      "timeTag": null,
+      "timeOffsetMinutes": null
+    },
+    {
+      "rawText": "하루에 두 세번 꼴",
+      "timeTag": null,
+      "timeOffsetMinutes": null
+    },
+    {
+      "rawText": "NTG 사용하니 5분 이내 호전",
+      "timeTag": null,
+      "timeOffsetMinutes": null
+    },
+    {
+      "rawText": "오늘은 ntg 호전 없음",
+      "timeTag": "오늘",
+      "timeOffsetMinutes": 0
+    },
+    {
+      "rawText": "좌측 가슴",
+      "timeTag": null,
+      "timeOffsetMinutes": null
+    },
+    {
+      "rawText": "쥐어짜는",
+      "timeTag": null,
+      "timeOffsetMinutes": null
+    },
+    {
+      "rawText": "움직이면 악화",
+      "timeTag": null,
+      "timeOffsetMinutes": null
+    },
+    {
+      "rawText": "가만히 있으면 호전",
+      "timeTag": null,
+      "timeOffsetMinutes": null
+    },
+    {
+      "rawText": "HTN DM med 매일 복용",
+      "timeTag": null,
+      "timeOffsetMinutes": null
+    },
+    {
+      "rawText": "Op -",
+      "timeTag": null,
+      "timeOffsetMinutes": null
+    }
+  ],
+  "expectedHpi": "상기 환자 3일 전부터 발생한 chest pain 주소로 본원 응급실 내원함.\n협심증 과거력 있어 NTG 가지고 있으며, 하루에 두 세번 꼴로 pain 발생 시마다 NTG 사용하면 5분 이내 호전됨.\n오늘 10:00 증상 재발하여 NTG 사용하였으나 증상 호전되지 않음.",
+  "expectedTemplate": "NTG response? 3일간 NTG 사용 시 5분 이내 호전, 금일 NTG 무반응\nongoing? +\n\n* Chest pain\nOnset : 3일 전\nDuration : 간헐적, 하루 2~3회\nLocation : left chest\nCharacter : squeezing\nAsso. Sx. : \nRadiating pain :\nResting pain : 가만히 있으면 호전\nExertional pain : 움직이면 악화\n\nAgg.relieving factor : 운동 시 악화, 안정 시 호전\n\nF/C(-/-)  C/S/R(-/-/-)  A/N/V/D/C(-/-/-/-/-)",
+  "expectedHistory": "Past Hx. : Angina, HTN, DM\nMed Hx.  : HTN, DM 관련 약물 복용 중\nOp Hx.   : (-)"
+}

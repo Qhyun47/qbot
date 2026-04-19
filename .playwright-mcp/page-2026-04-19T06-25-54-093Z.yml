@@ -1,0 +1,95 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - link "ER Scribe" [ref=e4] [cursor=pointer]:
+        - /url: /dashboard
+      - navigation [ref=e5]:
+        - link "대시보드" [ref=e6] [cursor=pointer]:
+          - /url: /dashboard
+        - link "케이스 목록" [ref=e7] [cursor=pointer]:
+          - /url: /cases
+        - link "가이드라인" [ref=e8] [cursor=pointer]:
+          - /url: /guidelines
+        - link "설정" [ref=e9] [cursor=pointer]:
+          - /url: /settings
+      - button "Logout" [ref=e11] [cursor=pointer]
+    - main [ref=e12]:
+      - generic [ref=e13]:
+        - heading "케이스 목록" [level=1] [ref=e14]
+        - table [ref=e16]:
+          - rowgroup [ref=e17]:
+            - row "베드번호 날짜 C.C 상태" [ref=e18]:
+              - columnheader "베드번호" [ref=e19]
+              - columnheader "날짜" [ref=e20]
+              - columnheader "C.C" [ref=e21]
+              - columnheader "상태" [ref=e22]
+              - columnheader [ref=e23]
+          - rowgroup [ref=e24]:
+            - row "A-3 4/19 15:00 Chest pain 완료 케이스 삭제" [ref=e25] [cursor=pointer]:
+              - cell "A-3" [ref=e26]:
+                - generic [ref=e27]: A-3
+              - cell "4/19 15:00" [ref=e28]
+              - cell "Chest pain" [ref=e29]
+              - cell "완료" [ref=e30]:
+                - generic [ref=e31]:
+                  - img [ref=e32]
+                  - text: 완료
+              - cell "케이스 삭제" [ref=e35]:
+                - button "케이스 삭제" [ref=e36]:
+                  - img
+            - row "B-7 4/19 14:30 Dyspnea 완료 케이스 삭제" [ref=e37] [cursor=pointer]:
+              - cell "B-7" [ref=e38]:
+                - generic [ref=e39]: B-7
+              - cell "4/19 14:30" [ref=e40]
+              - cell "Dyspnea" [ref=e41]
+              - cell "완료" [ref=e42]:
+                - generic [ref=e43]:
+                  - img [ref=e44]
+                  - text: 완료
+              - cell "케이스 삭제" [ref=e47]:
+                - button "케이스 삭제" [ref=e48]:
+                  - img
+            - row "R-2 4/19 16:00 GI bleeding 생성 중 케이스 삭제" [ref=e49] [cursor=pointer]:
+              - cell "R-2" [ref=e50]:
+                - generic [ref=e51]: R-2
+              - cell "4/19 16:00" [ref=e52]
+              - cell "GI bleeding" [ref=e53]
+              - cell "생성 중" [ref=e54]:
+                - generic [ref=e55]:
+                  - img [ref=e56]
+                  - text: 생성 중
+              - cell "케이스 삭제" [ref=e58]:
+                - button "케이스 삭제" [ref=e59]:
+                  - img
+            - row "A-1 4/19 13:00 Abdominal pain 실패 케이스 삭제" [ref=e60] [cursor=pointer]:
+              - cell "A-1" [ref=e61]:
+                - generic [ref=e62]: A-1
+              - cell "4/19 13:00" [ref=e63]
+              - cell "Abdominal pain" [ref=e64]
+              - cell "실패" [ref=e65]:
+                - generic [ref=e66]:
+                  - img [ref=e67]
+                  - text: 실패
+              - cell "케이스 삭제" [ref=e71]:
+                - button "케이스 삭제" [ref=e72]:
+                  - img
+            - row "B-11 4/19 16:30 Hemoptysis 초안 케이스 삭제" [ref=e73] [cursor=pointer]:
+              - cell "B-11" [ref=e74]:
+                - generic [ref=e75]: B-11
+              - cell "4/19 16:30" [ref=e76]
+              - cell "Hemoptysis" [ref=e77]
+              - cell "초안" [ref=e78]:
+                - generic [ref=e79]:
+                  - img [ref=e80]
+                  - text: 초안
+              - cell "케이스 삭제" [ref=e83]:
+                - button "케이스 삭제" [ref=e84]:
+                  - img
+    - region "Notifications alt+T":
+      - list:
+        - listitem [ref=e103]:
+          - img [ref=e105]
+          - generic [ref=e108]: 케이스가 삭제되었습니다.
+  - button "Open Next.js Dev Tools" [ref=e90] [cursor=pointer]:
+    - img [ref=e91]
+  - alert [ref=e94]

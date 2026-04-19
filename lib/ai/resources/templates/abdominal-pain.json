@@ -1,0 +1,200 @@
+{
+  "templateKey": "abdominal-pain",
+  "cc": "Abdominal pain",
+  "description": "복통 환자 EMR 상용구 템플릿",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. format 문자열의 변수를 교체해 출력하라. conditional: true인 field: 조건이 충족되지 않으면 해당 줄 전체를 출력에서 생략하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "fields": [
+    {
+      "key": "character",
+      "label": "Character",
+      "type": "open",
+      "description": "복통 양상 (예: 'colicky', 'constant', 'cramping'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "location",
+      "label": "Location",
+      "type": "open",
+      "description": "복통 위치 (예: 'RLQ', 'epigastric', 'diffuse'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "intensity",
+      "label": "Intensity",
+      "type": "open",
+      "description": "통증 강도 (예: 'NRS 7'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "duration",
+      "label": "Duration",
+      "type": "open",
+      "description": "복통 지속 시간 및 발생 시점. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "agg_relieving_factor",
+      "label": "Agg.relieving factor",
+      "type": "open",
+      "description": "악화 및 완화 요인 (예: '식사 후 악화', '앞으로 구부리면 완화'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "pregnancy_possibility",
+      "label": "임신 가능성 (가임기 여성 환자)",
+      "type": "open",
+      "conditional": true,
+      "condition_description": "가임기 여성 환자에게만 해당. 남성이거나 폐경 이후 환자인 경우 이 줄 전체를 출력에서 생략하라. 성별/연령 정보로 판단이 불가한 경우에도 생략하라.",
+      "description": "임신 가능성 여부. 해당하는 경우 '있음' 또는 '없음'으로 채워라. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "recent_uri",
+      "label": "최근URI",
+      "type": "symptom_check",
+      "format": "최근URI({recent_uri})",
+      "slots": [
+        {
+          "key": "recent_uri",
+          "symptom": "Recent URI",
+          "description": "최근 상기도 감염 여부",
+          "default": "-"
+        }
+      ],
+      "description": "최근 상기도 감염 여부. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "fever_chill",
+      "label": "F/C",
+      "type": "symptom_check",
+      "format": "F/C({fever}/{chill})",
+      "slots": [
+        {
+          "key": "fever",
+          "symptom": "Fever",
+          "description": "발열",
+          "default": "-"
+        },
+        {
+          "key": "chill",
+          "symptom": "Chill",
+          "description": "오한",
+          "default": "-"
+        }
+      ],
+      "description": "발열/오한 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "cough_sputum_rhinorrhea",
+      "label": "C/S/R",
+      "type": "symptom_check",
+      "format": "C/S/R({cough}/{sputum}/{rhinorrhea})",
+      "slots": [
+        {
+          "key": "cough",
+          "symptom": "Cough",
+          "description": "기침",
+          "default": "-"
+        },
+        {
+          "key": "sputum",
+          "symptom": "Sputum",
+          "description": "가래",
+          "default": "-"
+        },
+        {
+          "key": "rhinorrhea",
+          "symptom": "Rhinorrhea",
+          "description": "콧물",
+          "default": "-"
+        }
+      ],
+      "description": "기침/가래/콧물 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "anvdc",
+      "label": "A/N/V/D/C",
+      "type": "symptom_check",
+      "format": "A/N/V/D/C({anorexia}/{nausea}/{vomiting}/{diarrhea}/{constipation})",
+      "slots": [
+        {
+          "key": "anorexia",
+          "symptom": "Anorexia",
+          "description": "식욕부진",
+          "default": "-"
+        },
+        {
+          "key": "nausea",
+          "symptom": "Nausea",
+          "description": "구역",
+          "default": "-"
+        },
+        {
+          "key": "vomiting",
+          "symptom": "Vomiting",
+          "description": "구토",
+          "default": "-"
+        },
+        {
+          "key": "diarrhea",
+          "symptom": "Diarrhea",
+          "description": "설사",
+          "default": "-"
+        },
+        {
+          "key": "constipation",
+          "symptom": "Constipation",
+          "description": "변비",
+          "default": "-"
+        }
+      ],
+      "description": "식욕부진/구역/구토/설사/변비 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "urinary_symptom",
+      "label": "Urinary symptom",
+      "type": "symptom_check",
+      "format": "Urinary symptom({urinary_symptom})",
+      "slots": [
+        {
+          "key": "urinary_symptom",
+          "symptom": "Urinary symptom",
+          "description": "배뇨 증상",
+          "default": "-"
+        }
+      ],
+      "description": "배뇨 증상 여부. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "npo_solid",
+      "label": "NPO Solid",
+      "type": "open",
+      "description": "고형식 마지막 섭취 시점. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "npo_liquid",
+      "label": "NPO Liquid",
+      "type": "open",
+      "description": "수분 마지막 섭취 시점. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "gas_out",
+      "label": "Gas out",
+      "type": "open",
+      "description": "마지막 방귀 여부 및 시점. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "last_defecation",
+      "label": "Last defecation time",
+      "type": "open",
+      "description": "마지막 배변 시점. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "past_egds",
+      "label": "과거 EGDS",
+      "type": "open",
+      "description": "과거 위내시경(EGD) 시행 여부 및 결과. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "past_colonoscopy",
+      "label": "과거 colonoscopy",
+      "type": "open",
+      "description": "과거 대장내시경 시행 여부 및 결과. 정보 없으면 빈 문자열."
+    }
+  ],
+  "output_example": "* Abdominal Pain\nCharacter : \nLocation : \nIntensity : \nDuration : \nAgg.relieving factor : \n\n임신 가능성 (가임기 여성 환자) : 있음/없음\n\n최근URI(-) , F/C(-/-),  C/S/R(-/-/-)\nA/N/V/D/C(-/-/-/-/-) \nUrinary symptom(-)\n\nNPO : Solid -\n        Liquid -\nGas out : \nLast defecation time : \n\n과거 EGDS : \n과거 colonoscopy : "
+}

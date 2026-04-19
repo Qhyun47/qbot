@@ -1,0 +1,133 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HemoptysisCase",
+  "description": "각혈(Hemoptysis) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history",
+    "family_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류. 아래 enum 값 중 가장 적합한 것 하나를 선택.",
+            "enum": [
+              "onset",
+              "color",
+              "amount",
+              "count",
+              "trigger",
+              "associated_symptom",
+              "prior_episode",
+              "tb_history",
+              "vital_sign",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "family_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. 카드-섹션 매핑 기준: onset/color/amount/count/trigger → [hpi, template] | associated_symptom/prior_episode/tb_history/vital_sign → [hpi] | past_history/medication_history/operation_history/family_history → [history] 전용 (HPI·상용구에 포함 금지)",
+            "items": {
+              "type": "string",
+              "enum": ["hpi", "template", "history"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "각혈 최초 발생 시점 (예: '금일 오전', '3일 전'). 없으면 null."
+    },
+    "color": {
+      "type": ["string", "null"],
+      "description": "혈액 색깔 및 형태 (예: 'bright red', 'dark red', 'mixed with sputum', 'pink frothy'). 없으면 null."
+    },
+    "amount": {
+      "type": ["string", "null"],
+      "description": "출혈량 (예: 'teaspoon', '반 컵', 'small amount', 'massive'). 없으면 null."
+    },
+    "count": {
+      "type": ["string", "null"],
+      "description": "각혈 발생 횟수 (예: '1회', '3차례', '지속적'). 없으면 null."
+    },
+    "trigger": {
+      "type": ["string", "null"],
+      "description": "각혈 유발 상황 (예: '기침 중 발생', '구역 후', '특별한 유발 없이'). 없으면 null."
+    },
+    "dyspnea": {
+      "type": ["boolean", "null"],
+      "description": "호흡곤란 동반 여부. true/false/null."
+    },
+    "recent_weight_loss": {
+      "type": ["boolean", "null"],
+      "description": "최근 체중 감소 여부. true/false/null."
+    },
+    "tb_exposure": {
+      "type": ["string", "null"],
+      "description": "결핵 접촉력 또는 과거 결핵 이력 (예: '10년 전 폐결핵 치료 완료', '최근 결핵 환자 접촉 있음'). 없으면 null."
+    },
+    "associated_symptoms": {
+      "type": ["array", "null"],
+      "description": "동반 증상 목록 (예: fever, chill, cough, sputum, chest_pain, dizziness, night_sweats 등). 없으면 null.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "prior_episode": {
+      "type": ["string", "null"],
+      "description": "유사 각혈 과거 에피소드 (예: '6개월 전 동일 증상, 기관지염 진단 후 자연 호전'). 없으면 null."
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록 (예: ['기관지확장증', '폐암', '결핵', '폐렴']). History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록 (항응고제, 항혈소판제 주목). History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "family_history": {
+      "type": ["array", "null"],
+      "description": "가족력 목록. null이면 History 출력 시 해당 항목 전체 생략.",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

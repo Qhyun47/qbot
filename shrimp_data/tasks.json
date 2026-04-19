@@ -1,262 +1,169 @@
 {
   "tasks": [
     {
-      "id": "021ba057-2b60-4cd7-8bb0-985b68ba5e74",
-      "name": "Step 0: 차트 출력 언어 확정",
-      "description": "모든 AI 리소스 파일의 방향을 결정하는 언어 설정을 확정합니다. 한국어 전체 / 영어 전체 / 혼용(의학 용어 영어 + 서술 한국어) 중 하나를 선택합니다. 이 결정이 style_guide.md, templates, guides 등 모든 후속 파일의 작성 언어를 결정합니다.",
-      "notes": "파일 저장 불필요. 단순 결정 사항. 대부분의 한국 응급실 환경에서는 한국어 전체가 일반적.",
+      "id": "8d42258b-e087-49f3-b1ee-c70d10da35b0",
+      "name": "shadcn alert-dialog 설치 및 Toaster 확인",
+      "description": "삭제 확인 모달에 필요한 shadcn alert-dialog 컴포넌트를 설치한다. 또한 app/(app)/layout.tsx에 sonner Toaster가 이미 추가되어 있는지 확인하고, 없으면 추가한다.",
+      "notes": "alert-dialog는 components/ui/alert-dialog.tsx로 생성됨. dialog보다 AlertDialog가 확인/취소 패턴에 의미상 적합.",
       "status": "completed",
       "dependencies": [],
-      "createdAt": "2026-04-14T11:15:21.365Z",
-      "updatedAt": "2026-04-14T11:16:44.803Z",
+      "createdAt": "2026-04-19T06:08:22.679Z",
+      "updatedAt": "2026-04-19T06:10:58.605Z",
       "relatedFiles": [
         {
-          "path": "docs/guide/ai-resource-preparation.md",
-          "type": "REFERENCE",
-          "description": "Step 0 언어 선택 가이드",
-          "lineStart": 30,
-          "lineEnd": 42
+          "path": "app/(app)/layout.tsx",
+          "type": "TO_MODIFY",
+          "description": "Toaster 추가 여부 확인 및 추가"
+        },
+        {
+          "path": "components/ui/alert-dialog.tsx",
+          "type": "CREATE",
+          "description": "shadcn alert-dialog 설치 결과물"
         }
       ],
-      "implementationGuide": "1. 사용자에게 3가지 선택지 제시\\n   - 한국어 전체: HPI와 상용구 모두 한국어\\n   - 영어 전체: HPI와 상용구 모두 영어\\n   - 혼용: 의학 용어 영어, 서술 한국어\\n2. 사용자가 선택한 언어 설정을 확인\\n3. 선택 결과를 이후 모든 Task에 반영",
-      "verificationCriteria": "사용자가 한국어/영어/혼용 중 하나를 명확히 선택하고 확정함",
-      "analysisResult": "AI 리소스 파일 준비 작업 계획. 목표: lib/ai/resources/ 폴더에 실제 내용이 채워진 AI 파이프라인 리소스 파일들을 사용자와 협력하여 단계별로 준비. 현재 lib/ai/resources/ 폴더가 존재하지 않으며 Task 003 완성이 최종 목표. 각 단계는 사용자가 파일을 준비해오면 Claude가 검토 후 수정 제안 또는 승인하여 프로젝트에 저장하는 방식으로 진행.",
-      "summary": "사용자가 혼용(한국어 문장 구조 + 영어 의학 용어) 방식으로 언어를 확정함. 이후 모든 리소스 파일은 이 기준에 따라 작성됨.",
-      "completedAt": "2026-04-14T11:16:44.801Z"
+      "implementationGuide": "1. npx shadcn@latest add alert-dialog 실행\n2. app/(app)/layout.tsx 읽어서 Toaster import 여부 확인\n3. Toaster 없으면 import { Toaster } from 'sonner' 추가 후 <main> 아래에 <Toaster /> 렌더",
+      "verificationCriteria": "components/ui/alert-dialog.tsx 파일 존재 확인. layout.tsx에 Toaster 렌더링 확인.",
+      "analysisResult": "Task 008: Phase 2 마지막 UI 작업. 더미 데이터 기반으로 3개 페이지(케이스 목록, 가이드라인 관리, 설정)의 UI를 완성한다. 실제 DB/API 연동은 Phase 3(Task 012, 013)에서 수행. 기존 컴포넌트(StatusBadge, BedBadge, MOCK_CASES, MOCK_GUIDE_CONTENT) 재사용 필수. shadcn alert-dialog 추가 설치 필요.",
+      "summary": "components/ui/alert-dialog.tsx 생성 완료. app/(app)/layout.tsx에 sonner Toaster import 및 렌더링 추가 완료.",
+      "completedAt": "2026-04-19T06:10:58.600Z"
     },
     {
-      "id": "e85f8fd0-303d-4490-9ca1-c99ad5c424d6",
-      "name": "Step 1: cc-list.json 준비 및 검토",
-      "description": "응급실에서 자주 보는 C.C.(Chief Complaint) 목록을 JSON 파일로 준비합니다. 이 파일은 앱의 C.C. 자동완성 기능의 기반이 되며, 어떤 템플릿 파일을 만들지도 결정합니다. 사용자가 ChatGPT 또는 직접 작성한 파일을 가져오면, 형식과 내용을 검토하고 수정이 필요하면 제안합니다.",
-      "notes": "hasTemplate:true 항목이 Step 4(templates)의 작업 범위를 결정함. 병원마다 실제 사용하는 C.C. 표현이 다를 수 있으므로 사용자 확인 필수.",
+      "id": "4454d6de-df59-437a-880e-b1efb8efedef",
+      "name": "케이스 목록 페이지 UI 구현",
+      "description": "app/(app)/cases/page.tsx와 components/cases/cases-table.tsx를 구현한다. MOCK_CASES 5개를 테이블로 표시하며, 컬럼 순서는 베드번호(BedBadge sm) / 날짜 / C.C / 상태(StatusBadge) / 삭제. 행 클릭 시 /cases/[id]로 이동. 삭제 버튼 클릭 시 AlertDialog 확인 모달 표시 후 toast 표시(더미). 모바일 반응형 대응.",
+      "notes": "date-fns는 이미 설치됨(package.json 확인). 삭제는 더미 동작(toast만 표시, 실제 state 변경 없음).",
       "status": "completed",
       "dependencies": [
         {
-          "taskId": "021ba057-2b60-4cd7-8bb0-985b68ba5e74"
+          "taskId": "8d42258b-e087-49f3-b1ee-c70d10da35b0"
         }
       ],
-      "createdAt": "2026-04-14T11:15:21.365Z",
-      "updatedAt": "2026-04-14T14:19:20.115Z",
+      "createdAt": "2026-04-19T06:08:22.679Z",
+      "updatedAt": "2026-04-19T06:11:35.166Z",
       "relatedFiles": [
         {
-          "path": "lib/ai/resources/cc-list.json",
-          "type": "CREATE",
-          "description": "C.C. 자동완성 목록 파일 (최종 저장 위치)"
-        },
-        {
-          "path": "docs/guide/ai-resource-preparation.md",
-          "type": "REFERENCE",
-          "description": "cc-list.json 형식 및 조건 가이드",
-          "lineStart": 44,
-          "lineEnd": 92
-        }
-      ],
-      "implementationGuide": "1. 사용자에게 cc-list.json 준비 요청\\n   - 응급실 C.C. 20~30개\\n   - 형식: [{cc, ccEnglish, hasTemplate, templateKey}]\\n2. 파일 수신 후 검토:\\n   - templateKey가 영어 kebab-case인지 확인\\n   - hasTemplate:true 항목 목록 추출 (Step 4 준비)\\n   - cc 필드가 실제 타이핑 단어인지 (흉통 vs 가슴통증)\\n3. 수정 필요 시 구체적 제안 후 재확인\\n4. 승인 후 lib/ai/resources/cc-list.json 에 저장",
-      "verificationCriteria": "cc 한국어/ccEnglish 영어/hasTemplate boolean/templateKey kebab-case 형식 준수. hasTemplate:true 항목에 대응하는 templateKey 목록이 확정됨",
-      "analysisResult": "AI 리소스 파일 준비 작업 계획. 목표: lib/ai/resources/ 폴더에 실제 내용이 채워진 AI 파이프라인 리소스 파일들을 사용자와 협력하여 단계별로 준비. 현재 lib/ai/resources/ 폴더가 존재하지 않으며 Task 003 완성이 최종 목표. 각 단계는 사용자가 파일을 준비해오면 Claude가 검토 후 수정 제안 또는 승인하여 프로젝트에 저장하는 방식으로 진행.",
-      "summary": "MVP 5개 C.C.(Chest Pain, Dyspnea, Hemoptysis, Abdominal Pain, GI Bleeding) 목록 확정. 모두 hasTemplate:true. cc는 Title Case 통일, templateKey는 kebab-case. lib/ai/resources/cc-list.json 저장 완료.",
-      "completedAt": "2026-04-14T14:19:20.112Z"
-    },
-    {
-      "id": "23ba7dcf-e25c-4324-9ab3-1ce6bc6e02a4",
-      "name": "Step 2: structured_schema.json 준비 및 검토",
-      "description": "AI Stage 1(normalize)에서 출력해야 하는 JSON 구조를 JSON Schema draft-07 형식으로 정의합니다. 이 스키마가 Stage 2(HPI 생성)와 Stage 3(상용구 채움)의 입력이 되므로 가장 중요한 파일입니다. 스키마를 잘못 설계하면 나중에 모든 프롬프트와 파일을 다시 만들어야 합니다.",
-      "notes": "가장 중요한 파일. 스키마 확정 전에 신중하게 검토 필요. 필드가 너무 적으면 HPI 품질 저하, 너무 많으면 AI 혼란. lib/ai/types.ts line 1에 TODO(schema-v2) 주석 있음.",
-      "status": "pending",
-      "dependencies": [
-        {
-          "taskId": "e85f8fd0-303d-4490-9ca1-c99ad5c424d6"
-        }
-      ],
-      "createdAt": "2026-04-14T11:15:21.365Z",
-      "updatedAt": "2026-04-14T11:15:21.365Z",
-      "relatedFiles": [
-        {
-          "path": "lib/ai/resources/structured_schema.json",
-          "type": "CREATE",
-          "description": "AI 정규화 출력 스키마 (최종 저장 위치)"
-        },
-        {
-          "path": "lib/ai/types.ts",
+          "path": "app/(app)/cases/page.tsx",
           "type": "TO_MODIFY",
-          "description": "StructuredCase 인터페이스 - 스키마 확정 후 TODO(schema-v2) 해소",
-          "lineStart": 1,
-          "lineEnd": 13
+          "description": "케이스 목록 Server Component 페이지"
         },
         {
-          "path": "docs/guide/ai-resource-preparation.md",
-          "type": "REFERENCE",
-          "description": "structured_schema.json 형식 및 중요성 가이드",
-          "lineStart": 94,
-          "lineEnd": 213
-        }
-      ],
-      "implementationGuide": "1. cc-list.json 확정 후 진행\\n2. 사용자에게 structured_schema.json 준비 요청\\n   - JSON Schema draft-07 형식\\n   - 최소 필수 필드: cc, onset, inputs\\n3. 파일 수신 후 검토:\\n   - required 배열에 핵심 필드 포함 여부\\n   - inputs 배열의 category enum 완결성 (onset/location/character/severity/associated/history/medication/other)\\n   - onset_minutes 같은 정렬용 필드 포함 여부\\n   - lib/ai/types.ts의 StructuredCase와 일치 여부\\n4. 수정 제안 후 승인 시:\\n   - lib/ai/resources/structured_schema.json 저장\\n   - lib/ai/types.ts의 StructuredCase 인터페이스 실제 스키마로 교체 (TODO(schema-v2) 해소)",
-      "verificationCriteria": "JSON Schema draft-07 형식 준수. required 필드 포함. inputs.category enum 완결성 확인. lib/ai/types.ts StructuredCase가 실제 스키마 반영",
-      "analysisResult": "AI 리소스 파일 준비 작업 계획. 목표: lib/ai/resources/ 폴더에 실제 내용이 채워진 AI 파이프라인 리소스 파일들을 사용자와 협력하여 단계별로 준비. 현재 lib/ai/resources/ 폴더가 존재하지 않으며 Task 003 완성이 최종 목표. 각 단계는 사용자가 파일을 준비해오면 Claude가 검토 후 수정 제안 또는 승인하여 프로젝트에 저장하는 방식으로 진행."
-    },
-    {
-      "id": "4dbf447a-8ba6-4d08-8ff6-d6f0636402cc",
-      "name": "Step 3: style_guide.md 준비 및 검토",
-      "description": "AI Stage 2에서 HPI 문단을 생성할 때 참조하는 작성 스타일 가이드를 Markdown 파일로 준비합니다. AI가 어떤 말투로, 얼마나 길게, 무엇을 반드시 포함해야 하는지를 이 파일에서 배웁니다. 실제 본인이 쓰는 차팅 예시 문장을 포함하면 AI 품질이 크게 향상됩니다.",
-      "notes": "사용자가 실제로 쓰는 차팅 예시 문장 2~3개를 추가하면 AI 품질이 크게 향상됨. 이 점을 사용자에게 적극 안내할 것.",
-      "status": "pending",
-      "dependencies": [
-        {
-          "taskId": "23ba7dcf-e25c-4324-9ab3-1ce6bc6e02a4"
-        }
-      ],
-      "createdAt": "2026-04-14T11:15:21.365Z",
-      "updatedAt": "2026-04-14T11:15:21.365Z",
-      "relatedFiles": [
-        {
-          "path": "lib/ai/resources/style_guide.md",
+          "path": "components/cases/cases-table.tsx",
           "type": "CREATE",
-          "description": "HPI 생성 AI 스타일 가이드 (최종 저장 위치)"
+          "description": "케이스 목록 테이블 Client Component"
         },
         {
-          "path": "docs/guide/ai-resource-preparation.md",
+          "path": "lib/mock/cases.ts",
           "type": "REFERENCE",
-          "description": "style_guide.md 형식 및 예시 가이드",
-          "lineStart": 215,
-          "lineEnd": 265
-        }
-      ],
-      "implementationGuide": "1. 사용자에게 style_guide.md 준비 요청\\n   - Markdown 형식\\n   - 포함 항목: 언어/시제/어투, 문장 길이, 필수 포함 요소, 금지 사항, 예시 출력\\n2. 파일 수신 후 검토:\\n   - Step 0에서 결정한 언어 설정과 일치하는지\\n   - 예시 출력이 1개 이상 포함되는지\\n   - 금지 사항 명시 여부 (진단명 직접 언급 금지 등)\\n   - 문장 길이 가이드 포함 여부\\n3. 수정 필요 시 제안 후 승인\\n4. lib/ai/resources/style_guide.md 저장",
-      "verificationCriteria": "Step 0 언어 설정과 일치. 언어/시제/문장 길이/필수 포함 요소/금지 사항/예시 출력 섹션 모두 포함",
-      "analysisResult": "AI 리소스 파일 준비 작업 계획. 목표: lib/ai/resources/ 폴더에 실제 내용이 채워진 AI 파이프라인 리소스 파일들을 사용자와 협력하여 단계별로 준비. 현재 lib/ai/resources/ 폴더가 존재하지 않으며 Task 003 완성이 최종 목표. 각 단계는 사용자가 파일을 준비해오면 Claude가 검토 후 수정 제안 또는 승인하여 프로젝트에 저장하는 방식으로 진행."
-    },
-    {
-      "id": "e01f2165-cd0a-4522-97cb-df6e86fc521f",
-      "name": "Step 4: templates/{cc}.json 준비 및 검토",
-      "description": "AI Stage 3에서 구조화된 JSON을 받아 채워 넣어야 하는 상용구 틀을 C.C.별 JSON 파일로 준비합니다. Step 1에서 확정된 hasTemplate:true 항목들에 대응하는 파일이 각각 필요합니다. 현재 EMR에서 실제로 사용하는 상용구 형식을 기반으로 만들면 가장 정확합니다.",
-      "notes": "현재 EMR에서 실제로 쓰고 있는 상용구 1개를 복사해서 기준으로 삼으면 가장 정확. templateKey 오타 주의 (cc-list.json과 정확히 일치해야 함).",
-      "status": "pending",
-      "dependencies": [
-        {
-          "taskId": "4dbf447a-8ba6-4d08-8ff6-d6f0636402cc"
-        }
-      ],
-      "createdAt": "2026-04-14T11:15:21.365Z",
-      "updatedAt": "2026-04-14T11:15:21.365Z",
-      "relatedFiles": [
-        {
-          "path": "lib/ai/resources/templates",
-          "type": "CREATE",
-          "description": "상용구 템플릿 폴더 - {templateKey}.json 파일들"
+          "description": "MOCK_CASES 더미 데이터"
         },
         {
-          "path": "lib/ai/resources/cc-list.json",
+          "path": "components/cases/status-badge.tsx",
           "type": "DEPENDENCY",
-          "description": "hasTemplate:true 항목 목록 참조"
+          "description": "재사용 StatusBadge"
         },
         {
-          "path": "docs/guide/ai-resource-preparation.md",
-          "type": "REFERENCE",
-          "description": "템플릿 형식 옵션 A/B 가이드",
-          "lineStart": 267,
-          "lineEnd": 313
+          "path": "components/cases/bed-badge.tsx",
+          "type": "DEPENDENCY",
+          "description": "재사용 BedBadge"
+        },
+        {
+          "path": "components/ui/alert-dialog.tsx",
+          "type": "DEPENDENCY",
+          "description": "삭제 확인 모달"
         }
       ],
-      "implementationGuide": "1. Step 1의 hasTemplate:true 항목 목록 제시\\n2. 사용자에게 각 C.C.에 대한 template JSON 준비 요청\\n   - 옵션 A(필드 기반): {templateKey, label, fields: {onset, location, ...}}\\n   - 옵션 B(문장 블록): {templateKey, label, template: '...'}\\n   - 현재 EMR 상용구 형식 참고 권장\\n3. 파일 수신 후 검토:\\n   - templateKey가 cc-list.json의 templateKey와 정확히 일치\\n   - 필드명이 structured_schema.json 필드와 매핑 가능한지\\n   - 모든 hasTemplate:true 항목에 대응 파일 존재\\n4. lib/ai/resources/templates/{templateKey}.json 저장",
-      "verificationCriteria": "cc-list.json의 hasTemplate:true 항목 모두에 대응하는 templates/{templateKey}.json 존재. templateKey 일치 확인",
-      "analysisResult": "AI 리소스 파일 준비 작업 계획. 목표: lib/ai/resources/ 폴더에 실제 내용이 채워진 AI 파이프라인 리소스 파일들을 사용자와 협력하여 단계별로 준비. 현재 lib/ai/resources/ 폴더가 존재하지 않으며 Task 003 완성이 최종 목표. 각 단계는 사용자가 파일을 준비해오면 Claude가 검토 후 수정 제안 또는 승인하여 프로젝트에 저장하는 방식으로 진행."
+      "implementationGuide": "page.tsx: Server Component. MOCK_CASES import 후 <CasesTable cases={MOCK_CASES} /> 렌더.\n\ncases-table.tsx: 'use client'. props: cases: Case[]\n- <table> 래퍼에 overflow-x-auto\n- thead: 베드번호 / 날짜 / C.C / 상태 / 삭제\n- tbody: cases.map → <tr>에 onClick으로 router.push('/cases/' + id)\n  - <BedBadge bedZone size=\"sm\" />\n  - date-fns format(parseISO(created_at), 'M/d HH:mm')\n  - cc 텍스트\n  - <StatusBadge status />\n  - 삭제버튼: Button variant=ghost size=sm, Trash2 아이콘, 클릭 시 AlertDialog 오픈\n- AlertDialog: 삭제 확인 → onConfirm: toast('케이스가 삭제되었습니다.')\n- 삭제 버튼 클릭 시 tr 클릭 이벤트 전파 방지(e.stopPropagation)",
+      "verificationCriteria": "/cases 페이지에서 5개 케이스 목록 테이블 표시 확인. BedBadge(sm), StatusBadge 올바르게 표시. 행 클릭 시 /cases/[id]로 이동. 삭제 버튼 → AlertDialog → 확인 시 toast 표시. 모바일에서 가로 스크롤 또는 레이아웃 깨짐 없음.",
+      "analysisResult": "Task 008: Phase 2 마지막 UI 작업. 더미 데이터 기반으로 3개 페이지(케이스 목록, 가이드라인 관리, 설정)의 UI를 완성한다. 실제 DB/API 연동은 Phase 3(Task 012, 013)에서 수행. 기존 컴포넌트(StatusBadge, BedBadge, MOCK_CASES, MOCK_GUIDE_CONTENT) 재사용 필수. shadcn alert-dialog 추가 설치 필요.",
+      "summary": "cases-table.tsx 클라이언트 컴포넌트 구현 완료. BedBadge(sm), StatusBadge, AlertDialog 확인 모달, 행 클릭 라우팅, 삭제 toast, overflow-x-auto 반응형 적용. cases/page.tsx를 Server Component로 MOCK_CASES 렌더링.",
+      "completedAt": "2026-04-19T06:11:35.164Z"
     },
     {
-      "id": "01e3f004-2c89-4fe4-a427-879b4f2a7c98",
-      "name": "Step 5: guides/{cc}.md 준비 및 검토",
-      "description": "새 케이스 입력 화면에서 의사 옆에 표시되는 C.C.별 문진 체크리스트를 Markdown 파일로 준비합니다. AI가 사용하는 것이 아니라 의사가 문진 시 직접 참고하는 자료입니다. 주요 C.C. 5~10개부터 시작하면 충분합니다.",
-      "notes": "가이드라인 파일은 PRD에 따라 커스텀 DB와 분리됨. 시스템 기본은 이 파일로, 사용자 커스텀은 interview_guidelines 테이블로 관리. 5~10개면 충분하므로 과도한 작업 불필요.",
-      "status": "pending",
+      "id": "eb7c35a7-227a-443a-948e-c7a3602f1eb4",
+      "name": "가이드라인 관리 페이지 UI 구현",
+      "description": "app/(app)/guidelines/page.tsx와 components/guidelines/guidelines-editor.tsx를 구현한다. cc-list.json 기반 C.C 드롭다운, 시스템 기본 가이드라인 읽기전용 미리보기(MOCK_GUIDE_CONTENT), 커스텀 Markdown 편집 Textarea, 저장/삭제 버튼(toast 더미), 커스텀 현황 목록(빈 상태 안내).",
+      "notes": "react-markdown 미설치 상태. Pre 태그로 시스템 기본 표시. guidelines-panel.tsx는 재사용하지 않음(해당 컴포넌트는 새 케이스 입력 화면 전용). MOCK_GUIDE_CONTENT를 lib/mock/cases.ts에서 import.",
+      "status": "completed",
       "dependencies": [
         {
-          "taskId": "e01f2165-cd0a-4522-97cb-df6e86fc521f"
+          "taskId": "8d42258b-e087-49f3-b1ee-c70d10da35b0"
         }
       ],
-      "createdAt": "2026-04-14T11:15:21.365Z",
-      "updatedAt": "2026-04-14T11:15:21.365Z",
+      "createdAt": "2026-04-19T06:08:22.679Z",
+      "updatedAt": "2026-04-19T06:14:35.237Z",
       "relatedFiles": [
         {
-          "path": "lib/ai/resources/guides",
-          "type": "CREATE",
-          "description": "C.C.별 문진 가이드라인 폴더 - {cc}.md 파일들"
-        },
-        {
-          "path": "docs/guide/ai-resource-preparation.md",
-          "type": "REFERENCE",
-          "description": "guides/{cc}.md 형식 및 예시 가이드",
-          "lineStart": 315,
-          "lineEnd": 356
-        }
-      ],
-      "implementationGuide": "1. 사용자에게 주요 C.C. guides Markdown 파일 준비 요청\\n   - 우선순위: hasTemplate:true 항목 + 빈도 높은 C.C.\\n   - 5~10개 파일\\n   - 형식: 핵심 문진 항목(체크리스트) / 감별 진단 포인트 / 위험 신호\\n2. 파일 수신 후 검토:\\n   - 파일명 규칙 확인 (kebab-case 권장)\\n   - 핵심 문진 항목 체크리스트 포함 여부\\n   - 감별 진단 포인트 포함 여부\\n   - 위험 신호(Red Flags) 섹션 포함 여부\\n3. lib/ai/resources/guides/{cc}.md 저장",
-      "verificationCriteria": "5개 이상 C.C. 가이드라인 파일 존재. 각 파일에 핵심 문진 항목(체크리스트)/감별 진단 포인트/위험 신호 섹션 포함",
-      "analysisResult": "AI 리소스 파일 준비 작업 계획. 목표: lib/ai/resources/ 폴더에 실제 내용이 채워진 AI 파이프라인 리소스 파일들을 사용자와 협력하여 단계별로 준비. 현재 lib/ai/resources/ 폴더가 존재하지 않으며 Task 003 완성이 최종 목표. 각 단계는 사용자가 파일을 준비해오면 Claude가 검토 후 수정 제안 또는 승인하여 프로젝트에 저장하는 방식으로 진행."
-    },
-    {
-      "id": "1f9d9921-7739-4a1b-847a-d705a7826d29",
-      "name": "Step 6-prep: lib/ai/load-resources.ts 및 examples 폴더 생성",
-      "description": "모든 리소스 파일이 준비된 후, lib/ai/load-resources.ts 명시적 매핑 함수 스텁을 생성하고 examples/ 폴더와 빈 .jsonl 파일을 만들어 Task 003을 완성합니다. 이로써 AI 파이프라인 구현(Task 010)을 위한 폴더 구조와 파일 골격이 모두 준비됩니다.",
-      "notes": "load-resources.ts는 스텁(빈 함수 골격)만 작성. 실제 구현은 Task 010에서 진행. 명시적 맵 방식으로 런타임 동적 파일 로딩 최소화.",
-      "status": "pending",
-      "dependencies": [
-        {
-          "taskId": "01e3f004-2c89-4fe4-a427-879b4f2a7c98"
-        }
-      ],
-      "createdAt": "2026-04-14T11:15:21.366Z",
-      "updatedAt": "2026-04-14T11:15:21.366Z",
-      "relatedFiles": [
-        {
-          "path": "lib/ai/load-resources.ts",
-          "type": "CREATE",
-          "description": "AI 리소스 파일 로딩 함수 스텁"
-        },
-        {
-          "path": "lib/ai/resources/examples",
-          "type": "CREATE",
-          "description": "Few-shot 예시 폴더 - 빈 .jsonl 파일"
-        },
-        {
-          "path": "docs/ROADMAP.md",
+          "path": "app/(app)/guidelines/page.tsx",
           "type": "TO_MODIFY",
-          "description": "Task 003 완료 체크"
-        }
-      ],
-      "implementationGuide": "1. lib/ai/resources/examples/ 폴더 + 빈 chest-pain.jsonl 파일 생성\\n2. lib/ai/load-resources.ts 스텁 생성:\\n   - loadCcList(): cc-list.json 읽기\\n   - loadStructuredSchema(): structured_schema.json 읽기\\n   - loadStyleGuide(): style_guide.md 읽기\\n   - loadTemplate(templateKey): templates/{templateKey}.json 읽기\\n   - loadGuide(cc): guides/{cc}.md 읽기\\n   - loadExamples(templateKey): examples/{templateKey}.jsonl 읽기\\n3. ROADMAP.md에서 Task 003 완료 체크 (✅ 표시)",
-      "verificationCriteria": "lib/ai/resources/ 폴더 전체 구조 완성. load-resources.ts 스텁 함수 6개 존재. ROADMAP.md Task 003 완료 표시",
-      "analysisResult": "AI 리소스 파일 준비 작업 계획. 목표: lib/ai/resources/ 폴더에 실제 내용이 채워진 AI 파이프라인 리소스 파일들을 사용자와 협력하여 단계별로 준비. 현재 lib/ai/resources/ 폴더가 존재하지 않으며 Task 003 완성이 최종 목표. 각 단계는 사용자가 파일을 준비해오면 Claude가 검토 후 수정 제안 또는 승인하여 프로젝트에 저장하는 방식으로 진행."
-    },
-    {
-      "id": "0073b9f7-affa-411c-b402-c8a4aa80eea3",
-      "name": "Step 6: fixtures/ 케이스 샘플 준비 및 검토",
-      "description": "AI 품질 검증을 위한 테스트 케이스 샘플을 준비합니다. 실제 문진한 환자 사례를 익명화한 JSON 파일로, Task 010(AI 파이프라인 CLI 하네스) 착수 직전에 제공해야 합니다. 개인정보 완전 제거가 필수입니다.",
-      "notes": "개인정보 보호가 최우선. Task 010 착수 직전까지는 진행하지 않아도 됨. expectedHpi는 의사가 직접 작성한 이상적인 출력이어야 AI 품질 기준선이 됨.",
-      "status": "pending",
-      "dependencies": [
-        {
-          "taskId": "1f9d9921-7739-4a1b-847a-d705a7826d29"
-        }
-      ],
-      "createdAt": "2026-04-14T11:15:21.366Z",
-      "updatedAt": "2026-04-14T11:15:21.366Z",
-      "relatedFiles": [
-        {
-          "path": "lib/ai/resources/fixtures",
-          "type": "CREATE",
-          "description": "AI 품질 검증용 테스트 케이스 폴더"
+          "description": "가이드라인 관리 Server Component 페이지"
         },
         {
-          "path": "docs/guide/ai-resource-preparation.md",
+          "path": "components/guidelines/guidelines-editor.tsx",
+          "type": "CREATE",
+          "description": "가이드라인 편집 Client Component"
+        },
+        {
+          "path": "lib/ai/resources/cc-list.json",
           "type": "REFERENCE",
-          "description": "fixtures 파일 형식 및 조건 가이드",
-          "lineStart": 358,
-          "lineEnd": 406
+          "description": "C.C 목록 8개"
+        },
+        {
+          "path": "lib/mock/cases.ts",
+          "type": "REFERENCE",
+          "description": "MOCK_GUIDE_CONTENT"
+        },
+        {
+          "path": "components/ui/select.tsx",
+          "type": "DEPENDENCY",
+          "description": "C.C 드롭다운"
+        },
+        {
+          "path": "components/ui/textarea.tsx",
+          "type": "DEPENDENCY",
+          "description": "커스텀 편집 영역"
         }
       ],
-      "implementationGuide": "1. Task 010 착수 직전 시점에 진행\\n2. 사용자에게 익명화된 실제 ER 케이스 2~3개 JSON 요청\\n   - 형식: {case: {cc, bedZone, bedNumber}, inputs: [...], expectedHpi, expectedTemplate}\\n   - C.C. 다양하게: 흉통 1개, 호흡곤란 1개, 복통 1개 등\\n3. 파일 수신 후 검토:\\n   - 개인식별 정보 완전 제거 확인 (날짜/이름/나이/병록번호 등)\\n   - expectedHpi와 expectedTemplate이 의사가 직접 작성한 이상적 출력인지\\n   - inputs의 rawText가 실제 문진 키워드 형태인지\\n4. lib/ai/resources/fixtures/case-01.json 등으로 저장",
-      "verificationCriteria": "케이스 2개 이상 존재. 개인식별 정보 없음. expectedHpi/expectedTemplate 의사 직접 작성. 다양한 C.C. 커버",
-      "analysisResult": "AI 리소스 파일 준비 작업 계획. 목표: lib/ai/resources/ 폴더에 실제 내용이 채워진 AI 파이프라인 리소스 파일들을 사용자와 협력하여 단계별로 준비. 현재 lib/ai/resources/ 폴더가 존재하지 않으며 Task 003 완성이 최종 목표. 각 단계는 사용자가 파일을 준비해오면 Claude가 검토 후 수정 제안 또는 승인하여 프로젝트에 저장하는 방식으로 진행."
+      "implementationGuide": "page.tsx: Server Component. cc-list.json을 import 후 <GuidelinesEditor ccList={ccList} /> 렌더.\n\nguidelines-editor.tsx: 'use client'. props: ccList: {cc: string, hasTemplate: boolean, templateKey: string}[]\n- selectedCc state (초기값: ccList[0].cc)\n- customContent state (초기값: '')\n- 상단: Label + shadcn Select로 C.C 선택 (8개 옵션)\n- 중단 2열(md:grid-cols-2) 또는 탭 레이아웃:\n  - 시스템 기본: <div className='rounded border bg-muted p-3 text-sm overflow-y-auto max-h-64'><pre className='whitespace-pre-wrap'>{MOCK_GUIDE_CONTENT}</pre></div> (읽기전용)\n  - 커스텀 편집: <Textarea value={customContent} onChange /> + 아래 [저장][삭제] 버튼\n- [저장]: toast('가이드라인이 저장되었습니다.')\n- [삭제]: 커스텀 내용 비우고 toast('가이드라인이 삭제되었습니다.')\n- 하단: 커스텀 현황 목록 섹션 - 비어있으면 '저장된 커스텀 가이드라인이 없습니다.' 안내",
+      "verificationCriteria": "/guidelines 페이지에서 C.C 드롭다운 8개 옵션 표시 확인. 시스템 기본 가이드라인 내용 표시(읽기전용). 커스텀 편집 Textarea 입력 가능. 저장/삭제 버튼 클릭 시 toast 표시. 커스텀 현황 빈 상태 안내 메시지 표시.",
+      "analysisResult": "Task 008: Phase 2 마지막 UI 작업. 더미 데이터 기반으로 3개 페이지(케이스 목록, 가이드라인 관리, 설정)의 UI를 완성한다. 실제 DB/API 연동은 Phase 3(Task 012, 013)에서 수행. 기존 컴포넌트(StatusBadge, BedBadge, MOCK_CASES, MOCK_GUIDE_CONTENT) 재사용 필수. shadcn alert-dialog 추가 설치 필요.",
+      "summary": "guidelines-editor.tsx 구현 완료: cc-list.json 8개 옵션 Select, 시스템 기본 가이드라인 읽기전용 pre 표시, 커스텀 Textarea 편집, 저장/삭제 toast, 커스텀 현황 빈 상태 안내. guidelines/page.tsx Server Component로 업데이트.",
+      "completedAt": "2026-04-19T06:14:35.234Z"
+    },
+    {
+      "id": "60b4d55c-c13c-47ac-a6b4-50fd4e28f9c2",
+      "name": "설정 페이지 UI 구현",
+      "description": "app/(app)/settings/page.tsx와 components/settings/layout-settings.tsx를 구현한다. 레이아웃 선택(단독/상하분할/좌우분할) 카드형 라디오 UI + 각 옵션 미리보기 아이콘 + 저장 버튼(toast 더미).",
+      "notes": "shadcn Radio 컴포넌트 없음. ToggleGroup 대신 직접 카드형 선택 UI 구현이 더 직관적(미리보기 아이콘 포함 필요). Rows2, Columns, LayoutTemplate은 lucide-react에 존재.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "8d42258b-e087-49f3-b1ee-c70d10da35b0"
+        }
+      ],
+      "createdAt": "2026-04-19T06:08:22.679Z",
+      "updatedAt": "2026-04-19T06:14:38.251Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/settings/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "설정 Server Component 페이지"
+        },
+        {
+          "path": "components/settings/layout-settings.tsx",
+          "type": "CREATE",
+          "description": "레이아웃 설정 Client Component"
+        },
+        {
+          "path": "components/ui/button.tsx",
+          "type": "DEPENDENCY",
+          "description": "저장 버튼"
+        }
+      ],
+      "implementationGuide": "page.tsx: Server Component. <LayoutSettings /> 렌더.\n\nlayout-settings.tsx: 'use client'.\n- selectedLayout state: 'single' | 'split_vertical' | 'split_horizontal' (초기값: 'single')\n- LAYOUT_OPTIONS 배열:\n  [{value: 'single', label: '단독', description: '입력 화면만 전체 표시', icon: LayoutTemplate},\n   {value: 'split_vertical', label: '상하 분할', description: '상단 가이드 / 하단 입력', icon: Rows2},\n   {value: 'split_horizontal', label: '좌우 분할', description: '좌측 입력 / 우측 가이드 (폴드/태블릿)', icon: Columns}]\n- 카드형 선택 UI: div.grid.grid-cols-1.gap-3.sm:grid-cols-3\n  각 카드: onClick으로 선택, 선택된 카드는 border-primary + bg-primary/5 강조\n  카드 내부: Icon(size-8) + label(font-medium) + description(text-sm text-muted-foreground)\n- [저장] 버튼: toast('설정이 저장되었습니다.')\n- lucide-react 아이콘: LayoutTemplate, Rows2, Columns",
+      "verificationCriteria": "/settings 페이지에서 3가지 레이아웃 옵션 카드 표시 확인. 각 카드에 아이콘+레이블+설명 표시. 클릭 시 선택 강조 스타일 전환. 저장 버튼 클릭 시 toast 표시.",
+      "analysisResult": "Task 008: Phase 2 마지막 UI 작업. 더미 데이터 기반으로 3개 페이지(케이스 목록, 가이드라인 관리, 설정)의 UI를 완성한다. 실제 DB/API 연동은 Phase 3(Task 012, 013)에서 수행. 기존 컴포넌트(StatusBadge, BedBadge, MOCK_CASES, MOCK_GUIDE_CONTENT) 재사용 필수. shadcn alert-dialog 추가 설치 필요.",
+      "summary": "layout-settings.tsx 구현 완료: 단독/상하분할/좌우분할 카드형 선택 UI, lucide 아이콘, 선택 강조 스타일(border-primary/bg-primary/5), 저장 toast. settings/page.tsx Server Component로 업데이트.",
+      "completedAt": "2026-04-19T06:14:38.248Z"
     }
   ]
 }

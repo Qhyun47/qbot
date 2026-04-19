@@ -100,6 +100,13 @@ import { Button } from "@/components/ui/button";
   - ✅ `"chest-pain"`, `"gi-bleeding"`
 - **출력 언어**: 혼용 (한국어 문장 구조 + 영어 의학 용어)
 
+## 테스트 계정
+
+Playwright MCP 또는 기타 검증 작업 시 아래 계정을 사용합니다:
+
+- **이메일**: kh047@naver.com
+- **비밀번호**: wjdrbgus123!
+
 ## 작업 완료 체크리스트
 
 ```bash

@@ -1,27 +1,41 @@
-// ER Scribe 앱 전용 공통 레이아웃
-// TODO: Task 004 — AppNavbar 컴포넌트로 헤더 교체
-
 import type { ReactNode } from "react";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
+import { Toaster } from "sonner";
+import { LogoutButton } from "@/components/logout-button";
+import { MobileNav } from "@/components/mobile-nav";
 
-export default async function AppLayout({ children }: { children: ReactNode }) {
-  // 미들웨어(proxy.ts)가 1차 방어선이나, 레이아웃에서도 인증 상태를 검증 (심층 방어)
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    redirect("/auth/login");
-  }
+const NAV_LINKS = [
+  { href: "/dashboard", label: "대시보드" },
+  { href: "/cases", label: "케이스 목록" },
+  { href: "/guidelines", label: "가이드라인" },
+  { href: "/settings", label: "설정" },
+];
 
+export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="flex h-14 items-center border-b px-4">
-        {/* TODO: Task 004 — 공통 네비바 컴포넌트로 교체 */}
-        <span className="text-sm font-semibold">ER Scribe</span>
+      <header className="relative flex h-14 items-center border-b px-4">
+        <MobileNav />
+        <Link href="/dashboard" className="ml-2 text-sm font-semibold md:ml-0">
+          ER Scribe
+        </Link>
+        <nav className="ml-6 hidden items-center gap-4 md:flex">
+          {NAV_LINKS.map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
+        <div className="ml-auto">
+          <LogoutButton />
+        </div>
       </header>
       <main className="flex flex-1 flex-col">{children}</main>
+      <Toaster />
     </div>
   );
 }

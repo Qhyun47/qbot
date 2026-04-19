@@ -1,0 +1,188 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GIBleedingCase",
+  "description": "위장관 출혈(GI bleeding / Hematemesis / Melena / Hematochezia) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history",
+    "family_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류. 아래 enum 값 중 가장 적합한 것 하나를 선택.",
+            "enum": [
+              "onset",
+              "bleeding_type",
+              "amount",
+              "count",
+              "trigger",
+              "npo_status",
+              "associated_symptom",
+              "prior_episode",
+              "endoscopy_history",
+              "vital_sign",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "family_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. 카드-섹션 매핑 기준: onset/bleeding_type/amount/count/trigger/endoscopy_history → [hpi, template] | npo_status → [template] | associated_symptom/prior_episode/vital_sign → [hpi] | past_history/medication_history/operation_history/family_history → [history] 전용 (HPI·상용구에 포함 금지)",
+            "items": {
+              "type": "string",
+              "enum": ["hpi", "template", "history"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "출혈 최초 발생 시점 (예: '2일 전 새벽', '어제 아침', '금일 오전'). 없으면 null."
+    },
+    "bleeding_types": {
+      "type": ["array", "null"],
+      "description": "발생한 출혈 형태 목록 (hematemesis / melena / hematochezia 중 해당하는 것 모두). 없으면 null.",
+      "items": {
+        "type": "string",
+        "enum": ["hematemesis", "melena", "hematochezia"]
+      }
+    },
+    "hematemesis_detail": {
+      "type": ["object", "null"],
+      "description": "hematemesis(토혈) 상세 정보. 없으면 null.",
+      "properties": {
+        "count": {
+          "type": ["string", "null"],
+          "description": "총 횟수 (예: '2차례', '3회'). 없으면 null."
+        },
+        "amount": {
+          "type": ["string", "null"],
+          "description": "출혈량 (예: '종이컵 1컵', '소량', 'large amount'). 없으면 null."
+        },
+        "onset": {
+          "type": ["string", "null"],
+          "description": "이 유형 출혈의 발생 시점. 없으면 null."
+        },
+        "character": {
+          "type": ["string", "null"],
+          "description": "색깔·형태 묘사 (예: '선홍색', '커피색', '피 섞임'). 없으면 null."
+        }
+      }
+    },
+    "melena_detail": {
+      "type": ["object", "null"],
+      "description": "melena(흑변) 상세 정보. 없으면 null.",
+      "properties": {
+        "count": {
+          "type": ["string", "null"],
+          "description": "총 횟수. 없으면 null."
+        },
+        "amount": {
+          "type": ["string", "null"],
+          "description": "출혈량 묘사. 없으면 null."
+        },
+        "onset": {
+          "type": ["string", "null"],
+          "description": "이 유형 출혈의 발생 시점. 없으면 null."
+        }
+      }
+    },
+    "hematochezia_detail": {
+      "type": ["object", "null"],
+      "description": "hematochezia(혈변) 상세 정보. 없으면 null.",
+      "properties": {
+        "count": {
+          "type": ["string", "null"],
+          "description": "총 횟수. 없으면 null."
+        },
+        "amount": {
+          "type": ["string", "null"],
+          "description": "출혈량 묘사. 없으면 null."
+        },
+        "onset": {
+          "type": ["string", "null"],
+          "description": "이 유형 출혈의 발생 시점. 없으면 null."
+        }
+      }
+    },
+    "trigger": {
+      "type": ["string", "null"],
+      "description": "출혈 유발 또는 직전 행동·상황 (예: '음식 섭취 후', '음주 후', '구토 후'). 없으면 null."
+    },
+    "npo_solid": {
+      "type": ["string", "null"],
+      "description": "고형식 마지막 섭취 시점 또는 내용. 없으면 null."
+    },
+    "npo_liquid": {
+      "type": ["string", "null"],
+      "description": "수분(음료) 마지막 섭취 시점 또는 내용. 없으면 null."
+    },
+    "associated_symptoms": {
+      "type": ["array", "null"],
+      "description": "동반 증상 목록 (예: dizziness, dyspnea, abdominal_pain, nausea, vomiting, fever, syncope 등). 없으면 null.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "prior_episode": {
+      "type": ["string", "null"],
+      "description": "유사 출혈 과거 에피소드 (예: '3개월 전 동일 증상으로 타원 입원, EGD상 위궤양'). 없으면 null."
+    },
+    "endoscopy_history": {
+      "type": ["string", "null"],
+      "description": "과거 EGD(위내시경)/Colonoscopy 이력 및 결과 (예: 'EGD 1년 전 — 이상 없음', 'Colonoscopy 미시행'). 없으면 null."
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록 (예: ['간경변', '소화성 궤양', '고혈압']). History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록 (특히 NSAID, 아스피린, 항응고제 등 출혈 위험 약물 주목). History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "family_history": {
+      "type": ["array", "null"],
+      "description": "가족력 목록. null이면 History 출력 시 해당 항목 전체 생략.",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DyspneaCase",
+  "description": "호흡곤란(Dyspnea) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history",
+    "family_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류. 아래 enum 값 중 가장 적합한 것 하나를 선택.",
+            "enum": [
+              "onset",
+              "onset_character",
+              "severity",
+              "orthopnea",
+              "nocturnal_symptom",
+              "aggravating_factor",
+              "relieving_factor",
+              "prior_episode",
+              "associated_symptom",
+              "vital_sign",
+              "suspected_cause",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "family_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. 카드-섹션 매핑 기준: onset/onset_character/orthopnea/aggravating_factor/relieving_factor → [hpi, template] | severity/vital_sign/suspected_cause/associated_symptom/prior_episode → [hpi] | past_history/medication_history/operation_history/family_history → [history] 전용 (HPI·상용구에 포함 금지)",
+            "items": {
+              "type": "string",
+              "enum": ["hpi", "template", "history"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "호흡곤란 발생 시점 (예: '어제 밤', '2시간 전', '00:30경'). 없으면 null."
+    },
+    "onset_character": {
+      "type": ["string", "null"],
+      "description": "발생 양상 — 'acute'(갑작스러운) 또는 'gradual'(서서히 악화). 없으면 null."
+    },
+    "orthopnea": {
+      "type": ["boolean", "null"],
+      "description": "기좌호흡(누울 때 숨참 악화) 여부. true/false/null."
+    },
+    "nocturnal_symptom": {
+      "type": ["boolean", "null"],
+      "description": "수면 중 또는 야간에 증상이 발생하거나 악화되는지 여부. true/false/null."
+    },
+    "aggravating_factor": {
+      "type": ["string", "null"],
+      "description": "호흡곤란 악화 요인 (예: '투석 후 체중 증가', '운동 시', '누울 때'). 없으면 null."
+    },
+    "relieving_factor": {
+      "type": ["string", "null"],
+      "description": "호흡곤란 완화 요인 (예: '기관지확장제 사용', '좌위', '투석 후 체중 감량'). 없으면 null."
+    },
+    "prior_episode": {
+      "type": ["string", "null"],
+      "description": "유사 증상 과거 에피소드 요약 (예: '5년에 1번 꼴로 악화, 천식으로 이전 입원력', '작년 동일 증상으로 동의의료원 입원'). 없으면 null."
+    },
+    "severity_description": {
+      "type": ["string", "null"],
+      "description": "중증도 표현 (예: 'SpO2 70%', '말을 할 수 없을 정도로 severe', '초기 SpO2 85%'). 없으면 null."
+    },
+    "associated_symptoms": {
+      "type": ["array", "null"],
+      "description": "동반 증상 목록 (예: fever, chill, cough, sputum, nausea, dizziness, chest_pain, abdominal_pain 등). 없으면 null.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록 (예: ['천식', '심장판막질환', 'HD(혈액투석)']. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록 (예: ['Ventolin PRN', '투석 관련 약물']. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "family_history": {
+      "type": ["array", "null"],
+      "description": "가족력 목록. null이면 History 출력 시 해당 항목 전체 생략.",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

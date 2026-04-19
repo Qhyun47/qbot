@@ -1,0 +1,17 @@
+[     304ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3001/auth/login:0
+[     468ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_0ifwd0~._.js:2925
+[     581ms] [LOG] [HMR] connected @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_0ifwd0~._.js:2925
+[   43999ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_0ifwd0~._.js:2925
+[   44123ms] [LOG] [Fast Refresh] done in 43ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_0ifwd0~._.js:2925
+[   44232ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_0ifwd0~._.js:2925
+[   44324ms] [LOG] [Fast Refresh] done in 199ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_0ifwd0~._.js:2925
+[   44752ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_0ifwd0~._.js:2925
+[   44778ms] [LOG] [Fast Refresh] done in 127ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_0ifwd0~._.js:2925
+[   56801ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_0ifwd0~._.js:2925
+[   56897ms] [LOG] [Fast Refresh] done in 79ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_0ifwd0~._.js:2925
+[  122766ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_0ifwd0~._.js:2925
+[  122925ms] [LOG] [Fast Refresh] done in 54ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_0ifwd0~._.js:2925
+[  123055ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_0ifwd0~._.js:2925
+[  123470ms] [LOG] [Fast Refresh] done in 527ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_0ifwd0~._.js:2925
+[  124565ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_0ifwd0~._.js:2925
+[  124733ms] [LOG] [Fast Refresh] done in 269ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_0ifwd0~._.js:2925
