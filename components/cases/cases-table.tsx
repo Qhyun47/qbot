@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { BedBadge } from "@/components/cases/bed-badge";
 import { StatusBadge } from "@/components/cases/status-badge";
-import type { Case } from "@/lib/supabase/types";
+import type { Case, BedZone, CaseStatus } from "@/lib/supabase/types";
 
 interface CasesTableProps {
   cases: Case[];
@@ -42,68 +42,75 @@ export function CasesTable({ cases }: CasesTableProps) {
     toast.success("케이스가 삭제되었습니다.");
   }
 
+  if (cases.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-4 rounded-lg border border-dashed py-16 text-center">
+        <p className="text-sm text-muted-foreground">케이스가 없습니다.</p>
+      </div>
+    );
+  }
+
   return (
     <>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b text-left text-muted-foreground">
-              <th className="py-3 pr-4 font-medium">베드번호</th>
-              <th className="py-3 pr-4 font-medium">날짜</th>
-              <th className="py-3 pr-4 font-medium">C.C</th>
-              <th className="py-3 pr-4 font-medium">상태</th>
-              <th className="py-3 font-medium"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {cases.map((c) => (
-              <tr
-                key={c.id}
-                onClick={() => handleRowClick(c.id)}
-                className="cursor-pointer border-b transition-colors hover:bg-muted/50"
-              >
-                <td className="py-3 pr-4">
-                  <BedBadge
-                    bedZone={c.bed_zone as "A" | "B" | "R"}
-                    bedNumber={c.bed_number}
-                    size="sm"
-                  />
-                </td>
-                <td className="py-3 pr-4 text-muted-foreground">
-                  {format(parseISO(c.created_at), "M/d HH:mm")}
-                </td>
-                <td className="py-3 pr-4">{c.cc ?? "-"}</td>
-                <td className="py-3 pr-4">
-                  <StatusBadge
-                    status={
-                      c.status as
-                        | "draft"
-                        | "generating"
-                        | "completed"
-                        | "failed"
-                    }
-                  />
-                </td>
-                <td className="py-3">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => handleDeleteClick(e, c.id)}
-                    aria-label="케이스 삭제"
-                  >
-                    <Trash2 className="size-4 text-destructive" />
-                  </Button>
-                </td>
+      <div className="rounded-lg border">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b bg-muted/50">
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  베드번호
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  날짜
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  C.C
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  상태
+                </th>
+                <th className="px-4 py-3"></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {cases.length === 0 && (
-          <p className="py-12 text-center text-muted-foreground">
-            케이스가 없습니다.
-          </p>
-        )}
+            </thead>
+            <tbody className="divide-y">
+              {cases.map((c) => (
+                <tr
+                  key={c.id}
+                  onClick={() => handleRowClick(c.id)}
+                  className="cursor-pointer bg-card transition-colors hover:bg-muted/30"
+                >
+                  <td className="px-4 py-3.5">
+                    <BedBadge
+                      bedZone={c.bed_zone as BedZone}
+                      bedNumber={c.bed_number}
+                      size="sm"
+                    />
+                  </td>
+                  <td className="px-4 py-3.5 text-muted-foreground">
+                    {format(parseISO(c.created_at), "M/d HH:mm")}
+                  </td>
+                  <td className="px-4 py-3.5 font-medium">
+                    {c.cc ?? <span className="text-muted-foreground">-</span>}
+                  </td>
+                  <td className="px-4 py-3.5">
+                    <StatusBadge status={c.status as CaseStatus} />
+                  </td>
+                  <td className="px-4 py-3.5">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => handleDeleteClick(e, c.id)}
+                      aria-label="케이스 삭제"
+                      className="size-8 p-0 text-muted-foreground hover:text-destructive"
+                    >
+                      <Trash2 className="size-3.5" />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <AlertDialog

@@ -8,13 +8,13 @@
       "key": "ntg_response",
       "label": "NTG response?",
       "type": "open",
-      "description": "NTG(니트로글리세린) 투여 후 증상 반응 여부. 투여 이력 없으면 빈 문자열."
+      "description": "NTG(니트로글리세린) 투여 후 증상 반응 여부 서술. 과거 이력과 금번 반응을 함께 서술 (예: '3일간 NTG 사용 시 5분 이내 호전, 금일 NTG 무반응'). 투여 이력 없으면 빈 문자열."
     },
     {
       "key": "ongoing",
       "label": "ongoing?",
       "type": "open",
-      "description": "내원 시점에도 흉통이 지속 중인지 여부. 정보 없으면 빈 문자열."
+      "description": "내원 시점에도 흉통이 지속 중인지 여부. 지속 중이면 '+', 아니면 '-'. 정보 없으면 빈 문자열."
     }
   ],
   "fields": [
@@ -22,13 +22,13 @@
       "key": "onset",
       "label": "Onset",
       "type": "open",
-      "description": "흉통 발생 시점 (예: '3일 전', '금일 오전'). 정보 없으면 빈 문자열."
+      "description": "증상이 처음 발생한 시점 (예: '3일 전', '금일 오전'). prior_episode가 있으면 최초 발생 시점을 사용. 정보 없으면 빈 문자열."
     },
     {
       "key": "duration",
       "label": "Duration",
       "type": "open",
-      "description": "흉통 지속 시간 (예: '30분', '간헐적'). 정보 없으면 빈 문자열."
+      "description": "흉통 지속 형태 (예: '간헐적, 하루 2~3회', '지속적 30분'). 정보 없으면 빈 문자열."
     },
     {
       "key": "location",
@@ -58,7 +58,7 @@
       "key": "resting_pain",
       "label": "Resting pain",
       "type": "open",
-      "description": "안정 시 통증 유무 및 양상. 정보 없으면 빈 문자열."
+      "description": "안정 시 통증 완화/지속 여부. 안정 시 호전되면 해당 표현 기재 (예: '가만히 있으면 호전'). ccSpecificFields의 relieving_factor 또는 templateInputs의 aggravating_relieving_factor 카드 참고. 정보 없으면 빈 문자열."
     },
     {
       "key": "exertional_pain",

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -18,6 +19,7 @@ interface CcItem {
   cc: string;
   hasTemplate: boolean;
   templateKey: string;
+  aliasOf?: string;
 }
 
 interface GuidelinesEditorProps {
@@ -25,7 +27,8 @@ interface GuidelinesEditorProps {
 }
 
 export function GuidelinesEditor({ ccList }: GuidelinesEditorProps) {
-  const [selectedCc, setSelectedCc] = useState(ccList[0]?.cc ?? "");
+  const primaryList = ccList.filter((item) => !item.aliasOf);
+  const [selectedCc, setSelectedCc] = useState(primaryList[0]?.cc ?? "");
   const [customContent, setCustomContent] = useState("");
 
   function handleSave() {
@@ -39,14 +42,17 @@ export function GuidelinesEditor({ ccList }: GuidelinesEditorProps) {
 
   return (
     <div className="space-y-6">
+      {/* C.C 선택 */}
       <div className="space-y-1.5">
-        <Label htmlFor="cc-select">Chief Complaint</Label>
+        <Label htmlFor="cc-select" className="text-sm font-medium">
+          Chief Complaint 선택
+        </Label>
         <Select value={selectedCc} onValueChange={setSelectedCc}>
-          <SelectTrigger id="cc-select" className="w-full max-w-xs">
+          <SelectTrigger id="cc-select" className="w-full max-w-sm">
             <SelectValue placeholder="C.C를 선택하세요" />
           </SelectTrigger>
-          <SelectContent>
-            {ccList.map((item) => (
+          <SelectContent position="popper">
+            {primaryList.map((item) => (
               <SelectItem key={item.cc} value={item.cc}>
                 {item.cc}
               </SelectItem>
@@ -55,40 +61,52 @@ export function GuidelinesEditor({ ccList }: GuidelinesEditorProps) {
         </Select>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="space-y-2">
-          <p className="text-sm font-medium">
-            시스템 기본 가이드라인 (읽기 전용)
-          </p>
-          <div className="max-h-64 overflow-y-auto rounded border bg-muted p-3">
-            <pre className="whitespace-pre-wrap text-sm">
+      {/* 에디터 영역 */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium">시스템 기본 가이드라인</p>
+            <span className="rounded-md bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
+              읽기 전용
+            </span>
+          </div>
+          <div className="max-h-72 overflow-y-auto rounded-lg border bg-muted/50 p-4">
+            <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-muted-foreground">
               {MOCK_GUIDE_CONTENT}
             </pre>
           </div>
         </div>
 
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <p className="text-sm font-medium">커스텀 가이드라인 편집</p>
           <Textarea
             value={customContent}
             onChange={(e) => setCustomContent(e.target.value)}
             placeholder="Markdown 형식으로 커스텀 가이드라인을 작성하세요..."
-            className="min-h-48 resize-y font-mono text-sm"
+            className="min-h-72 resize-none font-mono text-sm"
           />
           <div className="flex gap-2">
-            <Button onClick={handleSave} size="sm">
+            <Button onClick={handleSave} size="sm" className="gap-1.5">
+              <Save className="size-3.5" />
               저장
             </Button>
-            <Button onClick={handleDelete} variant="outline" size="sm">
+            <Button
+              onClick={handleDelete}
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+            >
+              <Trash2 className="size-3.5" />
               삭제
             </Button>
           </div>
         </div>
       </div>
 
+      {/* 커스텀 현황 */}
       <div className="space-y-2">
-        <p className="text-sm font-medium">커스텀 가이드라인 현황</p>
-        <div className="rounded border p-4">
+        <p className="text-sm font-medium">커스텀 설정 현황</p>
+        <div className="rounded-lg border bg-card p-4">
           <p className="text-sm text-muted-foreground">
             저장된 커스텀 가이드라인이 없습니다.
           </p>

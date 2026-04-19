@@ -1,35 +1,26 @@
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import Link from "next/link";
 import { Toaster } from "sonner";
 import { LogoutButton } from "@/components/logout-button";
 import { MobileNav } from "@/components/mobile-nav";
-
-const NAV_LINKS = [
-  { href: "/dashboard", label: "대시보드" },
-  { href: "/cases", label: "케이스 목록" },
-  { href: "/guidelines", label: "가이드라인" },
-  { href: "/settings", label: "설정" },
-];
+import { NavLinks } from "@/components/nav-links";
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="relative flex h-14 items-center border-b px-4">
-        <MobileNav />
-        <Link href="/dashboard" className="ml-2 text-sm font-semibold md:ml-0">
+      <header className="sticky top-0 z-50 flex h-14 items-center border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <Suspense fallback={<div className="size-8 md:hidden" />}>
+          <MobileNav />
+        </Suspense>
+        <Link
+          href="/dashboard"
+          className="ml-2 text-sm font-bold tracking-tight md:ml-0"
+        >
           ER Scribe
         </Link>
-        <nav className="ml-6 hidden items-center gap-4 md:flex">
-          {NAV_LINKS.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {label}
-            </Link>
-          ))}
-        </nav>
+        <Suspense fallback={<div className="ml-8 hidden md:flex" />}>
+          <NavLinks />
+        </Suspense>
         <div className="ml-auto">
           <LogoutButton />
         </div>

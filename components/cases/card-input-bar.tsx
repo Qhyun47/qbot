@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { SendHorizontal } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { parseTimeTag } from "@/lib/time/parse-time-tag";
+import { cn } from "@/lib/utils";
 
 interface CardInputBarProps {
   onSubmit: (
@@ -33,29 +33,33 @@ export function CardInputBar({ onSubmit }: CardInputBarProps) {
   };
 
   return (
-    <div className="sticky bottom-0 flex flex-col gap-1 border-t bg-background p-3">
+    <div className="border-t bg-background pb-[env(safe-area-inset-bottom)]">
       {parsed.timeTag && (
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <span>시간 감지:</span>
-          <Badge variant="outline" className="text-xs">
+        <div className="flex items-center gap-1.5 border-b bg-blue-50 px-3 py-1.5 text-xs dark:bg-blue-950">
+          <span className="text-muted-foreground">감지된 시간:</span>
+          <span className="rounded bg-blue-100 px-1.5 py-0.5 font-medium text-blue-700 dark:bg-blue-900 dark:text-blue-300">
             {parsed.timeTag}
-          </Badge>
+          </span>
         </div>
       )}
-      <div className="flex items-end gap-2">
+      <div className="flex items-end gap-2 p-3">
         <Textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
           rows={2}
           placeholder="문진 키워드를 입력하세요... (Enter 전송, Shift+Enter 줄바꿈)"
-          className="flex-1 resize-none"
+          className={cn(
+            "flex-1 resize-none text-sm transition-colors",
+            "focus-visible:ring-1 focus-visible:ring-foreground"
+          )}
         />
         <Button
           size="icon"
           onClick={handleSubmit}
           disabled={!text.trim()}
           aria-label="전송"
+          className="shrink-0"
         >
           <SendHorizontal className="size-4" />
         </Button>

@@ -3,13 +3,13 @@ import { cn } from "@/lib/utils";
 import type { BedZone } from "@/lib/supabase/types";
 
 const bedBadgeVariants = cva(
-  "inline-flex items-center border font-medium transition-colors",
+  "inline-flex items-center font-mono font-semibold tracking-wide",
   {
     variants: {
       size: {
         sm: "rounded px-1.5 py-0.5 text-xs",
-        md: "rounded-md px-2.5 py-0.5 text-sm",
-        lg: "rounded-md px-3 py-1 text-base font-semibold",
+        md: "rounded px-2 py-0.5 text-sm",
+        lg: "rounded-md px-2.5 py-1 text-base",
       },
     },
     defaultVariants: {
@@ -34,7 +34,7 @@ export function BedBadge({
     <span
       className={cn(
         bedBadgeVariants({ size }),
-        "bg-primary text-primary-foreground",
+        "bg-foreground text-background",
         className
       )}
     >

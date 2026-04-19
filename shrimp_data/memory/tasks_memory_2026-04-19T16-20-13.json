@@ -1,0 +1,169 @@
+{
+  "tasks": [
+    {
+      "id": "8d42258b-e087-49f3-b1ee-c70d10da35b0",
+      "name": "shadcn alert-dialog 설치 및 Toaster 확인",
+      "description": "삭제 확인 모달에 필요한 shadcn alert-dialog 컴포넌트를 설치한다. 또한 app/(app)/layout.tsx에 sonner Toaster가 이미 추가되어 있는지 확인하고, 없으면 추가한다.",
+      "notes": "alert-dialog는 components/ui/alert-dialog.tsx로 생성됨. dialog보다 AlertDialog가 확인/취소 패턴에 의미상 적합.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-19T06:08:22.679Z",
+      "updatedAt": "2026-04-19T06:10:58.605Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/layout.tsx",
+          "type": "TO_MODIFY",
+          "description": "Toaster 추가 여부 확인 및 추가"
+        },
+        {
+          "path": "components/ui/alert-dialog.tsx",
+          "type": "CREATE",
+          "description": "shadcn alert-dialog 설치 결과물"
+        }
+      ],
+      "implementationGuide": "1. npx shadcn@latest add alert-dialog 실행\n2. app/(app)/layout.tsx 읽어서 Toaster import 여부 확인\n3. Toaster 없으면 import { Toaster } from 'sonner' 추가 후 <main> 아래에 <Toaster /> 렌더",
+      "verificationCriteria": "components/ui/alert-dialog.tsx 파일 존재 확인. layout.tsx에 Toaster 렌더링 확인.",
+      "analysisResult": "Task 008: Phase 2 마지막 UI 작업. 더미 데이터 기반으로 3개 페이지(케이스 목록, 가이드라인 관리, 설정)의 UI를 완성한다. 실제 DB/API 연동은 Phase 3(Task 012, 013)에서 수행. 기존 컴포넌트(StatusBadge, BedBadge, MOCK_CASES, MOCK_GUIDE_CONTENT) 재사용 필수. shadcn alert-dialog 추가 설치 필요.",
+      "summary": "components/ui/alert-dialog.tsx 생성 완료. app/(app)/layout.tsx에 sonner Toaster import 및 렌더링 추가 완료.",
+      "completedAt": "2026-04-19T06:10:58.600Z"
+    },
+    {
+      "id": "4454d6de-df59-437a-880e-b1efb8efedef",
+      "name": "케이스 목록 페이지 UI 구현",
+      "description": "app/(app)/cases/page.tsx와 components/cases/cases-table.tsx를 구현한다. MOCK_CASES 5개를 테이블로 표시하며, 컬럼 순서는 베드번호(BedBadge sm) / 날짜 / C.C / 상태(StatusBadge) / 삭제. 행 클릭 시 /cases/[id]로 이동. 삭제 버튼 클릭 시 AlertDialog 확인 모달 표시 후 toast 표시(더미). 모바일 반응형 대응.",
+      "notes": "date-fns는 이미 설치됨(package.json 확인). 삭제는 더미 동작(toast만 표시, 실제 state 변경 없음).",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "8d42258b-e087-49f3-b1ee-c70d10da35b0"
+        }
+      ],
+      "createdAt": "2026-04-19T06:08:22.679Z",
+      "updatedAt": "2026-04-19T06:11:35.166Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/cases/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "케이스 목록 Server Component 페이지"
+        },
+        {
+          "path": "components/cases/cases-table.tsx",
+          "type": "CREATE",
+          "description": "케이스 목록 테이블 Client Component"
+        },
+        {
+          "path": "lib/mock/cases.ts",
+          "type": "REFERENCE",
+          "description": "MOCK_CASES 더미 데이터"
+        },
+        {
+          "path": "components/cases/status-badge.tsx",
+          "type": "DEPENDENCY",
+          "description": "재사용 StatusBadge"
+        },
+        {
+          "path": "components/cases/bed-badge.tsx",
+          "type": "DEPENDENCY",
+          "description": "재사용 BedBadge"
+        },
+        {
+          "path": "components/ui/alert-dialog.tsx",
+          "type": "DEPENDENCY",
+          "description": "삭제 확인 모달"
+        }
+      ],
+      "implementationGuide": "page.tsx: Server Component. MOCK_CASES import 후 <CasesTable cases={MOCK_CASES} /> 렌더.\n\ncases-table.tsx: 'use client'. props: cases: Case[]\n- <table> 래퍼에 overflow-x-auto\n- thead: 베드번호 / 날짜 / C.C / 상태 / 삭제\n- tbody: cases.map → <tr>에 onClick으로 router.push('/cases/' + id)\n  - <BedBadge bedZone size=\"sm\" />\n  - date-fns format(parseISO(created_at), 'M/d HH:mm')\n  - cc 텍스트\n  - <StatusBadge status />\n  - 삭제버튼: Button variant=ghost size=sm, Trash2 아이콘, 클릭 시 AlertDialog 오픈\n- AlertDialog: 삭제 확인 → onConfirm: toast('케이스가 삭제되었습니다.')\n- 삭제 버튼 클릭 시 tr 클릭 이벤트 전파 방지(e.stopPropagation)",
+      "verificationCriteria": "/cases 페이지에서 5개 케이스 목록 테이블 표시 확인. BedBadge(sm), StatusBadge 올바르게 표시. 행 클릭 시 /cases/[id]로 이동. 삭제 버튼 → AlertDialog → 확인 시 toast 표시. 모바일에서 가로 스크롤 또는 레이아웃 깨짐 없음.",
+      "analysisResult": "Task 008: Phase 2 마지막 UI 작업. 더미 데이터 기반으로 3개 페이지(케이스 목록, 가이드라인 관리, 설정)의 UI를 완성한다. 실제 DB/API 연동은 Phase 3(Task 012, 013)에서 수행. 기존 컴포넌트(StatusBadge, BedBadge, MOCK_CASES, MOCK_GUIDE_CONTENT) 재사용 필수. shadcn alert-dialog 추가 설치 필요.",
+      "summary": "cases-table.tsx 클라이언트 컴포넌트 구현 완료. BedBadge(sm), StatusBadge, AlertDialog 확인 모달, 행 클릭 라우팅, 삭제 toast, overflow-x-auto 반응형 적용. cases/page.tsx를 Server Component로 MOCK_CASES 렌더링.",
+      "completedAt": "2026-04-19T06:11:35.164Z"
+    },
+    {
+      "id": "eb7c35a7-227a-443a-948e-c7a3602f1eb4",
+      "name": "가이드라인 관리 페이지 UI 구현",
+      "description": "app/(app)/guidelines/page.tsx와 components/guidelines/guidelines-editor.tsx를 구현한다. cc-list.json 기반 C.C 드롭다운, 시스템 기본 가이드라인 읽기전용 미리보기(MOCK_GUIDE_CONTENT), 커스텀 Markdown 편집 Textarea, 저장/삭제 버튼(toast 더미), 커스텀 현황 목록(빈 상태 안내).",
+      "notes": "react-markdown 미설치 상태. Pre 태그로 시스템 기본 표시. guidelines-panel.tsx는 재사용하지 않음(해당 컴포넌트는 새 케이스 입력 화면 전용). MOCK_GUIDE_CONTENT를 lib/mock/cases.ts에서 import.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "8d42258b-e087-49f3-b1ee-c70d10da35b0"
+        }
+      ],
+      "createdAt": "2026-04-19T06:08:22.679Z",
+      "updatedAt": "2026-04-19T06:14:35.237Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/guidelines/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "가이드라인 관리 Server Component 페이지"
+        },
+        {
+          "path": "components/guidelines/guidelines-editor.tsx",
+          "type": "CREATE",
+          "description": "가이드라인 편집 Client Component"
+        },
+        {
+          "path": "lib/ai/resources/cc-list.json",
+          "type": "REFERENCE",
+          "description": "C.C 목록 8개"
+        },
+        {
+          "path": "lib/mock/cases.ts",
+          "type": "REFERENCE",
+          "description": "MOCK_GUIDE_CONTENT"
+        },
+        {
+          "path": "components/ui/select.tsx",
+          "type": "DEPENDENCY",
+          "description": "C.C 드롭다운"
+        },
+        {
+          "path": "components/ui/textarea.tsx",
+          "type": "DEPENDENCY",
+          "description": "커스텀 편집 영역"
+        }
+      ],
+      "implementationGuide": "page.tsx: Server Component. cc-list.json을 import 후 <GuidelinesEditor ccList={ccList} /> 렌더.\n\nguidelines-editor.tsx: 'use client'. props: ccList: {cc: string, hasTemplate: boolean, templateKey: string}[]\n- selectedCc state (초기값: ccList[0].cc)\n- customContent state (초기값: '')\n- 상단: Label + shadcn Select로 C.C 선택 (8개 옵션)\n- 중단 2열(md:grid-cols-2) 또는 탭 레이아웃:\n  - 시스템 기본: <div className='rounded border bg-muted p-3 text-sm overflow-y-auto max-h-64'><pre className='whitespace-pre-wrap'>{MOCK_GUIDE_CONTENT}</pre></div> (읽기전용)\n  - 커스텀 편집: <Textarea value={customContent} onChange /> + 아래 [저장][삭제] 버튼\n- [저장]: toast('가이드라인이 저장되었습니다.')\n- [삭제]: 커스텀 내용 비우고 toast('가이드라인이 삭제되었습니다.')\n- 하단: 커스텀 현황 목록 섹션 - 비어있으면 '저장된 커스텀 가이드라인이 없습니다.' 안내",
+      "verificationCriteria": "/guidelines 페이지에서 C.C 드롭다운 8개 옵션 표시 확인. 시스템 기본 가이드라인 내용 표시(읽기전용). 커스텀 편집 Textarea 입력 가능. 저장/삭제 버튼 클릭 시 toast 표시. 커스텀 현황 빈 상태 안내 메시지 표시.",
+      "analysisResult": "Task 008: Phase 2 마지막 UI 작업. 더미 데이터 기반으로 3개 페이지(케이스 목록, 가이드라인 관리, 설정)의 UI를 완성한다. 실제 DB/API 연동은 Phase 3(Task 012, 013)에서 수행. 기존 컴포넌트(StatusBadge, BedBadge, MOCK_CASES, MOCK_GUIDE_CONTENT) 재사용 필수. shadcn alert-dialog 추가 설치 필요.",
+      "summary": "guidelines-editor.tsx 구현 완료: cc-list.json 8개 옵션 Select, 시스템 기본 가이드라인 읽기전용 pre 표시, 커스텀 Textarea 편집, 저장/삭제 toast, 커스텀 현황 빈 상태 안내. guidelines/page.tsx Server Component로 업데이트.",
+      "completedAt": "2026-04-19T06:14:35.234Z"
+    },
+    {
+      "id": "60b4d55c-c13c-47ac-a6b4-50fd4e28f9c2",
+      "name": "설정 페이지 UI 구현",
+      "description": "app/(app)/settings/page.tsx와 components/settings/layout-settings.tsx를 구현한다. 레이아웃 선택(단독/상하분할/좌우분할) 카드형 라디오 UI + 각 옵션 미리보기 아이콘 + 저장 버튼(toast 더미).",
+      "notes": "shadcn Radio 컴포넌트 없음. ToggleGroup 대신 직접 카드형 선택 UI 구현이 더 직관적(미리보기 아이콘 포함 필요). Rows2, Columns, LayoutTemplate은 lucide-react에 존재.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "8d42258b-e087-49f3-b1ee-c70d10da35b0"
+        }
+      ],
+      "createdAt": "2026-04-19T06:08:22.679Z",
+      "updatedAt": "2026-04-19T06:14:38.251Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/settings/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "설정 Server Component 페이지"
+        },
+        {
+          "path": "components/settings/layout-settings.tsx",
+          "type": "CREATE",
+          "description": "레이아웃 설정 Client Component"
+        },
+        {
+          "path": "components/ui/button.tsx",
+          "type": "DEPENDENCY",
+          "description": "저장 버튼"
+        }
+      ],
+      "implementationGuide": "page.tsx: Server Component. <LayoutSettings /> 렌더.\n\nlayout-settings.tsx: 'use client'.\n- selectedLayout state: 'single' | 'split_vertical' | 'split_horizontal' (초기값: 'single')\n- LAYOUT_OPTIONS 배열:\n  [{value: 'single', label: '단독', description: '입력 화면만 전체 표시', icon: LayoutTemplate},\n   {value: 'split_vertical', label: '상하 분할', description: '상단 가이드 / 하단 입력', icon: Rows2},\n   {value: 'split_horizontal', label: '좌우 분할', description: '좌측 입력 / 우측 가이드 (폴드/태블릿)', icon: Columns}]\n- 카드형 선택 UI: div.grid.grid-cols-1.gap-3.sm:grid-cols-3\n  각 카드: onClick으로 선택, 선택된 카드는 border-primary + bg-primary/5 강조\n  카드 내부: Icon(size-8) + label(font-medium) + description(text-sm text-muted-foreground)\n- [저장] 버튼: toast('설정이 저장되었습니다.')\n- lucide-react 아이콘: LayoutTemplate, Rows2, Columns",
+      "verificationCriteria": "/settings 페이지에서 3가지 레이아웃 옵션 카드 표시 확인. 각 카드에 아이콘+레이블+설명 표시. 클릭 시 선택 강조 스타일 전환. 저장 버튼 클릭 시 toast 표시.",
+      "analysisResult": "Task 008: Phase 2 마지막 UI 작업. 더미 데이터 기반으로 3개 페이지(케이스 목록, 가이드라인 관리, 설정)의 UI를 완성한다. 실제 DB/API 연동은 Phase 3(Task 012, 013)에서 수행. 기존 컴포넌트(StatusBadge, BedBadge, MOCK_CASES, MOCK_GUIDE_CONTENT) 재사용 필수. shadcn alert-dialog 추가 설치 필요.",
+      "summary": "layout-settings.tsx 구현 완료: 단독/상하분할/좌우분할 카드형 선택 UI, lucide 아이콘, 선택 강조 스타일(border-primary/bg-primary/5), 저장 toast. settings/page.tsx Server Component로 업데이트.",
+      "completedAt": "2026-04-19T06:14:38.248Z"
+    }
+  ]
+}

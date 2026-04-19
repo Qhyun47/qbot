@@ -19,16 +19,21 @@ export function ResultSection({ title, value, className }: ResultSectionProps) {
   }, [value]);
 
   return (
-    <div className={cn("flex flex-col gap-2", className)}>
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium">{title}</h2>
-        <CopyButton text={localValue} />
+    <div
+      className={cn(
+        "shadow-xs flex flex-col overflow-hidden rounded-lg border bg-card",
+        className
+      )}
+    >
+      <div className="flex items-center justify-between border-b bg-muted/30 px-4 py-2.5">
+        <h2 className="text-sm font-semibold">{title}</h2>
+        <CopyButton text={localValue} label={`${title} 복사`} />
       </div>
       <Textarea
         value={localValue}
         onChange={(e) => setLocalValue(e.target.value)}
-        rows={8}
-        className="resize-none font-mono text-sm"
+        rows={9}
+        className="resize-none rounded-none border-0 font-mono text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
       />
     </div>
   );
