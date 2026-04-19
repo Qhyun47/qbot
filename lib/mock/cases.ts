@@ -178,6 +178,12 @@ export const MOCK_CASE_RESULTS: CaseResult[] = [
     model_version: "gemini-2.0-flash",
     structured_json: {},
     error_message: null,
+    history_draft:
+      "Past Hx. : HTN, DM / 이전 PCI 이력\n" +
+      "Med Hx. : ASA, metformin 복용 중\n" +
+      "Op Hx. : PCI (2022)\n" +
+      "Family Hx. : 부친 AMI",
+    history_edited: null,
     generated_at: "2026-04-19T06:15:00.000Z",
   },
   {
@@ -191,6 +197,8 @@ export const MOCK_CASE_RESULTS: CaseResult[] = [
     model_version: "gemini-2.0-flash",
     structured_json: {},
     error_message: "AI 생성 중 오류가 발생했습니다. API 응답 없음.",
+    history_draft: "Past Hx. : (-)\nMed Hx. : (-)\nOp Hx. : (-)",
+    history_edited: null,
     generated_at: "2026-04-19T04:10:00.000Z",
   },
 ];

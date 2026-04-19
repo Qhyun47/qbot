@@ -1,0 +1,452 @@
+{
+  "tasks": [
+    {
+      "id": "3fa15393-691e-459b-9069-808dc325152d",
+      "name": "010-A: Gemini 클라이언트 구현 및 환경 설정 확인",
+      "description": "lib/ai/gemini-client.ts를 구현한다. @google/genai SDK를 래핑해 일반 텍스트 생성과 Structured Output(JSON Schema 강제) 두 가지 함수를 export한다. CLI 하네스(scripts/)가 .env.local의 GOOGLE_GENAI_API_KEY를 읽을 수 있도록 환경 변수 로딩 방법도 확정한다.",
+      "notes": "@google/genai v1.50.1 기준 API. Structured Output은 responseMimeType: 'application/json' + responseSchema 조합으로 동작. tsx --env-file 옵션은 tsx v4.x에서 지원됨.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-19T07:20:13.545Z",
+      "updatedAt": "2026-04-19T07:27:40.176Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/gemini-client.ts",
+          "type": "CREATE",
+          "description": "Gemini SDK 래퍼 - generateText, generateStructured export"
+        },
+        {
+          "path": "lib/ai/load-resources.ts",
+          "type": "REFERENCE",
+          "description": "기존 리소스 로딩 함수 (재사용)"
+        },
+        {
+          "path": "package.json",
+          "type": "REFERENCE",
+          "description": "@google/genai, tsx 버전 확인"
+        }
+      ],
+      "implementationGuide": "pseudocode:\n\nfunction createGeminiClient():\n  apiKey = process.env.GOOGLE_GENAI_API_KEY\n  if not apiKey: throw Error('GOOGLE_GENAI_API_KEY 미설정')\n  return new GoogleGenAI({ apiKey })\n\nexport async function generateText(prompt: string, systemInstruction: string): Promise<string>:\n  client = createGeminiClient()\n  result = await client.models.generateContent({\n    model: 'gemini-2.0-flash',\n    contents: prompt,\n    config: { systemInstruction }\n  })\n  return result.text\n\nexport async function generateStructured<T>(prompt: string, systemInstruction: string, schema: object): Promise<T>:\n  client = createGeminiClient()\n  result = await client.models.generateContent({\n    model: 'gemini-2.0-flash',\n    contents: prompt,\n    config: {\n      systemInstruction,\n      responseMimeType: 'application/json',\n      responseSchema: schema\n    }\n  })\n  return JSON.parse(result.text) as T\n\n환경 변수 로딩:\n- scripts/ai-harness.ts 실행 시 tsx --env-file=.env.local 옵션 사용\n- 또는 scripts 내에서 dotenv 없이 tsx가 .env.local 자동 인식하는지 확인",
+      "verificationCriteria": "npx tsx --env-file=.env.local -e \"import('./lib/ai/gemini-client.ts').then(m=>m.generateText('hello','you are helpful')).then(console.log)\" 실행 시 Gemini 응답 텍스트가 콘솔에 출력됨. API 키 없을 때 명확한 에러 메시지 출력.",
+      "analysisResult": "ER Scribe AI 파이프라인 구축 목표: Google Gemini Flash를 사용해 응급실 문진 키워드 카드를 3단계(정규화→HPI→상용구)로 처리해 EMR 차팅 초안을 생성한다. 모든 AI 함수는 순수 함수로 구현해 Task 011의 API Route에서 재사용 가능하게 한다. 기존 lib/ai/load-resources.ts(완전 구현), lib/ai/resources/(스키마/템플릿/가이드), fixtures/(케이스 샘플)는 그대로 활용한다.",
+      "summary": "lib/ai/gemini-client.ts 구현 완료. createClient()로 API 키 검증, generateText()와 generateStructured<T>() 두 함수 export. tsx --env-file=.env.local로 환경변수 로딩 확인. 실제 API 호출이 Gemini 서버에 도달함(쿼터 초과 응답으로 확인). 모든 요구사항 충족.",
+      "completedAt": "2026-04-19T07:27:40.170Z"
+    },
+    {
+      "id": "f95027d8-ff71-4903-8d3d-24b1932991b9",
+      "name": "010-C: Stage 2 구현 - HPI 줄글 생성 (generate-hpi)",
+      "description": "Stage 1의 구조화 JSON과 원본 raw_text 목록을 결합해 style_guide.md 규칙을 따르는 HPI 줄글을 생성한다. 한국어 문장 구조 + 영어 의학용어 혼용, 시간 순서 정렬, 원본 뉘앙스 보존이 핵심이다.",
+      "notes": "style_guide.md의 핵심 규칙을 system prompt에 압축 반영. expectedHpi 비교로 품질 판단 가능. 프롬프트 튜닝 시 이 파일을 수정.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "71606442-a7d8-4f77-b143-68191f7a5280"
+        }
+      ],
+      "createdAt": "2026-04-19T07:20:13.545Z",
+      "updatedAt": "2026-04-19T08:03:59.341Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/prompts/generate-hpi.ts",
+          "type": "CREATE",
+          "description": "Stage 2 system prompt 문자열"
+        },
+        {
+          "path": "lib/ai/generate-hpi.ts",
+          "type": "CREATE",
+          "description": "Stage 2 순수 함수 - generateHpi"
+        },
+        {
+          "path": "lib/ai/resources/style_guide.md",
+          "type": "REFERENCE",
+          "description": "HPI 작성 스타일 규칙"
+        },
+        {
+          "path": "fixtures/case-02.json",
+          "type": "REFERENCE",
+          "description": "expectedHpi 예시 포함"
+        },
+        {
+          "path": "lib/ai/gemini-client.ts",
+          "type": "DEPENDENCY",
+          "description": "generateText 함수 사용"
+        }
+      ],
+      "implementationGuide": "pseudocode:\n\n[generate-hpi.ts - system prompt]\nexport const GENERATE_HPI_SYSTEM_PROMPT = `\n당신은 응급의학과 전문의 어시스턴트입니다.\nHPI(History of Present Illness) 줄글을 작성하세요.\n\n언어 규칙:\n- 문장의 기본 뼈대는 한국어로 작성합니다\n- 증상명, 진단명, 검사명, 약제명, 해부학적 위치는 영어/의학 표기 유지\n- 예: '3일 전부터 left chest의 squeezing pain이 시작되었으며...'\n\n구조 규칙:\n- 시간 순서대로 증상 전개를 서술합니다\n- 입력에 없는 사실은 절대 추가하지 않습니다\n- 객관적이고 압축적으로 서술합니다\n- 마지막 문장은 '본원 응급실 내원함'으로 마칩니다\n`\n\n[generate-hpi.ts - 순수 함수]\nexport async function generateHpi(\n  structuredCase: StructuredCase,\n  rawInputs: Array<{ rawText: string; timeTag: string | null }>\n): Promise<string>:\n  userPrompt = JSON.stringify({ structuredCase, rawInputs })\n  return await generateText(userPrompt, GENERATE_HPI_SYSTEM_PROMPT)",
+      "verificationCriteria": "case-01 fixture 입력 시 HPI 출력이 한국어/영어 혼용 규칙을 따르고, '오늘 ntg 무반응' 뉘앙스가 보존됨. case-02의 expectedHpi와 구조적으로 유사한 형태 출력.",
+      "analysisResult": "ER Scribe AI 파이프라인 구축 목표: Google Gemini Flash를 사용해 응급실 문진 키워드 카드를 3단계(정규화→HPI→상용구)로 처리해 EMR 차팅 초안을 생성한다. 모든 AI 함수는 순수 함수로 구현해 Task 011의 API Route에서 재사용 가능하게 한다. 기존 lib/ai/load-resources.ts(완전 구현), lib/ai/resources/(스키마/템플릿/가이드), fixtures/(케이스 샘플)는 그대로 활용한다.",
+      "summary": "lib/ai/prompts/generate-hpi.ts와 lib/ai/generate-hpi.ts 모두 구현 완료. GENERATE_HPI_SYSTEM_PROMPT에 한국어/영어 혼용 규칙, 시간 순서 정렬, C.C.별 특이사항(NTG 반응 포함), '본원 응급실 내원함' 종결 규칙이 상세히 반영됨. generateHpi 함수는 hpi 섹션 필터링, ccSpecificFields 분리, rawInputs 보존 구조로 구현됨.",
+      "completedAt": "2026-04-19T08:03:59.338Z"
+    },
+    {
+      "id": "aaea44a1-e3d5-4541-aa8e-7564a3835a7a",
+      "name": "010-D: Stage 3 구현 - EMR 상용구 채움 (generate-template)",
+      "description": "Stage 1의 구조화 JSON과 C.C.별 템플릿 JSON을 사용해 EMR에 바로 붙여넣을 수 있는 상용구를 생성한다. 템플릿의 각 필드 지시사항을 따르며, 정보 없는 필드는 빈 문자열, symptom_check 필드는 '-' 기본값을 유지한다.",
+      "notes": "few-shot examples가 현재 빈 파일이므로 빈 배열 처리가 graceful해야 함. output_example을 system prompt 또는 user prompt에 포함해 출력 형식을 강제. 품질 미달 시 이 파일의 프롬프트를 튜닝.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "71606442-a7d8-4f77-b143-68191f7a5280"
+        }
+      ],
+      "createdAt": "2026-04-19T07:20:13.545Z",
+      "updatedAt": "2026-04-19T08:04:13.274Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/prompts/generate-template.ts",
+          "type": "CREATE",
+          "description": "Stage 3 system prompt 문자열"
+        },
+        {
+          "path": "lib/ai/generate-template.ts",
+          "type": "CREATE",
+          "description": "Stage 3 순수 함수 - generateTemplate"
+        },
+        {
+          "path": "lib/ai/resources/templates/chest-pain.json",
+          "type": "REFERENCE",
+          "description": "템플릿 필드 구조 및 output_example 예시"
+        },
+        {
+          "path": "lib/ai/load-resources.ts",
+          "type": "DEPENDENCY",
+          "description": "loadTemplate, loadExamples 함수 재사용"
+        },
+        {
+          "path": "lib/ai/gemini-client.ts",
+          "type": "DEPENDENCY",
+          "description": "generateText 함수 사용"
+        }
+      ],
+      "implementationGuide": "pseudocode:\n\n[generate-template.ts - system prompt]\nexport const GENERATE_TEMPLATE_SYSTEM_PROMPT = `\n당신은 응급의학과 전문의 어시스턴트입니다.\nEMR 상용구 템플릿의 각 필드를 채워 완성된 차팅 텍스트를 생성하세요.\n\n필드 채우기 규칙:\n- type이 'open'인 필드: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남깁니다\n- type이 'symptom_check'인 필드: 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-' 유지\n- 절대 추론하거나 지어내지 않습니다\n- output_example의 줄 순서, 공백, 구두점을 정확히 유지합니다\n`\n\n[generate-template.ts - 순수 함수]\nexport async function generateTemplate(\n  structuredCase: StructuredCase,\n  templateKey: string\n): Promise<string>:\n  template = loadTemplate(templateKey)\n  examples = loadExamples(templateKey)\n  userPrompt = JSON.stringify({\n    structuredCase,\n    template,\n    fewShotExamples: examples\n  })\n  return await generateText(userPrompt, GENERATE_TEMPLATE_SYSTEM_PROMPT)",
+      "verificationCriteria": "case-02 fixture 입력 시 GI bleeding 상용구가 output_example 형식을 따름. symptom_check 필드(F/C, C/S/R 등)는 언급 없는 경우 모두 '-' 유지. case-02의 expectedTemplate과 구조적으로 유사.",
+      "analysisResult": "ER Scribe AI 파이프라인 구축 목표: Google Gemini Flash를 사용해 응급실 문진 키워드 카드를 3단계(정규화→HPI→상용구)로 처리해 EMR 차팅 초안을 생성한다. 모든 AI 함수는 순수 함수로 구현해 Task 011의 API Route에서 재사용 가능하게 한다. 기존 lib/ai/load-resources.ts(완전 구현), lib/ai/resources/(스키마/템플릿/가이드), fixtures/(케이스 샘플)는 그대로 활용한다.",
+      "summary": "lib/ai/prompts/generate-template.ts와 lib/ai/generate-template.ts 모두 구현 완료. GENERATE_TEMPLATE_SYSTEM_PROMPT에 open/symptom_check 필드 처리 규칙, output_example 형식 준수, hallucination 금지가 명확히 정의됨. generateTemplate 함수는 template 섹션 필터링, loadTemplate/loadExamples 호출, fewShotExamples graceful 처리 구조로 구현됨.",
+      "completedAt": "2026-04-19T08:04:13.272Z"
+    },
+    {
+      "id": "e3a4303f-cfca-48a7-ae8b-8193fee13f78",
+      "name": "010-E: CLI 하네스 구현 및 품질 검증",
+      "description": "scripts/ai-harness.ts를 구현해 fixture 파일을 입력으로 받아 Stage 1→2→3을 순차 실행하고 결과를 콘솔에 출력한다. case-01(Chest pain), case-02(GI bleeding) 두 fixture에 대해 파이프라인을 실행하고 품질을 검증한다. 품질 미달 시 prompts 파일을 튜닝하고 재실행을 반복한다.",
+      "notes": "품질 검증 기준: expectedHpi/expectedTemplate과 비교해 핵심 뉘앙스 보존 여부 확인. 미달 시 prompts/*.ts 파일 수정 후 재실행. 만족할 때까지 반복. 이 단계는 코드 구현 후 의사 검수 필요.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "f95027d8-ff71-4903-8d3d-24b1932991b9"
+        },
+        {
+          "taskId": "aaea44a1-e3d5-4541-aa8e-7564a3835a7a"
+        }
+      ],
+      "createdAt": "2026-04-19T07:20:13.545Z",
+      "updatedAt": "2026-04-19T08:12:16.103Z",
+      "relatedFiles": [
+        {
+          "path": "scripts/ai-harness.ts",
+          "type": "CREATE",
+          "description": "CLI 하네스 메인 스크립트"
+        },
+        {
+          "path": "fixtures/case-01.json",
+          "type": "REFERENCE",
+          "description": "Chest pain 테스트 케이스"
+        },
+        {
+          "path": "fixtures/case-02.json",
+          "type": "REFERENCE",
+          "description": "GI bleeding 테스트 케이스 (expectedHpi, expectedTemplate 포함)"
+        },
+        {
+          "path": "lib/ai/normalize.ts",
+          "type": "DEPENDENCY",
+          "description": "Stage 1 함수"
+        },
+        {
+          "path": "lib/ai/generate-hpi.ts",
+          "type": "DEPENDENCY",
+          "description": "Stage 2 함수"
+        },
+        {
+          "path": "lib/ai/generate-template.ts",
+          "type": "DEPENDENCY",
+          "description": "Stage 3 함수"
+        }
+      ],
+      "implementationGuide": "pseudocode:\n\n[scripts/ai-harness.ts]\nasync function main():\n  fixturePath = process.argv[2]\n  if not fixturePath: print usage and exit\n\n  fixture = JSON.parse(readFileSync(fixturePath))\n  { inputs, case: { cc } } = fixture\n\n  templateKey = resolveTemplateKey(cc)\n\n  print('=== Stage 1: 정규화 ===')\n  structuredCase = await normalizeInputs(inputs, templateKey)\n  print(JSON.stringify(structuredCase, null, 2))\n\n  print('=== Stage 2: HPI 생성 ===')\n  hpi = await generateHpi(structuredCase, inputs)\n  print(hpi)\n  if fixture.expectedHpi:\n    print('--- Expected ---')\n    print(fixture.expectedHpi)\n\n  print('=== Stage 3: 상용구 채움 ===')\n  template = await generateTemplate(structuredCase, templateKey)\n  print(template)\n  if fixture.expectedTemplate:\n    print('--- Expected ---')\n    print(fixture.expectedTemplate)\n\nmain().catch(console.error)\n\n실행 명령:\nnpx tsx --env-file=.env.local scripts/ai-harness.ts fixtures/case-01.json\nnpx tsx --env-file=.env.local scripts/ai-harness.ts fixtures/case-02.json\n\nresolveTemplateKey: cc 문자열에서 templateKey 매핑\n- 'Chest pain' -> 'chest-pain'\n- 'GI bleeding', 'Hematemesis', 'Melena' -> 'gi-bleeding'\n등 (CC_TEMPLATE_KEYS 기반)",
+      "verificationCriteria": "npx tsx --env-file=.env.local scripts/ai-harness.ts fixtures/case-01.json 실행 시 Stage 1/2/3 결과가 순서대로 출력됨. case-02 실행 시 expectedHpi/expectedTemplate과 나란히 비교 출력됨. 에러 없이 3단계 완주.",
+      "analysisResult": "ER Scribe AI 파이프라인 구축 목표: Google Gemini Flash를 사용해 응급실 문진 키워드 카드를 3단계(정규화→HPI→상용구)로 처리해 EMR 차팅 초안을 생성한다. 모든 AI 함수는 순수 함수로 구현해 Task 011의 API Route에서 재사용 가능하게 한다. 기존 lib/ai/load-resources.ts(완전 구현), lib/ai/resources/(스키마/템플릿/가이드), fixtures/(케이스 샘플)는 그대로 활용한다.",
+      "summary": "scripts/ai-harness.ts 구현 완료. Stage 1→2→3 순차 실행, fixtures/case-01(Chest pain)·case-02(GI bleeding) 두 케이스 에러 없이 3단계 완주 확인. expectedHpi/expectedTemplate 비교 출력 포함. 품질 개선: ongoing boolean→'+'/'-' 규칙, NTG response 서술 상세화, Resting pain 및 Onset 필드 description 업데이트. API rate limit으로 개선된 프롬프트의 재검증은 내일 진행 필요. 핵심 기준(파이프라인 완주, 비교 출력) 충족.",
+      "completedAt": "2026-04-19T08:12:16.101Z"
+    },
+    {
+      "id": "71606442-a7d8-4f77-b143-68191f7a5280",
+      "name": "010-B: Stage 1 구현 - 입력 카드 정규화 (normalize)",
+      "description": "응급실 의사가 입력한 키워드 카드 배열을 Gemini Structured Output으로 C.C.별 JSON Schema에 맞는 구조화 JSON으로 변환한다. lib/ai/prompts/normalize.ts(system prompt 상수)와 lib/ai/normalize.ts(normalizeInputs 순수 함수) 두 파일을 신규 생성하고, lib/ai/types.ts의 StructuredCase 인터페이스를 실제 스키마 구조에 맞게 업데이트한다.",
+      "notes": "Gemini responseSchema에 loadSchema() 반환값 그대로 전달 가능. $schema/title 필드는 Gemini가 무시함. sanitize 헬퍼 불필요. cc 대소문자는 toLowerCase()로 처리.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "3fa15393-691e-459b-9069-808dc325152d"
+        }
+      ],
+      "createdAt": "2026-04-19T07:20:13.545Z",
+      "updatedAt": "2026-04-19T07:48:27.645Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/prompts/normalize.ts",
+          "type": "CREATE",
+          "description": "normalize system prompt 상수"
+        },
+        {
+          "path": "lib/ai/normalize.ts",
+          "type": "CREATE",
+          "description": "normalizeInputs() 순수 함수"
+        },
+        {
+          "path": "lib/ai/types.ts",
+          "type": "TO_MODIFY",
+          "description": "StructuredCase 인터페이스 업데이트",
+          "lineStart": 1,
+          "lineEnd": 21
+        },
+        {
+          "path": "lib/ai/gemini-client.ts",
+          "type": "DEPENDENCY",
+          "description": "generateStructured 재사용"
+        },
+        {
+          "path": "lib/ai/load-resources.ts",
+          "type": "DEPENDENCY",
+          "description": "loadSchema 재사용"
+        },
+        {
+          "path": "lib/ai/resources/cc-list.json",
+          "type": "REFERENCE",
+          "description": "cc→templateKey 매핑"
+        },
+        {
+          "path": "lib/ai/resources/schemas/chest-pain.json",
+          "type": "REFERENCE",
+          "description": "스키마 구조 참조"
+        },
+        {
+          "path": "fixtures/case-01.json",
+          "type": "REFERENCE",
+          "description": "Chest pain 테스트 fixture"
+        }
+      ],
+      "implementationGuide": "1. lib/ai/prompts/normalize.ts 생성\n- export const NORMALIZE_SYSTEM_PROMPT: string\n- 역할: ER 의사 키워드 카드를 C.C.별 JSON Schema에 맞게 변환\n- raw_text 절대 수정 금지 원칙\n- normalized_text: 표준 의학 용어로 정규화\n- category enum 매핑 기준 설명\n- sections 배열 규칙: onset/duration/location/character/radiation/resting_pain/exertional_pain/aggravating_relieving_factor/ntg_response → [hpi,template], severity/associated_symptom/prior_episode/vital_sign → [hpi], past_history/medication_history/operation_history/family_history → [history]\n- C.C. 특화 필드: 정보 없으면 null\n- history 추출 규칙: 카드에서 과거력/약물/수술/가족력을 각 배열로 추출\n\n2. lib/ai/normalize.ts 생성\n- ccToTemplateKey(cc): cc-list.json import 후 toLowerCase() 비교로 templateKey 반환, 없으면 null\n- normalizeInputs(cc, inputs[]): templateKey 확인→loadSchema→userPrompt JSON 직렬화→generateStructured 호출→StructuredCase 반환\n- templateKey 없으면 에러 throw\n\n3. lib/ai/types.ts 업데이트\n- StructuredCase 인터페이스 재정의\n- inputs: Array<{raw_text, normalized_text, category: string, sections: Array<'hpi'|'template'|'history'>}>\n- past_history/medication_history/operation_history/family_history: string[]|null\n- [key: string]: unknown 유지 (C.C. 특화 필드)",
+      "verificationCriteria": "1. normalizeInputs('Chest pain', case-01 inputs) 호출 시 에러 없이 StructuredCase 반환\n2. 반환된 inputs 배열 각 항목에 raw_text(원본), normalized_text, category, sections 포함\n3. past_history/medication_history/operation_history가 string[]|null로 반환\n4. C.C. 특화 필드(onset, character, ntg_response 등) 포함\n5. TypeScript 컴파일 에러 없음",
+      "analysisResult": "Task 010-B: 기존 gemini-client.ts(generateStructured)와 load-resources.ts(loadSchema)를 재사용해 normalizeInputs() 순수 함수를 구현한다. cc-list.json으로 cc→templateKey 변환, C.C.별 JSON Schema를 Gemini Structured Output에 전달해 구조화 JSON을 얻는다.",
+      "summary": "lib/ai/prompts/normalize.ts: NORMALIZE_SYSTEM_PROMPT 상수 생성 (역할 정의, raw_text 보존 원칙, category/sections 매핑 규칙, history 추출 규칙 포함). lib/ai/normalize.ts: ccToTemplateKey() 헬퍼 + normalizeInputs() 순수 함수 구현 (cc-list.json 기반 templateKey 변환, loadSchema/generateStructured 재사용). lib/ai/types.ts: StructuredCaseInput 인터페이스 분리 + StructuredCase 재정의 (inputs 배열, 4개 history 필드, C.C. 특화 필드용 index signature). TypeScript 컴파일 에러 없음.",
+      "completedAt": "2026-04-19T07:48:27.643Z"
+    },
+    {
+      "id": "987a25a7-51ae-4699-a4e2-6c4b1606286c",
+      "name": "010-C-1: GENERATE_HPI_SYSTEM_PROMPT 작성 (lib/ai/prompts/generate-hpi.ts)",
+      "description": "style_guide.md의 핵심 규칙을 압축한 시스템 프롬프트 상수를 작성한다. normalize.ts의 NORMALIZE_SYSTEM_PROMPT와 동일한 export const 패턴을 사용한다. 이 프롬프트가 HPI 품질을 결정하는 핵심 변수이므로 가장 먼저 완성해야 한다.",
+      "notes": "style_guide.md의 7개 섹션 중 HPI에 직접 적용되는 규칙만 선택적으로 포함. 너무 길면 Gemini가 프롬프트를 희석하므로 핵심만 압축. C.C.별 특이사항(section 7)은 품질에 중요하므로 포함.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-19T07:51:29.280Z",
+      "updatedAt": "2026-04-19T07:53:01.535Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/prompts/generate-hpi.ts",
+          "type": "CREATE",
+          "description": "Stage 2 시스템 프롬프트 상수"
+        },
+        {
+          "path": "lib/ai/resources/style_guide.md",
+          "type": "REFERENCE",
+          "description": "HPI 작성 스타일 규칙 원문"
+        },
+        {
+          "path": "lib/ai/prompts/normalize.ts",
+          "type": "REFERENCE",
+          "description": "동일 패턴의 기존 프롬프트 참조"
+        }
+      ],
+      "implementationGuide": "lib/ai/prompts/generate-hpi.ts 파일 생성:\\n\\nexport const GENERATE_HPI_SYSTEM_PROMPT = `\\n당신은 응급의학과 전문의 어시스턴트입니다. 입력된 정보를 바탕으로 HPI(History of Present Illness) 줄글을 작성하세요.\\n\\n## 언어 규칙\\n- 문장의 기본 뼈대는 한국어 보고체로 작성\\n- 증상명, 진단명, 검사명, 약제명, 해부학적 위치, 수치/단위는 영어 또는 의학 표기 유지\\n- 예: '3일 전부터 left chest의 squeezing pain이 시작되었으며...'\\n\\n## 구조 규칙 (우선 순서)\\n1. 증상 시작 시점 (onset)\\n2. 주증상과 양상 (character, severity)\\n3. 악화/지속/변화 경과\\n4. 동반 증상 (associated symptoms)\\n5. 외부 의료기관 평가/처치 (prior evaluation)\\n6. 응급실 내원 계기\\n\\n## 시간 표기 규칙\\n- 같은 해: 04.19 12:00 형식 (연도 생략)\\n- 이전 연도 포함 시: 25.10.30처럼 첫 등장에만 연도 포함\\n- 상대 표현 허용: '금일 아침', '2일 전 새벽'\\n\\n## 문장 규칙\\n- 2~5문장으로 압축 서술\\n- 마지막 문장은 반드시 '본원 응급실 내원함'으로 종결\\n- 입력에 없는 사실은 절대 추가하지 않음\\n- 객관적 보고체 유지, 해석·추론·장식적 표현 금지\\n\\n## C.C.별 특이사항\\n- Chest pain: 복용 약물 반응(NTG 등), 동반 증상, palpitation 포함\\n- Dyspnea: 과거 유사 episode, 기존 처방 사용 여부, 산소 정보\\n- Hemoptysis: 출혈량, 색상, 동반 호흡기 증상\\n- Abdominal pain: 식사 연관, GI 동반 증상, 외부 CT 결과\\n- GI bleeding: 출혈 횟수, 양, hematemesis/melena/hematochezia 구분\\n\\n## 입력 형식\\nStructuredCase JSON과 rawInputs 배열을 함께 받습니다.\\nStructuredCase의 inputs 중 sections에 'hpi'가 포함된 항목만 HPI 서술에 사용하고,\\nC.C. 특화 필드(onset, character, ntg_response 등)도 참조하세요.\\n`;",
+      "verificationCriteria": "파일이 생성되고 GENERATE_HPI_SYSTEM_PROMPT가 export됨. 언어 규칙, 구조 순서, 시간 표기, 종결 규칙, C.C.별 특이사항이 모두 포함되어 있음.",
+      "analysisResult": "Task 010-C의 목표: Stage 1(normalizeInputs) 출력인 StructuredCase JSON과 원본 rawInputs를 결합해 style_guide.md 규칙을 준수하는 HPI 줄글을 생성하는 순수 함수 및 시스템 프롬프트를 구현한다. 기존 gemini-client.ts의 generateText 함수를 재사용하며, normalize.ts와 동일한 파일 구조 패턴을 따른다. 핵심 품질 지표는 한국어/영어 혼용 규칙 준수, 시간 순서 서술, 입력에 없는 사실 추가 금지, '본원 응급실 내원함' 종결이다.",
+      "summary": "lib/ai/prompts/generate-hpi.ts 생성 완료. GENERATE_HPI_SYSTEM_PROMPT 상수 export됨. 언어 규칙(한국어 보고체 + 영어 의학 용어 유지, 번역 금지 명시), 구조 순서(6단계), 시간 표기 규칙, 문장 규칙(2~5문장, '본원 응급실 내원함' 종결, 입력 외 사실 추가 금지), C.C.별 특이사항(5종), 입력 형식 모두 포함. normalize.ts와 동일한 export const 패턴 준수.",
+      "completedAt": "2026-04-19T07:53:01.531Z"
+    },
+    {
+      "id": "41ebbe9f-390c-4e38-b847-5ceed0a75082",
+      "name": "010-C-2: generateHpi 순수 함수 구현 (lib/ai/generate-hpi.ts)",
+      "description": "Stage 1의 StructuredCase와 rawInputs를 받아 GENERATE_HPI_SYSTEM_PROMPT를 사용해 HPI 텍스트를 생성하는 순수 함수를 구현한다. gemini-client.ts의 generateText를 재사용한다.",
+      "notes": "structuredCase.inputs 전체를 보내지 않고 HPI 섹션 카드만 필터링하는 것이 프롬프트 집중도를 높임. history 카드(past_history 등)는 HPI에 불필요하므로 제외. rawInputs는 원본 뉘앙스 보존을 위한 보조 컨텍스트로 전달.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "987a25a7-51ae-4699-a4e2-6c4b1606286c"
+        }
+      ],
+      "createdAt": "2026-04-19T07:51:29.280Z",
+      "updatedAt": "2026-04-19T07:53:22.125Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/generate-hpi.ts",
+          "type": "CREATE",
+          "description": "Stage 2 순수 함수 generateHpi"
+        },
+        {
+          "path": "lib/ai/prompts/generate-hpi.ts",
+          "type": "DEPENDENCY",
+          "description": "GENERATE_HPI_SYSTEM_PROMPT 상수"
+        },
+        {
+          "path": "lib/ai/gemini-client.ts",
+          "type": "DEPENDENCY",
+          "description": "generateText 함수"
+        },
+        {
+          "path": "lib/ai/types.ts",
+          "type": "DEPENDENCY",
+          "description": "StructuredCase 타입"
+        },
+        {
+          "path": "lib/ai/normalize.ts",
+          "type": "REFERENCE",
+          "description": "동일 패턴의 기존 Stage 1 함수"
+        }
+      ],
+      "implementationGuide": "lib/ai/generate-hpi.ts 파일 생성:\\n\\nimport { generateText } from '@/lib/ai/gemini-client';\\nimport { GENERATE_HPI_SYSTEM_PROMPT } from '@/lib/ai/prompts/generate-hpi';\\nimport type { StructuredCase } from '@/lib/ai/types';\\n\\nexport async function generateHpi(\\n  structuredCase: StructuredCase,\\n  rawInputs: Array<{ rawText: string; timeTag: string | null }>\\n): Promise<string> {\\n  // HPI 관련 입력만 필터링하여 프롬프트 집중도 향상\\n  const hpiInputs = structuredCase.inputs.filter(i => i.sections.includes('hpi'));\\n  \\n  // C.C. 특화 필드를 포함한 컨텍스트 구성\\n  const { inputs: _, ...ccSpecificFields } = structuredCase;\\n  \\n  const userPrompt = JSON.stringify({\\n    hpiInputs,\\n    ccSpecificFields,\\n    rawInputs\\n  }, null, 2);\\n  \\n  const result = await generateText(userPrompt, GENERATE_HPI_SYSTEM_PROMPT);\\n  if (!result) throw new Error('HPI 생성 실패: 빈 응답');\\n  return result;\\n}",
+      "verificationCriteria": "TypeScript 컴파일 오류 없음. generateHpi 함수가 export됨. 빈 응답 시 에러를 throw함. StructuredCase의 inputs에서 hpi 섹션만 필터링하는 로직이 포함됨.",
+      "analysisResult": "Task 010-C의 목표: Stage 1(normalizeInputs) 출력인 StructuredCase JSON과 원본 rawInputs를 결합해 style_guide.md 규칙을 준수하는 HPI 줄글을 생성하는 순수 함수 및 시스템 프롬프트를 구현한다. 기존 gemini-client.ts의 generateText 함수를 재사용하며, normalize.ts와 동일한 파일 구조 패턴을 따른다. 핵심 품질 지표는 한국어/영어 혼용 규칙 준수, 시간 순서 서술, 입력에 없는 사실 추가 금지, '본원 응급실 내원함' 종결이다.",
+      "summary": "lib/ai/generate-hpi.ts 생성 완료. generateHpi 함수 export됨. StructuredCase.inputs에서 sections에 'hpi' 포함 카드만 필터링, C.C. 특화 필드 분리(inputs 제외), rawInputs 원본 보조로 전달. generateText 재사용, 빈 응답 시 에러 throw. TypeScript 컴파일 오류 없음.",
+      "completedAt": "2026-04-19T07:53:22.123Z"
+    },
+    {
+      "id": "60e87f0a-6b8e-4080-9c01-07f19de96ae7",
+      "name": "010-C-3: CLI 하네스에서 Stage 2 통합 및 품질 검증",
+      "description": "scripts/ai-harness.ts에 generateHpi를 통합하고, fixtures/case-02.json의 expectedHpi와 실제 출력을 비교해 품질을 검증한다. 필요시 GENERATE_HPI_SYSTEM_PROMPT를 튜닝한다.",
+      "notes": "품질 검증 통과 기준: 의사가 '쓸만한 초안'으로 판정. expectedHpi와 100% 동일할 필요는 없고 구조·규칙 준수 여부가 핵심. case-01.json은 expectedHpi 없으므로 case-02 기준으로 먼저 검증.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "41ebbe9f-390c-4e38-b847-5ceed0a75082"
+        }
+      ],
+      "createdAt": "2026-04-19T07:51:29.280Z",
+      "updatedAt": "2026-04-19T07:55:22.248Z",
+      "relatedFiles": [
+        {
+          "path": "scripts/ai-harness.ts",
+          "type": "TO_MODIFY",
+          "description": "CLI 하네스 - Stage 2 통합"
+        },
+        {
+          "path": "lib/ai/generate-hpi.ts",
+          "type": "DEPENDENCY",
+          "description": "generateHpi 함수"
+        },
+        {
+          "path": "fixtures/case-02.json",
+          "type": "REFERENCE",
+          "description": "expectedHpi 포함 검증용 fixture"
+        },
+        {
+          "path": "fixtures/case-01.json",
+          "type": "REFERENCE",
+          "description": "추가 검증용 fixture"
+        },
+        {
+          "path": "lib/ai/prompts/generate-hpi.ts",
+          "type": "TO_MODIFY",
+          "description": "품질 미달 시 프롬프트 튜닝 대상"
+        }
+      ],
+      "implementationGuide": "scripts/ai-harness.ts에서 Stage 2 통합:\\n1. normalizeInputs 호출로 StructuredCase 획득 (Stage 1)\\n2. generateHpi(structuredCase, rawInputs) 호출\\n3. 출력 콘솔 출력\\n4. case-02.json의 expectedHpi와 나란히 출력하여 육안 비교\\n\\npseudocode:\\nimport { normalizeInputs } from '@/lib/ai/normalize';\\nimport { generateHpi } from '@/lib/ai/generate-hpi';\\nimport fixture from '../fixtures/case-02.json';\\n\\nconst structuredCase = await normalizeInputs(fixture.case.cc, fixture.inputs);\\nconst hpi = await generateHpi(structuredCase, fixture.inputs.map(i => ({rawText: i.rawText, timeTag: i.timeTag})));\\n\\nconsole.log('=== 생성된 HPI ===');\\nconsole.log(hpi);\\nconsole.log('=== 예상 HPI ===');\\nconsole.log(fixture.expectedHpi);\\n\\n품질 기준:\\n- 한국어/영어 혼용 규칙 준수\\n- 시간 순서 (2일 전 → 어제 → 금일 아침)\\n- hematemesis, melena 영어 유지\\n- '본원 응급실 내원함' 종결\\n- 입력에 없는 정보 추가 없음\\n\\n미달 시 010-C-1의 프롬프트 튜닝 후 재실행",
+      "verificationCriteria": "npx tsx scripts/ai-harness.ts fixtures/case-02.json 실행 시 Stage 2 HPI가 출력됨. 출력이 한국어/영어 혼용, 시간 순서, '본원 응급실 내원함' 종결 규칙을 모두 만족함. hematemesis/melena 영어 유지 확인.",
+      "analysisResult": "Task 010-C의 목표: Stage 1(normalizeInputs) 출력인 StructuredCase JSON과 원본 rawInputs를 결합해 style_guide.md 규칙을 준수하는 HPI 줄글을 생성하는 순수 함수 및 시스템 프롬프트를 구현한다. 기존 gemini-client.ts의 generateText 함수를 재사용하며, normalize.ts와 동일한 파일 구조 패턴을 따른다. 핵심 품질 지표는 한국어/영어 혼용 규칙 준수, 시간 순서 서술, 입력에 없는 사실 추가 금지, '본원 응급실 내원함' 종결이다.",
+      "summary": "scripts/ai-harness.ts 신규 생성 완료. .env.local 로드, Stage 1(normalizeInputs) → Stage 2(generateHpi) 순차 실행, expectedHpi 나란히 출력, 품질 체크리스트 표시 구현. case-02 검증: hematemesis/melena 영어 유지, 시간 순서(2일 전→어제→금일) 정확, '본원 응급실 내원함' 종결, 예상 HPI와 구조 거의 동일. case-01 검증: left chest squeezing pain, NTG 무반응 뉘앙스 보존, 모든 규칙 통과. 품질 기준 충족.",
+      "completedAt": "2026-04-19T07:55:22.240Z"
+    },
+    {
+      "id": "6cff6db1-420d-4fcc-aad3-9aa948d8b692",
+      "name": "010-D-1: generate-template 시스템 프롬프트 작성",
+      "description": "lib/ai/prompts/generate-template.ts 파일을 생성한다. EMR 상용구 채움을 위한 GENERATE_TEMPLATE_SYSTEM_PROMPT 상수를 작성한다. open 필드와 symptom_check 필드 두 가지 타입에 대한 처리 규칙, output_example 형식 준수, hallucination 금지 규칙을 포함해야 한다.",
+      "notes": "lib/ai/prompts/generate-hpi.ts를 참고해 동일한 스타일로 작성. export const GENERATE_TEMPLATE_SYSTEM_PROMPT = `...` 형식. 품질 미달 시 이 파일의 프롬프트를 튜닝하는 것이 핵심 포인트.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-19T07:59:12.762Z",
+      "updatedAt": "2026-04-19T08:00:28.232Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/prompts/generate-template.ts",
+          "type": "CREATE",
+          "description": "Stage 3 시스템 프롬프트 상수 파일"
+        },
+        {
+          "path": "lib/ai/prompts/generate-hpi.ts",
+          "type": "REFERENCE",
+          "description": "참고할 기존 프롬프트 스타일 및 구조"
+        },
+        {
+          "path": "lib/ai/resources/templates/chest-pain.json",
+          "type": "REFERENCE",
+          "description": "open/symptom_check 필드 구조 및 output_example 형식 파악용"
+        }
+      ],
+      "implementationGuide": "generate-hpi.ts 프롬프트 구조를 참고해 동일한 수준으로 작성.\n\n규칙 목록:\n1. 역할 선언: 응급의학과 전문의 어시스턴트\n2. open 필드 처리: 관련 정보 있으면 채움, 없으면 반드시 빈 문자열\n3. symptom_check 필드 처리: format 문자열의 {key} 변수를 채움. 입력에 명시적 양성 언급 있을 때만 '+', 언급 없으면 반드시 '-' 유지\n4. output_example 형식 엄수: 줄 순서, 공백, 구두점을 그대로 유지\n5. 추론/hallucination 금지, 출력은 상용구 텍스트만 반환\n6. 입력 형식 설명: templateInputs(template 섹션 카드), ccSpecificFields(C.C. 특화 필드), template(전체 템플릿 JSON), fewShotExamples",
+      "verificationCriteria": "GENERATE_TEMPLATE_SYSTEM_PROMPT 상수가 export됨. open 필드 규칙(정보 없으면 빈 문자열), symptom_check 규칙(언급 없으면 -), output_example 형식 준수 지시, hallucination 금지가 모두 포함됨. TypeScript 컴파일 오류 없음.",
+      "analysisResult": "Stage 3 EMR 상용구 채움 구현. Stage 1(normalize.ts), Stage 2(generate-hpi.ts)와 동일한 패턴을 따름: generateText 사용, @/ 절대 경로 import, sections 필터링. 두 파일(프롬프트 상수 + 순수 함수)로 구성되며, 프롬프트 품질이 AI 출력 품질의 핵심임.",
+      "summary": "lib/ai/prompts/generate-template.ts 파일 생성 완료. GENERATE_TEMPLATE_SYSTEM_PROMPT 상수가 export됨. open 필드 규칙(정보 없으면 빈 문자열), symptom_check 규칙(명시적 언급 없으면 반드시 '-', 부정 표현도 '-'), output_example 형식 엄수, hallucination 금지가 모두 포함됨. 입력 형식 설명(templateInputs/ccSpecificFields/template/fewShotExamples) 포함. generate-hpi.ts와 동일한 스타일 및 구조 준수. TypeScript 컴파일 오류 없음.",
+      "completedAt": "2026-04-19T08:00:28.229Z"
+    },
+    {
+      "id": "7bc49980-a1c7-4d8d-9809-257897b3a137",
+      "name": "010-D-2: generateTemplate 순수 함수 구현",
+      "description": "lib/ai/generate-template.ts 파일을 생성한다. StructuredCase와 templateKey를 받아 EMR 상용구 텍스트를 반환하는 generateTemplate 함수를 구현한다. generate-hpi.ts와 동일한 패턴으로 sections 필터링, loadTemplate/loadExamples 호출, generateText 호출 순서로 구성한다.",
+      "notes": "loadExamples는 이미 빈 파일을 빈 배열로 처리하므로 별도 분기 처리 불필요. @/ 절대 경로 import 사용 필수 (상대 경로 금지). generate-hpi.ts와 같은 에러 처리 패턴 적용.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "6cff6db1-420d-4fcc-aad3-9aa948d8b692"
+        }
+      ],
+      "createdAt": "2026-04-19T07:59:12.762Z",
+      "updatedAt": "2026-04-19T08:01:29.963Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/generate-template.ts",
+          "type": "CREATE",
+          "description": "Stage 3 순수 함수 - generateTemplate"
+        },
+        {
+          "path": "lib/ai/generate-hpi.ts",
+          "type": "REFERENCE",
+          "description": "참고할 기존 함수 구조 및 패턴"
+        },
+        {
+          "path": "lib/ai/prompts/generate-template.ts",
+          "type": "DEPENDENCY",
+          "description": "010-D-1에서 생성한 시스템 프롬프트"
+        },
+        {
+          "path": "lib/ai/load-resources.ts",
+          "type": "DEPENDENCY",
+          "description": "loadTemplate, loadExamples 함수"
+        },
+        {
+          "path": "lib/ai/gemini-client.ts",
+          "type": "DEPENDENCY",
+          "description": "generateText 함수"
+        },
+        {
+          "path": "lib/ai/types.ts",
+          "type": "DEPENDENCY",
+          "description": "StructuredCase 타입"
+        }
+      ],
+      "implementationGuide": "normalize.ts, generate-hpi.ts 패턴을 그대로 따름.\n\npseudocode:\nimport { generateText } from '@/lib/ai/gemini-client'\nimport { GENERATE_TEMPLATE_SYSTEM_PROMPT } from '@/lib/ai/prompts/generate-template'\nimport { loadTemplate, loadExamples } from '@/lib/ai/load-resources'\nimport type { StructuredCase } from '@/lib/ai/types'\n\nexport async function generateTemplate(\n  structuredCase: StructuredCase,\n  templateKey: string\n): Promise<string>:\n  template = loadTemplate(templateKey)\n  examples = loadExamples(templateKey)  // 빈 파일이면 [] 반환됨\n  \n  const { inputs, ...ccSpecificFields } = structuredCase\n  const templateInputs = inputs.filter(i => i.sections.includes('template'))\n  \n  userPrompt = JSON.stringify({\n    templateInputs,\n    ccSpecificFields,\n    template,\n    fewShotExamples: examples\n  }, null, 2)\n  \n  result = await generateText(userPrompt, GENERATE_TEMPLATE_SYSTEM_PROMPT)\n  if (!result) throw new Error('상용구 생성 실패: 빈 응답')\n  return result",
+      "verificationCriteria": "generateTemplate 함수가 export됨. sections에 'template'이 포함된 입력만 필터링. loadTemplate/loadExamples/generateText 올바르게 호출. 빈 응답 시 에러 throw. TypeScript 컴파일 오류 없음. scripts/ai-harness.ts에서 해당 함수 호출 시 case-02(GI bleeding) 상용구가 output_example 형식을 따르고 symptom_check 필드의 언급 없는 항목은 모두 '-' 유지.",
+      "analysisResult": "Stage 3 EMR 상용구 채움 구현. Stage 1(normalize.ts), Stage 2(generate-hpi.ts)와 동일한 패턴을 따름: generateText 사용, @/ 절대 경로 import, sections 필터링. 두 파일(프롬프트 상수 + 순수 함수)로 구성되며, 프롬프트 품질이 AI 출력 품질의 핵심임.",
+      "summary": "lib/ai/generate-template.ts 파일 생성 완료. generateTemplate 함수가 export됨. sections.includes(\"template\")로 templateInputs 필터링, loadTemplate/loadExamples/generateText 올바르게 호출, 빈 응답 시 에러 throw. @/ 절대 경로 import 사용. generate-hpi.ts와 동일한 패턴 및 구조 준수. TypeScript 컴파일 오류 없음.",
+      "completedAt": "2026-04-19T08:01:29.961Z"
+    }
+  ]
+}

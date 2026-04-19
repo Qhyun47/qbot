@@ -46,6 +46,7 @@ export type Database = {
           {
             foreignKeyName: "case_inputs_case_id_fkey";
             columns: ["case_id"];
+            isOneToOne: false;
             referencedRelation: "cases";
             referencedColumns: ["id"];
           },
@@ -56,6 +57,8 @@ export type Database = {
           case_id: string;
           error_message: string | null;
           generated_at: string;
+          history_draft: string;
+          history_edited: string | null;
           hpi_draft: string;
           hpi_edited: string | null;
           id: string;
@@ -69,6 +72,8 @@ export type Database = {
           case_id: string;
           error_message?: string | null;
           generated_at?: string;
+          history_draft: string;
+          history_edited?: string | null;
           hpi_draft: string;
           hpi_edited?: string | null;
           id?: string;
@@ -82,6 +87,8 @@ export type Database = {
           case_id?: string;
           error_message?: string | null;
           generated_at?: string;
+          history_draft?: string;
+          history_edited?: string | null;
           hpi_draft?: string;
           hpi_edited?: string | null;
           id?: string;
@@ -95,6 +102,7 @@ export type Database = {
           {
             foreignKeyName: "case_results_case_id_fkey";
             columns: ["case_id"];
+            isOneToOne: false;
             referencedRelation: "cases";
             referencedColumns: ["id"];
           },
@@ -103,54 +111,56 @@ export type Database = {
       cases: {
         Row: {
           bed_number: number;
-          bed_zone: string;
+          bed_zone: Database["public"]["Enums"]["bed_zone"];
           cc: string | null;
           cc_has_template: boolean;
           created_at: string;
           current_result_id: string | null;
           id: string;
-          status: string;
+          status: Database["public"]["Enums"]["case_status"];
           template_key: string | null;
           updated_at: string;
           user_id: string;
         };
         Insert: {
-          bed_number: number;
-          bed_zone?: string;
+          bed_number?: number;
+          bed_zone?: Database["public"]["Enums"]["bed_zone"];
           cc?: string | null;
           cc_has_template?: boolean;
           created_at?: string;
           current_result_id?: string | null;
           id?: string;
-          status?: string;
+          status?: Database["public"]["Enums"]["case_status"];
           template_key?: string | null;
           updated_at?: string;
           user_id: string;
         };
         Update: {
           bed_number?: number;
-          bed_zone?: string;
+          bed_zone?: Database["public"]["Enums"]["bed_zone"];
           cc?: string | null;
           cc_has_template?: boolean;
           created_at?: string;
           current_result_id?: string | null;
           id?: string;
-          status?: string;
+          status?: Database["public"]["Enums"]["case_status"];
           template_key?: string | null;
           updated_at?: string;
           user_id?: string;
         };
         Relationships: [
           {
-            foreignKeyName: "cases_user_id_fkey";
-            columns: ["user_id"];
-            referencedRelation: "profiles";
+            foreignKeyName: "cases_current_result_id_fkey";
+            columns: ["current_result_id"];
+            isOneToOne: false;
+            referencedRelation: "case_results";
             referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "cases_current_result_id_fkey";
-            columns: ["current_result_id"];
-            referencedRelation: "case_results";
+            foreignKeyName: "cases_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
         ];
@@ -184,6 +194,7 @@ export type Database = {
           {
             foreignKeyName: "interview_guidelines_user_id_fkey";
             columns: ["user_id"];
+            isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
@@ -195,7 +206,7 @@ export type Database = {
           created_at: string;
           full_name: string | null;
           id: string;
-          input_layout: string | null;
+          input_layout: Database["public"]["Enums"]["input_layout"];
           updated_at: string;
         };
         Insert: {
@@ -203,7 +214,7 @@ export type Database = {
           created_at?: string;
           full_name?: string | null;
           id: string;
-          input_layout?: string | null;
+          input_layout?: Database["public"]["Enums"]["input_layout"];
           updated_at?: string;
         };
         Update: {
@@ -211,7 +222,7 @@ export type Database = {
           created_at?: string;
           full_name?: string | null;
           id?: string;
-          input_layout?: string | null;
+          input_layout?: Database["public"]["Enums"]["input_layout"];
           updated_at?: string;
         };
         Relationships: [];
@@ -357,9 +368,9 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      bed_zone: ["A", "B", "R"] as const,
-      case_status: ["draft", "generating", "completed", "failed"] as const,
-      input_layout: ["single", "split_vertical", "split_horizontal"] as const,
+      bed_zone: ["A", "B", "R"],
+      case_status: ["draft", "generating", "completed", "failed"],
+      input_layout: ["single", "split_vertical", "split_horizontal"],
     },
   },
 } as const;

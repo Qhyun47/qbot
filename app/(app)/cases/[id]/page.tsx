@@ -7,6 +7,7 @@ import { BedBadge } from "@/components/cases/bed-badge";
 import { StatusBadge } from "@/components/cases/status-badge";
 import { CardTimeline } from "@/components/cases/card-timeline";
 import { ResultSection } from "@/components/cases/result-section";
+import { GenerationPoller } from "@/components/cases/generation-poller";
 import {
   MOCK_CASES,
   MOCK_CASE_INPUTS,
@@ -86,6 +87,7 @@ async function CaseContent({ params }: { params: Promise<{ id: string }> }) {
 
   return (
     <div className="flex flex-col gap-6 p-4 md:p-8">
+      <GenerationPoller caseId={caseData.id} initialStatus={status} />
       {/* 페이지 헤더 */}
       <div className="flex flex-wrap items-center gap-3 border-b pb-5">
         <BedBadge
