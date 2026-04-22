@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# playwright mcp 세션 로그 (자동 생성, 커밋 불필요)
+/.playwright-mcp/
