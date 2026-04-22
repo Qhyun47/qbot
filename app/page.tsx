@@ -24,7 +24,7 @@ export default function Home() {
       <Suspense fallback={null}>
         <AuthRedirect />
       </Suspense>
-      <h1 className="text-2xl font-bold">ER Scribe</h1>
+      <h1 className="text-2xl font-bold">규봇</h1>
       <p className="text-muted-foreground">
         응급실 의사를 위한 AI 차팅 어시스턴트
       </p>

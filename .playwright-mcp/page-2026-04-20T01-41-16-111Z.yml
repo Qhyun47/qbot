@@ -1,0 +1,26 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - link "ER Scribe" [ref=e5] [cursor=pointer]:
+        - /url: /dashboard
+      - button "Logout" [ref=e7] [cursor=pointer]
+    - main [ref=e8]:
+      - generic [ref=e9]:
+        - link "+ 새 케이스 시작" [ref=e10] [cursor=pointer]:
+          - /url: /cases/new
+        - generic [ref=e11]:
+          - generic [ref=e12]:
+            - heading "현황판" [level=2] [ref=e13]
+            - generic [ref=e14]:
+              - button "전체 삭제" [ref=e15] [cursor=pointer]:
+                - img
+                - text: 전체 삭제
+              - link "전체 보기" [ref=e16] [cursor=pointer]:
+                - /url: /cases
+                - text: 전체 보기
+                - img [ref=e17]
+          - paragraph [ref=e19]: 불러오는 중...
+    - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e25] [cursor=pointer]:
+    - img [ref=e26]
+  - alert [ref=e29]

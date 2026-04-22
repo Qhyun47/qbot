@@ -1,0 +1,187 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - main [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - button "뒤로 가기" [ref=e6] [cursor=pointer]:
+            - img
+          - generic [ref=e7]: 새 케이스 입력
+          - button "C.C 편집" [ref=e90] [cursor=pointer]: Chest pain
+          - generic [ref=e8]:
+            - generic [ref=e9]:
+              - button "단독 레이아웃" [ref=e10] [cursor=pointer]:
+                - img [ref=e11]
+              - button "상하 레이아웃" [ref=e13] [cursor=pointer]:
+                - img [ref=e14]
+              - button "좌우 레이아웃" [ref=e16] [cursor=pointer]:
+                - img [ref=e17]
+            - button "차팅 생성" [ref=e81] [cursor=pointer]:
+              - img
+              - text: 차팅 생성
+        - generic [ref=e19]:
+          - generic [ref=e21]:
+            - generic [ref=e23]:
+              - generic [ref=e25]: 베드 선택
+              - generic [ref=e26]:
+                - button "A구역 선택" [ref=e27] [cursor=pointer]: A구역
+                - button "B구역 선택" [ref=e28] [cursor=pointer]: B구역
+                - button "R구역 선택" [ref=e29] [cursor=pointer]: R구역
+              - generic [ref=e30]:
+                - button "A구역 1번 베드 선택" [ref=e31] [cursor=pointer]: "1"
+                - button "A구역 2번 베드 선택" [ref=e32] [cursor=pointer]: "2"
+                - button "A구역 3번 베드 선택" [ref=e33] [cursor=pointer]: "3"
+                - button "A구역 4번 베드 선택" [ref=e34] [cursor=pointer]: "4"
+                - button "A구역 5번 베드 선택" [ref=e35] [cursor=pointer]: "5"
+                - button "A구역 6번 베드 선택" [ref=e36] [cursor=pointer]: "6"
+                - button "A구역 7번 베드 선택" [ref=e37] [cursor=pointer]: "7"
+                - button "A구역 8번 베드 선택" [ref=e38] [cursor=pointer]: "8"
+            - generic [ref=e46]:
+              - paragraph [ref=e47]: 아직 입력된 내용이 없습니다.
+              - paragraph [ref=e48]: 아래 입력창에 문진 키워드를 입력하세요.
+            - generic [ref=e50]:
+              - textbox "문진 키워드를 입력하세요... (Enter 전송, Shift+Enter 줄바꿈)" [ref=e51]
+              - button "전송" [disabled]:
+                - img
+          - img [ref=e55]
+          - generic [ref=e64]:
+            - generic [ref=e66]:
+              - img [ref=e67]
+              - text: 문진 가이드라인
+              - generic [ref=e91]: — Chest pain
+            - generic [ref=e92]:
+              - heading "Chest Pain 문진 가이드" [level=1] [ref=e93]
+              - heading "핵심 문진 항목" [level=2] [ref=e94]
+              - heading "통증 특성" [level=3] [ref=e95]
+              - list [ref=e96]:
+                - listitem [ref=e97]:
+                  - checkbox [disabled] [ref=e98]
+                  - strong [ref=e99]: Onset
+                  - text: ": 언제부터? 갑자기(acute) vs 서서히(gradual)?"
+                - listitem [ref=e100]:
+                  - checkbox [disabled] [ref=e101]
+                  - strong [ref=e102]: Duration
+                  - text: ": 얼마나 지속? 간헐적 vs 지속적?"
+                - listitem [ref=e103]:
+                  - checkbox [disabled] [ref=e104]
+                  - strong [ref=e105]: Location
+                  - text: ": 어디가 아픈가? (left chest / substernal / right chest)"
+                - listitem [ref=e106]:
+                  - checkbox [disabled] [ref=e107]
+                  - strong [ref=e108]: Character
+                  - text: ": 어떻게 아픈가? (squeezing / pressure / sharp / burning / stabbing)"
+                - listitem [ref=e109]:
+                  - checkbox [disabled] [ref=e110]
+                  - strong [ref=e111]: Radiation
+                  - text: ": 방사통 있는가? (left arm / jaw / back / shoulder)"
+                - listitem [ref=e112]:
+                  - checkbox [disabled] [ref=e113]
+                  - strong [ref=e114]: Severity
+                  - text: ": NRS 몇 점?"
+              - heading "상황적 특성" [level=3] [ref=e115]
+              - list [ref=e116]:
+                - listitem [ref=e117]:
+                  - checkbox [disabled] [ref=e118]
+                  - strong [ref=e119]: Resting pain
+                  - text: ": 쉬고 있을 때도 아픈가?"
+                - listitem [ref=e120]:
+                  - checkbox [disabled] [ref=e121]
+                  - strong [ref=e122]: Exertional pain
+                  - text: ": 움직이면 더 아픈가?"
+                - listitem [ref=e123]:
+                  - checkbox [disabled] [ref=e124]
+                  - strong [ref=e125]: Aggravating/relieving factor
+                  - text: ": 악화/완화 요인?"
+                - listitem [ref=e126]:
+                  - checkbox [disabled] [ref=e127]
+                  - strong [ref=e128]: NTG response
+                  - text: ": NTG 투여했는가? 효과 있었는가?"
+                - listitem [ref=e129]:
+                  - checkbox [disabled] [ref=e130]
+                  - strong [ref=e131]: Ongoing
+                  - text: ": 지금도 아픈가?"
+              - heading "동반 증상" [level=3] [ref=e132]
+              - list [ref=e133]:
+                - listitem [ref=e134]:
+                  - checkbox [disabled] [ref=e135]
+                  - text: Dyspnea
+                - listitem [ref=e136]:
+                  - checkbox [disabled] [ref=e137]
+                  - text: Diaphoresis (식은땀)
+                - listitem [ref=e138]:
+                  - checkbox [disabled] [ref=e139]
+                  - text: Nausea / Vomiting
+                - listitem [ref=e140]:
+                  - checkbox [disabled] [ref=e141]
+                  - text: Palpitation
+                - listitem [ref=e142]:
+                  - checkbox [disabled] [ref=e143]
+                  - text: Syncope / Presyncope
+                - listitem [ref=e144]:
+                  - checkbox [disabled] [ref=e145]
+                  - text: Fever / Chill
+              - heading "과거력 및 위험인자" [level=3] [ref=e146]
+              - list [ref=e147]:
+                - listitem [ref=e148]:
+                  - checkbox [disabled] [ref=e149]
+                  - text: HTN, DM, Dyslipidemia, Smoking
+                - listitem [ref=e150]:
+                  - checkbox [disabled] [ref=e151]
+                  - text: 이전 ACS / CAG / PCI / CABG 이력
+                - listitem [ref=e152]:
+                  - checkbox [disabled] [ref=e153]
+                  - text: 이전 유사 에피소드
+              - separator [ref=e154]
+              - heading "감별 진단 포인트" [level=2] [ref=e155]
+              - table [ref=e156]:
+                - rowgroup [ref=e157]:
+                  - row "진단 주요 특징" [ref=e158]:
+                    - columnheader "진단" [ref=e159]
+                    - columnheader "주요 특징" [ref=e160]
+                - rowgroup [ref=e161]:
+                  - row "ACS (UA/NSTEMI/STEMI) Squeezing, 방사통, 운동 시 악화, diaphoresis" [ref=e162]:
+                    - cell "ACS (UA/NSTEMI/STEMI)" [ref=e163]:
+                      - strong [ref=e164]: ACS
+                      - text: (UA/NSTEMI/STEMI)
+                    - cell "Squeezing, 방사통, 운동 시 악화, diaphoresis" [ref=e165]
+                  - row "Aortic dissection Sudden onset tearing pain, back radiation, 양팔 BP 차이" [ref=e166]:
+                    - cell "Aortic dissection" [ref=e167]:
+                      - strong [ref=e168]: Aortic dissection
+                    - cell "Sudden onset tearing pain, back radiation, 양팔 BP 차이" [ref=e169]
+                  - row "Pulmonary embolism Pleuritic chest pain + dyspnea + leg swelling" [ref=e170]:
+                    - cell "Pulmonary embolism" [ref=e171]:
+                      - strong [ref=e172]: Pulmonary embolism
+                    - cell "Pleuritic chest pain + dyspnea + leg swelling" [ref=e173]
+                  - row "Pleuritis Sharp, 호흡 시 악화, 자세 변화에 영향 없음" [ref=e174]:
+                    - cell "Pleuritis" [ref=e175]:
+                      - strong [ref=e176]: Pleuritis
+                    - cell "Sharp, 호흡 시 악화, 자세 변화에 영향 없음" [ref=e177]
+                  - row "GERD / Esophageal spasm Burning, 식후 악화, NTG에 반응할 수 있음" [ref=e178]:
+                    - cell "GERD / Esophageal spasm" [ref=e179]:
+                      - strong [ref=e180]: GERD / Esophageal spasm
+                    - cell "Burning, 식후 악화, NTG에 반응할 수 있음" [ref=e181]
+                  - row "Costochondritis 누르면 재현되는 압통" [ref=e182]:
+                    - cell "Costochondritis" [ref=e183]:
+                      - strong [ref=e184]: Costochondritis
+                    - cell "누르면 재현되는 압통" [ref=e185]
+              - separator [ref=e186]
+              - heading "⚠️ 위험 신호 (즉시 확인)" [level=2] [ref=e187]
+              - list [ref=e188]:
+                - listitem [ref=e189]:
+                  - strong [ref=e190]: Diaphoresis + chest pain
+                  - text: → ACS 강력 의심
+                - listitem [ref=e191]:
+                  - strong [ref=e192]: Radiation to left arm / jaw
+                  - text: → ACS
+                - listitem [ref=e193]:
+                  - strong [ref=e194]: Sudden tearing pain + HTN 기저
+                  - text: → Aortic dissection
+                - listitem [ref=e195]:
+                  - strong [ref=e196]: Hypotension + tachycardia
+                  - text: → 심인성 쇼크, 대동맥 박리, 긴장성 기흉
+                - listitem [ref=e197]:
+                  - strong [ref=e198]: New resting pain
+                  - text: → Unstable angina
+    - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e76] [cursor=pointer]:
+    - img [ref=e77]
+  - alert [ref=e80]

@@ -1,0 +1,51 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - button "메뉴 열기" [ref=e5] [cursor=pointer]:
+        - img
+      - link "ER Scribe" [ref=e6] [cursor=pointer]:
+        - /url: /dashboard
+      - button "Logout" [ref=e8] [cursor=pointer]
+    - main [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e11]:
+          - heading "케이스 목록" [level=1] [ref=e12]
+          - paragraph [ref=e13]: 총 1개의 케이스
+        - table [ref=e16]:
+          - rowgroup [ref=e17]:
+            - row "베드번호 날짜 C.C 상태" [ref=e18]:
+              - columnheader "베드번호" [ref=e19]
+              - columnheader "날짜" [ref=e20]
+              - columnheader "C.C" [ref=e21]
+              - columnheader "상태" [ref=e22]
+              - columnheader [ref=e23]
+          - rowgroup [ref=e24]:
+            - row "A-3 4/19 18:35 Chest pain 완료 케이스 삭제" [ref=e25] [cursor=pointer]:
+              - cell "A-3" [ref=e26]:
+                - generic [ref=e27]: A-3
+              - cell "4/19 18:35" [ref=e28]
+              - cell "Chest pain" [ref=e29]
+              - cell "완료" [ref=e30]:
+                - generic [ref=e31]:
+                  - img [ref=e32]
+                  - text: 완료
+              - cell "케이스 삭제" [ref=e35]:
+                - button "케이스 삭제" [ref=e36]:
+                  - img
+    - region "Notifications alt+T":
+      - list:
+        - listitem [ref=e76]:
+          - img [ref=e78]
+          - generic [ref=e81]: 케이스가 삭제되었습니다.
+  - generic [ref=e53] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e54]:
+      - img [ref=e55]
+    - generic [ref=e58]:
+      - button "Open issues overlay" [ref=e59]:
+        - generic [ref=e60]:
+          - generic [ref=e61]: "0"
+          - generic [ref=e62]: "1"
+        - generic [ref=e63]: Issue
+      - button "Collapse issues badge" [ref=e64]:
+        - img [ref=e65]
+  - alert [ref=e67]

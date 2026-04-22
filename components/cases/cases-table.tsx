@@ -1,23 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Trash2 } from "lucide-react";
-import { toast } from "sonner";
+import { PlusCircle } from "lucide-react";
 import { format, parseISO } from "date-fns";
-import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import { restoreToBoard } from "@/lib/cases/actions";
 import { BedBadge } from "@/components/cases/bed-badge";
 import { StatusBadge } from "@/components/cases/status-badge";
+import { Button } from "@/components/ui/button";
 import type { Case, BedZone, CaseStatus } from "@/lib/supabase/types";
 
 interface CasesTableProps {
@@ -26,116 +16,159 @@ interface CasesTableProps {
 
 export function CasesTable({ cases }: CasesTableProps) {
   const router = useRouter();
-  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   function handleRowClick(id: string) {
-    router.push(`/cases/${id}`);
+    router.push(`/cases/${id}?from=cases`);
   }
 
-  function handleDeleteClick(e: React.MouseEvent, id: string) {
+  async function handleRestore(e: React.MouseEvent, id: string) {
     e.stopPropagation();
-    setDeletingId(id);
-  }
-
-  function handleDeleteConfirm() {
-    setDeletingId(null);
-    toast.success("케이스가 삭제되었습니다.");
+    await restoreToBoard(id);
+    toast.success("현황판에 재등록했습니다.");
   }
 
   if (cases.length === 0) {
     return (
       <div className="flex flex-col items-center gap-4 rounded-lg border border-dashed py-16 text-center">
-        <p className="text-sm text-muted-foreground">케이스가 없습니다.</p>
+        <p className="text-sm text-muted-foreground">
+          최근 12시간 이내 케이스가 없습니다.
+        </p>
       </div>
     );
   }
 
   return (
     <>
-      <div className="rounded-lg border">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b bg-muted/50">
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  베드번호
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  날짜
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  C.C
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  상태
-                </th>
-                <th className="px-4 py-3"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {cases.map((c) => (
-                <tr
-                  key={c.id}
-                  onClick={() => handleRowClick(c.id)}
-                  className="cursor-pointer bg-card transition-colors hover:bg-muted/30"
-                >
-                  <td className="px-4 py-3.5">
-                    <BedBadge
-                      bedZone={c.bed_zone as BedZone}
-                      bedNumber={c.bed_number}
-                      size="sm"
-                    />
-                  </td>
-                  <td className="px-4 py-3.5 text-muted-foreground">
+      {/* 모바일 카드 리스트 */}
+      <div className="lg:hidden">
+        <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+          {cases.map((c, idx) => {
+            const isHidden = c.board_hidden_at !== null;
+            return (
+              <div
+                key={c.id}
+                onClick={() => handleRowClick(c.id)}
+                className={[
+                  "relative flex cursor-pointer items-center gap-3 px-4 py-3.5",
+                  "transition-colors active:bg-muted/60",
+                  idx !== 0 ? "border-t" : "",
+                  isHidden
+                    ? "bg-card"
+                    : "border-l-[3px] border-l-blue-500 bg-blue-50/60 dark:bg-blue-950/20",
+                ].join(" ")}
+              >
+                {/* 베드번호 배지 */}
+                <div className="shrink-0">
+                  <BedBadge
+                    bedZone={c.bed_zone as BedZone}
+                    bedNumber={c.bed_number}
+                    size="md"
+                  />
+                </div>
+
+                {/* C.C + 날짜 */}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold leading-tight">
+                    {c.cc ?? (
+                      <span className="font-normal text-muted-foreground">
+                        C.C 없음
+                      </span>
+                    )}
+                  </p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
                     {format(parseISO(c.created_at), "M/d HH:mm")}
-                  </td>
-                  <td className="px-4 py-3.5 font-medium">
-                    {c.cc ?? <span className="text-muted-foreground">-</span>}
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <StatusBadge status={c.status as CaseStatus} />
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => handleDeleteClick(e, c.id)}
-                      aria-label="케이스 삭제"
-                      className="size-8 p-0 text-muted-foreground hover:text-destructive"
+                  </p>
+                </div>
+
+                {/* 상태 배지 + 재등록 버튼 */}
+                <div className="flex shrink-0 flex-col items-end gap-1.5">
+                  <StatusBadge status={c.status as CaseStatus} />
+                  {isHidden && (
+                    <button
+                      onClick={(e) => handleRestore(e, c.id)}
+                      className="flex items-center gap-1 rounded text-xs text-muted-foreground hover:text-foreground active:text-foreground"
                     >
-                      <Trash2 className="size-3.5" />
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      <PlusCircle className="size-3.5" />
+                      재등록
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      <AlertDialog
-        open={deletingId !== null}
-        onOpenChange={(open) => !open && setDeletingId(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>케이스를 삭제하시겠습니까?</AlertDialogTitle>
-            <AlertDialogDescription>
-              이 작업은 되돌릴 수 없습니다. 케이스와 관련된 모든 입력 카드 및
-              결과가 삭제됩니다.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>취소</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteConfirm}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              삭제
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* 데스크탑 테이블 */}
+      <div className="hidden lg:block">
+        <div className="rounded-lg border">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-muted/50">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    베드번호
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    날짜
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    C.C
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    상태
+                  </th>
+                  <th className="px-4 py-3"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {cases.map((c) => {
+                  const isHidden = c.board_hidden_at !== null;
+                  return (
+                    <tr
+                      key={c.id}
+                      onClick={() => handleRowClick(c.id)}
+                      className={`cursor-pointer transition-colors hover:bg-muted/30 ${isHidden ? "bg-card" : "bg-blue-50 dark:bg-blue-950/20"}`}
+                    >
+                      <td className="h-14 px-4">
+                        <BedBadge
+                          bedZone={c.bed_zone as BedZone}
+                          bedNumber={c.bed_number}
+                          size="sm"
+                        />
+                      </td>
+                      <td className="h-14 px-4 text-muted-foreground">
+                        {format(parseISO(c.created_at), "M/d HH:mm")}
+                      </td>
+                      <td className="h-14 px-4 font-medium">
+                        {c.cc ?? (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </td>
+                      <td className="h-14 px-4">
+                        <StatusBadge status={c.status as CaseStatus} />
+                      </td>
+                      <td className="h-14 px-4">
+                        {isHidden && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => handleRestore(e, c.id)}
+                            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                          >
+                            <PlusCircle className="size-3.5" />
+                            현황판 재등록
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </>
   );
 }

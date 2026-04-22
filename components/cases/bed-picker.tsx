@@ -7,8 +7,8 @@ import type { BedZone } from "@/lib/supabase/types";
 
 interface BedPickerProps {
   bedZone: BedZone;
-  bedNumber: number;
-  onChange: (zone: BedZone, number: number) => void;
+  bedNumber: number | null;
+  onChange: (zone: BedZone, number: number | null) => void;
 }
 
 const ZONES: BedZone[] = ["A", "B", "R"];
@@ -30,12 +30,12 @@ export function BedPicker({ bedZone, bedNumber, onChange }: BedPickerProps) {
             key={zone}
             type="button"
             aria-label={`${zone}구역 선택`}
-            onClick={() => onChange(zone, 1)}
+            onClick={() => onChange(zone, null)}
             className={cn(
               "flex-1 rounded-md border py-2 text-sm font-semibold transition-all",
               bedZone === zone
-                ? "border-foreground bg-foreground text-background"
-                : "border-border bg-background text-muted-foreground hover:border-foreground/30 hover:text-foreground"
+                ? "border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-neutral-900"
+                : "border-border text-muted-foreground hover:border-neutral-400 hover:text-neutral-900 dark:hover:border-neutral-500 dark:hover:text-white"
             )}
           >
             {zone}구역
@@ -53,9 +53,9 @@ export function BedPicker({ bedZone, bedNumber, onChange }: BedPickerProps) {
             onClick={() => onChange(bedZone, num)}
             className={cn(
               "h-10 w-full rounded-md border text-sm font-medium transition-all",
-              num === bedNumber
-                ? "border-foreground bg-foreground text-background"
-                : "border-border bg-background text-foreground hover:border-foreground/30"
+              bedNumber !== null && num === bedNumber
+                ? "border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-neutral-900"
+                : "border-border text-neutral-900 hover:border-neutral-400 dark:text-neutral-100 dark:hover:border-neutral-500"
             )}
           >
             {num}

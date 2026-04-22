@@ -1,0 +1,7 @@
+[
+  { "templateKey": "chest-pain", "displayName": "Chest pain" },
+  { "templateKey": "dyspnea", "displayName": "Dyspnea" },
+  { "templateKey": "hemoptysis", "displayName": "Hemoptysis" },
+  { "templateKey": "abdominal-pain", "displayName": "Abdominal pain" },
+  { "templateKey": "gi-bleeding", "displayName": "GI bleeding" }
+]

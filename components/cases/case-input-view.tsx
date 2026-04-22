@@ -1,0 +1,390 @@
+"use client";
+
+import { useEffect, useOptimistic, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Rows2, Columns2, Square, Zap } from "lucide-react";
+import { ResizableSplit } from "@/components/cases/resizable-split";
+import { CardInputBar } from "@/components/cases/card-input-bar";
+import { CardTimeline } from "@/components/cases/card-timeline";
+import { CcAutocomplete } from "@/components/cases/cc-autocomplete";
+import { BedPicker } from "@/components/cases/bed-picker";
+import { BedBadge } from "@/components/cases/bed-badge";
+import { GuidelinePanel } from "@/components/cases/guideline-panel";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import templateListJson from "@/lib/ai/resources/template-list.json";
+import { cn } from "@/lib/utils";
+import {
+  updateCaseBed,
+  updateCaseCc,
+  addCaseInput,
+  overrideTemplateKey,
+} from "@/lib/cases/actions";
+import { loadGuideline } from "@/lib/guidelines/actions";
+import type {
+  BedZone,
+  CaseInput,
+  CaseStatus,
+  InputLayout,
+} from "@/lib/supabase/types";
+
+const LAYOUT_OPTIONS: {
+  value: InputLayout;
+  Icon: React.FC<{ className?: string }>;
+  label: string;
+}[] = [
+  { value: "single", Icon: Square, label: "단독" },
+  { value: "split_vertical", Icon: Rows2, label: "상하" },
+  { value: "split_horizontal", Icon: Columns2, label: "좌우" },
+];
+
+interface CaseInputViewProps {
+  caseId: string;
+  defaultBedZone: BedZone;
+  defaultBedNumber: number;
+  defaultCc: string | null;
+  defaultTemplateKey: string | null;
+  initialCards: CaseInput[];
+  defaultLayout: InputLayout;
+  defaultSplitRatio: number;
+  status: CaseStatus;
+  generatedAt?: string;
+  from?: string;
+}
+
+export function CaseInputView({
+  caseId,
+  defaultBedZone,
+  defaultBedNumber,
+  defaultCc,
+  defaultTemplateKey,
+  initialCards,
+  defaultLayout,
+  defaultSplitRatio,
+  status,
+  generatedAt,
+  from,
+}: CaseInputViewProps) {
+  const router = useRouter();
+  const [bedZone, setBedZone] = useState<BedZone>(defaultBedZone);
+  const [bedNumber, setBedNumber] = useState<number>(defaultBedNumber);
+  const [bedPickerOpen, setBedPickerOpen] = useState(false);
+  const [cc, setCc] = useState<string | null>(defaultCc);
+  const [ccEditing, setCcEditing] = useState(defaultCc === null);
+  const [guidelineContent, setGuidelineContent] = useState<string | null>(null);
+  const [selectedTemplateKey, setSelectedTemplateKey] = useState<string | null>(
+    defaultTemplateKey
+  );
+  const [pendingTemplateKeys, setPendingTemplateKeys] = useState<
+    string[] | null
+  >(null);
+  const [cards, setCards] = useState<CaseInput[]>(initialCards);
+  const [layout, setLayout] = useState<InputLayout>(defaultLayout);
+  const [generating, setGenerating] = useState(false);
+  const [, startTransition] = useTransition();
+
+  const [optimisticCards, addOptimisticCard] = useOptimistic(
+    cards,
+    (state: CaseInput[], newCard: CaseInput) => [newCard, ...state]
+  );
+
+  useEffect(() => {
+    if (defaultCc) {
+      loadGuideline(defaultCc)
+        .then(({ customContent, systemContent }) => {
+          setGuidelineContent(customContent ?? systemContent);
+        })
+        .catch(() => setGuidelineContent(null));
+    }
+  }, [defaultCc]);
+
+  const handleBedChange = (zone: BedZone, number: number | null) => {
+    setBedZone(zone);
+    if (number !== null) {
+      setBedNumber(number);
+      setBedPickerOpen(false);
+      startTransition(() => updateCaseBed(caseId, zone, number));
+    }
+  };
+
+  const handleCcSelect = (
+    selectedCc: string,
+    hasTemplate: boolean,
+    templateKeys: string[]
+  ) => {
+    setCc(selectedCc);
+    setCcEditing(false);
+    setGuidelineContent(null);
+
+    if (templateKeys.length >= 2) {
+      setPendingTemplateKeys(templateKeys);
+      setSelectedTemplateKey(null);
+      startTransition(async () => {
+        try {
+          const { customContent, systemContent } =
+            await loadGuideline(selectedCc);
+          setGuidelineContent(customContent ?? systemContent);
+        } catch {
+          setGuidelineContent(null);
+        }
+      });
+    } else {
+      const key = templateKeys[0] ?? null;
+      setPendingTemplateKeys(null);
+      setSelectedTemplateKey(key);
+      startTransition(async () => {
+        await updateCaseCc(caseId, selectedCc, hasTemplate, key);
+        try {
+          const { customContent, systemContent } =
+            await loadGuideline(selectedCc);
+          setGuidelineContent(customContent ?? systemContent);
+        } catch {
+          setGuidelineContent(null);
+        }
+      });
+    }
+  };
+
+  const handleTemplateKeyConfirm = (key: string | null) => {
+    setPendingTemplateKeys(null);
+    setSelectedTemplateKey(key);
+    if (cc) {
+      startTransition(() => updateCaseCc(caseId, cc, key !== null, key));
+    }
+  };
+
+  const handleGuidelineChange = (_guidelineCc: string) => {
+    // GuidelinePanel 내부에서 콘텐츠 로드까지 처리
+  };
+
+  const handleTemplateChange = (newTemplateKey: string | null) => {
+    setSelectedTemplateKey(newTemplateKey);
+    startTransition(() => overrideTemplateKey(caseId, newTemplateKey));
+  };
+
+  const handleCardSubmit = (
+    rawText: string,
+    timeTag: string | null,
+    timeOffsetMinutes: number | null
+  ) => {
+    const tempCard: CaseInput = {
+      id: crypto.randomUUID(),
+      case_id: caseId,
+      raw_text: rawText,
+      time_tag: timeTag,
+      time_offset_minutes: timeOffsetMinutes,
+      display_order: cards.length + 1,
+      created_at: new Date().toISOString(),
+    };
+    startTransition(async () => {
+      addOptimisticCard(tempCard);
+      const saved = await addCaseInput(
+        caseId,
+        rawText,
+        timeTag,
+        timeOffsetMinutes
+      );
+      setCards((prev) => [saved, ...prev]);
+    });
+  };
+
+  const handleGenerate = async () => {
+    setGenerating(true);
+    await fetch(`/api/cases/${caseId}/generate`, { method: "POST" });
+    const fromParam = from ? `&from=${from}` : "";
+    router.replace(`/cases/${caseId}?view=result${fromParam}`);
+  };
+
+  const InputArea = (
+    <div className="flex h-full flex-col overflow-hidden">
+      {bedPickerOpen && (
+        <>
+          <div className="shrink-0 p-4">
+            <BedPicker
+              bedZone={bedZone}
+              bedNumber={bedNumber}
+              onChange={handleBedChange}
+            />
+          </div>
+          <Separator />
+        </>
+      )}
+      {ccEditing && (
+        <>
+          <div className="shrink-0 p-4">
+            <CcAutocomplete value={cc ?? ""} onSelect={handleCcSelect} />
+          </div>
+          <Separator />
+        </>
+      )}
+      {!ccEditing && pendingTemplateKeys && pendingTemplateKeys.length >= 2 && (
+        <>
+          <div className="shrink-0 p-4">
+            <p className="mb-2 text-sm font-medium">
+              어떤 상용구로 생성할까요?
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {pendingTemplateKeys.map((key) => {
+                const label =
+                  (
+                    templateListJson as {
+                      templateKey: string;
+                      displayName: string;
+                    }[]
+                  ).find((t) => t.templateKey === key)?.displayName ?? key;
+                return (
+                  <Button
+                    key={key}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleTemplateKeyConfirm(key)}
+                  >
+                    {label}
+                  </Button>
+                );
+              })}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-muted-foreground"
+                onClick={() => handleTemplateKeyConfirm(null)}
+              >
+                상용구 없이 진행
+              </Button>
+            </div>
+          </div>
+          <Separator />
+        </>
+      )}
+      <div className="flex-1 overflow-y-auto p-4">
+        <CardTimeline cards={optimisticCards} generatedAt={generatedAt} />
+      </div>
+      <CardInputBar onSubmit={handleCardSubmit} />
+    </div>
+  );
+
+  const GuideArea = (
+    <div className="h-full">
+      <GuidelinePanel
+        content={guidelineContent}
+        cc={cc}
+        templateKey={selectedTemplateKey}
+        onGuidelineChange={handleGuidelineChange}
+        onTemplateChange={handleTemplateChange}
+      />
+    </div>
+  );
+
+  return (
+    <div className="flex h-screen flex-col">
+      <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
+        {/* 뒤로가기 */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="shrink-0"
+          onClick={() =>
+            router.push(from === "cases" ? "/cases" : "/dashboard")
+          }
+          aria-label="뒤로 가기"
+        >
+          <ArrowLeft className="size-4" />
+        </Button>
+
+        {/* 헤더 칩: 베드 배지 */}
+        <button
+          type="button"
+          onClick={() => setBedPickerOpen(true)}
+          className="shrink-0"
+          aria-label="베드 선택 열기"
+        >
+          <BedBadge bedZone={bedZone} bedNumber={bedNumber} size="sm" />
+        </button>
+
+        {/* 헤더 칩: CC 텍스트 (접힌 상태일 때만 표시) */}
+        {!ccEditing && (
+          <button
+            type="button"
+            onClick={() => setCcEditing(true)}
+            className="rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors hover:bg-muted"
+            aria-label="C.C 편집"
+          >
+            {cc ?? <span className="text-muted-foreground">C.C 입력</span>}
+          </button>
+        )}
+
+        <div className="flex flex-1 items-center justify-end gap-2">
+          <div className="hidden items-center gap-0.5 rounded-md border p-0.5 lg:flex">
+            {LAYOUT_OPTIONS.map(({ value, Icon, label }) => (
+              <button
+                key={value}
+                type="button"
+                aria-label={`${label} 레이아웃`}
+                title={label}
+                onClick={() => setLayout(value)}
+                className={cn(
+                  "rounded p-1.5 transition-colors",
+                  layout === value
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Icon className="size-3.5" />
+              </button>
+            ))}
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              router.replace(
+                `/cases/${caseId}?view=result${from ? `&from=${from}` : ""}`
+              )
+            }
+          >
+            AI 차팅 보기
+          </Button>
+
+          <Button
+            size="sm"
+            onClick={handleGenerate}
+            disabled={generating}
+            className="gap-1.5"
+          >
+            <Zap className="size-3.5" />
+            {generating
+              ? "생성 중..."
+              : status === "draft"
+                ? "차팅 생성"
+                : "재생성"}
+          </Button>
+        </div>
+      </header>
+
+      {layout === "single" && (
+        <div className="flex-1 overflow-hidden">{InputArea}</div>
+      )}
+
+      {layout === "split_vertical" && (
+        <ResizableSplit
+          direction="vertical"
+          first={GuideArea}
+          second={InputArea}
+          defaultFirstPercent={defaultSplitRatio}
+        />
+      )}
+
+      {layout === "split_horizontal" && (
+        <ResizableSplit
+          direction="horizontal"
+          first={InputArea}
+          second={GuideArea}
+          defaultFirstPercent={defaultSplitRatio}
+        />
+      )}
+    </div>
+  );
+}

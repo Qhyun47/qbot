@@ -11,6 +11,9 @@ export const MOCK_CASES: Case[] = [
     template_key: "chest-pain",
     status: "completed",
     current_result_id: "r1b2c3d4-e5f6-4a7b-8c9d-000000000001",
+    memo: null,
+    has_inputs: true,
+    board_hidden_at: null,
     created_at: "2026-04-19T06:00:00.000Z",
     updated_at: "2026-04-19T06:15:00.000Z",
   },
@@ -24,6 +27,9 @@ export const MOCK_CASES: Case[] = [
     template_key: "dyspnea",
     status: "completed",
     current_result_id: "r1b2c3d4-e5f6-4a7b-8c9d-000000000002",
+    memo: null,
+    has_inputs: true,
+    board_hidden_at: null,
     created_at: "2026-04-19T05:30:00.000Z",
     updated_at: "2026-04-19T05:45:00.000Z",
   },
@@ -37,6 +43,9 @@ export const MOCK_CASES: Case[] = [
     template_key: "gi-bleeding",
     status: "generating",
     current_result_id: null,
+    memo: null,
+    has_inputs: true,
+    board_hidden_at: null,
     created_at: "2026-04-19T07:00:00.000Z",
     updated_at: "2026-04-19T07:02:00.000Z",
   },
@@ -50,6 +59,9 @@ export const MOCK_CASES: Case[] = [
     template_key: "abdominal-pain",
     status: "failed",
     current_result_id: null,
+    memo: null,
+    has_inputs: true,
+    board_hidden_at: null,
     created_at: "2026-04-19T04:00:00.000Z",
     updated_at: "2026-04-19T04:10:00.000Z",
   },
@@ -63,6 +75,9 @@ export const MOCK_CASES: Case[] = [
     template_key: "hemoptysis",
     status: "draft",
     current_result_id: null,
+    memo: null,
+    has_inputs: true,
+    board_hidden_at: null,
     created_at: "2026-04-19T07:30:00.000Z",
     updated_at: "2026-04-19T07:30:00.000Z",
   },
@@ -156,12 +171,12 @@ export const MOCK_CASE_RESULTS: CaseResult[] = [
   {
     id: "r1b2c3d4-e5f6-4a7b-8c9d-000000000001",
     case_id: "a1b2c3d4-e5f6-4a7b-8c9d-000000000001",
-    hpi_draft:
+    pi_draft:
       "65세 남자 환자로 3일 전부터 substernal chest pain이 발생하여 내원하였습니다. " +
       "통증은 squeezing 양상으로 NRS 8점이며, left arm radiation을 동반합니다. " +
       "어제 저녁 NTG를 투여하였으나 통증이 지속되었으며, 30분 전부터 diaphoresis가 발생하였습니다. " +
       "기저질환으로 HTN, DM이 있으며 이전 PCI 시행 이력이 있습니다.",
-    hpi_edited: null,
+    pi_edited: null,
     template_draft:
       "Onset: 3일 전, 갑자기 발생\n" +
       "Duration: 지속적\n" +
@@ -174,6 +189,17 @@ export const MOCK_CASE_RESULTS: CaseResult[] = [
       "Associated sx: Diaphoresis (+), Dyspnea (-), Nausea (-)\n" +
       "PMHx: HTN, DM / 이전 PCI 이력",
     template_edited: null,
+    pe_draft:
+      "General : Alert, oriented\n" +
+      "V/S : BP 142/88 mmHg  PR 98/min  RR 18/min  BT 36.8°C  SpO2 97%\n" +
+      "HEENT : Not anemic conjunctiva, anicteric sclera\n" +
+      "Neck : No JVD\n" +
+      "Chest : Clear breathing sound bilaterally, no wheezing, no crackle\n" +
+      "        No dullness on percussion\n" +
+      "Heart : Regular rate and rhythm, no murmur\n" +
+      "Abdomen : Soft, non-tender, no organomegaly\n" +
+      "Extremities : No pitting edema",
+    pe_edited: null,
     template_key_used: "chest-pain",
     model_version: "gemini-2.0-flash",
     structured_json: {},
@@ -189,10 +215,12 @@ export const MOCK_CASE_RESULTS: CaseResult[] = [
   {
     id: "r1b2c3d4-e5f6-4a7b-8c9d-000000000004",
     case_id: "a1b2c3d4-e5f6-4a7b-8c9d-000000000004",
-    hpi_draft: "",
-    hpi_edited: null,
+    pi_draft: "",
+    pi_edited: null,
     template_draft: "",
     template_edited: null,
+    pe_draft: "",
+    pe_edited: null,
     template_key_used: "abdominal-pain",
     model_version: "gemini-2.0-flash",
     structured_json: {},

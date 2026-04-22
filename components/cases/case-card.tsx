@@ -10,7 +10,7 @@ interface CaseCardProps {
 
 export function CaseCard({ case: c }: CaseCardProps) {
   return (
-    <Link href={`/cases/${c.id}`}>
+    <Link href={`/cases/${c.id}?from=dashboard`}>
       <div className="shadow-xs group flex h-full cursor-pointer flex-col gap-3 rounded-lg border bg-card p-4 transition-all hover:border-foreground/20 hover:shadow-sm">
         <div className="flex items-start justify-between gap-2">
           <BedBadge

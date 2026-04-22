@@ -1,0 +1,157 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ChestPainCase",
+  "description": "흉통(Chest pain) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history",
+    "family_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류. 아래 enum 값 중 가장 적합한 것 하나를 선택.",
+            "enum": [
+              "onset",
+              "duration",
+              "location",
+              "character",
+              "radiation",
+              "resting_pain",
+              "exertional_pain",
+              "aggravating_relieving_factor",
+              "ntg_response",
+              "severity",
+              "associated_symptom",
+              "prior_episode",
+              "vital_sign",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "family_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. 카드-섹션 매핑 기준: onset/duration/location/character/radiation/resting_pain/exertional_pain/aggravating_relieving_factor/ntg_response → [hpi, template] | severity/associated_symptom/prior_episode/vital_sign → [hpi] | past_history/medication_history/operation_history/family_history → [history] 전용 (HPI·상용구에 포함 금지)",
+            "items": {
+              "type": "string",
+              "enum": ["hpi", "template", "history"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "흉통 발생 시점 (예: '3일 전', '금일 오전 10시경'). 없으면 null."
+    },
+    "onset_character": {
+      "type": ["string", "null"],
+      "description": "발생 양상 — 'acute'(갑작스러운) 또는 'gradual'(서서히 악화). 없으면 null."
+    },
+    "duration": {
+      "type": ["string", "null"],
+      "description": "흉통 지속 시간 (예: '30분', '간헐적', '지속적'). 없으면 null."
+    },
+    "location": {
+      "type": ["string", "null"],
+      "description": "통증 위치 (예: 'left chest', 'substernal', 'right chest'). 없으면 null."
+    },
+    "character": {
+      "type": ["string", "null"],
+      "description": "통증 양상/성질 (예: 'squeezing', 'sharp', 'pressure', 'burning', 'stabbing'). 없으면 null."
+    },
+    "radiation": {
+      "type": ["string", "null"],
+      "description": "방사통 부위 (예: 'left arm', 'jaw', 'back', 'shoulder'). 없으면 null."
+    },
+    "resting_pain": {
+      "type": ["boolean", "null"],
+      "description": "안정 시에도 통증 지속 여부. true/false/null."
+    },
+    "exertional_pain": {
+      "type": ["boolean", "null"],
+      "description": "운동·활동 시 통증 발생 또는 악화 여부. true/false/null."
+    },
+    "aggravating_factor": {
+      "type": ["string", "null"],
+      "description": "통증 악화 요인 (예: '심호흡 시', '운동 시', '식사 후'). 없으면 null."
+    },
+    "relieving_factor": {
+      "type": ["string", "null"],
+      "description": "통증 완화 요인 (예: 'NTG sublingual', '안정 시', '자세 변경'). 없으면 null."
+    },
+    "ntg_response": {
+      "type": ["string", "null"],
+      "description": "NTG(니트로글리세린) 투여 후 반응 (예: '완전 소실', '부분 호전', '무반응', '미투여'). 없으면 null."
+    },
+    "ongoing": {
+      "type": ["boolean", "null"],
+      "description": "내원 시점에도 흉통이 지속 중인지 여부. true/false/null."
+    },
+    "severity": {
+      "type": ["string", "null"],
+      "description": "통증 강도 표현 (예: 'NRS 7/10', 'severe', 'mild'). 없으면 null."
+    },
+    "associated_symptoms": {
+      "type": ["array", "null"],
+      "description": "동반 증상 목록 (예: dyspnea, diaphoresis, nausea, vomiting, dizziness, syncope, palpitation 등). 없으면 null.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "prior_episode": {
+      "type": ["string", "null"],
+      "description": "유사 흉통 과거 에피소드 (예: '6개월 전 동일 양상으로 타원 CAG 시행, 정상'). 없으면 null."
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록 (예: ['고혈압', '당뇨', '관상동맥질환', '이전 MI']). History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록 (예: ['aspirin', 'statin', 'beta-blocker']). History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록 (예: ['PCI 2020년', 'CABG']). History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "family_history": {
+      "type": ["array", "null"],
+      "description": "가족력 목록 (예: ['부: 50대 급성 심근경색']). null이면 History 출력 시 해당 항목 전체 생략.",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

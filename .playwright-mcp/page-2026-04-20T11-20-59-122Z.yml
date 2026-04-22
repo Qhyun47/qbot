@@ -1,0 +1,50 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - button "메뉴 열기" [ref=e5] [cursor=pointer]:
+        - img
+      - link "ER Scribe" [ref=e6] [cursor=pointer]:
+        - /url: /dashboard
+      - button "Logout" [ref=e8] [cursor=pointer]
+    - main [ref=e9]:
+      - generic [ref=e10]:
+        - link "+ 새 케이스 시작" [ref=e11] [cursor=pointer]:
+          - /url: /cases/new
+        - generic [ref=e12]:
+          - generic [ref=e13]:
+            - heading "현황판" [level=2] [ref=e14]
+            - generic [ref=e15]:
+              - button "전체 삭제" [ref=e16] [cursor=pointer]:
+                - img
+                - text: 전체 삭제
+              - link "전체 보기" [ref=e17] [cursor=pointer]:
+                - /url: /cases
+                - text: 전체 보기
+                - img [ref=e18]
+          - generic [ref=e21]:
+            - paragraph [ref=e22]: A구역
+            - generic [ref=e23]:
+              - generic [ref=e24] [cursor=pointer]:
+                - generic [ref=e25]:
+                  - generic [ref=e26]: A01
+                  - generic [ref=e27]:
+                    - img [ref=e28]
+                    - text: 초안
+                - paragraph [ref=e31]: Chest pain
+                - textbox "메모..." [ref=e32]
+                - button "케이스 삭제" [ref=e34]:
+                  - img
+              - generic [ref=e35] [cursor=pointer]:
+                - generic [ref=e36]:
+                  - generic [ref=e37]: A02
+                  - generic [ref=e38]:
+                    - img [ref=e39]
+                    - text: 초안
+                - paragraph [ref=e42]: Chest pain
+                - textbox "메모..." [ref=e43]
+                - button "케이스 삭제" [ref=e45]:
+                  - img
+    - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e51] [cursor=pointer]:
+    - img [ref=e52]
+  - alert [ref=e55]

@@ -1,0 +1,204 @@
+{
+  "templateKey": "chest-pain",
+  "cc": "Chest pain",
+  "description": "흉통 환자 EMR 상용구 템플릿",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "special_questions": [
+    {
+      "key": "ntg_response",
+      "label": "NTG response?",
+      "type": "open",
+      "description": "NTG(니트로글리세린) 투여 후 증상 반응 여부 서술. 과거 이력과 금번 반응을 함께 서술 (예: '3일간 NTG 사용 시 5분 이내 호전, 금일 NTG 무반응'). 투여 이력 없으면 빈 문자열."
+    },
+    {
+      "key": "ongoing",
+      "label": "ongoing?",
+      "type": "open",
+      "description": "내원 시점에도 흉통이 지속 중인지 여부. 지속 중이면 '+', 아니면 '-'. 정보 없으면 빈 문자열."
+    }
+  ],
+  "fields": [
+    {
+      "key": "onset",
+      "label": "Onset",
+      "type": "open",
+      "description": "증상이 처음 발생한 시점 (예: '3일 전', '금일 오전'). prior_episode가 있으면 최초 발생 시점을 사용. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "duration",
+      "label": "Duration",
+      "type": "open",
+      "description": "흉통 지속 형태 (예: '간헐적, 하루 2~3회', '지속적 30분'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "location",
+      "label": "Location",
+      "type": "open",
+      "description": "통증 위치 (예: 'left chest', 'substernal'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "character",
+      "label": "Character",
+      "type": "open",
+      "description": "통증 양상 (예: 'squeezing', 'sharp', 'pressure'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "associated_sx",
+      "label": "Asso. Sx.",
+      "type": "open",
+      "description": "동반 증상 서술형. symptom_check로 분리된 항목 외 추가 동반 증상. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "radiating_pain",
+      "label": "Radiating pain",
+      "type": "open",
+      "description": "방사통 여부 및 방향 (예: 'left arm', 'jaw'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "resting_pain",
+      "label": "Resting pain",
+      "type": "open",
+      "description": "안정 시 통증 완화/지속 여부. 안정 시 호전되면 해당 표현 기재 (예: '가만히 있으면 호전'). ccSpecificFields의 relieving_factor 또는 templateInputs의 aggravating_relieving_factor 카드 참고. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "exertional_pain",
+      "label": "Exertional pain",
+      "type": "open",
+      "description": "운동/활동 시 통증 유무 및 양상. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "agg_relieving_factor",
+      "label": "Agg.relieving factor",
+      "type": "open",
+      "description": "악화 및 완화 요인. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "fever_chill",
+      "label": "F/C",
+      "type": "symptom_check",
+      "format": "F/C({fever}/{chill})",
+      "slots": [
+        {
+          "key": "fever",
+          "symptom": "Fever",
+          "description": "발열",
+          "default": "-"
+        },
+        {
+          "key": "chill",
+          "symptom": "Chill",
+          "description": "오한",
+          "default": "-"
+        }
+      ],
+      "description": "발열/오한 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "cough_sputum_rhinorrhea",
+      "label": "C/S/R",
+      "type": "symptom_check",
+      "format": "C/S/R({cough}/{sputum}/{rhinorrhea})",
+      "slots": [
+        {
+          "key": "cough",
+          "symptom": "Cough",
+          "description": "기침",
+          "default": "-"
+        },
+        {
+          "key": "sputum",
+          "symptom": "Sputum",
+          "description": "가래",
+          "default": "-"
+        },
+        {
+          "key": "rhinorrhea",
+          "symptom": "Rhinorrhea",
+          "description": "콧물",
+          "default": "-"
+        }
+      ],
+      "description": "기침/가래/콧물 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "anvdc",
+      "label": "A/N/V/D/C",
+      "type": "symptom_check",
+      "format": "A/N/V/D/C({anorexia}/{nausea}/{vomiting}/{diarrhea}/{constipation})",
+      "slots": [
+        {
+          "key": "anorexia",
+          "symptom": "Anorexia",
+          "description": "식욕부진",
+          "default": "-"
+        },
+        {
+          "key": "nausea",
+          "symptom": "Nausea",
+          "description": "구역",
+          "default": "-"
+        },
+        {
+          "key": "vomiting",
+          "symptom": "Vomiting",
+          "description": "구토",
+          "default": "-"
+        },
+        {
+          "key": "diarrhea",
+          "symptom": "Diarrhea",
+          "description": "설사",
+          "default": "-"
+        },
+        {
+          "key": "constipation",
+          "symptom": "Constipation",
+          "description": "변비",
+          "default": "-"
+        }
+      ],
+      "description": "식욕부진/구역/구토/설사/변비 체크. 언급 없으면 기본값(-) 유지."
+    }
+  ],
+  "output_example": "NTG response?\nongoing?\n\n* Chest pain\nOnset : \nDuration : \nLocation : \nCharacter : \nAsso. Sx. : \nRadiating pain :\nResting pain :\nExertional pain : \n\nAgg.relieving factor :\n\nF/C(-/-)  C/S/R(-/-/-)  A/N/V/D/C(-/-/-/-/-)",
+  "pe": {
+    "fields": [
+      {
+        "key": "general",
+        "label": "General / Vital status",
+        "default": "Vital stable, Mental alert"
+      },
+      {
+        "key": "chest_tenderness",
+        "label": "Chest tenderness",
+        "default": "(-)"
+      },
+      { "key": "lung_sound", "label": "Lung sound", "default": "clear" },
+      {
+        "key": "abd_tenderness",
+        "label": "Abdominal tenderness",
+        "default": "(-)"
+      },
+      { "key": "pitting_edema", "label": "Pitting edema", "default": "(-)" }
+    ],
+    "output_example": "Vital stable, Mental alert\nChest tenderness (-)\nLung sound : clear\nAbdominal tenderness (-)\nPitting edema (-)"
+  },
+  "history": {
+    "fields": [
+      { "key": "cag", "label": "CAG Hx", "default": "" },
+      { "key": "past", "label": "Past Hx", "default": "" },
+      { "key": "medication", "label": "Med Hx", "default": "" },
+      { "key": "operation", "label": "Op Hx", "default": "" },
+      { "key": "allergy", "label": "Allergy Hx", "default": "" },
+      { "key": "alcohol", "label": "Alcohol", "default": "" },
+      { "key": "smoking", "label": "Smoking", "default": "" },
+      {
+        "key": "family",
+        "label": "FHx.",
+        "default": "Cardiac(-),Stroke(-),Cancer(-)"
+      },
+      { "key": "stress", "label": "최근 스트레스", "default": "" }
+    ],
+    "output_example": "CAG Hx: \nPast Hx: \nMed Hx:\nOp Hx: \nAllergy Hx:\nAlcohol:     , Smoking: \n\nFHx. : Cardiac(-),Stroke(-),Cancer(-)\n최근 스트레스 :"
+  }
+}

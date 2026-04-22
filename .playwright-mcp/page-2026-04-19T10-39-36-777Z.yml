@@ -1,0 +1,68 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - link "ER Scribe" [ref=e4] [cursor=pointer]:
+        - /url: /dashboard
+      - navigation [ref=e5]:
+        - link "대시보드" [ref=e6] [cursor=pointer]:
+          - /url: /dashboard
+        - link "케이스 목록" [ref=e7] [cursor=pointer]:
+          - /url: /cases
+        - link "가이드라인" [ref=e8] [cursor=pointer]:
+          - /url: /guidelines
+        - link "설정" [ref=e9] [cursor=pointer]:
+          - /url: /settings
+      - button "Logout" [ref=e11] [cursor=pointer]
+    - main [ref=e12]:
+      - generic [ref=e13]:
+        - generic [ref=e14]:
+          - generic [ref=e15]: B07
+          - heading "Chest pain" [level=1] [ref=e17]
+          - generic [ref=e18]:
+            - img [ref=e19]
+            - text: 완료
+          - button "재생성" [ref=e22] [cursor=pointer]:
+            - img
+            - text: 재생성
+        - generic [ref=e23]:
+          - generic [ref=e24]:
+            - generic [ref=e25]:
+              - generic [ref=e26]:
+                - heading "HPI" [level=2] [ref=e27]
+                - button "HPI 복사" [active] [ref=e70] [cursor=pointer]:
+                  - img
+                  - text: HPI 복사
+              - textbox [ref=e29]: "[편집 테스트]"
+            - generic [ref=e30]:
+              - generic [ref=e31]:
+                - heading "상용구" [level=2] [ref=e32]
+                - button "상용구 복사" [ref=e33] [cursor=pointer]:
+                  - img
+                  - text: 상용구 복사
+              - textbox [ref=e34]
+            - generic [ref=e35]:
+              - generic [ref=e36]:
+                - heading "History" [level=2] [ref=e37]
+                - button "History 복사" [ref=e38] [cursor=pointer]:
+                  - img
+                  - text: History 복사
+              - textbox [ref=e39]: "Past Hx. : (-) Med Hx. : (-) Op Hx. : (-)"
+          - complementary [ref=e40]:
+            - heading "원본 입력 카드" [level=2] [ref=e41]
+            - generic [ref=e42]:
+              - generic [ref=e43]:
+                - paragraph [ref=e44]:
+                  - img [ref=e45]
+                  - text: 시간 순
+                - generic [ref=e49]:
+                  - generic [ref=e50]: 3일 전부터 흉통 시작
+                  - generic [ref=e51]: 3일 전
+              - generic [ref=e52]:
+                - paragraph [ref=e53]: 시간 미상
+                - generic [ref=e54]:
+                  - generic [ref=e56]: 좌측 흉부 압박감, 방사통 없음
+                  - generic [ref=e58]: NTG 0.4mg 1회 舌下 투여 → 무반응
+    - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e64] [cursor=pointer]:
+    - img [ref=e65]
+  - alert [ref=e68]

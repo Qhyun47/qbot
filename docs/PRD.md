@@ -1,4 +1,4 @@
-# ER Scribe MVP PRD
+# 규봇 MVP PRD
 
 ## 핵심 정보
 

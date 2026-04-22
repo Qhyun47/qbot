@@ -1,5 +1,34 @@
+import { Suspense } from "react";
 import ccList from "@/lib/ai/resources/cc-list.json";
 import { GuidelinesEditor } from "@/components/guidelines/guidelines-editor";
+import { getAllCustomGuidelines } from "@/lib/guidelines/actions";
+import { loadGuide } from "@/lib/ai/load-resources";
+
+async function GuidelinesContent() {
+  const initialGuidelines = await getAllCustomGuidelines();
+
+  const primaryList = ccList.filter((item) => !("aliasOf" in item));
+  const systemGuides: Record<string, string> = {};
+  for (const item of primaryList) {
+    const templateKey = (item as { guideKeys?: string[] }).guideKeys?.[0];
+    if (templateKey) {
+      try {
+        const guide = loadGuide(templateKey);
+        if (guide) systemGuides[item.cc] = guide;
+      } catch {
+        // 가이드 파일 없으면 스킵
+      }
+    }
+  }
+
+  return (
+    <GuidelinesEditor
+      ccList={ccList}
+      initialGuidelines={initialGuidelines}
+      systemGuides={systemGuides}
+    />
+  );
+}
 
 export default function GuidelinesPage() {
   return (
@@ -11,7 +40,13 @@ export default function GuidelinesPage() {
           기본보다 우선 적용됩니다.
         </p>
       </div>
-      <GuidelinesEditor ccList={ccList} />
+      <Suspense
+        fallback={
+          <p className="text-sm text-muted-foreground">불러오는 중...</p>
+        }
+      >
+        <GuidelinesContent />
+      </Suspense>
     </div>
   );
 }

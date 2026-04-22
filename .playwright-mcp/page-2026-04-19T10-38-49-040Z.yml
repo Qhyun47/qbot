@@ -1,0 +1,67 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - link "ER Scribe" [ref=e4] [cursor=pointer]:
+        - /url: /dashboard
+      - navigation [ref=e5]:
+        - link "대시보드" [ref=e6] [cursor=pointer]:
+          - /url: /dashboard
+        - link "케이스 목록" [ref=e7] [cursor=pointer]:
+          - /url: /cases
+        - link "가이드라인" [ref=e8] [cursor=pointer]:
+          - /url: /guidelines
+        - link "설정" [ref=e9] [cursor=pointer]:
+          - /url: /settings
+      - button "Logout" [ref=e11] [cursor=pointer]
+    - main [ref=e12]:
+      - generic [ref=e13]:
+        - generic [ref=e14]:
+          - generic [ref=e15]:
+            - heading "대시보드" [level=1] [ref=e16]
+            - paragraph [ref=e17]: 최근 케이스를 확인하고 새 케이스를 시작하세요.
+          - link "새 케이스" [ref=e18] [cursor=pointer]:
+            - /url: /cases/new
+            - img
+            - text: 새 케이스
+        - generic [ref=e19]:
+          - generic [ref=e20]:
+            - heading "최근 케이스" [level=2] [ref=e21]
+            - link "전체 보기" [ref=e22] [cursor=pointer]:
+              - /url: /cases
+              - text: 전체 보기
+              - img [ref=e23]
+          - generic [ref=e25]:
+            - link "B07 완료 Chest pain 4월 19일 19:36" [ref=e26] [cursor=pointer]:
+              - /url: /cases/a13ee0b3-25bd-4824-a4ef-aa8448f35d38
+              - generic [ref=e27]:
+                - generic [ref=e28]:
+                  - generic [ref=e29]: B07
+                  - generic [ref=e30]:
+                    - img [ref=e31]
+                    - text: 완료
+                - paragraph [ref=e34]: Chest pain
+                - paragraph [ref=e35]: 4월 19일 19:36
+            - link "A01 초안 C.C 미입력 4월 19일 19:36" [ref=e36] [cursor=pointer]:
+              - /url: /cases/b4225065-82ef-471e-9be0-ec09a83ce373
+              - generic [ref=e37]:
+                - generic [ref=e38]:
+                  - generic [ref=e39]: A01
+                  - generic [ref=e40]:
+                    - img [ref=e41]
+                    - text: 초안
+                - paragraph [ref=e44]: C.C 미입력
+                - paragraph [ref=e45]: 4월 19일 19:36
+            - link "A01 초안 Chest pain 4월 19일 19:19" [ref=e46] [cursor=pointer]:
+              - /url: /cases/69bfcca8-7689-4c9b-a1d8-16bc88e8c3ce
+              - generic [ref=e47]:
+                - generic [ref=e48]:
+                  - generic [ref=e49]: A01
+                  - generic [ref=e50]:
+                    - img [ref=e51]
+                    - text: 초안
+                - paragraph [ref=e54]: Chest pain
+                - paragraph [ref=e55]: 4월 19일 19:19
+    - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e61] [cursor=pointer]:
+    - img [ref=e62]
+  - alert [ref=e65]

@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 
-const MODEL = "gemini-2.5-flash";
+const MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
 
 function createClient(): GoogleGenAI {
   const apiKey = process.env.GOOGLE_GENAI_API_KEY;
@@ -10,13 +10,14 @@ function createClient(): GoogleGenAI {
 
 export async function generateText(
   prompt: string,
-  systemInstruction: string
+  systemInstruction: string,
+  maxOutputTokens?: number
 ): Promise<string> {
   const client = createClient();
   const result = await client.models.generateContent({
     model: MODEL,
     contents: prompt,
-    config: { systemInstruction },
+    config: { systemInstruction, ...(maxOutputTokens && { maxOutputTokens }) },
   });
   return result.text ?? "";
 }
@@ -24,7 +25,8 @@ export async function generateText(
 export async function generateStructured<T>(
   prompt: string,
   systemInstruction: string,
-  schema: object
+  schema: object,
+  maxOutputTokens?: number
 ): Promise<T> {
   const client = createClient();
   const result = await client.models.generateContent({
@@ -34,7 +36,14 @@ export async function generateStructured<T>(
       systemInstruction,
       responseMimeType: "application/json",
       responseSchema: schema,
+      ...(maxOutputTokens && { maxOutputTokens }),
     },
   });
-  return JSON.parse(result.text ?? "{}") as T;
+  try {
+    return JSON.parse(result.text ?? "{}") as T;
+  } catch {
+    throw new Error(
+      `Gemini 구조화 응답 파싱 실패. 원문: ${result.text?.slice(0, 200)}`
+    );
+  }
 }

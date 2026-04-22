@@ -59,10 +59,12 @@ export type Database = {
           generated_at: string;
           history_draft: string;
           history_edited: string | null;
-          hpi_draft: string;
-          hpi_edited: string | null;
           id: string;
           model_version: string;
+          pe_draft: string;
+          pe_edited: string | null;
+          pi_draft: string;
+          pi_edited: string | null;
           structured_json: Json;
           template_draft: string;
           template_edited: string | null;
@@ -74,10 +76,12 @@ export type Database = {
           generated_at?: string;
           history_draft: string;
           history_edited?: string | null;
-          hpi_draft: string;
-          hpi_edited?: string | null;
           id?: string;
           model_version: string;
+          pe_draft?: string;
+          pe_edited?: string | null;
+          pi_draft: string;
+          pi_edited?: string | null;
           structured_json: Json;
           template_draft: string;
           template_edited?: string | null;
@@ -89,10 +93,12 @@ export type Database = {
           generated_at?: string;
           history_draft?: string;
           history_edited?: string | null;
-          hpi_draft?: string;
-          hpi_edited?: string | null;
           id?: string;
           model_version?: string;
+          pe_draft?: string;
+          pe_edited?: string | null;
+          pi_draft?: string;
+          pi_edited?: string | null;
           structured_json?: Json;
           template_draft?: string;
           template_edited?: string | null;
@@ -112,11 +118,14 @@ export type Database = {
         Row: {
           bed_number: number;
           bed_zone: Database["public"]["Enums"]["bed_zone"];
+          board_hidden_at: string | null;
           cc: string | null;
           cc_has_template: boolean;
           created_at: string;
           current_result_id: string | null;
+          has_inputs: boolean;
           id: string;
+          memo: string | null;
           status: Database["public"]["Enums"]["case_status"];
           template_key: string | null;
           updated_at: string;
@@ -125,11 +134,14 @@ export type Database = {
         Insert: {
           bed_number?: number;
           bed_zone?: Database["public"]["Enums"]["bed_zone"];
+          board_hidden_at?: string | null;
           cc?: string | null;
           cc_has_template?: boolean;
           created_at?: string;
           current_result_id?: string | null;
+          has_inputs?: boolean;
           id?: string;
+          memo?: string | null;
           status?: Database["public"]["Enums"]["case_status"];
           template_key?: string | null;
           updated_at?: string;
@@ -138,11 +150,14 @@ export type Database = {
         Update: {
           bed_number?: number;
           bed_zone?: Database["public"]["Enums"]["bed_zone"];
+          board_hidden_at?: string | null;
           cc?: string | null;
           cc_has_template?: boolean;
           created_at?: string;
           current_result_id?: string | null;
+          has_inputs?: boolean;
           id?: string;
+          memo?: string | null;
           status?: Database["public"]["Enums"]["case_status"];
           template_key?: string | null;
           updated_at?: string;
@@ -202,34 +217,258 @@ export type Database = {
       };
       profiles: {
         Row: {
+          ai_access_alert_dismissed: boolean;
+          ai_access_name: string | null;
+          ai_access_requested_at: string | null;
+          ai_access_status: "none" | "pending" | "approved" | "denied";
           avatar_url: string | null;
           created_at: string;
+          fold_auto_switch: boolean;
+          fold_fallback_layout: "single" | "split_vertical";
           full_name: string | null;
           id: string;
           input_layout: Database["public"]["Enums"]["input_layout"];
+          is_admin: boolean;
+          mobile_font_size: number;
+          split_ratio: number;
           updated_at: string;
         };
         Insert: {
+          ai_access_alert_dismissed?: boolean;
+          ai_access_name?: string | null;
+          ai_access_requested_at?: string | null;
+          ai_access_status?: "none" | "pending" | "approved" | "denied";
           avatar_url?: string | null;
           created_at?: string;
+          fold_auto_switch?: boolean;
+          fold_fallback_layout?: "single" | "split_vertical";
           full_name?: string | null;
           id: string;
           input_layout?: Database["public"]["Enums"]["input_layout"];
+          is_admin?: boolean;
+          mobile_font_size?: number;
+          split_ratio?: number;
           updated_at?: string;
         };
         Update: {
+          ai_access_alert_dismissed?: boolean;
+          ai_access_name?: string | null;
+          ai_access_requested_at?: string | null;
+          ai_access_status?: "none" | "pending" | "approved" | "denied";
           avatar_url?: string | null;
           created_at?: string;
+          fold_auto_switch?: boolean;
+          fold_fallback_layout?: "single" | "split_vertical";
           full_name?: string | null;
           id?: string;
           input_layout?: Database["public"]["Enums"]["input_layout"];
+          is_admin?: boolean;
+          mobile_font_size?: number;
+          split_ratio?: number;
           updated_at?: string;
         };
         Relationships: [];
       };
+      ai_corrections: {
+        Row: {
+          id: string;
+          user_id: string;
+          case_id: string | null;
+          section_type: "pi" | "template" | "history" | "pe";
+          cc: string;
+          template_key: string | null;
+          case_inputs_json: Json;
+          api_output: string;
+          corrected_output: string;
+          comment: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          case_id?: string | null;
+          section_type: "pi" | "template" | "history" | "pe";
+          cc: string;
+          template_key?: string | null;
+          case_inputs_json: Json;
+          api_output: string;
+          corrected_output: string;
+          comment?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          case_id?: string | null;
+          section_type?: "pi" | "template" | "history" | "pe";
+          cc?: string;
+          template_key?: string | null;
+          case_inputs_json?: Json;
+          api_output?: string;
+          corrected_output?: string;
+          comment?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ai_corrections_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ai_corrections_case_id_fkey";
+            columns: ["case_id"];
+            isOneToOne: false;
+            referencedRelation: "cases";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      ai_style_rules: {
+        Row: {
+          id: string;
+          rule_text: string;
+          cc: string | null;
+          section_type: "pi" | "template" | "history" | "pe" | "all";
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          rule_text: string;
+          cc?: string | null;
+          section_type: "pi" | "template" | "history" | "pe" | "all";
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          rule_text?: string;
+          cc?: string | null;
+          section_type?: "pi" | "template" | "history" | "pe" | "all";
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      ai_documents: {
+        Row: {
+          doc_path: string;
+          doc_type: "md" | "json";
+          content: string;
+          is_editable: boolean;
+          version: number;
+          synced_at: string | null;
+          updated_at: string;
+          updated_by: string;
+        };
+        Insert: {
+          doc_path: string;
+          doc_type: "md" | "json";
+          content: string;
+          is_editable?: boolean;
+          version?: number;
+          synced_at?: string | null;
+          updated_at?: string;
+          updated_by?: string;
+        };
+        Update: {
+          doc_path?: string;
+          doc_type?: "md" | "json";
+          content?: string;
+          is_editable?: boolean;
+          version?: number;
+          synced_at?: string | null;
+          updated_at?: string;
+          updated_by?: string;
+        };
+        Relationships: [];
+      };
+      ai_document_versions: {
+        Row: {
+          id: string;
+          doc_path: string;
+          content: string;
+          version: number;
+          changed_by: string;
+          change_summary: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          doc_path: string;
+          content: string;
+          version: number;
+          changed_by?: string;
+          change_summary?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          doc_path?: string;
+          content?: string;
+          version?: number;
+          changed_by?: string;
+          change_summary?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ai_document_versions_doc_path_fkey";
+            columns: ["doc_path"];
+            isOneToOne: false;
+            referencedRelation: "ai_documents";
+            referencedColumns: ["doc_path"];
+          },
+        ];
+      };
+      ai_usage_logs: {
+        Row: {
+          id: string;
+          user_id: string;
+          case_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          case_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          case_id?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ai_usage_logs_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ai_usage_logs_case_id_fkey";
+            columns: ["case_id"];
+            isOneToOne: false;
+            referencedRelation: "cases";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
-      [_ in never]: never;
+      ai_access_requests: {
+        Row: {
+          id: string;
+          ai_access_name: string | null;
+          ai_access_status: "none" | "pending" | "approved" | "denied";
+          ai_access_requested_at: string | null;
+          email: string | null;
+        };
+        Relationships: [];
+      };
     };
     Functions: {
       [_ in never]: never;
@@ -405,7 +644,29 @@ export type GuidelineInsert =
 export type GuidelineUpdate =
   Database["public"]["Tables"]["interview_guidelines"]["Update"];
 
+// 편의 타입 — ai_corrections
+export type AiCorrection =
+  Database["public"]["Tables"]["ai_corrections"]["Row"];
+export type AiCorrectionInsert =
+  Database["public"]["Tables"]["ai_corrections"]["Insert"];
+
+// 편의 타입 — ai_style_rules
+export type AiStyleRule = Database["public"]["Tables"]["ai_style_rules"]["Row"];
+export type AiStyleRuleInsert =
+  Database["public"]["Tables"]["ai_style_rules"]["Insert"];
+
+// 편의 타입 — ai_documents
+export type AiDocument = Database["public"]["Tables"]["ai_documents"]["Row"];
+export type AiDocumentInsert =
+  Database["public"]["Tables"]["ai_documents"]["Insert"];
+
+// 편의 타입 — ai_document_versions
+export type AiDocumentVersion =
+  Database["public"]["Tables"]["ai_document_versions"]["Row"];
+
 // 편의 타입 — enum
 export type CaseStatus = Database["public"]["Enums"]["case_status"];
 export type BedZone = Database["public"]["Enums"]["bed_zone"];
 export type InputLayout = Database["public"]["Enums"]["input_layout"];
+export type FoldFallbackLayout = "single" | "split_vertical";
+export type AiAccessStatus = "none" | "pending" | "approved" | "denied";

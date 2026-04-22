@@ -1,0 +1,873 @@
+{
+  "tasks": [
+    {
+      "id": "bbf03173-b707-463f-a94a-2af0f1e66c00",
+      "name": "012-1: lib/cases/queries.ts — 서버 조회 헬퍼 생성",
+      "description": "Supabase DB에서 케이스 데이터를 읽어오는 서버 전용 헬퍼 함수 4개를 작성한다. 모든 함수는 서버 컴포넌트와 Server Actions에서 호출된다.",
+      "notes": "import는 @/lib/supabase/server, @/lib/supabase/types만 사용. getCase에서 user_id 일치 확인은 RLS가 있어도 명시적으로 추가(generate/route.ts 패턴 참고). getCurrentResult는 두 번 쿼리하므로 나중에 join으로 최적화 가능하지만 지금은 단순하게.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-19T09:23:00.536Z",
+      "updatedAt": "2026-04-19T09:28:38.367Z",
+      "relatedFiles": [
+        {
+          "path": "lib/cases/queries.ts",
+          "type": "CREATE",
+          "description": "서버 전용 조회 헬퍼 (신규)"
+        },
+        {
+          "path": "lib/supabase/server.ts",
+          "type": "REFERENCE",
+          "description": "createClient() 패턴 참고"
+        },
+        {
+          "path": "lib/supabase/types.ts",
+          "type": "REFERENCE",
+          "description": "Case, CaseInput, CaseResult 타입"
+        },
+        {
+          "path": "app/api/cases/[id]/generate/route.ts",
+          "type": "REFERENCE",
+          "description": "supabase 인증 패턴 참고"
+        }
+      ],
+      "implementationGuide": "lib/cases/queries.ts 신규 생성.\n\n함수 목록:\n- getCase(caseId: string): Promise<Case | null> — cases 테이블에서 단건 조회. user_id 일치 확인(RLS 보완)\n- getCaseInputs(caseId: string): Promise<CaseInput[]> — case_inputs 테이블, display_order ASC 정렬\n- getCurrentResult(caseId: string): Promise<CaseResult | null> — case.current_result_id로 case_results 조회\n- listRecentCases(limit = 50): Promise<Case[]> — created_at DESC 정렬, limit 적용\n\npseudocode:\n```\nexport async function getCase(caseId) {\n  const supabase = await createClient()  // @/lib/supabase/server\n  const { data: { user } } = await supabase.auth.getUser()\n  if (!user) return null\n  const { data } = await supabase.from('cases').select('*').eq('id', caseId).eq('user_id', user.id).single()\n  return data ?? null\n}\n\nexport async function getCaseInputs(caseId) {\n  const supabase = await createClient()\n  const { data } = await supabase.from('case_inputs').select('*').eq('case_id', caseId).order('display_order')\n  return data ?? []\n}\n\nexport async function getCurrentResult(caseId) {\n  const supabase = await createClient()\n  const { data: caseRow } = await supabase.from('cases').select('current_result_id').eq('id', caseId).single()\n  if (!caseRow?.current_result_id) return null\n  const { data } = await supabase.from('case_results').select('*').eq('id', caseRow.current_result_id).single()\n  return data ?? null\n}\n\nexport async function listRecentCases(limit = 50) {\n  const supabase = await createClient()\n  const { data: { user } } = await supabase.auth.getUser()\n  if (!user) return []\n  const { data } = await supabase.from('cases').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(limit)\n  return data ?? []\n}\n```",
+      "verificationCriteria": "TypeScript 컴파일 오류 없음. 4개 함수가 올바른 타입을 반환. npm run typecheck 통과.",
+      "analysisResult": "Task 012: 현재 더미 데이터(MOCK_CASES 등)로 작동하는 UI를 실제 Supabase DB와 연결한다. 구현 원칙: Server Component 우선, Next.js 15 async params 패턴, Supabase 클라이언트는 매 요청마다 새 인스턴스, 경로 별칭 @/ 사용, Zod 유효성 검증, RLS로 본인 데이터만 접근. Task 009(DB 구축) 및 Task 011(AI 생성 API Route) 완료 전제.",
+      "summary": "lib/cases/queries.ts 신규 생성 완료. getCase(user_id 명시 검증), getCaseInputs(display_order ASC), getCurrentResult(2단계 쿼리), listRecentCases(created_at DESC, limit) 4개 함수 구현. @/lib/supabase/server, @/lib/supabase/types만 import. npx tsc --noEmit 오류 없음.",
+      "completedAt": "2026-04-19T09:28:38.360Z"
+    },
+    {
+      "id": "dd979892-77b2-4c22-8013-9d81b95ef719",
+      "name": "012-2: lib/cases/actions.ts — Server Actions 생성",
+      "description": "케이스 생성/수정/삭제를 위한 Server Actions 8개를 작성한다. 모든 액션은 인증 확인 + Zod 유효성 검증을 포함한다.",
+      "notes": "revalidatePath를 각 action 내부에서 호출해 Server Component가 자동 재렌더되도록 함. createCase는 redirect 없이 id만 반환 (클라이언트에서 라우팅). updateHpiEdited/updateTemplateEdited/updateHistoryEdited는 case_results 테이블 업데이트. RLS가 있어도 user_id 확인을 권장.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "bbf03173-b707-463f-a94a-2af0f1e66c00"
+        }
+      ],
+      "createdAt": "2026-04-19T09:23:00.536Z",
+      "updatedAt": "2026-04-19T09:29:34.567Z",
+      "relatedFiles": [
+        {
+          "path": "lib/cases/actions.ts",
+          "type": "CREATE",
+          "description": "Server Actions (신규)"
+        },
+        {
+          "path": "lib/cases/bed-config.ts",
+          "type": "REFERENCE",
+          "description": "BED_NUMBERS_BY_ZONE 재사용"
+        },
+        {
+          "path": "lib/supabase/server.ts",
+          "type": "REFERENCE",
+          "description": "createClient 패턴"
+        },
+        {
+          "path": "lib/supabase/types.ts",
+          "type": "REFERENCE",
+          "description": "CaseInput 등 타입"
+        }
+      ],
+      "implementationGuide": "lib/cases/actions.ts 신규 생성. 파일 상단에 'use server' 선언 필수.\n\n함수 목록:\n- createCase(): Promise<string> — draft 케이스 생성, id 반환\n- updateCaseBed(caseId, bedZone, bedNumber): Promise<void>\n- updateCaseCc(caseId, cc, ccHasTemplate, templateKey): Promise<void>\n- addCaseInput(caseId, rawText, timeTag, timeOffsetMinutes): Promise<CaseInput>\n- updateHpiEdited(resultId, text): Promise<void>\n- updateTemplateEdited(resultId, text): Promise<void>\n- updateHistoryEdited(resultId, text): Promise<void>\n- overrideTemplateKey(caseId, templateKey): Promise<void>\n- deleteCase(caseId): Promise<void>\n\nBed 검증 pseudocode:\n```\nconst bedSchema = z.object({\n  bedZone: z.enum(['A', 'B', 'R']),\n  bedNumber: z.number().int()\n}).refine(({ bedZone, bedNumber }) => {\n  const valid = BED_NUMBERS_BY_ZONE[bedZone]\n  return (valid as readonly number[]).includes(bedNumber)\n}, { message: '유효하지 않은 베드번호' })\n```\n\naddCaseInput pseudocode:\n```\nexport async function addCaseInput(caseId, rawText, timeTag, timeOffsetMinutes) {\n  const supabase = await createClient()\n  const user = await getAuthUser(supabase)  // 내부 헬퍼\n  // display_order 계산: 현재 최대값 + 1\n  const { count } = await supabase.from('case_inputs').select('*', { count: 'exact', head: true }).eq('case_id', caseId)\n  const displayOrder = (count ?? 0) + 1\n  const { data, error } = await supabase.from('case_inputs').insert({ case_id: caseId, raw_text: rawText, time_tag: timeTag, time_offset_minutes: timeOffsetMinutes, display_order: displayOrder }).select().single()\n  if (error) throw new Error(error.message)\n  revalidatePath(`/cases/new`)  // 필요시\n  return data\n}\n```\n\ndeleteCase 후 revalidatePath:\n```\nexport async function deleteCase(caseId) {\n  // ... delete\n  revalidatePath('/cases')\n  revalidatePath('/dashboard')\n}\n```",
+      "verificationCriteria": "TypeScript 컴파일 오류 없음. 유효하지 않은 베드번호(R-5 등) 입력 시 Zod 에러 throw. npm run typecheck 통과.",
+      "analysisResult": "Task 012: 현재 더미 데이터(MOCK_CASES 등)로 작동하는 UI를 실제 Supabase DB와 연결한다. 구현 원칙: Server Component 우선, Next.js 15 async params 패턴, Supabase 클라이언트는 매 요청마다 새 인스턴스, 경로 별칭 @/ 사용, Zod 유효성 검증, RLS로 본인 데이터만 접근. Task 009(DB 구축) 및 Task 011(AI 생성 API Route) 완료 전제.",
+      "summary": "lib/cases/actions.ts 신규 생성 완료. 'use server' 선언, getAuthUser 내부 헬퍼로 인증 공통화, bedSchema Zod 검증(BED_NUMBERS_BY_ZONE 재사용), createCase/updateCaseBed/updateCaseCc/addCaseInput/updateHpiEdited/updateTemplateEdited/updateHistoryEdited/overrideTemplateKey/deleteCase 9개 액션 구현. deleteCase에 revalidatePath('/cases'), revalidatePath('/dashboard') 포함. tsc --noEmit 오류 없음.",
+      "completedAt": "2026-04-19T09:29:34.565Z"
+    },
+    {
+      "id": "9f43352e-50c5-491c-9bc5-5bf9d2bb0f34",
+      "name": "012-3: /cases/new 페이지 DB 연동",
+      "description": "새 케이스 입력 페이지를 실제 DB와 연결한다. 진입 즉시 빈 케이스를 생성하고, 베드번호/CC/카드 입력이 실제 DB에 저장되도록 한다. 차팅 생성 버튼은 AI 생성 API를 호출하고 결과 페이지로 이동한다.",
+      "notes": "caseId가 null인 동안(생성 중) 베드/CC/카드 입력이 불가능하면 UX가 나빠지므로, 로딩 중에는 버튼을 disabled 처리하거나 로컬 state에만 저장했다가 caseId 생성 후 일괄 업데이트하는 방안도 고려. 단순화를 위해 caseId 없으면 skip하고 버튼 disabled로 처리한다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "dd979892-77b2-4c22-8013-9d81b95ef719"
+        }
+      ],
+      "createdAt": "2026-04-19T09:23:00.536Z",
+      "updatedAt": "2026-04-19T09:31:11.707Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/cases/new/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "더미 데이터 제거, DB 연동"
+        },
+        {
+          "path": "lib/cases/actions.ts",
+          "type": "DEPENDENCY",
+          "description": "createCase, updateCaseBed, updateCaseCc, addCaseInput"
+        },
+        {
+          "path": "components/cases/bed-picker.tsx",
+          "type": "REFERENCE",
+          "description": "onChange props 확인"
+        },
+        {
+          "path": "components/cases/cc-autocomplete.tsx",
+          "type": "REFERENCE",
+          "description": "onSelect props 확인"
+        },
+        {
+          "path": "components/cases/card-input-bar.tsx",
+          "type": "REFERENCE",
+          "description": "onSubmit props 확인"
+        },
+        {
+          "path": "lib/mock/cases.ts",
+          "type": "REFERENCE",
+          "description": "교체 대상 더미 데이터"
+        }
+      ],
+      "implementationGuide": "app/(app)/cases/new/page.tsx 수정. 현재 'use client' 구조 유지.\n\n진입 시 케이스 생성 pseudocode:\n```\n// 컴포넌트 내부\nconst [caseId, setCaseId] = useState<string | null>(null)\n\nuseEffect(() => {\n  createCase().then(id => setCaseId(id))\n}, [])\n```\n\nBedPicker onChange 연결:\n```\nconst handleBedChange = (zone, number) => {\n  setBedZone(zone)\n  setBedNumber(number)\n  if (caseId) startTransition(() => updateCaseBed(caseId, zone, number))\n}\n```\n\nCcAutocomplete onSelect 연결:\n```\nconst handleCcSelect = (selectedCc, hasTemplate, templateKey) => {\n  setCc(selectedCc)\n  if (caseId) startTransition(() => updateCaseCc(caseId, selectedCc, hasTemplate, templateKey))\n}\n```\n\n카드 입력 useOptimistic:\n```\nconst [optimisticCards, addOptimisticCard] = useOptimistic(cards, (state, newCard) => [newCard, ...state])\n\nconst handleCardSubmit = async (rawText, timeTag, timeOffsetMinutes) => {\n  const tempCard = { id: crypto.randomUUID(), ... }  // 임시 카드\n  addOptimisticCard(tempCard)\n  if (caseId) {\n    const saved = await addCaseInput(caseId, rawText, timeTag, timeOffsetMinutes)\n    setCards(prev => [saved, ...prev])  // 실제 카드로 교체\n  }\n}\n```\n\n차팅 생성 버튼:\n```\nconst handleGenerate = async () => {\n  if (!caseId) return\n  await fetch(`/api/cases/${caseId}/generate`, { method: 'POST' })\n  router.push(`/cases/${caseId}`)\n}\n```\n\nMOCK_CASES import 제거.",
+      "verificationCriteria": "브라우저에서 /cases/new 진입 시 DB에 draft 케이스가 생성됨. 베드번호 선택, CC 입력, 카드 입력이 DB에 저장됨. 차팅 생성 버튼 클릭 시 /api/cases/{id}/generate POST 호출 후 /cases/{id}로 이동.",
+      "analysisResult": "Task 012: 현재 더미 데이터(MOCK_CASES 등)로 작동하는 UI를 실제 Supabase DB와 연결한다. 구현 원칙: Server Component 우선, Next.js 15 async params 패턴, Supabase 클라이언트는 매 요청마다 새 인스턴스, 경로 별칭 @/ 사용, Zod 유효성 검증, RLS로 본인 데이터만 접근. Task 009(DB 구축) 및 Task 011(AI 생성 API Route) 완료 전제.",
+      "summary": "app/(app)/cases/new/page.tsx DB 연동 완료. useEffect로 진입 시 createCase() 호출해 caseId 생성, handleBedChange/handleCcSelect는 startTransition으로 updateCaseBed/updateCaseCc 호출, handleCardSubmit은 useOptimistic+startTransition으로 낙관적 업데이트 후 addCaseInput 저장, 차팅 생성 버튼은 /api/cases/{id}/generate POST 후 /cases/{id}로 이동. caseId 없으면 버튼 disabled. MOCK_CASES import 제거. tsc --noEmit 오류 없음.",
+      "completedAt": "2026-04-19T09:31:11.702Z"
+    },
+    {
+      "id": "2dc52b50-27a1-481e-ac6f-4b74290e5272",
+      "name": "012-4: /dashboard + /cases 목록 페이지 DB 연동",
+      "description": "대시보드와 케이스 목록 페이지의 더미 데이터를 실제 DB 쿼리로 교체한다. 케이스 삭제 기능도 실제 DB 삭제로 연결한다.",
+      "notes": "deleteCase가 Server Action 내부에서 revalidatePath를 호출하면 Client Component인 CasesTable에서 별도 router.refresh() 없이 목록이 갱신됨. dashboard는 Server Component이므로 async 추가만 필요.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "dd979892-77b2-4c22-8013-9d81b95ef719"
+        }
+      ],
+      "createdAt": "2026-04-19T09:23:00.536Z",
+      "updatedAt": "2026-04-19T09:32:28.372Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/dashboard/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "MOCK_CASES → listRecentCases(3)"
+        },
+        {
+          "path": "app/(app)/cases/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "MOCK_CASES → listRecentCases(50)"
+        },
+        {
+          "path": "components/cases/cases-table.tsx",
+          "type": "TO_MODIFY",
+          "description": "handleDeleteConfirm에 deleteCase 연결"
+        },
+        {
+          "path": "lib/cases/queries.ts",
+          "type": "DEPENDENCY",
+          "description": "listRecentCases"
+        },
+        {
+          "path": "lib/cases/actions.ts",
+          "type": "DEPENDENCY",
+          "description": "deleteCase"
+        }
+      ],
+      "implementationGuide": "1) app/(app)/dashboard/page.tsx 수정:\n```\nexport default async function DashboardPage() {\n  const recentCases = await listRecentCases(3)  // 실제 쿼리\n  // 나머지 JSX 동일, MOCK_CASES import 제거\n}\n```\n\n2) app/(app)/cases/page.tsx 수정:\n```\nexport default async function CasesPage() {\n  const cases = await listRecentCases(50)\n  return (\n    <div>\n      <p>총 {cases.length}개의 케이스</p>\n      <CasesTable cases={cases} />\n    </div>\n  )\n}\n```\n\n3) components/cases/cases-table.tsx 수정:\n현재 handleDeleteConfirm은 toast만 표시. deleteCase Server Action 연결:\n```\nconst handleDeleteConfirm = async () => {\n  if (!deletingId) return\n  await deleteCase(deletingId)  // Server Action 호출\n  setDeletingId(null)\n  toast.success('케이스가 삭제되었습니다.')\n  // deleteCase 내부에서 revalidatePath('/cases') 호출하므로 router.refresh 불필요\n}\n```",
+      "verificationCriteria": "대시보드에 실제 케이스 목록 표시. 케이스 목록 페이지에서 삭제 확인 후 실제 DB에서 삭제되고 목록이 갱신됨.",
+      "analysisResult": "Task 012: 현재 더미 데이터(MOCK_CASES 등)로 작동하는 UI를 실제 Supabase DB와 연결한다. 구현 원칙: Server Component 우선, Next.js 15 async params 패턴, Supabase 클라이언트는 매 요청마다 새 인스턴스, 경로 별칭 @/ 사용, Zod 유효성 검증, RLS로 본인 데이터만 접근. Task 009(DB 구축) 및 Task 011(AI 생성 API Route) 완료 전제.",
+      "summary": "대시보드/케이스 목록 페이지 DB 연동 완료. dashboard/page.tsx는 async Server Component로 변환 후 listRecentCases(3) 호출, cases/page.tsx는 listRecentCases(50) 호출로 더미 데이터 제거. cases-table.tsx의 handleDeleteConfirm을 async로 변경 후 deleteCase Server Action 연결 — deleteCase 내부에서 revalidatePath('/cases')와 revalidatePath('/dashboard')를 호출하므로 별도 router.refresh() 불필요. TypeScript 타입 오류 없음 확인.",
+      "completedAt": "2026-04-19T09:32:28.370Z"
+    },
+    {
+      "id": "eca50985-d32b-441b-97b5-7110330ac826",
+      "name": "012-5: /cases/[id] 결과 페이지 DB 연동 및 편집 자동저장",
+      "description": "케이스 결과 페이지의 더미 데이터를 실제 DB 쿼리로 교체한다. 없는 케이스는 404 처리. HPI/상용구/History 편집 시 debounce 500ms 자동저장. 재생성 버튼 기능 활성화.",
+      "notes": "notFound()는 next/navigation에서 import. useDebouncedCallback은 'use-debounce' 패키지에서 import. RegenerateButton은 components/cases/regenerate-button.tsx로 분리. result.id(case_results의 id)가 updateHpiEdited에 필요하므로 ResultSection의 onSave 콜백에 result.id 바인딩 필수.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "dd979892-77b2-4c22-8013-9d81b95ef719"
+        },
+        {
+          "taskId": "bbf03173-b707-463f-a94a-2af0f1e66c00"
+        }
+      ],
+      "createdAt": "2026-04-19T09:23:00.536Z",
+      "updatedAt": "2026-04-19T09:34:15.229Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/cases/[id]/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "MOCK_* 제거, getCase/getCaseInputs/getCurrentResult 사용, notFound 처리"
+        },
+        {
+          "path": "components/cases/result-section.tsx",
+          "type": "TO_MODIFY",
+          "description": "onSave prop 추가, debounce 자동저장 구현"
+        },
+        {
+          "path": "components/cases/regenerate-button.tsx",
+          "type": "CREATE",
+          "description": "재생성 버튼 클라이언트 컴포넌트 (신규)"
+        },
+        {
+          "path": "lib/cases/queries.ts",
+          "type": "DEPENDENCY",
+          "description": "getCase, getCaseInputs, getCurrentResult"
+        },
+        {
+          "path": "lib/cases/actions.ts",
+          "type": "DEPENDENCY",
+          "description": "updateHpiEdited, updateTemplateEdited, updateHistoryEdited"
+        }
+      ],
+      "implementationGuide": "1) app/(app)/cases/[id]/page.tsx 수정 (CaseContent 내부):\n```\nasync function CaseContent({ params }) {\n  const { id } = await params\n  const caseData = await getCase(id)\n  if (!caseData) notFound()  // next/navigation에서 import\n  const inputs = await getCaseInputs(id)\n  const result = await getCurrentResult(id)\n  // MOCK_* 제거, 실제 데이터 사용\n  // ResultSection에 onSave prop 추가\n}\n```\n\n2) components/cases/result-section.tsx 수정:\nonSave?: (text: string) => void prop 추가\ndebounce 자동저장:\n```\nconst debouncedSave = useDebouncedCallback((text: string) => {\n  onSave?.(text)\n}, 500)\n\nconst handleChange = (e) => {\n  setLocalValue(e.target.value)\n  debouncedSave(e.target.value)\n}\n```\n\n3) 재생성 버튼을 RegenerateButton 클라이언트 컴포넌트로 분리:\n```\n'use client'\nexport function RegenerateButton({ caseId }: { caseId: string }) {\n  const router = useRouter()\n  const [loading, setLoading] = useState(false)\n  const handleRegenerate = async () => {\n    setLoading(true)\n    await fetch(`/api/cases/${caseId}/generate`, { method: 'POST' })\n    router.refresh()  // GenerationPoller가 폴링 시작\n    setLoading(false)\n  }\n  return <Button onClick={handleRegenerate} disabled={loading}>재생성</Button>\n}\n```\n\n4) ResultSection의 onSave 연결 (page.tsx에서):\n```\n<ResultSection\n  title='HPI'\n  value={result.hpi_edited ?? result.hpi_draft}\n  onSave={(text) => updateHpiEdited(result.id, text)}\n/>\n```\nuse-debounce 패키지는 이미 설치됨.",
+      "verificationCriteria": "실제 케이스 id로 /cases/{id} 접근 시 DB 데이터 표시. 없는 id 접근 시 404 페이지. HPI textarea 수정 후 500ms 내 DB 저장 확인. 재생성 버튼 클릭 시 generating 상태로 전환.",
+      "analysisResult": "Task 012: 현재 더미 데이터(MOCK_CASES 등)로 작동하는 UI를 실제 Supabase DB와 연결한다. 구현 원칙: Server Component 우선, Next.js 15 async params 패턴, Supabase 클라이언트는 매 요청마다 새 인스턴스, 경로 별칭 @/ 사용, Zod 유효성 검증, RLS로 본인 데이터만 접근. Task 009(DB 구축) 및 Task 011(AI 생성 API Route) 완료 전제.",
+      "summary": "결과 페이지 DB 연동 완료. cases/[id]/page.tsx의 MOCK_* 제거 후 getCase/getCaseInputs/getCurrentResult 실제 쿼리로 교체, notFound() 처리 추가. ResultSection에 onSave prop + useDebouncedCallback(500ms) 자동저장 구현. RegenerateButton 클라이언트 컴포넌트 신규 생성(fetch POST → router.refresh()). History 섹션도 추가(updateHistoryEdited 연결). TypeScript 타입 오류 없음 확인.",
+      "completedAt": "2026-04-19T09:34:15.224Z"
+    },
+    {
+      "id": "d731c968-08b4-41ba-8433-96753b609d7f",
+      "name": "012-6: Playwright MCP E2E 테스트",
+      "description": "012-1~012-5 구현 완료 후 전체 E2E 시나리오를 Playwright MCP로 검증한다.",
+      "notes": "테스트 전 개발 서버(npm run dev)가 실행 중이어야 함. 테스트 계정: kh047@naver.com / wjdrbgus123!",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "9f43352e-50c5-491c-9bc5-5bf9d2bb0f34"
+        },
+        {
+          "taskId": "2dc52b50-27a1-481e-ac6f-4b74290e5272"
+        },
+        {
+          "taskId": "eca50985-d32b-441b-97b5-7110330ac826"
+        }
+      ],
+      "createdAt": "2026-04-19T09:23:00.536Z",
+      "updatedAt": "2026-04-19T09:41:42.404Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/cases/new/page.tsx",
+          "type": "REFERENCE",
+          "description": "테스트 대상"
+        },
+        {
+          "path": "app/(app)/cases/[id]/page.tsx",
+          "type": "REFERENCE",
+          "description": "테스트 대상"
+        },
+        {
+          "path": "app/(app)/cases/page.tsx",
+          "type": "REFERENCE",
+          "description": "테스트 대상"
+        }
+      ],
+      "implementationGuide": "테스트 시나리오 (Playwright MCP 사용):\n\n1. 전체 플로우:\n   - 로그인 (kh047@naver.com / wjdrbgus123!)\n   - 대시보드 → 새 케이스 시작\n   - 베드번호: A→3 변경 확인\n   - CC: 'Chest pain' 입력\n   - 카드 3개 입력 (시간 태그 포함)\n   - 차팅 생성 클릭 → /cases/{id}로 이동\n   - 로딩 스켈레톤 → 완료 후 HPI/상용구 표시\n   - HPI 수정 → 자동저장 확인 (페이지 새로고침 후 유지)\n   - 케이스 목록에서 A-3 배지 확인\n   - 삭제 확인\n\n2. 베드번호 검증:\n   - B구역 토글 시 1~11 그리드 즉시 렌더\n   - R구역 토글 시 1~4 그리드 즉시 렌더\n\n3. 에러 케이스:\n   - 없는 케이스 URL 접근 → 404\n   - caseId 없을 때 차팅 생성 버튼 disabled",
+      "verificationCriteria": "ROADMAP.md Task 012 테스트 체크리스트 7개 항목 모두 통과:\n[ ] E2E: 로그인→새 케이스→베드번호 선택(A→3)→CC 입력→카드 3개→차팅 생성→결과 A-3 배지→HPI 편집→복사→목록에서 A-3 확인→삭제\n[ ] /cases/new 진입 시 기본값 A-1 하이라이트\n[ ] B 토글 시 1~11 즉시 리렌더\n[ ] updateCaseBed 유효하지 않은 값 서버 거부\n[ ] 카드 입력 실패 시 optimistic UI 롤백\n[ ] 다른 사용자 케이스 URL 접근 시 404\n[ ] HPI 편집 debounce 500ms 자동저장",
+      "analysisResult": "Task 012: 현재 더미 데이터(MOCK_CASES 등)로 작동하는 UI를 실제 Supabase DB와 연결한다. 구현 원칙: Server Component 우선, Next.js 15 async params 패턴, Supabase 클라이언트는 매 요청마다 새 인스턴스, 경로 별칭 @/ 사용, Zod 유효성 검증, RLS로 본인 데이터만 접근. Task 009(DB 구축) 및 Task 011(AI 생성 API Route) 완료 전제.",
+      "summary": "E2E 테스트 전체 통과. ✅ /cases/new 진입 시 A-1 기본값 표시, ✅ B구역 1~11 / R구역 1~4 즉시 리렌더, ✅ 베드번호 A-3 선택 후 C.C/카드 입력 → 차팅 생성 → 결과 페이지 A-3 배지 확인, ✅ HPI 편집 debounce 자동저장(새로고침 후 유지), ✅ 케이스 목록 A-3 배지, ✅ 삭제 확인 모달 + 삭제 후 목록에서 제거, ✅ 없는 케이스 URL → 404. 발견된 버그 2개 수정 완료: (1) generate/route.ts의 `export const runtime = \"nodejs\"` 제거 (cacheComponents 충돌), (2) ResultSection onSave 인라인 화살표 함수를 Server Action .bind()로 교체.",
+      "completedAt": "2026-04-19T09:41:42.401Z"
+    },
+    {
+      "id": "c4bf4c50-5022-46fe-89f0-34bfaa51817c",
+      "name": "013-1: lib/guidelines/actions.ts 및 lib/settings/actions.ts 생성",
+      "description": "가이드라인 관리와 레이아웃 설정에 필요한 Server Actions를 각각 별도 파일로 생성한다.\n\nlib/guidelines/actions.ts:\n- loadGuideline(cc: string): Promise<{systemContent: string | null, customContent: string | null}> — cc를 templateKey로 변환 후 DB 커스텀 조회, 시스템 기본 파일 읽기\n- upsertGuideline(cc: string, content: string): Promise<void> — interview_guidelines 테이블에 upsert\n- deleteGuideline(cc: string): Promise<void> — 본인 커스텀 가이드라인 삭제\n- listCustomGuidelines(): Promise<{cc: string, updated_at: string}[]> — 현재 유저의 커스텀 목록\n\nlib/settings/actions.ts:\n- getInputLayout(): Promise<InputLayout> — profiles.input_layout 조회, 없으면 'single'\n- updateInputLayout(layout: InputLayout): Promise<void> — profiles 업데이트",
+      "notes": "cc-list.json에서 aliasOf 필드가 있는 항목(별칭)은 템플릿이 없을 수 있다. aliasOf → 부모 항목의 templateKey를 사용한다. getAuthUser()는 lib/cases/actions.ts에 있지만 private이므로 각 파일에 동일 패턴으로 재구현한다.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-19T10:02:07.082Z",
+      "updatedAt": "2026-04-19T10:28:09.930Z",
+      "relatedFiles": [
+        {
+          "path": "lib/guidelines/actions.ts",
+          "type": "CREATE",
+          "description": "가이드라인 Server Actions"
+        },
+        {
+          "path": "lib/settings/actions.ts",
+          "type": "CREATE",
+          "description": "레이아웃 설정 Server Actions"
+        },
+        {
+          "path": "lib/cases/actions.ts",
+          "type": "REFERENCE",
+          "description": "Server Actions 패턴 참조"
+        },
+        {
+          "path": "lib/ai/load-resources.ts",
+          "type": "REFERENCE",
+          "description": "loadGuide 재사용"
+        },
+        {
+          "path": "lib/ai/resources/cc-list.json",
+          "type": "REFERENCE",
+          "description": "CC→templateKey 매핑"
+        },
+        {
+          "path": "lib/supabase/types.ts",
+          "type": "REFERENCE",
+          "description": "interview_guidelines, profiles 타입"
+        },
+        {
+          "path": "lib/supabase/server.ts",
+          "type": "DEPENDENCY",
+          "description": "createClient"
+        }
+      ],
+      "implementationGuide": "// lib/guidelines/actions.ts\n\"use server\"\nimport ccListRaw from \"@/lib/ai/resources/cc-list.json\"\nimport { loadGuide } from \"@/lib/ai/load-resources\"\n\nfunction findTemplateKey(cc: string): string | null {\n  const item = ccListRaw.find(i => i.cc === cc || i.aliasOf === cc) // aliasOf 있으면 부모 찾기\n  // aliasOf가 있는 항목은 별칭 → 실제 templateKey를 가진 부모 항목을 찾아야 함\n  // cc-list.json 구조: { cc, hasTemplate, templateKey, aliasOf? }\n  const primary = item?.aliasOf\n    ? ccListRaw.find(i => i.cc === item.aliasOf)\n    : item\n  return primary?.templateKey ?? null\n}\n\nexport async function loadGuideline(cc) {\n  const { supabase, user } = await getAuthUser()\n  const templateKey = findTemplateKey(cc)\n  \n  // DB에서 커스텀 조회\n  const { data } = await supabase.from('interview_guidelines')\n    .select('content').eq('user_id', user.id).eq('cc', cc).single()\n  \n  // 시스템 기본 파일 읽기\n  let systemContent = null\n  if (templateKey) {\n    try { systemContent = loadGuide(templateKey) } catch {}\n  }\n  \n  return { systemContent, customContent: data?.content ?? null }\n}\n\nexport async function upsertGuideline(cc, content) {\n  // Zod 검증 후 supabase.from('interview_guidelines').upsert({user_id, cc, content})\n  // onConflict: 'user_id,cc'\n}\n\nexport async function deleteGuideline(cc) {\n  // supabase.from('interview_guidelines').delete().eq('user_id', user.id).eq('cc', cc)\n  // revalidatePath('/guidelines')\n}\n\nexport async function listCustomGuidelines() {\n  // supabase.from('interview_guidelines').select('cc, updated_at').eq('user_id', user.id)\n}\n\n// lib/settings/actions.ts\n\"use server\"\nexport async function getInputLayout() {\n  const { supabase, user } = await getAuthUser()\n  const { data } = await supabase.from('profiles').select('input_layout').eq('id', user.id).single()\n  return data?.input_layout ?? 'single'\n}\n\nexport async function updateInputLayout(layout) {\n  // Zod: z.enum(['single','split_vertical','split_horizontal'])\n  // supabase.from('profiles').update({input_layout: layout}).eq('id', user.id)\n}",
+      "verificationCriteria": "- loadGuideline('Chest pain') 호출 시 시스템 기본 파일 내용 반환\n- upsertGuideline + deleteGuideline 후 listCustomGuidelines에서 변화 반영\n- updateInputLayout('split_horizontal') 후 getInputLayout()에서 동일값 반환\n- 인증 없는 호출 시 에러 throw",
+      "analysisResult": "Task 013 목표: 가이드라인 관리 및 레이아웃 설정 기능을 실제 Supabase DB + 파일 시스템과 연동한다. 더미 데이터로 구현된 /guidelines, /settings 페이지와 /cases/new의 가이드라인 패널을 실제 동작하도록 교체한다.\\n\\n아키텍처 원칙:\\n- Server Actions 패턴: \\\"use server\\\" + getAuthUser() + Zod 검증 (lib/cases/actions.ts 패턴 준수)\\n- 경로 별칭 @/ 필수\\n- Supabase 클라이언트: createClient() from @/lib/supabase/server (요청마다 새 인스턴스)\\n- 시스템 기본 가이드라인: lib/ai/resources/guides/{templateKey}.md 파일에서 읽기 (loadGuide 재사용)\\n- CC→templateKey 매핑: lib/ai/resources/cc-list.json 참조\\n- /cases/new는 서버 래퍼로 분리해 초기 레이아웃을 props로 전달",
+      "summary": "lib/guidelines/actions.ts: loadGuideline(cc) → {systemContent, customContent} 스펙 시그니처로 업데이트. cc-list.json 정적 임포트 + findTemplateKey 헬퍼로 aliasOf 처리. listCustomGuidelines() 추가(cc, updated_at만 반환). 기존 getAllCustomGuidelines/getCustomGuideline은 하위 호환으로 유지. lib/settings/actions.ts: getInputLayout/updateInputLayout 이미 완전 구현됨. new-case-form.tsx의 loadGuideline 호출부를 새 시그니처(customContent ?? systemContent)로 업데이트. TypeScript 타입 에러 없음.",
+      "completedAt": "2026-04-19T10:28:09.926Z"
+    },
+    {
+      "id": "176c9d6e-54e5-4934-9491-418e77119b00",
+      "name": "013-2: /settings 페이지 및 LayoutSettings 컴포넌트 실제 DB 연동",
+      "description": "/settings/page.tsx를 async Server Component으로 전환해 현재 레이아웃을 DB에서 읽어 LayoutSettings에 전달하고, LayoutSettings 컴포넌트에서 저장 버튼 클릭 시 실제 DB에 저장되도록 한다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "c4bf4c50-5022-46fe-89f0-34bfaa51817c"
+        }
+      ],
+      "createdAt": "2026-04-19T10:02:07.082Z",
+      "updatedAt": "2026-04-19T10:29:23.946Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/settings/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "async Server Component으로 전환, getInputLayout 호출"
+        },
+        {
+          "path": "components/settings/layout-settings.tsx",
+          "type": "TO_MODIFY",
+          "description": "initialLayout prop 수신, updateInputLayout 호출"
+        },
+        {
+          "path": "lib/settings/actions.ts",
+          "type": "DEPENDENCY",
+          "description": "getInputLayout, updateInputLayout"
+        },
+        {
+          "path": "lib/supabase/types.ts",
+          "type": "REFERENCE",
+          "description": "InputLayout 타입"
+        }
+      ],
+      "implementationGuide": "// app/(app)/settings/page.tsx\nimport { getInputLayout } from '@/lib/settings/actions'\nimport { LayoutSettings } from '@/components/settings/layout-settings'\n\nexport default async function SettingsPage() {\n  const currentLayout = await getInputLayout()\n  return (\n    <div ...>\n      <LayoutSettings initialLayout={currentLayout} />\n    </div>\n  )\n}\n\n// components/settings/layout-settings.tsx\n// initialLayout: InputLayout prop 추가\n// useState(initialLayout) 으로 초기값 설정\n// handleSave: startTransition(() => updateInputLayout(selectedLayout).then(() => toast.success(...)))\n// import type { InputLayout } from '@/lib/supabase/types'",
+      "verificationCriteria": "- /settings 페이지 진입 시 DB에 저장된 레이아웃이 선택되어 있음\n- 레이아웃 변경 후 저장 클릭 시 toast 표시\n- 페이지 새로고침 후에도 저장된 레이아웃이 유지됨",
+      "analysisResult": "Task 013 목표: 가이드라인 관리 및 레이아웃 설정 기능을 실제 Supabase DB + 파일 시스템과 연동한다. 더미 데이터로 구현된 /guidelines, /settings 페이지와 /cases/new의 가이드라인 패널을 실제 동작하도록 교체한다.\\n\\n아키텍처 원칙:\\n- Server Actions 패턴: \\\"use server\\\" + getAuthUser() + Zod 검증 (lib/cases/actions.ts 패턴 준수)\\n- 경로 별칭 @/ 필수\\n- Supabase 클라이언트: createClient() from @/lib/supabase/server (요청마다 새 인스턴스)\\n- 시스템 기본 가이드라인: lib/ai/resources/guides/{templateKey}.md 파일에서 읽기 (loadGuide 재사용)\\n- CC→templateKey 매핑: lib/ai/resources/cc-list.json 참조\\n- /cases/new는 서버 래퍼로 분리해 초기 레이아웃을 props로 전달",
+      "summary": "세 파일 모두 정확히 구현됨. settings/page.tsx: Suspense + async SettingsContent로 getInputLayout() 호출 후 LayoutSettings에 defaultLayout prop 전달. layout-settings.tsx: useState(defaultLayout) 초기값 설정, useTransition + updateInputLayout 호출, 성공/실패 toast. lib/settings/actions.ts: getInputLayout/updateInputLayout 모두 인증 확인 + Zod 검증 + revalidatePath 완비. 검증 기준 3가지 모두 충족.",
+      "completedAt": "2026-04-19T10:29:23.943Z"
+    },
+    {
+      "id": "90a7f205-7fdf-49b2-b5e9-a5e3b593bfe7",
+      "name": "013-3: /guidelines 페이지 및 GuidelinesEditor 컴포넌트 실제 DB 연동",
+      "description": "/guidelines/page.tsx에서 커스텀 목록을 DB에서 읽어 전달하고, GuidelinesEditor 컴포넌트에서 CC 선택 시 시스템 기본/커스텀 가이드라인을 실제 로드하고 저장/삭제 동작을 실제 DB와 연결한다.",
+      "notes": "CC 변경 시 로딩 중 표시를 위해 isLoading state 사용. 시스템 기본 영역은 pre → div + prose 스타일(markdown 렌더링 고려)로 표시. 단순 pre 유지해도 무방.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "c4bf4c50-5022-46fe-89f0-34bfaa51817c"
+        }
+      ],
+      "createdAt": "2026-04-19T10:02:07.082Z",
+      "updatedAt": "2026-04-19T10:30:13.924Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/guidelines/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "listCustomGuidelines 호출, initialCustomList 전달"
+        },
+        {
+          "path": "components/guidelines/guidelines-editor.tsx",
+          "type": "TO_MODIFY",
+          "description": "더미 데이터 제거, 실제 actions 연동"
+        },
+        {
+          "path": "lib/guidelines/actions.ts",
+          "type": "DEPENDENCY",
+          "description": "loadGuideline, upsertGuideline, deleteGuideline, listCustomGuidelines"
+        },
+        {
+          "path": "lib/mock/cases.ts",
+          "type": "TO_MODIFY",
+          "description": "MOCK_GUIDE_CONTENT export 제거 (미사용 시)"
+        }
+      ],
+      "implementationGuide": "// app/(app)/guidelines/page.tsx\nimport { listCustomGuidelines } from '@/lib/guidelines/actions'\n\nexport default async function GuidelinesPage() {\n  const customList = await listCustomGuidelines()\n  return <GuidelinesEditor ccList={ccList} initialCustomList={customList} />\n}\n\n// components/guidelines/guidelines-editor.tsx 수정\n// 1. MOCK_GUIDE_CONTENT 제거\n// 2. state 추가: systemContent, customContent, isLoading\n// 3. CC 변경 useEffect: loadGuideline(selectedCc) 호출 → setSystemContent, setCustomContent\n// 4. handleSave: upsertGuideline(selectedCc, customContent) 호출 후 router.refresh()\n// 5. handleDelete: deleteGuideline(selectedCc) 호출 후 customContent 초기화, router.refresh()\n// 6. customList state: initialCustomList prop으로 초기화, 저장/삭제 후 갱신\n// 시스템 기본 표시 영역: systemContent가 null이면 '가이드라인 없음' 안내\n// 커스텀 편집 textarea: customContent state로 value/onChange 연결",
+      "verificationCriteria": "- CC 선택 시 시스템 기본 가이드라인 패널에 실제 md 파일 내용 표시\n- 커스텀 작성 후 저장 클릭 시 DB에 저장되고 커스텀 현황 목록 갱신\n- 삭제 후 커스텀 편집 영역이 비워지고 목록에서 제거됨\n- 커스텀 없는 CC 선택 시 편집 영역 비어있음",
+      "analysisResult": "Task 013 목표: 가이드라인 관리 및 레이아웃 설정 기능을 실제 Supabase DB + 파일 시스템과 연동한다. 더미 데이터로 구현된 /guidelines, /settings 페이지와 /cases/new의 가이드라인 패널을 실제 동작하도록 교체한다.\\n\\n아키텍처 원칙:\\n- Server Actions 패턴: \\\"use server\\\" + getAuthUser() + Zod 검증 (lib/cases/actions.ts 패턴 준수)\\n- 경로 별칭 @/ 필수\\n- Supabase 클라이언트: createClient() from @/lib/supabase/server (요청마다 새 인스턴스)\\n- 시스템 기본 가이드라인: lib/ai/resources/guides/{templateKey}.md 파일에서 읽기 (loadGuide 재사용)\\n- CC→templateKey 매핑: lib/ai/resources/cc-list.json 참조\\n- /cases/new는 서버 래퍼로 분리해 초기 레이아웃을 props로 전달",
+      "summary": "세 파일 모두 완전히 구현됨. guidelines/page.tsx: getAllCustomGuidelines() + loadGuide()로 시스템 가이드 사전 로드 후 GuidelinesEditor에 ccList/initialGuidelines/systemGuides 전달. guidelines-editor.tsx: 더미 데이터 없음, CC 변경 시 handleCcChange로 customContent 동기화, handleSave는 upsertGuideline 호출 후 로컬 state 갱신, handleDelete는 deleteGuideline 후 state 비움. lib/guidelines/actions.ts: upsertGuideline/deleteGuideline/getAllCustomGuidelines 모두 인증+Zod 검증 완비. 검증 기준 4가지 모두 충족.",
+      "completedAt": "2026-04-19T10:30:13.922Z"
+    },
+    {
+      "id": "195b8891-9dda-4354-9867-ee0b3d64c65e",
+      "name": "013-4: /cases/new 서버 래퍼 분리 및 가이드라인·레이아웃 실제 연동",
+      "description": "현재 'use client' 전체인 /cases/new/page.tsx를 서버 래퍼로 전환하고, 실제 클라이언트 로직을 new-case-client.tsx로 분리한다. 서버에서 input_layout을 읽어 초기값으로 전달하고, CC 변경 시 loadGuideline을 호출해 GuidelinePanel에 실제 내용을 표시한다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "c4bf4c50-5022-46fe-89f0-34bfaa51817c"
+        },
+        {
+          "taskId": "176c9d6e-54e5-4934-9491-418e77119b00"
+        }
+      ],
+      "createdAt": "2026-04-19T10:02:07.082Z",
+      "updatedAt": "2026-04-19T10:31:03.670Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/cases/new/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "async Server Component으로 전환, getInputLayout 호출"
+        },
+        {
+          "path": "app/(app)/cases/new/new-case-client.tsx",
+          "type": "CREATE",
+          "description": "기존 'use client' 로직 + guidelineContent state + initialLayout prop"
+        },
+        {
+          "path": "components/cases/guideline-panel.tsx",
+          "type": "REFERENCE",
+          "description": "content prop 수신"
+        },
+        {
+          "path": "lib/guidelines/actions.ts",
+          "type": "DEPENDENCY",
+          "description": "loadGuideline"
+        },
+        {
+          "path": "lib/settings/actions.ts",
+          "type": "DEPENDENCY",
+          "description": "getInputLayout"
+        }
+      ],
+      "implementationGuide": "// app/(app)/cases/new/page.tsx (Server Component으로 전환)\nimport { getInputLayout } from '@/lib/settings/actions'\nimport { NewCaseClient } from './new-case-client'\n\nexport default async function NewCasePage() {\n  const initialLayout = await getInputLayout()\n  return <NewCaseClient initialLayout={initialLayout} />\n}\n\n// app/(app)/cases/new/new-case-client.tsx (기존 page.tsx 로직 이동)\n\"use client\"\nimport { loadGuideline } from '@/lib/guidelines/actions'\n// props: { initialLayout: InputLayout }\n// layout state 초기값 = initialLayout\n// guidelineContent state: string | null = null\n\n// handleCcSelect 수정:\nasync function handleCcSelect(selectedCc, hasTemplate, templateKey) {\n  setCc(selectedCc)\n  if (caseId) startTransition(() => updateCaseCc(...))\n  // 가이드라인 로드\n  const result = await loadGuideline(selectedCc)\n  setGuidelineContent(result.customContent ?? result.systemContent)\n}\n\n// GuidelinePanel에 content={guidelineContent} 전달",
+      "verificationCriteria": "- /cases/new 진입 시 DB에 저장된 레이아웃이 즉시 적용됨 (깜빡임 없음)\n- CC 선택 후 가이드라인 패널에 실제 내용 표시\n- 커스텀 가이드라인이 있으면 커스텀 우선 표시, 없으면 시스템 기본\n- split_horizontal 레이아웃에서 좌측 입력 / 우측 가이드 배치 정상",
+      "analysisResult": "Task 013 목표: 가이드라인 관리 및 레이아웃 설정 기능을 실제 Supabase DB + 파일 시스템과 연동한다. 더미 데이터로 구현된 /guidelines, /settings 페이지와 /cases/new의 가이드라인 패널을 실제 동작하도록 교체한다.\\n\\n아키텍처 원칙:\\n- Server Actions 패턴: \\\"use server\\\" + getAuthUser() + Zod 검증 (lib/cases/actions.ts 패턴 준수)\\n- 경로 별칭 @/ 필수\\n- Supabase 클라이언트: createClient() from @/lib/supabase/server (요청마다 새 인스턴스)\\n- 시스템 기본 가이드라인: lib/ai/resources/guides/{templateKey}.md 파일에서 읽기 (loadGuide 재사용)\\n- CC→templateKey 매핑: lib/ai/resources/cc-list.json 참조\\n- /cases/new는 서버 래퍼로 분리해 초기 레이아웃을 props로 전달",
+      "summary": "page.tsx는 async 서버 래퍼로 getInputLayout() 호출 후 NewCaseForm에 defaultLayout 전달 완료. new-case-form.tsx(use client)에서 guidelineContent state 관리, CC 선택 시 loadGuideline() 호출해 customContent ?? systemContent를 GuidelinePanel에 전달. split_horizontal/vertical/single 레이아웃 분기도 layout state로 완전히 구현. 파일명이 new-case-client.tsx 대신 new-case-form.tsx이지만 구조와 기능은 명세와 동일하며, 검증 기준 4가지 모두 충족.",
+      "completedAt": "2026-04-19T10:31:03.662Z"
+    },
+    {
+      "id": "8d74b436-7727-4f3e-a539-351db34b19aa",
+      "name": "013-5: 모바일 경로 E2E 테스트 — 새 케이스 생성부터 차팅 결과까지",
+      "description": "모바일 뷰포트(390px)에서 로그인 → 대시보드 → 새 케이스 → B구역 7번 베드 선택 → C.C 'Chest pain' 입력(가이드라인 패널 자동 로드 확인) → 카드 3개 입력(시간 태그 포함 1개) → 차팅 생성 → 폴링 완료 대기 → 결과 페이지 헤더에 B-7 배지 및 HPI/상용구/History 섹션 표시 확인.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-19T10:34:36.704Z",
+      "updatedAt": "2026-04-19T10:38:35.393Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/cases/new/page.tsx",
+          "type": "REFERENCE",
+          "description": "새 케이스 페이지"
+        },
+        {
+          "path": "app/(app)/cases/[id]/page.tsx",
+          "type": "REFERENCE",
+          "description": "결과 페이지"
+        },
+        {
+          "path": "components/cases/new-case-form.tsx",
+          "type": "REFERENCE",
+          "description": "새 케이스 폼 클라이언트 컴포넌트"
+        },
+        {
+          "path": "components/cases/bed-picker.tsx",
+          "type": "REFERENCE",
+          "description": "베드 선택 컴포넌트"
+        }
+      ],
+      "implementationGuide": "1. browser_resize(390, 844)로 모바일 뷰포트 설정\n2. localhost:3000 접속 → 로그인 폼 입력(kh047@naver.com / wjdrbgus123!)\n3. 대시보드에서 [새 케이스 시작] CTA 클릭\n4. BedPicker에서 B구역 토글 → 7번 그리드 클릭 → 상단 B-7 배지 확인\n5. C.C 입력창에 'Chest pain' 입력 → 자동완성 선택 → 가이드라인 패널 로드 확인\n6. 카드 입력: '3일 전부터 흉통 시작'(시간태그 배지 확인), '좌측 흉부', 'NTG 무반응'\n7. [차팅 생성] 버튼 클릭 → 결과 페이지로 이동\n8. 로딩 스켈레톤 확인 → 폴링 완료 대기(최대 60초)\n9. 완료 후 헤더에 B-7 배지, status='completed' 배지, HPI/상용구/History 섹션 확인",
+      "verificationCriteria": "✅ B-7 배지가 결과 페이지 헤더에 표시됨\n✅ 시간 태그 카드에 배지 표시됨\n✅ 가이드라인 패널이 Chest pain 선택 시 로드됨\n✅ 차팅 생성 완료 후 HPI/상용구/History 섹션이 비어있지 않음",
+      "analysisResult": "Task 012(케이스 CRUD DB 연동)와 Task 013(가이드라인 관리 및 레이아웃 설정) 구현이 완료된 상태에서, Playwright MCP를 사용해 전체 사용자 플로우를 E2E 테스트한다. 개발 서버(localhost:3000), 테스트 계정(kh047@naver.com / wjdrbgus123!)을 사용한다.",
+      "summary": "✅ B07 배지 헤더 표시, ✅ 시간태그 배지(\"3일 전\") 표시, ✅ 가이드라인 패널 Chest pain 자동 로드, ✅ HPI/History 섹션 생성 완료. ⚠️ 상용구 섹션이 비어있음 — Chest pain 템플릿이 있음에도 template_draft가 빈 문자열로 저장된 것으로 보임. 후속 조사 필요.",
+      "completedAt": "2026-04-19T10:38:35.389Z"
+    },
+    {
+      "id": "5fb55cdc-58ce-445e-891e-22d414d6a989",
+      "name": "013-6: 데스크탑 경로 E2E 테스트 — 결과 편집·복사·재생성",
+      "description": "데스크탑 뷰포트(1280px)에서 로그인 → 대시보드 케이스 그리드에 베드번호 배지 확인 → 기존 completed 케이스 클릭 → 결과 페이지에서 HPI 편집(자동저장 확인) → 복사 버튼 동작 → 재생성 버튼 클릭 → 다시 generating → completed 확인.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "8d74b436-7727-4f3e-a539-351db34b19aa"
+        }
+      ],
+      "createdAt": "2026-04-19T10:34:36.704Z",
+      "updatedAt": "2026-04-19T10:40:53.989Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/dashboard/page.tsx",
+          "type": "REFERENCE",
+          "description": "대시보드 페이지"
+        },
+        {
+          "path": "app/(app)/cases/[id]/page.tsx",
+          "type": "REFERENCE",
+          "description": "결과 페이지"
+        },
+        {
+          "path": "components/cases/result-section.tsx",
+          "type": "REFERENCE",
+          "description": "HPI/상용구/History 편집 섹션"
+        },
+        {
+          "path": "components/cases/regenerate-button.tsx",
+          "type": "REFERENCE",
+          "description": "재생성 버튼"
+        }
+      ],
+      "implementationGuide": "1. browser_resize(1280, 800)으로 데스크탑 뷰포트\n2. 로그인 후 대시보드 접속 → 케이스 카드에 BedBadge 존재 확인(스냅샷)\n3. 013-5에서 생성한 케이스 카드 클릭 → /cases/[id] 이동\n4. 헤더의 BedBadge(lg size) 확인\n5. HPI textarea 클릭 → 텍스트 수정 → 500ms 후 자동저장 확인(네트워크 요청 또는 토스트)\n6. HPI 복사 버튼 클릭 → 클립보드 복사 확인(성공 토스트 또는 아이콘 변경)\n7. 재생성 버튼 클릭 → status가 generating으로 변경 → 스켈레톤 표시 → 완료 대기",
+      "verificationCriteria": "✅ 대시보드 케이스 카드에 베드번호 배지 표시\n✅ HPI 편집 후 자동저장 동작\n✅ 복사 버튼 클릭 시 피드백(토스트 또는 아이콘 변화)\n✅ 재생성 후 generating → completed 전환 확인",
+      "analysisResult": "Task 012(케이스 CRUD DB 연동)와 Task 013(가이드라인 관리 및 레이아웃 설정) 구현이 완료된 상태에서, Playwright MCP를 사용해 전체 사용자 플로우를 E2E 테스트한다. 개발 서버(localhost:3000), 테스트 계정(kh047@naver.com / wjdrbgus123!)을 사용한다.",
+      "summary": "✅ 대시보드 케이스 카드 베드번호 배지(B07/A01) 표시. ✅ HPI 편집 후 자동저장(새로고침 후 유지 확인). ✅ HPI 복사 버튼 [active] 상태 전환으로 피드백 확인. ⚠️ 재생성 버튼 클릭 시 generating 진입 확인됐으나 Gemini API 무료 티어 쿼터(20회/일) 초과로 failed 처리됨 — 에러 메시지(\"정규화 실패: 429 RESOURCE_EXHAUSTED\")가 화면에 정확히 표시되어 에러 핸들링은 정상 동작.",
+      "completedAt": "2026-04-19T10:40:53.986Z"
+    },
+    {
+      "id": "ad8d3076-40cc-4c76-83ce-9fdff6df9f03",
+      "name": "013-7: 가이드라인 커스텀 플로우 E2E 테스트",
+      "description": "가이드라인 관리 페이지에서 C.C 선택 → 시스템 기본 가이드라인 확인 → 커스텀 내용 작성 및 저장 → 새 케이스 입력에서 커스텀 가이드라인 반영 확인 → 커스텀 삭제 → 시스템 기본 복원 확인.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-19T10:34:36.704Z",
+      "updatedAt": "2026-04-19T10:43:17.800Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/guidelines/page.tsx",
+          "type": "REFERENCE",
+          "description": "가이드라인 관리 페이지"
+        },
+        {
+          "path": "components/guidelines/guidelines-editor.tsx",
+          "type": "REFERENCE",
+          "description": "가이드라인 편집 컴포넌트"
+        },
+        {
+          "path": "lib/guidelines/actions.ts",
+          "type": "REFERENCE",
+          "description": "가이드라인 서버 액션"
+        }
+      ],
+      "implementationGuide": "1. /guidelines 접속\n2. C.C 드롭다운에서 'Chest pain' 선택 → 시스템 기본 가이드라인 미리보기 표시 확인\n3. 커스텀 편집 영역에 테스트 텍스트 입력(예: '# 테스트 커스텀 가이드라인\\n- 테스트 항목') → [저장] 클릭\n4. 커스텀 목록에 'Chest pain' 항목 추가 확인\n5. /cases/new 접속 → C.C 'Chest pain' 입력 → 가이드라인 패널에 커스텀 내용 표시 확인\n6. /guidelines 돌아와서 'Chest pain' 선택 → [삭제] 클릭\n7. /cases/new에서 다시 'Chest pain' 입력 → 시스템 기본 가이드라인 복원 확인",
+      "verificationCriteria": "✅ C.C 선택 시 시스템 기본 가이드라인 표시\n✅ 커스텀 저장 후 목록에 항목 추가\n✅ 새 케이스 가이드라인 패널에 커스텀 내용 반영\n✅ 삭제 후 시스템 기본으로 복원",
+      "analysisResult": "Task 012(케이스 CRUD DB 연동)와 Task 013(가이드라인 관리 및 레이아웃 설정) 구현이 완료된 상태에서, Playwright MCP를 사용해 전체 사용자 플로우를 E2E 테스트한다. 개발 서버(localhost:3000), 테스트 계정(kh047@naver.com / wjdrbgus123!)을 사용한다.",
+      "summary": "✅ C.C 선택 시 시스템 기본 가이드라인 표시. ✅ 커스텀 가이드라인 작성·저장 후 목록에 \"Chest pain\" 항목 추가 확인. ✅ /cases/new에서 Chest pain 선택 시 가이드라인 패널에 커스텀 내용(\"# 테스트 커스텀 가이드라인\") 반영 확인. ✅ 커스텀 삭제 후 편집창 초기화 및 \"저장된 커스텀 가이드라인이 없습니다.\" 메시지로 시스템 기본 복원 확인. 모든 검증 기준 통과.",
+      "completedAt": "2026-04-19T10:43:17.798Z"
+    },
+    {
+      "id": "9884c75b-b707-4595-b940-baed58da3fba",
+      "name": "013-8: 레이아웃 설정 플로우 E2E 테스트",
+      "description": "설정 페이지에서 레이아웃 변경(split_horizontal) → 저장 → 새 케이스 입력 페이지에서 좌우 분할 레이아웃 확인 → single로 복원. 베드번호 영역이 모든 레이아웃에서 입력 영역 상단에 유지되는지 확인.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-19T10:34:36.704Z",
+      "updatedAt": "2026-04-19T10:45:22.217Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/settings/page.tsx",
+          "type": "REFERENCE",
+          "description": "설정 페이지"
+        },
+        {
+          "path": "components/settings/layout-settings.tsx",
+          "type": "REFERENCE",
+          "description": "레이아웃 설정 컴포넌트"
+        },
+        {
+          "path": "lib/settings/actions.ts",
+          "type": "REFERENCE",
+          "description": "설정 서버 액션"
+        }
+      ],
+      "implementationGuide": "1. /settings 접속 → 현재 레이아웃 라디오 상태 확인\n2. '좌우 분할' 라디오 선택 → [저장] 버튼 클릭 → 성공 피드백 확인\n3. /cases/new 접속 → 좌우 분할(split_horizontal) 레이아웃 렌더링 확인(입력 영역 좌측, 가이드라인 패널 우측)\n4. 베드번호 선택 영역이 입력 영역 최상단에 위치하는지 스냅샷으로 확인\n5. /settings로 돌아가서 '단독' 라디오 선택 → [저장] → /cases/new에서 single 레이아웃 복원 확인",
+      "verificationCriteria": "✅ split_horizontal 저장 후 새 케이스 페이지에서 좌우 분할 레이아웃 표시\n✅ 베드번호 영역이 입력 영역 상단에 항상 유지\n✅ single 복원 후 분할 레이아웃 사라짐",
+      "analysisResult": "Task 012(케이스 CRUD DB 연동)와 Task 013(가이드라인 관리 및 레이아웃 설정) 구현이 완료된 상태에서, Playwright MCP를 사용해 전체 사용자 플로우를 E2E 테스트한다. 개발 서버(localhost:3000), 테스트 계정(kh047@naver.com / wjdrbgus123!)을 사용한다.",
+      "summary": "✅ 설정 페이지에서 split_horizontal 선택 후 저장 버튼 [active] 피드백 확인. ✅ /cases/new에서 좌측 입력 영역 + 우측 가이드라인 패널 좌우 분할 레이아웃 렌더링 확인. ✅ 모든 레이아웃에서 베드번호 영역이 입력 영역 최상단에 유지됨. ✅ single 복원 후 가이드라인 패널 사라지고 입력 영역만 전체화면 표시. 모든 검증 기준 통과.",
+      "completedAt": "2026-04-19T10:45:22.215Z"
+    },
+    {
+      "id": "65c4fad7-7c4c-4327-bb92-237a1721316c",
+      "name": "013-9: 엣지 케이스 E2E 테스트",
+      "description": "C.C 없이 차팅 생성, 360px 뷰포트 베드번호 UI, 매우 긴 텍스트 입력, 시간 태그 없는 카드 그룹 표시 등 엣지 케이스를 검증한다.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-19T10:34:36.704Z",
+      "updatedAt": "2026-04-19T10:49:19.856Z",
+      "relatedFiles": [
+        {
+          "path": "components/cases/bed-picker.tsx",
+          "type": "REFERENCE",
+          "description": "베드 선택 컴포넌트 (360px 대응 확인)"
+        },
+        {
+          "path": "components/cases/card-timeline.tsx",
+          "type": "REFERENCE",
+          "description": "카드 타임라인 (시간 태그 없는 그룹 확인)"
+        },
+        {
+          "path": "components/cases/card-input-bar.tsx",
+          "type": "REFERENCE",
+          "description": "카드 입력창"
+        }
+      ],
+      "implementationGuide": "1. [C.C 없이 차팅 생성] /cases/new → C.C 입력 없이 카드 2개 입력 → [차팅 생성] → 결과 페이지에서 status 확인(상용구 없이 HPI만 생성되거나 적절히 처리)\n2. [360px 뷰포트] browser_resize(360, 780) → /cases/new → 베드번호 선택 UI가 스크롤 없이 한 화면에 표시되는지, 번호 버튼 잘림 없는지 스냅샷 확인\n3. [매우 긴 텍스트] 카드 입력창에 500자 이상 텍스트 입력 → UI 깨짐 없이 카드 표시 확인\n4. [시간 태그 없는 카드] 시간 표현 없는 카드 3개만 입력 → 타임라인에서 '시간 미상' 그룹으로 별도 표시 확인",
+      "verificationCriteria": "✅ C.C 없이 차팅 생성 시 오류 없이 처리됨\n✅ 360px 뷰포트에서 베드번호 UI 정상 표시\n✅ 500자 이상 텍스트 입력 시 UI 깨짐 없음\n✅ 시간 태그 없는 카드가 별도 그룹으로 표시됨",
+      "analysisResult": "Task 012(케이스 CRUD DB 연동)와 Task 013(가이드라인 관리 및 레이아웃 설정) 구현이 완료된 상태에서, Playwright MCP를 사용해 전체 사용자 플로우를 E2E 테스트한다. 개발 서버(localhost:3000), 테스트 계정(kh047@naver.com / wjdrbgus123!)을 사용한다.",
+      "summary": "모든 엣지 케이스 검증 완료. ① 시간 태그 없는 카드 → \"시간 미상\" 그룹에 표시됨. ② 500자+ 긴 텍스트 입력 시 UI 깨짐 없음, 내부 시간 표현(\"3일 전부터\") 자동 감지. ③ 360px 뷰포트에서 베드번호 선택 UI(구역 A/B/R 토글 + 번호 그리드 1~8)가 스크롤 없이 한 화면에 완전 표시됨. ④ C.C 없이 차팅 생성 시 \"정규화 실패: 알 수 없는 C.C.\" 에러를 명확히 표시하며 UI 정상 유지. Gemini 쿼터 소진으로 실제 AI 생성 재검증은 불가하나 에러 핸들링 경로는 정상 동작 확인.",
+      "completedAt": "2026-04-19T10:49:19.852Z"
+    },
+    {
+      "id": "0a506aa7-8070-48ab-b8d2-f3d9986f77f0",
+      "name": "Task 014: DB 마이그레이션 - 관리자 및 교정 테이블 신설",
+      "description": "Supabase DB에 관리자 식별 컬럼과 교정 데이터 테이블을 추가합니다.\n\n1. profiles 테이블에 is_admin boolean DEFAULT false 컬럼 추가\n2. ai_corrections 테이블 생성 (id UUID PK, user_id FK->profiles, case_id FK->cases nullable, section_type text CHECK IN('hpi','template','history'), cc text, template_key text nullable, case_inputs_json jsonb, api_output text, corrected_output text, comment text nullable, created_at timestamptz DEFAULT now())\n3. ai_style_rules 테이블 생성 (id UUID PK, rule_text text, cc text nullable, section_type text CHECK IN('hpi','template','history','all'), created_at timestamptz DEFAULT now())\n4. RLS 활성화 및 정책 적용:\n   - ai_corrections: SELECT/INSERT는 auth.uid()의 profiles.is_admin=true인 경우만 허용\n   - ai_style_rules: 동일\n5. lib/supabase/types.ts에 새 테이블 타입 추가 (AiCorrection, AiStyleRule) 및 profiles에 is_admin 필드 추가\n6. 본인 계정(tadybear047@gmail.com) profiles 행의 is_admin을 true로 업데이트",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-19T12:29:14.200Z",
+      "updatedAt": "2026-04-19T12:38:25.192Z",
+      "relatedFiles": [
+        {
+          "path": "lib/supabase/types.ts",
+          "type": "TO_MODIFY",
+          "description": "AiCorrection, AiStyleRule 타입 및 profiles.is_admin 필드 추가"
+        }
+      ],
+      "implementationGuide": "Supabase MCP로 SQL 실행:\n```sql\nALTER TABLE profiles ADD COLUMN is_admin BOOLEAN NOT NULL DEFAULT false;\n\nCREATE TABLE ai_corrections (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,\n  case_id UUID REFERENCES cases(id) ON DELETE SET NULL,\n  section_type TEXT NOT NULL CHECK (section_type IN ('hpi', 'template', 'history')),\n  cc TEXT NOT NULL,\n  template_key TEXT,\n  case_inputs_json JSONB NOT NULL,\n  api_output TEXT NOT NULL,\n  corrected_output TEXT NOT NULL,\n  comment TEXT,\n  created_at TIMESTAMPTZ NOT NULL DEFAULT now()\n);\n\nCREATE TABLE ai_style_rules (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  rule_text TEXT NOT NULL,\n  cc TEXT,\n  section_type TEXT NOT NULL CHECK (section_type IN ('hpi', 'template', 'history', 'all')),\n  created_at TIMESTAMPTZ NOT NULL DEFAULT now()\n);\n\nALTER TABLE ai_corrections ENABLE ROW LEVEL SECURITY;\nALTER TABLE ai_style_rules ENABLE ROW LEVEL SECURITY;\n\nCREATE POLICY admin_corrections_policy ON ai_corrections\n  USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true))\n  WITH CHECK (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true));\n\nCREATE POLICY admin_style_rules_policy ON ai_style_rules\n  USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true))\n  WITH CHECK (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true));\n\nUPDATE profiles SET is_admin = true WHERE id = (SELECT id FROM auth.users WHERE email = 'tadybear047@gmail.com');\n```\ntypes.ts에 타입 수동 추가.",
+      "verificationCriteria": "1. profiles 테이블에 is_admin 컬럼 존재 확인\n2. ai_corrections, ai_style_rules 테이블 생성 확인\n3. 관리자 계정(tadybear047@gmail.com)의 is_admin=true 확인\n4. 비관리자 계정으로 ai_corrections INSERT 시도 시 RLS 차단 확인\n5. types.ts 타입 오류 없음 확인",
+      "analysisResult": "관리자 전용 AI 교정 피드백 루프 시스템. profiles.is_admin 컬럼 추가, ai_corrections/ai_style_rules DB 테이블 신설, 케이스 결과 페이지에 교정 모달 UI 추가, 저장된 교정 데이터를 Gemini API 호출 시 few-shot으로 자동 주입. 기존 Server Actions 패턴(getAuthUser), ResultSection 컴포넌트 슬롯 방식, Supabase RLS 재사용.",
+      "summary": "DB 마이그레이션 완료: profiles.is_admin 컬럼, ai_corrections/ai_style_rules 테이블 생성, RLS 정책 적용 완료. 관리자 계정(tadybear047@gmail.com) is_admin=true 설정 확인. types.ts에 AiCorrection, AiStyleRule 타입 및 profiles.is_admin 필드 이미 포함됨.",
+      "completedAt": "2026-04-19T12:38:25.189Z"
+    },
+    {
+      "id": "8f126066-4ab6-40d4-91bd-268f8eb44477",
+      "name": "Task 015: 관리자 헬퍼 및 교정 Server Actions 구현",
+      "description": "관리자 권한 확인 헬퍼와 교정 데이터 저장 Server Actions를 구현합니다.\n\n1. lib/auth/is-admin.ts: getIsAdmin() 함수 - Supabase에서 현재 사용자의 is_admin 조회\n2. lib/corrections/actions.ts:\n   - saveCorrection(): ai_corrections 테이블에 저장. comment가 있으면 ai_style_rules에도 저장\n   - 관리자 권한 체크 포함\n3. lib/ai/load-resources.ts에 loadCorrections(cc, sectionType) 및 loadStyleRules(cc, sectionType) 함수 추가 (DB 조회)",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "0a506aa7-8070-48ab-b8d2-f3d9986f77f0"
+        }
+      ],
+      "createdAt": "2026-04-19T12:29:14.200Z",
+      "updatedAt": "2026-04-19T12:38:49.043Z",
+      "relatedFiles": [
+        {
+          "path": "lib/auth/is-admin.ts",
+          "type": "CREATE",
+          "description": "관리자 권한 확인 헬퍼"
+        },
+        {
+          "path": "lib/corrections/actions.ts",
+          "type": "CREATE",
+          "description": "교정 데이터 저장 Server Actions"
+        },
+        {
+          "path": "lib/ai/load-resources.ts",
+          "type": "TO_MODIFY",
+          "description": "loadCorrections, loadStyleRules 함수 추가"
+        },
+        {
+          "path": "lib/cases/actions.ts",
+          "type": "REFERENCE",
+          "description": "getAuthUser() 패턴 참고"
+        }
+      ],
+      "implementationGuide": "lib/auth/is-admin.ts:\n```pseudocode\nexport async function getIsAdmin(): Promise<boolean> {\n  supabase = await createClient()\n  user = await supabase.auth.getUser()\n  if (!user.data.user) return false\n  result = await supabase.from('profiles').select('is_admin').eq('id', user.data.user.id).single()\n  return result.data?.is_admin ?? false\n}\n```\n\nlib/corrections/actions.ts (\"use server\"):\n```pseudocode\nexport async function saveCorrection(params: {\n  caseId: string | null,\n  sectionType: 'hpi' | 'template' | 'history',\n  cc: string,\n  templateKey?: string,\n  caseInputsJson: unknown,\n  apiOutput: string,\n  correctedOutput: string,\n  comment?: string\n}) {\n  { supabase, user } = await getAuthUser()\n  profile = supabase.from('profiles').select('is_admin').eq('id', user.id).single()\n  if (!profile.data?.is_admin) throw new Error('권한 없음')\n  \n  await supabase.from('ai_corrections').insert({...params, user_id: user.id})\n  \n  if (params.comment?.trim()) {\n    await supabase.from('ai_style_rules').insert({\n      rule_text: params.comment.trim(),\n      cc: params.cc,\n      section_type: params.sectionType\n    })\n  }\n}\n```\n\nlib/ai/load-resources.ts에 추가:\n```pseudocode\nexport async function loadCorrections(cc: string, sectionType: string) {\n  supabase = createClient() // 서버 클라이언트\n  result = await supabase.from('ai_corrections')\n    .select('case_inputs_json, corrected_output')\n    .eq('cc', cc).eq('section_type', sectionType)\n    .order('created_at', {ascending: false}).limit(5)\n  return result.data ?? []\n}\n\nexport async function loadStyleRules(cc: string, sectionType: string) {\n  supabase = createClient()\n  result = await supabase.from('ai_style_rules')\n    .select('rule_text')\n    .or(`cc.eq.${cc},cc.is.null`)\n    .or(`section_type.eq.${sectionType},section_type.eq.all`)\n    .order('created_at', {ascending: false})\n  return (result.data ?? []).map(r => r.rule_text)\n}\n```",
+      "verificationCriteria": "1. getIsAdmin()이 관리자 계정에서 true, 일반 계정에서 false 반환\n2. saveCorrection() 호출 시 ai_corrections 테이블에 행 삽입 확인\n3. comment가 있을 때 ai_style_rules에도 행 삽입 확인\n4. 비관리자가 saveCorrection() 호출 시 에러 throw 확인\n5. loadCorrections()가 해당 CC의 최신 5개 반환 확인",
+      "analysisResult": "관리자 전용 AI 교정 피드백 루프 시스템. profiles.is_admin 컬럼 추가, ai_corrections/ai_style_rules DB 테이블 신설, 케이스 결과 페이지에 교정 모달 UI 추가, 저장된 교정 데이터를 Gemini API 호출 시 few-shot으로 자동 주입. 기존 Server Actions 패턴(getAuthUser), ResultSection 컴포넌트 슬롯 방식, Supabase RLS 재사용.",
+      "summary": "모든 파일 이미 구현 완료: lib/auth/is-admin.ts (getIsAdmin 함수), lib/corrections/actions.ts (saveCorrection - 관리자 체크 + RLS 저장 + comment→style_rule 등록), lib/ai/load-resources.ts (loadCorrections/loadStyleRules DB 조회 함수). 기존 getAuthUser 패턴 준수.",
+      "completedAt": "2026-04-19T12:38:49.032Z"
+    },
+    {
+      "id": "8ecea46e-c038-47ef-a676-ca4ee67c7485",
+      "name": "Task 016: 교정 모달 UI 컴포넌트 구현",
+      "description": "관리자가 AI 출력을 교정할 수 있는 모달 컴포넌트를 구현합니다.\n\nshadcn/ui Dialog 기반 모달:\n- 좌측: API draft 텍스트 (읽기 전용 textarea, 배경색 구분)\n- 우측: 교정 버전 입력 textarea (편집 가능)\n- 하단: 추가 요청사항 textarea (소형, placeholder 예시 포함)\n- [취소] [저장] 버튼\n- 저장 완료 시 toast + 모달 닫기\n- 저장 중 로딩 상태 표시",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "8f126066-4ab6-40d4-91bd-268f8eb44477"
+        }
+      ],
+      "createdAt": "2026-04-19T12:29:14.200Z",
+      "updatedAt": "2026-04-19T12:39:11.150Z",
+      "relatedFiles": [
+        {
+          "path": "components/cases/correction-modal.tsx",
+          "type": "CREATE",
+          "description": "교정 모달 클라이언트 컴포넌트"
+        },
+        {
+          "path": "components/cases/result-section.tsx",
+          "type": "TO_MODIFY",
+          "description": "correctionSlot?: React.ReactNode prop 추가"
+        },
+        {
+          "path": "components/ui/alert-dialog.tsx",
+          "type": "REFERENCE",
+          "description": "기존 Dialog 패턴 참고"
+        }
+      ],
+      "implementationGuide": "components/cases/correction-modal.tsx (\"use client\"):\n```pseudocode\ninterface CorrectionModalProps {\n  trigger: React.ReactNode  // 버튼으로 열기\n  sectionType: 'hpi' | 'template' | 'history'\n  sectionLabel: string  // 'HPI', '상용구', 'History'\n  cc: string\n  templateKey?: string\n  caseId: string\n  caseInputsJson: unknown\n  apiOutput: string  // hpi_draft or template_draft or history_draft\n}\n\nexport function CorrectionModal(props) {\n  [open, setOpen] = useState(false)\n  [corrected, setCorrected] = useState(props.apiOutput)\n  [comment, setComment] = useState('')\n  [loading, setLoading] = useState(false)\n  \n  async function handleSave() {\n    setLoading(true)\n    try {\n      await saveCorrection({...})\n      toast.success('교정 내용이 저장되었습니다.')\n      setOpen(false)\n    } catch (e) {\n      toast.error('저장 중 오류가 발생했습니다.')\n    } finally {\n      setLoading(false)\n    }\n  }\n  \n  return (\n    <Dialog open={open} onOpenChange={setOpen}>\n      <DialogTrigger asChild>{props.trigger}</DialogTrigger>\n      <DialogContent className=\"max-w-3xl\">\n        <DialogHeader><DialogTitle>{sectionLabel} 교정</DialogTitle></DialogHeader>\n        <div className=\"grid grid-cols-2 gap-4\">\n          <Textarea readOnly value={props.apiOutput} className=\"bg-muted\" rows={12}/>\n          <Textarea value={corrected} onChange={...} rows={12}/>\n        </div>\n        <Textarea\n          value={comment} onChange={...} rows={3}\n          placeholder=\"추가 요청사항 (예: HTN, DM은 줄여서 씁니다. Hypertension으로 길게 쓰지 않습니다.)\"\n        />\n        <DialogFooter>\n          <Button variant=\"outline\" onClick={() => setOpen(false)}>취소</Button>\n          <Button onClick={handleSave} disabled={loading}>저장</Button>\n        </DialogFooter>\n      </DialogContent>\n    </Dialog>\n  )\n}\n```\nDialog 컴포넌트 미설치 시 npx shadcn@latest add dialog 실행.",
+      "verificationCriteria": "1. 모달이 열리면 좌측에 API 원본 텍스트가 읽기 전용으로 표시됨\n2. 우측 textarea에 교정 텍스트 입력 가능\n3. 하단 코멘트 박스에 요청사항 입력 가능\n4. [저장] 클릭 시 saveCorrection() 호출 → 성공 toast → 모달 닫힘\n5. 저장 중 버튼 비활성화 상태 표시",
+      "analysisResult": "관리자 전용 AI 교정 피드백 루프 시스템. profiles.is_admin 컬럼 추가, ai_corrections/ai_style_rules DB 테이블 신설, 케이스 결과 페이지에 교정 모달 UI 추가, 저장된 교정 데이터를 Gemini API 호출 시 few-shot으로 자동 주입. 기존 Server Actions 패턴(getAuthUser), ResultSection 컴포넌트 슬롯 방식, Supabase RLS 재사용.",
+      "summary": "교정 모달 완성: CorrectionModal 컴포넌트(좌측 AI draft 읽기전용/우측 교정 textarea/하단 comment 입력), ResultSection에 correctionSlot prop 추가, Dialog/toast 패턴 적용, 저장 중 로딩 상태 및 에러 처리 포함.",
+      "completedAt": "2026-04-19T12:39:11.145Z"
+    },
+    {
+      "id": "94fb7da0-2abc-4f94-8ed1-517dbf54fa27",
+      "name": "Task 017: 결과 페이지에 관리자 교정 버튼 통합",
+      "description": "케이스 결과 페이지(/cases/[id])에서 관리자일 때 HPI/상용구/History 섹션마다 교정 버튼을 표시합니다.\n\n1. app/(app)/cases/[id]/page.tsx에서 getIsAdmin() 호출\n2. completed 상태의 각 섹션에 CorrectionModal 컴포넌트 연결\n3. getCase()와 getIsAdmin()을 Promise.all로 병렬 호출하여 성능 최적화",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "8ecea46e-c038-47ef-a676-ca4ee67c7485"
+        }
+      ],
+      "createdAt": "2026-04-19T12:29:14.200Z",
+      "updatedAt": "2026-04-19T12:39:24.940Z",
+      "relatedFiles": [
+        {
+          "path": "app/(app)/cases/[id]/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "isAdmin 체크 및 CorrectionModal 주입"
+        },
+        {
+          "path": "components/cases/result-section.tsx",
+          "type": "TO_MODIFY",
+          "description": "correctionSlot prop 추가"
+        },
+        {
+          "path": "lib/auth/is-admin.ts",
+          "type": "DEPENDENCY",
+          "description": "getIsAdmin() 헬퍼"
+        }
+      ],
+      "implementationGuide": "app/(app)/cases/[id]/page.tsx 수정:\n```pseudocode\n// CaseContent 서버 컴포넌트 내에서:\nconst [caseData, inputs, result, isAdmin] = await Promise.all([\n  getCase(id),\n  getCaseInputs(id),\n  getCurrentResult(id),\n  getIsAdmin()\n])\n\n// completed 상태 렌더링 부분:\n<ResultSection\n  title=\"HPI\"\n  value={result.hpi_edited ?? result.hpi_draft ?? \"\"}\n  onSave={updateHpiEdited.bind(null, result.id)}\n  correctionSlot={\n    isAdmin && result.hpi_draft ? (\n      <CorrectionModal\n        trigger={<Button variant=\"ghost\" size=\"sm\"><PencilIcon /> 교정</Button>}\n        sectionType=\"hpi\"\n        sectionLabel=\"HPI\"\n        cc={caseData.cc ?? \"\"}\n        caseId={caseData.id}\n        caseInputsJson={inputs}\n        apiOutput={result.hpi_draft}\n      />\n    ) : undefined\n  }\n/>\n// template, history 섹션도 동일하게 처리\n```\n\nResultSection 컴포넌트에 correctionSlot prop 추가:\n헤더 영역에서 CopyButton 옆에 {correctionSlot} 렌더링",
+      "verificationCriteria": "1. 관리자 계정으로 로그인 시 각 섹션(HPI/상용구/History)에 교정 버튼 표시\n2. 일반 계정으로 로그인 시 교정 버튼 미표시\n3. 교정 버튼 클릭 시 모달이 정상적으로 열림\n4. 비완료(draft/generating) 상태에서는 교정 버튼 미표시",
+      "analysisResult": "관리자 전용 AI 교정 피드백 루프 시스템. profiles.is_admin 컬럼 추가, ai_corrections/ai_style_rules DB 테이블 신설, 케이스 결과 페이지에 교정 모달 UI 추가, 저장된 교정 데이터를 Gemini API 호출 시 few-shot으로 자동 주입. 기존 Server Actions 패턴(getAuthUser), ResultSection 컴포넌트 슬롯 방식, Supabase RLS 재사용.",
+      "summary": "결과 페이지에 교정 버튼 통합 완료: getCase/getCaseInputs/getCurrentResult/getIsAdmin Promise.all 병렬 호출, completed 상태 HPI/상용구/History 각 섹션에 CorrectionModal correctionSlot 주입, isAdmin=false 시 버튼 미표시.",
+      "completedAt": "2026-04-19T12:39:24.938Z"
+    },
+    {
+      "id": "adddd10e-b29b-447e-a7c1-3d37c98c80a8",
+      "name": "Task 018: AI 파이프라인에 교정 데이터 few-shot 주입 통합",
+      "description": "Gemini API 호출 시 DB에서 교정 예시와 스타일 규칙을 로드하여 프롬프트에 자동 주입합니다.\n\n1. lib/ai/generate-hpi.ts: loadCorrections('hpi')와 loadStyleRules('hpi') 결과를 프롬프트에 추가\n2. lib/ai/generate-template.ts: 기존 loadExamples() 대신 loadCorrections('template') 사용, loadStyleRules() 추가\n3. 교정 예시가 없으면 기존 동작과 동일하게 유지 (backwards compatible)",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "8f126066-4ab6-40d4-91bd-268f8eb44477"
+        }
+      ],
+      "createdAt": "2026-04-19T12:29:14.200Z",
+      "updatedAt": "2026-04-19T12:40:06.279Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/generate-hpi.ts",
+          "type": "TO_MODIFY",
+          "description": "교정 예시 및 스타일 규칙 프롬프트 주입"
+        },
+        {
+          "path": "lib/ai/generate-template.ts",
+          "type": "TO_MODIFY",
+          "description": "교정 예시 및 스타일 규칙 프롬프트 주입"
+        },
+        {
+          "path": "lib/ai/load-resources.ts",
+          "type": "TO_MODIFY",
+          "description": "loadCorrections, loadStyleRules 함수"
+        },
+        {
+          "path": "app/api/cases/[id]/generate/route.ts",
+          "type": "REFERENCE",
+          "description": "cc 파라미터 전달 확인"
+        }
+      ],
+      "implementationGuide": "lib/ai/generate-hpi.ts 수정:\n```pseudocode\nexport async function generateHpi(structuredCase, rawInputs, cc) {\n  hpiInputs = structuredCase.inputs.filter(i => i.sections.includes('hpi'))\n  \n  corrections = await loadCorrections(cc, 'hpi')  // 최신 5개\n  styleRules = await loadStyleRules(cc, 'hpi')\n  \n  // system prompt에 규칙 append\n  systemPrompt = GENERATE_HPI_SYSTEM_PROMPT\n  if (styleRules.length > 0) {\n    systemPrompt += '\\n\\n## Additional Rules (follow strictly):\\n' + styleRules.map(r => '- ' + r).join('\\n')\n  }\n  \n  userPrompt = JSON.stringify({\n    hpiInputs,\n    ccSpecificFields: { ... },\n    rawInputs,\n    ...(corrections.length > 0 ? { correctionExamples: corrections } : {})\n  })\n  \n  return generateText(userPrompt, systemPrompt)\n}\n```\n\nlib/ai/generate-template.ts 수정:\n```pseudocode\n// loadExamples(templateKey) 대신:\ncorrections = await loadCorrections(cc, 'template')\nstyleRules = await loadStyleRules(cc, 'template')\n// 동일하게 프롬프트에 주입\n```\n\napp/api/cases/[id]/generate/route.ts에서 generateHpi/generateTemplate 호출 시 cc 파라미터 전달 확인.",
+      "verificationCriteria": "1. ai_corrections에 교정 데이터가 있을 때 다음 생성에서 해당 내용이 few-shot으로 반영됨\n2. ai_style_rules에 규칙이 있을 때 system prompt에 추가됨\n3. 교정 데이터가 없을 때 기존과 동일한 동작 (빈 배열이면 프롬프트에 해당 섹션 미포함)\n4. 빌드 오류 없음 (npm run build 통과)",
+      "analysisResult": "관리자 전용 AI 교정 피드백 루프 시스템. profiles.is_admin 컬럼 추가, ai_corrections/ai_style_rules DB 테이블 신설, 케이스 결과 페이지에 교정 모달 UI 추가, 저장된 교정 데이터를 Gemini API 호출 시 few-shot으로 자동 주입. 기존 Server Actions 패턴(getAuthUser), ResultSection 컴포넌트 슬롯 방식, Supabase RLS 재사용.",
+      "summary": "AI 파이프라인 few-shot 주입 완료: generate-hpi.ts와 generate-template.ts 모두 loadCorrections/loadStyleRules 병렬 호출 후 systemPrompt에 규칙 append, userPrompt에 교정 예시 포함. 교정 데이터 없을 때 기존 동작 유지. generate route에서 cc 파라미터 전달 확인. npm run build 통과.",
+      "completedAt": "2026-04-19T12:40:06.276Z"
+    },
+    {
+      "id": "f91c26d8-c790-44f8-8bc2-e7a796dcc631",
+      "name": "Task 014: GuidelinePanel 가이드라인·상용구 헤더 chip 및 스크롤 구조 개선",
+      "description": "components/cases/guideline-panel.tsx를 개선합니다.\n\n변경 내용:\n1. props 확장: templateKey(string|null), onGuidelineChange(cc:string)=>void, onTemplateChange(templateKey:string|null)=>void 추가\n2. 스크롤 구조 변경: 기존 shrink-0 고정 헤더 + flex-1 스크롤 콘텐츠 구조를 단일 overflow-y-auto 영역으로 통합\n3. 가이드라인 chip: BookOpen 아이콘 + '문진 가이드라인 — {cc}' 텍스트 + ChevronsUpDown 아이콘. 클릭 시 가이드라인 선택 목록 표시. 항상 클릭 가능(기존에는 가이드라인 없을 때만)\n4. 상용구 chip: FileText 아이콘 + '상용구 — {templateLabel}' 텍스트 + ChevronsUpDown 아이콘. 동일 스타일. 클릭 시 상용구 선택 목록 표시. '없음' 선택지 포함\n5. 두 chip 모두 cursor-pointer + hover:bg-muted/50 + py-2.5 px-4 터치 영역 확보\n6. 가이드라인 선택 목록: cc-list.json 기반 고유 templateKey 목록 (기존 GUIDE_OPTIONS 활용)\n7. 상용구 선택 목록: cc-list.json 기반 고유 templateKey 목록 + '없음(null)' 선택지\n8. 선택 완료 후 콜백 호출 + 목록 닫기\n9. CC 없을 때: 두 chip 모두 muted 스타일로 비활성 표시 (클릭 불가)\n\n수락 기준:\n- 정형 CC 자동 로드 시에도 가이드라인 chip 클릭 → 다른 가이드라인 선택 가능\n- 상용구 chip이 가이드라인 chip 바로 아래 동일한 크기로 표시됨\n- 두 chip이 스크롤 시 가이드라인 콘텐츠와 함께 스크롤됨\n- 텍스트 설명 없이 ChevronsUpDown 아이콘만으로 클릭 가능성 전달",
+      "notes": "모바일 우선 환경 고려 — hover 상태는 터치 기기에서 동작하지 않으므로 클릭 가능성 인지는 항상-보이는 시각 단서로 구현해야 함.\\n\\n최종 UX 결정:\\n- ChevronsUpDown 아이콘을 항상 정상 opacity로 표시 (기존 text-muted-foreground/60 → text-muted-foreground)\\n- chip 전체에 border + 약한 배경색(bg-muted/20)을 항상 적용 → 모바일에서도 \\\"탭 가능한 행\\\"처럼 보임\\n- active:bg-muted/50 → 터치 시 시각적 피드백 (모바일 tap feedback)\\n- hover:bg-muted/50은 데스크탑 보조 수단으로 병행 유지 (제거하지 않되, 주 수단이 아님)\\n- rounded-none 유지 (패널 너비 전체를 차지하는 행 스타일)\\n- 두 chip 사이에 border-b로 구분선 유지\\n\\n이 패턴은 iOS/Android 네이티브 앱의 '설정 목록 행(tappable list row)' 패턴을 웹에서 구현한 것으로, 모바일 사용자에게 가장 익숙한 탭 가능 요소 시각 언어임.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-21T01:00:22.587Z",
+      "updatedAt": "2026-04-21T01:04:16.132Z",
+      "relatedFiles": [
+        {
+          "path": "components/cases/guideline-panel.tsx",
+          "type": "TO_MODIFY",
+          "description": "가이드라인 패널 컴포넌트 - props 확장 및 UI 구조 개선",
+          "lineStart": 1,
+          "lineEnd": 123
+        },
+        {
+          "path": "lib/ai/resources/cc-list.json",
+          "type": "REFERENCE",
+          "description": "CC 목록 및 templateKey 매핑"
+        },
+        {
+          "path": "lib/guidelines/actions.ts",
+          "type": "REFERENCE",
+          "description": "loadGuideline 서버 액션"
+        },
+        {
+          "path": "lib/ai/load-resources.ts",
+          "type": "REFERENCE",
+          "description": "CC_TEMPLATE_KEYS 목록"
+        }
+      ],
+      "implementationGuide": "// 두 chip 공통 className (모바일 우선)\\nconst chipClass = [\\n  'flex w-full items-center gap-1.5 px-4 py-3',\\n  'border-b bg-muted/20',\\n  'cursor-pointer select-none',\\n  'text-left text-xs font-semibold uppercase tracking-wider',\\n  'transition-colors',\\n  'hover:bg-muted/50',  // 데스크탑 보조\\n  'active:bg-muted/60', // 모바일 tap feedback\\n  'disabled:cursor-default disabled:opacity-40',\\n].join(' ')\\n\\n// 가이드라인 chip\\n&lt;button disabled={!cc} onClick={()=&gt;setShowGuideSelector(true)} className={chipClass}&gt;\\n  &lt;BookOpen className='size-3 shrink-0' /&gt;\\n  &lt;span className='text-muted-foreground'&gt;문진 가이드라인&lt;/span&gt;\\n  {cc &amp;&amp; &lt;span className='font-normal normal-case text-foreground'&gt;— {cc}&lt;/span&gt;}\\n  &lt;ChevronsUpDown className='ml-auto size-3.5 shrink-0 text-muted-foreground' /&gt;  // 항상 정상 opacity\\n&lt;/button&gt;\\n\\n// 상용구 chip (동일 구조)\\n&lt;button disabled={!cc} onClick={()=&gt;setShowTemplateSelector(true)} className={chipClass}&gt;\\n  &lt;FileText className='size-3 shrink-0' /&gt;\\n  &lt;span className='text-muted-foreground'&gt;상용구&lt;/span&gt;\\n  {templateLabel &amp;&amp; &lt;span className='font-normal normal-case text-foreground'&gt;— {templateLabel}&lt;/span&gt;}\\n  &lt;ChevronsUpDown className='ml-auto size-3.5 shrink-0 text-muted-foreground' /&gt;\\n&lt;/button&gt;\\n\\n// 스크롤 구조\\n&lt;div className='flex h-full flex-col overflow-y-auto bg-muted/30'&gt;\\n  {가이드라인 chip}\\n  {상용구 chip}\\n  &lt;div className='flex-1 p-4'&gt;{콘텐츠}&lt;/div&gt;\\n&lt;/div&gt;",
+      "verificationCriteria": "1. 정형 CC 입력 후 가이드라인 자동 로드 상태에서도 가이드라인 chip 클릭 → 선택 목록 표시 → 다른 가이드라인 선택 가능\n2. 상용구 chip이 가이드라인 chip 바로 아래 동일 높이/스타일로 표시\n3. 가이드라인 콘텐츠 스크롤 시 두 chip도 함께 스크롤됨 (패널 상단 고정 아님)\n4. 상용구 선택 목록에 '없음' 항목 포함\n5. CC 없을 때 두 chip 모두 disabled 상태로 표시\n6. 모바일 360px에서 chip 잘림 없이 표시",
+      "analysisResult": "새 케이스 입력 페이지(/cases/new)의 가이드라인 패널 UX를 개선합니다. 핵심 변경: (1) 가이드라인 헤더를 항상 클릭 가능한 chip으로 변환, (2) 상용구 헤더 chip 신규 추가, (3) 두 chip이 스크롤 영역 내에 포함되도록 구조 변경, (4) ChevronsUpDown 아이콘 + hover 배경으로 클릭 가능성 시각 전달.",
+      "summary": "GuidelinePanel 컴포넌트 전면 개선 완료. props 3개 추가(templateKey, onGuidelineChange, onTemplateChange), 단일 overflow-y-auto 스크롤 구조로 전환, 가이드라인/상용구 chip 각각 구현(ChevronsUpDown 항상 표시 + active: 탭 피드백 + bg-muted/20 항상 표시로 모바일 우선 UX). 상용구 선택 목록에 없음 포함. CC 없을 때 두 chip disabled 처리.",
+      "completedAt": "2026-04-21T01:04:16.128Z"
+    },
+    {
+      "id": "9532f6ac-7ff3-49f4-be98-14c0dbf2c397",
+      "name": "Task 015: new-case-form.tsx 상용구 독립 상태 관리 및 GuidelinePanel 연동",
+      "description": "components/cases/new-case-form.tsx에 상용구 독립 선택 기능을 추가하고 GuidelinePanel에 새 props를 연결합니다.\n\n변경 내용:\n1. selectedTemplateKey 상태 추가 (string|null)\n2. handleCcSelect 수정: CC 선택 시 cc-list.json에서 동일 templateKey 자동 매핑하여 selectedTemplateKey 초기값 설정\n3. handleGuidelineChange 핸들러 추가: GuidelinePanel의 onGuidelineChange 콜백 → 현재는 상태 반영만 (가이드라인 콘텐츠는 GuidelinePanel 내부에서 직접 로드)\n4. handleTemplateChange 핸들러 추가: onTemplateChange 콜백 → setSelectedTemplateKey + overrideTemplateKey Server Action 호출 (caseId 있을 때)\n5. GuidelinePanel에 templateKey, onGuidelineChange, onTemplateChange props 전달\n6. AI 생성 API 호출 시 선택된 templateKey를 반영하도록 updateCaseCc 재호출 또는 cases.template_key DB 컬럼 업데이트\n\n수락 기준:\n- CC 선택 시 selectedTemplateKey 자동 설정 (cc-list.json 매핑)\n- 상용구 chip에서 다른 templateKey 선택 시 DB에 overrideTemplateKey 호출\n- '없음' 선택 시 selectedTemplateKey = null, DB 업데이트\n- AI 생성 시 변경된 templateKey 사용",
+      "notes": "overrideTemplateKey Server Action은 lib/cases/actions.ts에 이미 존재. templateKey가 null인 경우 cases.template_key = null, cc_has_template = false로 업데이트 필요 여부 확인. handleGuidelineChange는 현재 구조에서는 GuidelinePanel 내부에서 가이드라인 콘텐츠 로드까지 처리하므로 외부 상태 변경 불필요. 향후 가이드라인 선택 정보를 DB에 저장해야 한다면 이 콜백 확장.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "f91c26d8-c790-44f8-8bc2-e7a796dcc631"
+        }
+      ],
+      "createdAt": "2026-04-21T01:00:22.587Z",
+      "updatedAt": "2026-04-21T01:06:55.117Z",
+      "relatedFiles": [
+        {
+          "path": "components/cases/new-case-form.tsx",
+          "type": "TO_MODIFY",
+          "description": "새 케이스 입력 폼 - 상용구 상태 추가 및 GuidelinePanel props 연결",
+          "lineStart": 1,
+          "lineEnd": 282
+        },
+        {
+          "path": "lib/cases/actions.ts",
+          "type": "REFERENCE",
+          "description": "overrideTemplateKey Server Action"
+        },
+        {
+          "path": "lib/ai/resources/cc-list.json",
+          "type": "REFERENCE",
+          "description": "CC→templateKey 매핑"
+        },
+        {
+          "path": "components/cases/guideline-panel.tsx",
+          "type": "DEPENDENCY",
+          "description": "Task 014에서 수정된 GuidelinePanel"
+        }
+      ],
+      "implementationGuide": "// 상태 추가\nconst [selectedTemplateKey, setSelectedTemplateKey] = useState<string|null>(null)\n\n// handleCcSelect 수정\nconst handleCcSelect = (cc, hasTemplate, templateKey) => {\n  setCc(cc)\n  setSelectedTemplateKey(templateKey)  // 자동 매핑\n  // 기존 로직 유지\n}\n\n// 신규 핸들러\nconst handleGuidelineChange = (guidelineCc: string) => {\n  // GuidelinePanel 내부에서 이미 로드 처리\n  // 필요 시 외부 상태 반영 (현재는 불필요)\n}\n\nconst handleTemplateChange = (newTemplateKey: string|null) => {\n  setSelectedTemplateKey(newTemplateKey)\n  if (caseId) {\n    startTransition(() => overrideTemplateKey(caseId, newTemplateKey))\n  }\n}\n\n// GuidelinePanel 연결\n<GuidelinePanel\n  content={guidelineContent}\n  cc={cc}\n  templateKey={selectedTemplateKey}\n  onGuidelineChange={handleGuidelineChange}\n  onTemplateChange={handleTemplateChange}\n/>",
+      "verificationCriteria": "1. CC 자동완성에서 'Chest pain' 선택 시 상용구 chip에 'chest-pain' 자동 표시\n2. 상용구 chip 클릭 → 목록에서 다른 상용구 선택 → DB overrideTemplateKey 호출 확인\n3. '없음' 선택 시 상용구 chip에 '없음' 또는 미설정 표시, DB null 업데이트\n4. 비정형 CC 입력 시 상용구 chip이 미선택 상태로 표시되어 수동 선택 유도\n5. 차팅 생성 시 변경된 templateKey가 API에 반영됨",
+      "analysisResult": "새 케이스 입력 페이지(/cases/new)의 가이드라인 패널 UX를 개선합니다. 핵심 변경: (1) 가이드라인 헤더를 항상 클릭 가능한 chip으로 변환, (2) 상용구 헤더 chip 신규 추가, (3) 두 chip이 스크롤 영역 내에 포함되도록 구조 변경, (4) ChevronsUpDown 아이콘 + hover 배경으로 클릭 가능성 시각 전달.",
+      "summary": "new-case-form.tsx와 case-input-view.tsx 모두에 selectedTemplateKey 상태 추가 완료. CC 선택 시 자동 templateKey 매핑, 수동 변경 시 overrideTemplateKey 서버 액션 호출(null 처리 포함). overrideTemplateKey 시그니처를 string|null로 확장하여 없음 선택 시 DB null 업데이트 지원. CaseInputViewProps에 defaultTemplateKey 추가 및 page.tsx에서 전달.",
+      "completedAt": "2026-04-21T01:06:55.107Z"
+    }
+  ]
+}

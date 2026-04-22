@@ -20,7 +20,7 @@ const bedBadgeVariants = cva(
 
 interface BedBadgeProps extends VariantProps<typeof bedBadgeVariants> {
   bedZone: BedZone;
-  bedNumber: number;
+  bedNumber: number | null;
   className?: string;
 }
 
@@ -30,15 +30,17 @@ export function BedBadge({
   size,
   className,
 }: BedBadgeProps) {
+  if (bedNumber === null) return null;
   return (
     <span
       className={cn(
         bedBadgeVariants({ size }),
-        "bg-foreground text-background",
+        "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900",
         className
       )}
     >
-      {bedZone}-{bedNumber}
+      {bedZone}
+      {String(bedNumber).padStart(2, "0")}
     </span>
   );
 }

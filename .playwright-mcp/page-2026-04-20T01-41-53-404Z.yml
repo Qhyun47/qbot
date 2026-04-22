@@ -1,0 +1,45 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - button "메뉴 열기" [ref=e5] [cursor=pointer]:
+        - img
+      - link "ER Scribe" [ref=e6] [cursor=pointer]:
+        - /url: /dashboard
+      - button "Logout" [ref=e8] [cursor=pointer]
+    - main [ref=e9]:
+      - generic [ref=e177]:
+        - generic [ref=e178]:
+          - link "입력 화면" [ref=e179] [cursor=pointer]:
+            - /url: /cases/09f1368b-a8c9-4d67-9e55-fff83ff07268
+            - img
+            - text: 입력 화면
+          - button "베드번호 변경" [ref=e180] [cursor=pointer]:
+            - generic [ref=e181]: A01
+            - img [ref=e182]
+          - heading "C.C 미입력" [level=1] [ref=e186]
+          - generic [ref=e187]:
+            - img [ref=e188]
+            - text: 실패
+          - button "재생성" [ref=e192] [cursor=pointer]:
+            - img
+            - text: 재생성
+        - generic [ref=e193]:
+          - generic [ref=e196]:
+            - img [ref=e197]
+            - generic [ref=e199]:
+              - paragraph [ref=e200]: 차팅 생성 실패
+              - paragraph [ref=e201]: C.C.를 입력하면 다시 생성할 수 있습니다.
+            - generic [ref=e202]:
+              - 'textbox "예: Chest pain" [ref=e203]'
+              - button "재생성" [disabled]
+          - generic [ref=e205]:
+            - paragraph [ref=e207]: 입력 카드
+            - generic [ref=e213]: 흉통 호소
+            - generic [ref=e215]:
+              - textbox "문진 키워드를 입력하세요... (Enter 전송, Shift+Enter 줄바꿈)" [ref=e216]
+              - button "전송" [disabled]:
+                - img
+    - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e120] [cursor=pointer]:
+    - img [ref=e121]
+  - alert [ref=e124]

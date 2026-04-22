@@ -1,0 +1,42 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - button "메뉴 열기" [ref=e5] [cursor=pointer]:
+        - img
+      - link "ER Scribe" [ref=e6] [cursor=pointer]:
+        - /url: /dashboard
+      - button "Logout" [ref=e8] [cursor=pointer]
+    - main [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e11]:
+          - heading "가이드라인 관리" [level=1] [ref=e12]
+          - paragraph [ref=e13]: C.C.별 문진 가이드라인을 커스텀하세요. 커스텀 가이드라인이 시스템 기본보다 우선 적용됩니다.
+        - generic [ref=e14]:
+          - generic [ref=e15]:
+            - text: Chief Complaint 선택
+            - combobox "Chief Complaint 선택" [ref=e16] [cursor=pointer]:
+              - generic: Chest pain
+              - img
+          - generic [ref=e18]:
+            - generic [ref=e19]:
+              - generic [ref=e20]:
+                - paragraph [ref=e21]: 시스템 기본 가이드라인
+                - generic [ref=e22]: 읽기 전용
+              - generic [ref=e24]: "# Chest Pain 문진 가이드 ## 핵심 문진 항목 ### 통증 특성 - [ ] **Onset**: 언제부터? 갑자기(acute) vs 서서히(gradual)? - [ ] **Duration**: 얼마나 지속? 간헐적 vs 지속적? - [ ] **Location**: 어디가 아픈가? (left chest / substernal / right chest) - [ ] **Character**: 어떻게 아픈가? (squeezing / pressure / sharp / burning / stabbing) - [ ] **Radiation**: 방사통 있는가? (left arm / jaw / back / shoulder) - [ ] **Severity**: NRS 몇 점? ### 상황적 특성 - [ ] **Resting pain**: 쉬고 있을 때도 아픈가? - [ ] **Exertional pain**: 움직이면 더 아픈가? - [ ] **Aggravating/relieving factor**: 악화/완화 요인? - [ ] **NTG response**: NTG 투여했는가? 효과 있었는가? - [ ] **Ongoing**: 지금도 아픈가? ### 동반 증상 - [ ] Dyspnea - [ ] Diaphoresis (식은땀) - [ ] Nausea / Vomiting - [ ] Palpitation - [ ] Syncope / Presyncope - [ ] Fever / Chill ### 과거력 및 위험인자 - [ ] HTN, DM, Dyslipidemia, Smoking - [ ] 이전 ACS / CAG / PCI / CABG 이력 - [ ] 이전 유사 에피소드 --- ## 감별 진단 포인트 | 진단 | 주요 특징 | | --------------------------- | ------------------------------------------------------- | | **ACS** (UA/NSTEMI/STEMI) | Squeezing, 방사통, 운동 시 악화, diaphoresis | | **Aortic dissection** | Sudden onset tearing pain, back radiation, 양팔 BP 차이 | | **Pulmonary embolism** | Pleuritic chest pain + dyspnea + leg swelling | | **Pleuritis** | Sharp, 호흡 시 악화, 자세 변화에 영향 없음 | | **GERD / Esophageal spasm** | Burning, 식후 악화, NTG에 반응할 수 있음 | | **Costochondritis** | 누르면 재현되는 압통 | --- ## ⚠️ 위험 신호 (즉시 확인) - **Diaphoresis + chest pain** → ACS 강력 의심 - **Radiation to left arm / jaw** → ACS - **Sudden tearing pain + HTN 기저** → Aortic dissection - **Hypotension + tachycardia** → 심인성 쇼크, 대동맥 박리, 긴장성 기흉 - **New resting pain** → Unstable angina"
+            - generic [ref=e25]:
+              - paragraph [ref=e26]: 커스텀 가이드라인 편집
+              - textbox "Markdown 형식으로 커스텀 가이드라인을 작성하세요..." [ref=e27]
+              - generic [ref=e28]:
+                - button "저장" [disabled]:
+                  - img
+                  - text: 저장
+                - button "삭제" [disabled]:
+                  - img
+                  - text: 삭제
+          - generic [ref=e29]:
+            - paragraph [ref=e30]: 커스텀 설정 현황
+            - paragraph [ref=e32]: 저장된 커스텀 가이드라인이 없습니다.
+    - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e38] [cursor=pointer]:
+    - img [ref=e39]
+  - alert [ref=e42]

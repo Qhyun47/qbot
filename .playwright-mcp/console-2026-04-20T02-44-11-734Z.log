@@ -1,0 +1,35 @@
+[    9670ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ https://g2sh.me/kkyu/646897:0
+[   12143ms] [LOG] main: ensureInitialized - 3 @ https://g2sh.me/main.dart.js:52891
+[   12143ms] [LOG] Device: agent Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36 @ https://g2sh.me/main.dart.js:52891
+[   12168ms] [LOG] AppUpdate: old version 0.0.0, new 1.2.6 @ https://g2sh.me/main.dart.js:52891
+[   12171ms] [LOG] TokenMessageHandler: current tab id I2Fz067sR1 @ https://g2sh.me/main.dart.js:52891
+[   12174ms] [LOG] HiveManager: init @ https://g2sh.me/main.dart.js:52891
+[   12175ms] [LOG] HiveManager: remove db because encryption key is loss @ https://g2sh.me/main.dart.js:52891
+[   12176ms] [LOG] LogStore: ErrorLog(httpStatus: , errorCode: , message: , requestUri: , apiLog: , clientLog: 2026-04-20 11:44:23.909/HiveManager: remove db because encryption key is loss, traceId: , spanId: ) @ https://g2sh.me/main.dart.js:52891
+[   12176ms] [LOG] Delete sharing_file_box_1 // null from disk @ https://g2sh.me/main.dart.js:52891
+[   12186ms] [LOG] Delete history_box_1 // null from disk @ https://g2sh.me/main.dart.js:52891
+[   12191ms] [LOG] Delete keyword_box_1 // null from disk @ https://g2sh.me/main.dart.js:52891
+[   12197ms] [LOG] Delete room_box_1 // null from disk @ https://g2sh.me/main.dart.js:52891
+[   12221ms] [LOG] Got object store box in database sharing_file_box_1. @ https://g2sh.me/main.dart.js:52891
+[   12224ms] [LOG] Got object store box in database history_box_1. @ https://g2sh.me/main.dart.js:52891
+[   12225ms] [LOG] Got object store box in database keyword_box_1. @ https://g2sh.me/main.dart.js:52891
+[   12227ms] [LOG] Got object store box in database room_box_1. @ https://g2sh.me/main.dart.js:52891
+[   12233ms] [LOG] main: init global service - 91 @ https://g2sh.me/main.dart.js:52891
+[   12234ms] [LOG] main: set path url strategy - 0 @ https://g2sh.me/main.dart.js:52891
+[   12234ms] [LOG] main: select init page - 1 @ https://g2sh.me/main.dart.js:52891
+[   12235ms] [LOG] main: set deviceLocale - 0 @ https://g2sh.me/main.dart.js:52891
+[   12235ms] [LOG] main: Dropship server version prd @ https://g2sh.me/main.dart.js:52891
+[   12259ms] [LOG] RouterBloc: [ROUTE] platformInitialRoute=/kkyu/646897, isRestored=false @ https://g2sh.me/main.dart.js:52891
+[   12434ms] [LOG] RouterBloc: privacyPolicyState=PrivacyPolicyState.notAgreed @ https://g2sh.me/main.dart.js:52891
+[   12435ms] [LOG] RouterBloc: [ROUTE] pushedRouteBeforeInit=null @ https://g2sh.me/main.dart.js:52891
+[   12518ms] [LOG] TokenMessageHandler: getAccessToken(), no other tabs @ https://g2sh.me/main.dart.js:52891
+[   12519ms] [LOG] TokenMg: Refresh token expired @ https://g2sh.me/main.dart.js:52891
+[   12520ms] [LOG] UserRepository: Not sign in @ https://g2sh.me/main.dart.js:52891
+[   12522ms] [LOG] client: get download code k**46897 @ https://g2sh.me/main.dart.js:52891
+[   12786ms] [LOG] HistoryRepository: total 1, cur 1 @ https://g2sh.me/main.dart.js:52891
+[   14663ms] [LOG] SharingSvc: push kkyu646897, queue size:1, running: false @ https://g2sh.me/main.dart.js:52891
+[   15169ms] [LOG] SharingSvc: pop kkyu646897 true @ https://g2sh.me/main.dart.js:52891
+[   59066ms] [LOG] SharingSvc: push kkyu646897, queue size:1, running: false @ https://g2sh.me/main.dart.js:52891
+[   59568ms] [LOG] SharingSvc: pop kkyu646897 true @ https://g2sh.me/main.dart.js:52891
+[   92751ms] [LOG] SharingSvc: push kkyu646897, queue size:1, running: false @ https://g2sh.me/main.dart.js:52891
+[   93253ms] [LOG] SharingSvc: pop kkyu646897 true @ https://g2sh.me/main.dart.js:52891

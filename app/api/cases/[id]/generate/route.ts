@@ -1,30 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeInputs } from "@/lib/ai/normalize";
-import { generateHpi } from "@/lib/ai/generate-hpi";
+import { generatePi } from "@/lib/ai/generate-pi";
 import { generateTemplate } from "@/lib/ai/generate-template";
+import { generatePe } from "@/lib/ai/generate-pe";
+import { generateHistory, buildHistoryDraft } from "@/lib/ai/generate-history";
 import type { StructuredCase } from "@/lib/ai/types";
 import type { Json } from "@/lib/supabase/types";
 
-export const runtime = "nodejs";
 export const maxDuration = 60;
 
-const MODEL_VERSION = "gemini-2.5-flash";
-
-function buildHistoryDraft(structured: StructuredCase | null): string {
-  const past = structured?.past_history?.join(", ") || "(-)";
-  const med = structured?.medication_history?.join(", ") || "(-)";
-  const op = structured?.operation_history?.join(", ") || "(-)";
-  const family = structured?.family_history;
-
-  const lines = [`Past Hx. : ${past}`, `Med Hx. : ${med}`, `Op Hx. : ${op}`];
-
-  if (family && family.length > 0) {
-    lines.push(`Family Hx. : ${family.join(", ")}`);
-  }
-
-  return lines.join("\n");
-}
+const MODEL_VERSION = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
 
 export async function POST(
   _req: NextRequest,
@@ -38,6 +24,56 @@ export async function POST(
   } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: "인증이 필요합니다" }, { status: 401 });
+  }
+
+  // AI 사용 권한 확인 (관리자 또는 approved 상태만 허용)
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_admin, ai_access_status")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile?.is_admin && profile?.ai_access_status !== "approved") {
+    return NextResponse.json(
+      { error: "AI 사용 권한이 없습니다. 관리자 승인 후 이용 가능합니다." },
+      { status: 403 }
+    );
+  }
+
+  // 일일 사용량 + 연속 생성 방지 체크 (관리자는 무제한)
+  if (!profile?.is_admin) {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const tenSecondsAgo = new Date(Date.now() - 10_000);
+
+    const [{ count: todayCount }, { count: recentCount }] = await Promise.all([
+      supabase
+        .from("ai_usage_logs")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .gte("created_at", todayStart.toISOString()),
+      supabase
+        .from("ai_usage_logs")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .gte("created_at", tenSecondsAgo.toISOString()),
+    ]);
+
+    if ((todayCount ?? 0) >= 50) {
+      return NextResponse.json(
+        {
+          error:
+            "오늘 AI 차팅 생성 한도(50회)를 초과했습니다. 내일 다시 시도해주세요.",
+        },
+        { status: 429 }
+      );
+    }
+    if ((recentCount ?? 0) > 0) {
+      return NextResponse.json(
+        { error: "너무 빠른 재시도입니다. 잠시 후 다시 시도해주세요." },
+        { status: 429 }
+      );
+    }
   }
 
   const { data: caseRow } = await supabase
@@ -54,8 +90,18 @@ export async function POST(
     );
   }
 
-  // 동시 요청 중복 실행 방지
-  if (caseRow.status === "generating") {
+  // 원자적 CAS(Compare-and-Swap) 패턴으로 중복 실행 방지
+  // — 별도 체크 후 업데이트 방식은 레이스 컨디션 위험이 있으므로 단일 원자적 업데이트 사용
+  const { data: locked } = await supabase
+    .from("cases")
+    .update({ status: "generating" })
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .neq("status", "generating")
+    .select("id")
+    .single();
+
+  if (!locked) {
     return NextResponse.json(
       { error: "이미 생성 중인 케이스입니다" },
       { status: 409 }
@@ -70,8 +116,6 @@ export async function POST(
 
   const inputs = inputRows ?? [];
 
-  await supabase.from("cases").update({ status: "generating" }).eq("id", id);
-
   // Stage 1: 정규화 (실패 시 전체 failed)
   let structured: StructuredCase;
   try {
@@ -81,7 +125,8 @@ export async function POST(
         rawText: i.raw_text,
         timeTag: i.time_tag,
         timeOffsetMinutes: i.time_offset_minutes,
-      }))
+      })),
+      caseRow.template_key
     );
   } catch (e) {
     const errorMessage = `정규화 실패: ${e instanceof Error ? e.message : String(e)}`;
@@ -89,7 +134,8 @@ export async function POST(
       .from("case_results")
       .insert({
         case_id: id,
-        hpi_draft: "",
+        pi_draft: "",
+        pe_draft: "",
         template_draft: "",
         history_draft: buildHistoryDraft(null),
         structured_json: {} as Json,
@@ -109,40 +155,78 @@ export async function POST(
     return NextResponse.json({ error: "AI 정규화 단계 실패" }, { status: 500 });
   }
 
-  // Stage 2: HPI 생성 (실패 허용)
-  let hpiDraft = "";
+  // Stage 2: P.I 생성 (실패 허용 — 에러는 기록)
+  const cc = caseRow.cc ?? "";
+  let piDraft = "";
+  let piError: string | null = null;
   try {
-    hpiDraft = await generateHpi(
+    piDraft = await generatePi(
       structured,
-      inputs.map((i) => ({ rawText: i.raw_text, timeTag: i.time_tag }))
+      inputs.map((i) => ({ rawText: i.raw_text, timeTag: i.time_tag })),
+      cc
     );
-  } catch {
-    hpiDraft = "";
+  } catch (e) {
+    piError = e instanceof Error ? e.message : String(e);
+    console.error("[generate] Stage 2 P.I 실패:", piError);
   }
 
   // Stage 3: 상용구 생성 (cc_has_template && template_key 있을 때만, 실패 허용)
   let templateDraft = "";
+  let templateError: string | null = null;
   if (caseRow.cc_has_template && caseRow.template_key) {
     try {
-      templateDraft = await generateTemplate(structured, caseRow.template_key);
-    } catch {
-      templateDraft = "";
+      templateDraft = await generateTemplate(
+        structured,
+        caseRow.template_key,
+        cc
+      );
+    } catch (e) {
+      templateError = e instanceof Error ? e.message : String(e);
+      console.error("[generate] Stage 3 Template 실패:", templateError);
     }
   }
 
-  // Stage 4: History 추출 (AI 호출 없이 Stage 1 결과에서)
-  const historyDraft = buildHistoryDraft(structured);
+  // Stage 4: P/E 생성 (cc_has_template && template_key 있을 때만, 실패 허용)
+  let peDraft = "";
+  let peError: string | null = null;
+  if (caseRow.cc_has_template && caseRow.template_key) {
+    try {
+      peDraft = await generatePe(structured, caseRow.template_key, cc);
+    } catch (e) {
+      peError = e instanceof Error ? e.message : String(e);
+      console.error("[generate] Stage 4 P/E 실패:", peError);
+    }
+  }
+
+  // Stage 5: History 생성 (template.json history 섹션 기반, 없으면 generic 포맷 폴백)
+  let historyDraft = "";
+  let historyError: string | null = null;
+  try {
+    historyDraft = await generateHistory(structured, caseRow.template_key, cc);
+  } catch (e) {
+    historyError = e instanceof Error ? e.message : String(e);
+    console.error("[generate] Stage 5 History 실패:", historyError);
+    historyDraft = buildHistoryDraft(structured);
+  }
+
+  // Stage 2/3/4/5 부분 실패 메시지 합산 (Stage 1 성공이므로 status는 completed 유지)
+  const partialErrorMessage =
+    [piError, templateError, peError, historyError]
+      .filter(Boolean)
+      .join(" / ") || null;
 
   const { data: result, error: insertError } = await supabase
     .from("case_results")
     .insert({
       case_id: id,
-      hpi_draft: hpiDraft,
+      pi_draft: piDraft,
+      pe_draft: peDraft,
       template_draft: templateDraft,
       history_draft: historyDraft,
       structured_json: structured as unknown as Json,
       model_version: MODEL_VERSION,
       template_key_used: caseRow.template_key ?? "",
+      error_message: partialErrorMessage,
     })
     .select("id")
     .single();
@@ -159,6 +243,11 @@ export async function POST(
     .from("cases")
     .update({ status: "completed", current_result_id: result.id })
     .eq("id", id);
+
+  // 사용 이력 기록 (실패해도 생성 결과에 영향 없음)
+  await supabase
+    .from("ai_usage_logs")
+    .insert({ user_id: user.id, case_id: id });
 
   return NextResponse.json(
     { caseId: id, resultId: result.id },

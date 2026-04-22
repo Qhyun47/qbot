@@ -2,7 +2,7 @@ export interface StructuredCaseInput {
   raw_text: string;
   normalized_text: string;
   category: string;
-  sections: Array<"hpi" | "template" | "history">;
+  sections: Array<"pi" | "template" | "history" | "pe">;
 }
 
 export interface StructuredCase {

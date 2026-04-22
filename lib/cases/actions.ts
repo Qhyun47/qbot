@@ -1,0 +1,282 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
+import { createClient } from "@/lib/supabase/server";
+import { BED_NUMBERS_BY_ZONE } from "@/lib/cases/bed-config";
+import type { BedZone, CaseInput } from "@/lib/supabase/types";
+
+async function getAuthUser() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("인증이 필요합니다");
+  return { supabase, user };
+}
+
+const bedSchema = z
+  .object({
+    bedZone: z.enum(["A", "B", "R"]),
+    bedNumber: z.number().int(),
+  })
+  .refine(
+    ({ bedZone, bedNumber }) => {
+      const valid = BED_NUMBERS_BY_ZONE[bedZone as BedZone];
+      return (valid as readonly number[]).includes(bedNumber);
+    },
+    { message: "유효하지 않은 베드번호" }
+  );
+
+export async function createCase(): Promise<string> {
+  const { supabase, user } = await getAuthUser();
+
+  // CC 없는 빈 draft 정리 (입력 카드가 없는 경우만)
+  const { data: emptyDrafts } = await supabase
+    .from("cases")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("status", "draft")
+    .is("cc", null);
+
+  if (emptyDrafts && emptyDrafts.length > 0) {
+    const ids = emptyDrafts.map((d) => d.id);
+    const { data: withInputs } = await supabase
+      .from("case_inputs")
+      .select("case_id")
+      .in("case_id", ids);
+    const idsWithInputs = new Set((withInputs ?? []).map((i) => i.case_id));
+    const toDelete = ids.filter((id) => !idsWithInputs.has(id));
+    if (toDelete.length > 0) {
+      await supabase.from("cases").delete().in("id", toDelete);
+    }
+  }
+
+  const { data, error } = await supabase
+    .from("cases")
+    .insert({ user_id: user.id })
+    .select("id")
+    .single();
+
+  if (error || !data) throw new Error(error?.message ?? "케이스 생성 실패");
+  return data.id;
+}
+
+export async function updateCaseBed(
+  caseId: string,
+  bedZone: string,
+  bedNumber: number
+): Promise<void> {
+  const parsed = bedSchema.parse({ bedZone, bedNumber });
+  const { supabase, user } = await getAuthUser();
+
+  const { error } = await supabase
+    .from("cases")
+    .update({ bed_zone: parsed.bedZone, bed_number: parsed.bedNumber })
+    .eq("id", caseId)
+    .eq("user_id", user.id);
+
+  if (error) throw new Error(error.message);
+}
+
+export async function updateCaseCc(
+  caseId: string,
+  cc: string,
+  ccHasTemplate: boolean,
+  templateKey: string | null
+): Promise<void> {
+  const { supabase, user } = await getAuthUser();
+
+  const { error } = await supabase
+    .from("cases")
+    .update({ cc, cc_has_template: ccHasTemplate, template_key: templateKey })
+    .eq("id", caseId)
+    .eq("user_id", user.id);
+
+  if (error) throw new Error(error.message);
+}
+
+export async function addCaseInput(
+  caseId: string,
+  rawText: string,
+  timeTag: string | null,
+  timeOffsetMinutes: number | null
+): Promise<CaseInput> {
+  const { supabase } = await getAuthUser();
+
+  const { count } = await supabase
+    .from("case_inputs")
+    .select("*", { count: "exact", head: true })
+    .eq("case_id", caseId);
+
+  const displayOrder = (count ?? 0) + 1;
+
+  const { data, error } = await supabase
+    .from("case_inputs")
+    .insert({
+      case_id: caseId,
+      raw_text: rawText,
+      time_tag: timeTag,
+      time_offset_minutes: timeOffsetMinutes,
+      display_order: displayOrder,
+    })
+    .select()
+    .single();
+
+  if (error || !data) throw new Error(error?.message ?? "카드 추가 실패");
+
+  if (displayOrder === 1) {
+    await supabase.from("cases").update({ has_inputs: true }).eq("id", caseId);
+  }
+
+  return data;
+}
+
+export async function updatePiEdited(
+  resultId: string,
+  text: string
+): Promise<void> {
+  const { supabase } = await getAuthUser();
+
+  const { error } = await supabase
+    .from("case_results")
+    .update({ pi_edited: text })
+    .eq("id", resultId);
+
+  if (error) throw new Error(error.message);
+}
+
+export async function updatePeEdited(
+  resultId: string,
+  text: string
+): Promise<void> {
+  const { supabase } = await getAuthUser();
+
+  const { error } = await supabase
+    .from("case_results")
+    .update({ pe_edited: text })
+    .eq("id", resultId);
+
+  if (error) throw new Error(error.message);
+}
+
+export async function updateTemplateEdited(
+  resultId: string,
+  text: string
+): Promise<void> {
+  const { supabase } = await getAuthUser();
+
+  const { error } = await supabase
+    .from("case_results")
+    .update({ template_edited: text })
+    .eq("id", resultId);
+
+  if (error) throw new Error(error.message);
+}
+
+export async function updateHistoryEdited(
+  resultId: string,
+  text: string
+): Promise<void> {
+  const { supabase } = await getAuthUser();
+
+  const { error } = await supabase
+    .from("case_results")
+    .update({ history_edited: text })
+    .eq("id", resultId);
+
+  if (error) throw new Error(error.message);
+}
+
+export async function overrideTemplateKey(
+  caseId: string,
+  templateKey: string | null
+): Promise<void> {
+  const { supabase, user } = await getAuthUser();
+
+  const { error } = await supabase
+    .from("cases")
+    .update({
+      template_key: templateKey,
+      cc_has_template: templateKey !== null,
+    })
+    .eq("id", caseId)
+    .eq("user_id", user.id);
+
+  if (error) throw new Error(error.message);
+}
+
+export async function updateCaseMemo(
+  caseId: string,
+  memo: string
+): Promise<void> {
+  const { supabase, user } = await getAuthUser();
+
+  const { error } = await supabase
+    .from("cases")
+    .update({ memo })
+    .eq("id", caseId)
+    .eq("user_id", user.id);
+
+  if (error) throw new Error(error.message);
+}
+
+export async function hideFromBoard(caseId: string): Promise<void> {
+  const { supabase, user } = await getAuthUser();
+
+  const { error } = await supabase
+    .from("cases")
+    .update({ board_hidden_at: new Date().toISOString() })
+    .eq("id", caseId)
+    .eq("user_id", user.id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/dashboard");
+  revalidatePath("/cases");
+}
+
+export async function hideAllFromBoard(): Promise<void> {
+  const { supabase, user } = await getAuthUser();
+
+  const { error } = await supabase
+    .from("cases")
+    .update({ board_hidden_at: new Date().toISOString() })
+    .eq("user_id", user.id)
+    .is("board_hidden_at", null);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/dashboard");
+  revalidatePath("/cases");
+}
+
+export async function restoreToBoard(caseId: string): Promise<void> {
+  const { supabase, user } = await getAuthUser();
+
+  const { error } = await supabase
+    .from("cases")
+    .update({ board_hidden_at: null })
+    .eq("id", caseId)
+    .eq("user_id", user.id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/dashboard");
+  revalidatePath("/cases");
+}
+
+export async function deleteCase(caseId: string): Promise<void> {
+  const { supabase, user } = await getAuthUser();
+
+  const { error } = await supabase
+    .from("cases")
+    .delete()
+    .eq("id", caseId)
+    .eq("user_id", user.id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/cases");
+  revalidatePath("/dashboard");
+}

@@ -1,0 +1,61 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - button "메뉴 열기" [ref=e5] [cursor=pointer]:
+        - img
+      - link "ER Scribe" [ref=e6] [cursor=pointer]:
+        - /url: /dashboard
+      - button "Logout" [ref=e8] [cursor=pointer]
+    - main [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e11]:
+          - heading "설정" [level=1] [ref=e12]
+          - paragraph [ref=e13]: 앱 사용 환경을 맞춤 설정하세요.
+        - generic [ref=e14]:
+          - generic [ref=e15]:
+            - generic [ref=e16]:
+              - paragraph [ref=e17]: 화면 테마
+              - paragraph [ref=e18]: 라이트/다크 모드를 선택하거나 기기 설정을 따릅니다.
+            - generic [ref=e19]:
+              - button "라이트" [ref=e20] [cursor=pointer]:
+                - img [ref=e21]
+                - paragraph [ref=e27]: 라이트
+              - button "다크" [ref=e28] [cursor=pointer]:
+                - img [ref=e29]
+                - paragraph [ref=e31]: 다크
+              - button "시스템" [ref=e32] [cursor=pointer]:
+                - img [ref=e33]
+                - paragraph [ref=e35]: 시스템
+          - generic [ref=e36]:
+            - generic [ref=e37]:
+              - paragraph [ref=e38]: 입력 화면 레이아웃
+              - paragraph [ref=e39]: 새 케이스 입력 화면에서 가이드라인 패널을 어떻게 배치할지 선택하세요.
+            - generic [ref=e40]:
+              - button "단독 입력 화면만 전체 표시" [ref=e41] [cursor=pointer]:
+                - img [ref=e42]
+                - generic [ref=e46]:
+                  - paragraph [ref=e47]: 단독
+                  - paragraph [ref=e48]: 입력 화면만 전체 표시
+              - button "상하 분할 상단 가이드 / 하단 입력" [ref=e49] [cursor=pointer]:
+                - img [ref=e50]
+                - generic [ref=e52]:
+                  - paragraph [ref=e53]: 상하 분할
+                  - paragraph [ref=e54]: 상단 가이드 / 하단 입력
+              - button "좌우 분할 좌측 입력 / 우측 가이드 (폴드/태블릿)" [ref=e55] [cursor=pointer]:
+                - img [ref=e57]
+                - img [ref=e59]
+                - generic [ref=e61]:
+                  - paragraph [ref=e62]: 좌우 분할
+                  - paragraph [ref=e63]: 좌측 입력 / 우측 가이드 (폴드/태블릿)
+          - generic [ref=e64]:
+            - generic [ref=e65]:
+              - paragraph [ref=e66]: 분할 비율
+              - paragraph [ref=e67]: 두 영역의 기본 크기 비율을 설정하세요. (드래그로 실시간 조정도 가능합니다)
+            - generic [ref=e72]:
+              - generic [ref=e73]: 입력 50%
+              - generic [ref=e74]: 가이드 50%
+          - button "저장" [ref=e75] [cursor=pointer]
+    - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e81] [cursor=pointer]:
+    - img [ref=e82]
+  - alert [ref=e85]

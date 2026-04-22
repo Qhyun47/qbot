@@ -3,16 +3,22 @@
 import { useEffect, useRef, useState } from "react";
 import { CheckSquare } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import ccList from "@/lib/ai/resources/cc-list.json";
+import ccListRaw from "@/lib/ai/resources/cc-list.json";
+
+const ccList = ccListRaw as CcListEntry[];
+
+interface CcListEntry {
+  cc: string;
+  guideKeys: string[];
+  templateKeys: string[];
+  aliasOf?: string;
+}
 
 interface CcAutocompleteProps {
   value: string;
-  onSelect: (
-    cc: string,
-    hasTemplate: boolean,
-    templateKey: string | null
-  ) => void;
+  onSelect: (cc: string, hasTemplate: boolean, templateKeys: string[]) => void;
 }
 
 export function CcAutocomplete({ value, onSelect }: CcAutocompleteProps) {
@@ -30,6 +36,14 @@ export function CcAutocomplete({ value, onSelect }: CcAutocompleteProps) {
         .filter((item) =>
           item.cc.toLowerCase().includes(inputValue.toLowerCase())
         )
+        .sort((a, b) => {
+          const q = inputValue.toLowerCase();
+          const aStarts = a.cc.toLowerCase().startsWith(q);
+          const bStarts = b.cc.toLowerCase().startsWith(q);
+          if (aStarts && !bStarts) return -1;
+          if (!aStarts && bStarts) return 1;
+          return 0;
+        })
         .slice(0, 8)
     : [];
 
@@ -46,9 +60,30 @@ export function CcAutocomplete({ value, onSelect }: CcAutocompleteProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleConfirm = () => {
+    const trimmed = inputValue.trim();
+    if (!trimmed) return;
+    onSelect(trimmed, false, []);
+    setOpen(false);
+  };
+
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Escape") {
       setOpen(false);
+      return;
+    }
+    if (e.key === "Enter") {
+      if (open && filtered.length > 0 && highlightedIndex >= 0) {
+        e.preventDefault();
+        const item = filtered[highlightedIndex];
+        const hasTemplate = item.templateKeys.length > 0;
+        onSelect(item.cc, hasTemplate, item.templateKeys);
+        setInputValue(item.cc);
+        setOpen(false);
+      } else if (inputValue.trim()) {
+        e.preventDefault();
+        handleConfirm();
+      }
       return;
     }
     if (!open || filtered.length === 0) return;
@@ -58,12 +93,6 @@ export function CcAutocomplete({ value, onSelect }: CcAutocompleteProps) {
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setHighlightedIndex((i) => Math.max(i - 1, 0));
-    } else if (e.key === "Enter" && highlightedIndex >= 0) {
-      e.preventDefault();
-      const item = filtered[highlightedIndex];
-      onSelect(item.cc, item.hasTemplate, item.templateKey);
-      setInputValue(item.cc);
-      setOpen(false);
     }
   }
 
@@ -73,42 +102,56 @@ export function CcAutocomplete({ value, onSelect }: CcAutocompleteProps) {
         <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           C.C (Chief Complaint)
         </label>
-        <Input
-          value={inputValue}
-          placeholder="예: Chest pain, Dyspnea..."
-          onChange={(e) => {
-            setInputValue(e.target.value);
-            setOpen(true);
-            setHighlightedIndex(-1);
-          }}
-          onFocus={() => {
-            if (inputValue) setOpen(true);
-          }}
-          onKeyDown={handleKeyDown}
-          className="h-9"
-        />
+        <div className="flex gap-1.5">
+          <Input
+            value={inputValue}
+            placeholder="예: Chest pain, Dyspnea..."
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              setOpen(true);
+              setHighlightedIndex(-1);
+            }}
+            onFocus={() => {
+              if (inputValue) setOpen(true);
+            }}
+            onKeyDown={handleKeyDown}
+            className="h-9 flex-1"
+          />
+          {inputValue.trim() && (
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              className="h-9 shrink-0"
+              onClick={handleConfirm}
+            >
+              확인
+            </Button>
+          )}
+        </div>
       </div>
 
       {open && filtered.length > 0 && (
-        <div className="absolute left-0 right-0 top-full z-20 mt-1 overflow-hidden rounded-md border bg-popover shadow-md">
+        <div className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-md border bg-white shadow-md dark:bg-zinc-900">
           {filtered.map((item, idx) => (
             <button
               key={item.cc}
               type="button"
               className={cn(
-                "flex w-full items-center justify-between px-3 py-2.5 text-sm transition-colors",
+                "flex w-full items-center justify-between bg-white px-3 py-2.5 text-sm transition-colors dark:bg-zinc-900",
                 idx === highlightedIndex
                   ? "bg-accent text-accent-foreground"
                   : "hover:bg-accent/60"
               )}
               onClick={() => {
-                onSelect(item.cc, item.hasTemplate, item.templateKey);
+                const hasTemplate = item.templateKeys.length > 0;
+                onSelect(item.cc, hasTemplate, item.templateKeys);
                 setInputValue(item.cc);
                 setOpen(false);
               }}
             >
               <span>{item.cc}</span>
-              {item.hasTemplate && (
+              {item.templateKeys.length > 0 && (
                 <span className="flex items-center gap-1 text-xs text-muted-foreground">
                   <CheckSquare className="size-3 text-emerald-600" />
                   상용구 있음

@@ -11,8 +11,12 @@ export async function GET(request: NextRequest) {
   // Supabase가 전달하는 인가 코드
   const code = searchParams.get("code");
 
-  // 로그인 성공 후 이동할 경로 (없으면 /protected로 이동)
-  const next = searchParams.get("next") ?? "/protected";
+  // 로그인 성공 후 이동할 경로 — 슬래시로 시작하는 상대 경로만 허용 (오픈 리다이렉트 방지)
+  const rawNext = searchParams.get("next") ?? "/dashboard";
+  const next =
+    rawNext.startsWith("/") && !rawNext.startsWith("//")
+      ? rawNext
+      : "/dashboard";
 
   if (code) {
     const supabase = await createClient();
@@ -20,8 +24,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error && data.user) {
-      // 절대 경로인 경우 그대로, 상대 경로인 경우 origin을 붙여 이동
-      const redirectUrl = next.startsWith("/") ? `${origin}${next}` : next;
+      const redirectUrl = `${origin}${next}`;
 
       // Google 메타데이터로 프로필 생성 또는 갱신 (행이 없으면 생성, 있으면 이름 갱신)
       const { id, user_metadata } = data.user;

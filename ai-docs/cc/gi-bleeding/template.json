@@ -1,0 +1,209 @@
+{
+  "templateKey": "gi-bleeding",
+  "cc": "GI bleeding",
+  "description": "위장관 출혈 환자 EMR 상용구 템플릿",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "fields": [
+    {
+      "key": "onset",
+      "label": "onset",
+      "type": "open",
+      "description": "출혈 발생 시점. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "color",
+      "label": "color",
+      "type": "open",
+      "description": "출혈 색깔 및 형태 (예: 'hematemesis', 'melena', 'hematochezia', 'bright red'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "amount",
+      "label": "amount",
+      "type": "open",
+      "description": "출혈량 (예: '소량', '반 컵 이상', 'large amount'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "count",
+      "label": "횟수",
+      "type": "open",
+      "description": "출혈 발생 횟수. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "npo_solid",
+      "label": "NPO Solid",
+      "type": "open",
+      "description": "고형식 마지막 섭취 시점. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "npo_liquid",
+      "label": "NPO Liquid",
+      "type": "open",
+      "description": "수분 마지막 섭취 시점. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "fever_chill",
+      "label": "F/C",
+      "type": "symptom_check",
+      "format": "F/C({fever}/{chill})",
+      "slots": [
+        {
+          "key": "fever",
+          "symptom": "Fever",
+          "description": "발열",
+          "default": "-"
+        },
+        {
+          "key": "chill",
+          "symptom": "Chill",
+          "description": "오한",
+          "default": "-"
+        }
+      ],
+      "description": "발열/오한 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "cough_sputum_rhinorrhea",
+      "label": "C/S/R",
+      "type": "symptom_check",
+      "format": "C/S/R({cough}/{sputum}/{rhinorrhea})",
+      "slots": [
+        {
+          "key": "cough",
+          "symptom": "Cough",
+          "description": "기침",
+          "default": "-"
+        },
+        {
+          "key": "sputum",
+          "symptom": "Sputum",
+          "description": "가래",
+          "default": "-"
+        },
+        {
+          "key": "rhinorrhea",
+          "symptom": "Rhinorrhea",
+          "description": "콧물",
+          "default": "-"
+        }
+      ],
+      "description": "기침/가래/콧물 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "anvdc",
+      "label": "A/N/V/D/C",
+      "type": "symptom_check",
+      "format": "A/N/V/D/C({anorexia}/{nausea}/{vomiting}/{diarrhea}/{constipation})",
+      "slots": [
+        {
+          "key": "anorexia",
+          "symptom": "Anorexia",
+          "description": "식욕부진",
+          "default": "-"
+        },
+        {
+          "key": "nausea",
+          "symptom": "Nausea",
+          "description": "구역",
+          "default": "-"
+        },
+        {
+          "key": "vomiting",
+          "symptom": "Vomiting",
+          "description": "구토",
+          "default": "-"
+        },
+        {
+          "key": "diarrhea",
+          "symptom": "Diarrhea",
+          "description": "설사",
+          "default": "-"
+        },
+        {
+          "key": "constipation",
+          "symptom": "Constipation",
+          "description": "변비",
+          "default": "-"
+        }
+      ],
+      "description": "식욕부진/구역/구토/설사/변비 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "dizziness",
+      "label": "Dizziness",
+      "type": "symptom_check",
+      "format": "Dizziness({dizziness})",
+      "slots": [
+        {
+          "key": "dizziness",
+          "symptom": "Dizziness",
+          "description": "어지럼증",
+          "default": "-"
+        }
+      ],
+      "description": "어지럼증 여부. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "dyspnea",
+      "label": "Dyspnea",
+      "type": "symptom_check",
+      "format": "Dyspnea({dyspnea})",
+      "slots": [
+        {
+          "key": "dyspnea",
+          "symptom": "Dyspnea",
+          "description": "호흡곤란",
+          "default": "-"
+        }
+      ],
+      "description": "호흡곤란 여부. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "abdominal_pain",
+      "label": "Abd.pain",
+      "type": "symptom_check",
+      "format": "Abd.pain({abd_pain})",
+      "slots": [
+        {
+          "key": "abd_pain",
+          "symptom": "Abdominal pain",
+          "description": "복통",
+          "default": "-"
+        }
+      ],
+      "description": "복통 여부. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "egds_colonoscopy_hx",
+      "label": "EGDS, Colonoscopy Hx.",
+      "type": "open",
+      "description": "과거 위내시경/대장내시경 이력 및 결과. 정보 없으면 빈 문자열."
+    }
+  ],
+  "output_example": "* GI bleeding\nonset : \ncolor : \namount : \n횟수 : \nNPO : Solid - \n        Liquid - \n\nF/C(-/-)  C/S/R(-/-/-)  A/N/V/D/C(-/-/-/-/-)\nDizziness (-) Dyspnea (-) Abd.pain (-)\n\nEGDS, Colonoscopy Hx. :",
+  "pe": {
+    "fields": [
+      {
+        "key": "general",
+        "label": "General / Vital status",
+        "default": "Vital stable, Mental alert"
+      },
+      { "key": "conjunctiva", "label": "Anemic conjunctiva", "default": "(-)" },
+      { "key": "sclera", "label": "Icteric sclera", "default": "(-)" },
+      { "key": "abd", "label": "Abd Td/rTd", "default": "(-)" },
+      { "key": "dre", "label": "DRE", "default": "" },
+      { "key": "l_tube", "label": "L tube", "default": "" }
+    ],
+    "output_example": "Vital stable, Mental alert\nAnemic conjunctiva (-)\nIcteric sclera (-)\nAbd Td / rTd (-)\n\nDRE : \nL tube :"
+  },
+  "history": {
+    "fields": [
+      { "key": "past", "label": "Past Hx", "default": "" },
+      { "key": "medication", "label": "Med Hx", "default": "" },
+      { "key": "operation", "label": "Op Hx", "default": "" },
+      { "key": "alcohol", "label": "Alcohol", "default": "" },
+      { "key": "smoking", "label": "Smoking", "default": "" },
+      { "key": "last_alcohol", "label": "마지막 음주", "default": "" }
+    ],
+    "output_example": "Past Hx: \nMed Hx: \nOp Hx: \nAlcohol:     , Smoking: \n마지막 음주:"
+  }
+}

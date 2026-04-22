@@ -100,6 +100,117 @@ import { Button } from "@/components/ui/button";
   - ✅ `"chest-pain"`, `"gi-bleeding"`
 - **출력 언어**: 혼용 (한국어 문장 구조 + 영어 의학 용어)
 
+## AI 리소스 추가 워크플로우
+
+사용자가 C.C., 가이드라인, 상용구, 케이스 예시 데이터를 추가하거나 수정을 요청할 때 아래 절차를 따릅니다.
+
+### 핵심 파일 위치
+
+| 파일                                  | 역할                                                                        |
+| ------------------------------------- | --------------------------------------------------------------------------- |
+| `lib/ai/resources/cc-list.json`       | 정형 C.C. 목록 (단일 소스, `{ cc, guideKeys[], templateKeys[], aliasOf? }`) |
+| `lib/ai/resources/template-list.json` | 상용구 표시명 목록 (`{ templateKey, displayName }`)                         |
+| `ai-docs/cc/{key}/guide.md`           | 시스템 가이드라인 파일                                                      |
+| `ai-docs/cc/{key}/template.json`      | 상용구 템플릿 파일 (`fields`, `pe`, `history` 섹션 포함)                    |
+| `ai-docs/cc/{key}/schema.json`        | AI 정규화 스키마 파일                                                       |
+| `ai-docs/pending-matches.md`          | 미매칭 C.C. 추적 파일                                                       |
+| `fixtures/{cc-key}-{n}.json`          | AI 품질 검증용 케이스 예시 데이터                                           |
+
+---
+
+### 정형 C.C. 추가 절차
+
+1. `lib/ai/resources/cc-list.json`에 항목 추가:
+   ```json
+   { "cc": "Dizziness", "guideKeys": [], "templateKeys": [] }
+   ```
+
+   - C.C. 표기는 Sentence case (의학 약어 제외), key는 kebab-case
+2. 가이드라인/상용구 키를 사용자가 함께 알려준 경우:
+   - **1개**: 즉시 해당 키를 guideKeys/templateKeys에 추가
+   - **2개 이상**: 추천 목록으로 제시만 하고 자동 연결하지 않음. 사용자가 선택하면 그때 추가
+3. 가이드라인/상용구 없이 C.C.만 등록하는 경우:
+   - `ai-docs/pending-matches.md`를 읽어 동일/유사 항목이 이미 있는지 확인
+   - 없으면 아래 양식으로 새 항목 추가:
+     ```
+     ### {C.C. 이름}
+     - 등록일: YYYY-MM-DD
+     - 가이드라인: 없음
+     - 상용구: 없음
+     - 메모: -
+     ```
+4. 상용구(templateKeys)가 추가된 경우 → 케이스 예시 데이터 절차 참조
+
+---
+
+### 가이드라인 추가 절차
+
+1. `ai-docs/cc/{guideKey}/guide.md` 파일 생성 (Markdown, 문진 체크리스트 + 감별진단 + 위험신호 포함)
+2. **`ai-docs/pending-matches.md`를 읽는다** → 새 가이드라인 이름과 동일/유사한 미매칭 C.C.가 있는지 확인
+   - 있으면: "이 가이드라인을 {C.C.}와 매칭할까요?" 사용자에게 질문
+   - 없으면: 이름 기반으로 적절한 C.C.를 추천하며 매칭 여부 질문
+3. 매칭할 C.C.가 결정되면:
+   - `lib/ai/resources/cc-list.json`에서 해당 C.C. 항목의 `guideKeys`에 키 추가
+   - `cc-list.json`에 해당 C.C.가 없으면: 즉시 정형 C.C. 추가 여부를 사용자에게 질문
+4. 매칭 완료 시 `ai-docs/pending-matches.md` 업데이트:
+   - 미매칭 항목에서 제거 → 매칭 완료 기록 테이블에 추가
+5. **가이드라인 추가 시 케이스 예시 데이터는 불필요** (AI 파이프라인에 직접 영향 없음)
+
+---
+
+### 상용구 추가 절차
+
+1. 아래 파일들을 생성:
+   - `ai-docs/cc/{templateKey}/template.json` — 상용구 템플릿 (기존 chest-pain.json 구조 참조)
+     - **`pe` 섹션 필수**: `fields[]` + `output_example` 구조. 사용자에게 P/E 양식을 요청해 입력받아야 함
+     - **`history` 섹션 필수**: `fields[]` + `output_example` 구조. 사용자에게 History 양식을 요청해 입력받아야 함
+   - `ai-docs/cc/{templateKey}/schema.json` — AI 정규화 스키마 (기존 chest-pain.json 구조 참조)
+2. `lib/ai/resources/template-list.json`에 항목 추가:
+   ```json
+   { "templateKey": "new-key", "displayName": "Display Name" }
+   ```
+3. **`ai-docs/pending-matches.md`를 읽는다** → 가이드라인 추가 절차의 2~4단계와 동일하게 C.C. 매칭 처리. 단, `templateKeys`에 추가
+4. **P/E 및 History 양식 수집**: 상용구 파일 생성 전 반드시 사용자에게 순서대로 요청:
+   - "이 상용구의 P/E 양식(기본값 상태의 출력 포맷)을 알려주세요."
+   - "이 상용구의 History 양식(기본값 상태의 출력 포맷)을 알려주세요."
+5. **케이스 예시 데이터 요청**: 상용구 추가가 완료되면 반드시 사용자에게 다음을 요청:
+   > "AI 차팅 품질 향상을 위해 {C.C.} 케이스 예시 데이터가 필요합니다. `fixtures/{cc-key}-{n}.json` 형식으로 실제 문진 카드 입력 예시를 제공해 주실 수 있나요?"
+
+---
+
+### 케이스 예시 데이터 추가 절차
+
+- **저장 위치**: `fixtures/{cc-key}-{n}.json` (예: `fixtures/dizziness-01.json`)
+- **형식**: 기존 `fixtures/case-01.json` 구조 참조 (`case`, `inputs`, `expectedHpi?`, `expectedTemplate?`)
+- **검증**: 데이터 제공 즉시 하네스로 실행:
+  ```bash
+  npx tsx --env-file=.env.local scripts/ai-harness.ts fixtures/{파일명}.json
+  ```
+- **추가 기준**:
+  - 상용구(templateKeys)가 있는 C.C.: **필수** (최소 1개)
+  - 가이드라인만 있고 상용구 없는 C.C.: 불필요
+
+---
+
+### template-list.json 동기화 규칙
+
+- 상용구(templateKey)를 추가하거나 삭제할 때마다 `lib/ai/resources/template-list.json`을 **항상 동기화**
+- `cc-list.json`의 `templateKeys`에 키가 있으면 `template-list.json`에도 반드시 항목 존재해야 함
+
+---
+
+### pending-matches.md 확인 규칙 요약
+
+아래 작업을 수행할 때 **반드시** `ai-docs/pending-matches.md`를 먼저 읽는다:
+
+- 가이드라인을 추가할 때
+- 상용구를 추가할 때
+
+읽은 후 판단:
+
+1. 새로 추가하는 리소스 이름과 같거나 유사한 미매칭 C.C.가 있으면 → 사용자에게 매칭 여부 질문
+2. 매칭이 확정되면 → cc-list.json 업데이트 + pending-matches.md 업데이트
+
 ## 테스트 계정
 
 Playwright MCP 또는 기타 검증 작업 시 아래 계정을 사용합니다:

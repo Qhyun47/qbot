@@ -1,45 +1,45 @@
 [
   {
     "cc": "Chest pain",
-    "hasTemplate": true,
-    "templateKey": "chest-pain"
+    "guideKeys": ["chest-pain"],
+    "templateKeys": ["chest-pain"]
   },
   {
     "cc": "Dyspnea",
-    "hasTemplate": true,
-    "templateKey": "dyspnea"
+    "guideKeys": ["dyspnea"],
+    "templateKeys": ["dyspnea"]
   },
   {
     "cc": "Hemoptysis",
-    "hasTemplate": true,
-    "templateKey": "hemoptysis"
+    "guideKeys": ["hemoptysis"],
+    "templateKeys": ["hemoptysis"]
   },
   {
     "cc": "Abdominal pain",
-    "hasTemplate": true,
-    "templateKey": "abdominal-pain"
+    "guideKeys": ["abdominal-pain"],
+    "templateKeys": ["abdominal-pain"]
   },
   {
     "cc": "GI bleeding",
-    "hasTemplate": true,
-    "templateKey": "gi-bleeding"
+    "guideKeys": ["gi-bleeding"],
+    "templateKeys": ["gi-bleeding"]
   },
   {
     "cc": "Hematemesis",
-    "hasTemplate": true,
-    "templateKey": "gi-bleeding",
+    "guideKeys": [],
+    "templateKeys": [],
     "aliasOf": "GI bleeding"
   },
   {
     "cc": "Melena",
-    "hasTemplate": true,
-    "templateKey": "gi-bleeding",
+    "guideKeys": [],
+    "templateKeys": [],
     "aliasOf": "GI bleeding"
   },
   {
     "cc": "Hematochezia",
-    "hasTemplate": true,
-    "templateKey": "gi-bleeding",
+    "guideKeys": [],
+    "templateKeys": [],
     "aliasOf": "GI bleeding"
   }
 ]

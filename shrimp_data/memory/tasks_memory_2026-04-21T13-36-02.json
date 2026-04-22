@@ -1,0 +1,143 @@
+{
+  "tasks": [
+    {
+      "id": "e4c9fe7f-17b1-480b-9d8c-88c6018ea707",
+      "name": "Task B01: cc-list.json 통합 및 관련 코드 전면 업데이트",
+      "description": "두 곳에 분산된 cc-list.json을 lib/ai/resources/cc-list.json 단일 소스로 통합하고, suggestedTemplateKeys 필드를 templateKeys로 rename하며 guideKeys 배열 필드를 추가합니다. 이 변경에 영향받는 모든 파일을 함께 업데이트합니다.\n\n변경 내용:\n1. lib/ai/resources/cc-list.json 구조 변경\n   - 기존: { cc, suggestedTemplateKeys[], aliasOf? }\n   - 신규: { cc, guideKeys[], templateKeys[], aliasOf? }\n   - 기존 5개 C.C.: guideKeys = templateKeys = 기존 suggestedTemplateKeys 값\n   - 별칭 항목(Hematemesis, Melena, Hematochezia): guideKeys: [], templateKeys: [], aliasOf 유지\n2. ai-docs/cc-list.json 삭제\n3. scripts/seed-ai-documents.ts: READONLY_PATHS에서 cc-list 제거, cc-list 관련 시드 로직 제거 (load-resources.ts는 파일시스템에서 직접 읽으므로 DB에 cc-list 불필요)\n4. components/cases/cc-autocomplete.tsx: CcListEntry 인터페이스 업데이트, suggestedTemplateKeys → templateKeys\n5. components/cases/cc-retry-form.tsx: suggestedTemplateKeys → templateKeys\n6. components/cases/guideline-panel.tsx: suggestedTemplateKeys → templateKeys (로직 변경 없음)\n7. lib/guidelines/actions.ts: findTemplateKey 함수를 findGuideKey로 분리하여 guideKeys[0] 참조. aliasOf 처리 시 parent의 guideKeys[0] 사용\n8. scripts/ai-harness.ts: suggestedTemplateKeys → templateKeys",
+      "notes": "이 태스크는 순수한 rename/구조 통합입니다. cc-autocomplete.tsx의 onSelect 시그니처 변경(templateKeys[] 배열 전달)은 Task B03에서 처리합니다. 이 태스크에서는 기존 동작(templateKeys[0] 전달)을 유지하면서 필드명만 변경합니다.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-04-21T02:08:21.081Z",
+      "updatedAt": "2026-04-21T02:19:28.179Z",
+      "relatedFiles": [
+        {
+          "path": "lib/ai/resources/cc-list.json",
+          "type": "TO_MODIFY",
+          "description": "단일 소스 통합, 구조 변경"
+        },
+        {
+          "path": "ai-docs/cc-list.json",
+          "type": "TO_MODIFY",
+          "description": "삭제 대상"
+        },
+        {
+          "path": "scripts/seed-ai-documents.ts",
+          "type": "TO_MODIFY",
+          "description": "cc-list 시드 로직 제거"
+        },
+        {
+          "path": "components/cases/cc-autocomplete.tsx",
+          "type": "TO_MODIFY",
+          "description": "필드명 변경"
+        },
+        {
+          "path": "components/cases/cc-retry-form.tsx",
+          "type": "TO_MODIFY",
+          "description": "필드명 변경"
+        },
+        {
+          "path": "components/cases/guideline-panel.tsx",
+          "type": "TO_MODIFY",
+          "description": "필드명 변경"
+        },
+        {
+          "path": "lib/guidelines/actions.ts",
+          "type": "TO_MODIFY",
+          "description": "findTemplateKey → findGuideKey 분리"
+        },
+        {
+          "path": "scripts/ai-harness.ts",
+          "type": "TO_MODIFY",
+          "description": "필드명 변경"
+        }
+      ],
+      "implementationGuide": "// lib/ai/resources/cc-list.json 신규 구조\n[\n  { \"cc\": \"Chest pain\", \"guideKeys\": [\"chest-pain\"], \"templateKeys\": [\"chest-pain\"] },\n  { \"cc\": \"Hematemesis\", \"guideKeys\": [], \"templateKeys\": [], \"aliasOf\": \"GI bleeding\" }\n  // ...\n]\n\n// lib/guidelines/actions.ts 변경\n// findTemplateKey → findGuideKey\nfunction findGuideKey(cc: string): string | null {\n  const item = list.find(i => i.cc === cc)\n  if (!item) return null\n  if (item.aliasOf) {\n    const parent = list.find(i => i.cc === item.aliasOf)\n    return parent?.guideKeys[0] ?? null\n  }\n  return item.guideKeys[0] ?? null\n}\n// loadGuideline 내에서 findGuideKey 호출\n\n// cc-autocomplete.tsx - 인터페이스만 변경, 로직 동일\ninterface CcListEntry {\n  cc: string\n  guideKeys: string[]\n  templateKeys: string[]\n  aliasOf?: string\n}\n// hasTemplate = item.templateKeys.length > 0\n// templateKey = item.templateKeys[0] ?? null  (B03에서 변경 예정)",
+      "verificationCriteria": "1. npm run build 통과 (타입 에러 없음)\n2. 기존 5개 C.C. 자동완성이 동일하게 동작\n3. 가이드라인 패널에서 추천 상용구 목록 정상 표시\n4. ai-docs/cc-list.json 파일 삭제 확인\n5. seed 스크립트 실행 시 cc-list 관련 오류 없음",
+      "analysisResult": "ER Scribe 프로젝트에서 Claude가 C.C./가이드라인/상용구/케이스 예시 데이터를 대화 형식으로 추가·관리할 수 있는 워크플로우 시스템을 구축합니다.\\n\\n핵심 설계 결정:\\n- lib/ai/resources/cc-list.json을 단일 소스로 통합 (ai-docs/cc-list.json 삭제)\\n- 새 구조: { cc, guideKeys[], templateKeys[], aliasOf? }\\n- template-list.json은 유지하되 cc-list.json 업데이트 시 항상 동기화\\n- ai-docs/pending-matches.md 신설로 미매칭 C.C. 추적\\n- CLAUDE.md에 각 작업 유형별 워크플로우 규칙 추가\\n- 복수 templateKeys인 경우 C.C. 선택 즉시 인라인 상용구 선택 UI 표시",
+      "summary": "cc-list.json을 { cc, guideKeys[], templateKeys[], aliasOf? } 구조로 통합. ai-docs/cc-list.json 삭제. 영향받는 8개 파일(cc-autocomplete, cc-retry-form, guideline-panel, guidelines-editor, guidelines/page, guidelines/actions, ai-harness, seed-ai-documents) 전면 업데이트. findTemplateKey → findGuideKey 분리. npm run build 타입 에러 없이 통과.",
+      "completedAt": "2026-04-21T02:19:28.176Z"
+    },
+    {
+      "id": "09bdb0f7-b676-4dc5-a46a-35a86692d43a",
+      "name": "Task B02: pending-matches.md 신설 및 CLAUDE.md 워크플로우 규칙 추가",
+      "description": "미매칭 C.C.를 추적하는 ai-docs/pending-matches.md 파일을 생성하고, CLAUDE.md에 C.C./가이드라인/상용구/케이스 예시 데이터 추가 워크플로우 규칙을 추가합니다. 이 규칙들이 명확해야 Claude가 이후 대화에서 자동으로 올바른 절차를 따를 수 있습니다.",
+      "notes": "CLAUDE.md 규칙은 구체적이고 실행 가능해야 합니다. '확인한다'가 아니라 '읽는다 → 판단한다 → 질문한다'처럼 단계별로 명확히 기술해야 합니다. 가이드라인 추가 시 케이스 예시 불필요, 상용구 추가 시 필요라는 기준도 명확히 기술합니다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "e4c9fe7f-17b1-480b-9d8c-88c6018ea707"
+        }
+      ],
+      "createdAt": "2026-04-21T02:08:21.081Z",
+      "updatedAt": "2026-04-21T02:20:19.567Z",
+      "relatedFiles": [
+        {
+          "path": "ai-docs/pending-matches.md",
+          "type": "CREATE",
+          "description": "미매칭 C.C. 추적 파일"
+        },
+        {
+          "path": "CLAUDE.md",
+          "type": "TO_MODIFY",
+          "description": "AI 리소스 추가 워크플로우 섹션 추가"
+        },
+        {
+          "path": "lib/ai/resources/cc-list.json",
+          "type": "REFERENCE",
+          "description": "현재 등록된 C.C. 목록 확인용"
+        }
+      ],
+      "implementationGuide": "// ai-docs/pending-matches.md 포맷\n/*\n# Pending Matches\n\n이 파일은 정형 C.C.로 등록되었으나 아직 가이드라인 또는 상용구와 매칭되지 않은 항목을 추적합니다.\nClaude는 가이드라인/상용구를 추가할 때 반드시 이 파일을 확인하여 매칭 가능 항목이 있으면 사용자에게 알립니다.\n\n---\n\n## 미매칭 항목\n\n(현재 없음)\n\n---\n\n## 매칭 완료 기록\n\n| C.C. | 가이드라인 키 | 상용구 키 | 완료일 |\n|------|------------|---------|--------|\n*/\n\n// 항목 추가 예시 (C.C.만 등록, 가이드라인/상용구 없는 경우)\n/*\n### Dizziness\n- 등록일: 2026-04-21\n- 가이드라인: 없음\n- 상용구: 없음\n- 메모: -\n*/\n\n// CLAUDE.md 추가 섹션 구조 (## AI 리소스 추가 워크플로우)\n// 1. 정형 C.C. 추가 절차\n// 2. 가이드라인 추가 절차\n// 3. 상용구 추가 절차\n// 4. 케이스 예시 데이터 기준\n// 5. pending-matches.md 확인 규칙\n// 6. template-list.json 동기화 규칙",
+      "verificationCriteria": "1. ai-docs/pending-matches.md 파일 존재, 지정된 포맷 사용\n2. CLAUDE.md에 워크플로우 섹션이 추가됨\n3. 각 작업 유형(C.C./가이드라인/상용구)마다 명확한 단계별 절차 포함\n4. pending-matches.md 확인 트리거 조건이 명시됨\n5. 케이스 예시 데이터 요청 기준(상용구 있을 때만)이 명시됨\n6. template-list.json 동기화 규칙 포함",
+      "analysisResult": "ER Scribe 프로젝트에서 Claude가 C.C./가이드라인/상용구/케이스 예시 데이터를 대화 형식으로 추가·관리할 수 있는 워크플로우 시스템을 구축합니다.\\n\\n핵심 설계 결정:\\n- lib/ai/resources/cc-list.json을 단일 소스로 통합 (ai-docs/cc-list.json 삭제)\\n- 새 구조: { cc, guideKeys[], templateKeys[], aliasOf? }\\n- template-list.json은 유지하되 cc-list.json 업데이트 시 항상 동기화\\n- ai-docs/pending-matches.md 신설로 미매칭 C.C. 추적\\n- CLAUDE.md에 각 작업 유형별 워크플로우 규칙 추가\\n- 복수 templateKeys인 경우 C.C. 선택 즉시 인라인 상용구 선택 UI 표시",
+      "summary": "ai-docs/pending-matches.md 신설 (미매칭 항목 양식, 매칭 완료 기록 테이블 포함). CLAUDE.md에 \"AI 리소스 추가 워크플로우\" 섹션 추가: 정형 C.C./가이드라인/상용구/케이스 예시 데이터 추가 절차, pending-matches.md 확인 규칙, template-list.json 동기화 규칙 모두 단계별로 명시.",
+      "completedAt": "2026-04-21T02:20:19.554Z"
+    },
+    {
+      "id": "3596f743-91ab-463b-aa36-a01c2e9238d0",
+      "name": "Task B03: 복수 상용구 C.C. 선택 시 인라인 선택 UI 구현",
+      "description": "C.C.를 선택할 때 templateKeys가 2개 이상이면 즉시 인라인 상용구 선택 UI를 표시하도록 cc-autocomplete.tsx와 new-case-form.tsx를 수정합니다. 1개인 경우는 기존처럼 자동 설정, 0개는 null로 설정합니다.\n\n변경 내용:\n1. cc-autocomplete.tsx: onSelect 시그니처를 (cc, hasTemplate, templateKeys[])로 변경\n2. new-case-form.tsx: pendingTemplateKeys 상태 추가, templateKeys.length >= 2일 때 인라인 선택 UI 표시\n3. cc-retry-form.tsx: templateKeys 배열 수신, [0] 사용 (재시도는 첫 번째 자동 선택 유지)",
+      "notes": "인라인 UI는 shadcn 버튼 컴포넌트를 활용해 현재 앱 스타일과 일치시킵니다. template-list.json의 displayName을 참조하여 버튼 레이블을 표시합니다. '상용구 없이 진행' 옵션도 추가합니다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "e4c9fe7f-17b1-480b-9d8c-88c6018ea707"
+        }
+      ],
+      "createdAt": "2026-04-21T02:08:21.081Z",
+      "updatedAt": "2026-04-21T02:23:37.038Z",
+      "relatedFiles": [
+        {
+          "path": "components/cases/cc-autocomplete.tsx",
+          "type": "TO_MODIFY",
+          "description": "onSelect 시그니처 변경"
+        },
+        {
+          "path": "components/cases/new-case-form.tsx",
+          "type": "TO_MODIFY",
+          "description": "복수 templateKeys 처리 인라인 UI 추가"
+        },
+        {
+          "path": "components/cases/cc-retry-form.tsx",
+          "type": "TO_MODIFY",
+          "description": "templateKeys 배열 처리"
+        },
+        {
+          "path": "lib/ai/resources/template-list.json",
+          "type": "REFERENCE",
+          "description": "templateKey → displayName 변환용"
+        },
+        {
+          "path": "lib/cases/actions.ts",
+          "type": "REFERENCE",
+          "description": "updateCaseCc 시그니처 확인용"
+        }
+      ],
+      "implementationGuide": "// cc-autocomplete.tsx 시그니처 변경\ninterface CcAutocompleteProps {\n  value: string\n  onSelect: (cc: string, hasTemplate: boolean, templateKeys: string[]) => void\n}\n// onSelect 호출 시 item.templateKeys 배열 전달\n\n// new-case-form.tsx 변경\n// 새 상태 추가\nconst [pendingTemplateKeys, setPendingTemplateKeys] = useState<string[] | null>(null)\n\n// handleCcSelect 변경\nconst handleCcSelect = (cc, hasTemplate, templateKeys) => {\n  setCc(cc)\n  if (templateKeys.length >= 2) {\n    // 인라인 선택 UI 표시 (상용구 선택 완료 전까지 updateCaseCc 보류)\n    setPendingTemplateKeys(templateKeys)\n    setCcEditing(false)\n  } else {\n    // 기존 동작: 즉시 설정\n    const key = templateKeys[0] ?? null\n    setSelectedTemplateKey(key)\n    setPendingTemplateKeys(null)\n    // updateCaseCc 호출\n  }\n}\n\n// 인라인 선택 UI (InputArea 내 cc 확정 직후 표시)\n// pendingTemplateKeys가 있을 때만 렌더\n// 버튼 클릭 → handleTemplateKeyConfirm(key) 호출\n// handleTemplateKeyConfirm: setSelectedTemplateKey, setPendingTemplateKeys(null), updateCaseCc 호출\n\n// cc-retry-form.tsx\n// templateKeys 배열 수신, templateKeys[0] ?? null 사용 (기존 동작 유지)",
+      "verificationCriteria": "1. templateKeys 1개인 C.C. 선택: 기존과 동일하게 즉시 자동 설정\n2. templateKeys 2개 이상인 C.C. 선택: 인라인 상용구 선택 UI 표시\n3. 상용구 선택 완료 후 updateCaseCc 정상 호출\n4. '상용구 없이 진행' 선택 시 templateKey=null로 설정\n5. npm run build 타입 에러 없음\n6. 모바일 뷰포트에서 인라인 UI가 깨지지 않음",
+      "analysisResult": "ER Scribe 프로젝트에서 Claude가 C.C./가이드라인/상용구/케이스 예시 데이터를 대화 형식으로 추가·관리할 수 있는 워크플로우 시스템을 구축합니다.\\n\\n핵심 설계 결정:\\n- lib/ai/resources/cc-list.json을 단일 소스로 통합 (ai-docs/cc-list.json 삭제)\\n- 새 구조: { cc, guideKeys[], templateKeys[], aliasOf? }\\n- template-list.json은 유지하되 cc-list.json 업데이트 시 항상 동기화\\n- ai-docs/pending-matches.md 신설로 미매칭 C.C. 추적\\n- CLAUDE.md에 각 작업 유형별 워크플로우 규칙 추가\\n- 복수 templateKeys인 경우 C.C. 선택 즉시 인라인 상용구 선택 UI 표시",
+      "summary": "cc-autocomplete.tsx onSelect 시그니처를 templateKeys[] 배열로 변경. new-case-form.tsx와 case-input-view.tsx 양쪽에 pendingTemplateKeys 상태 + 인라인 상용구 선택 UI 추가 (2개 이상 시 버튼 목록 표시, \"상용구 없이 진행\" 옵션 포함). templateKeys 1개: 자동 설정, 0개: null. npm run build 타입 에러 없이 통과.",
+      "completedAt": "2026-04-21T02:23:37.035Z"
+    }
+  ]
+}
