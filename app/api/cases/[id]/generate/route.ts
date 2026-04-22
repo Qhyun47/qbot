@@ -8,8 +8,6 @@ import { generateHistory, buildHistoryDraft } from "@/lib/ai/generate-history";
 import type { StructuredCase } from "@/lib/ai/types";
 import type { Json } from "@/lib/supabase/types";
 
-export const maxDuration = 60;
-
 const MODEL_VERSION = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
 
 export async function POST(
@@ -155,59 +153,43 @@ export async function POST(
     return NextResponse.json({ error: "AI 정규화 단계 실패" }, { status: 500 });
   }
 
-  // Stage 2: P.I 생성 (실패 허용 — 에러는 기록)
+  // Stage 2~5: 병렬 생성 (각 Stage 실패 허용 — 에러는 기록)
   const cc = caseRow.cc ?? "";
-  let piDraft = "";
   let piError: string | null = null;
-  try {
-    piDraft = await generatePi(
+  let templateError: string | null = null;
+  let peError: string | null = null;
+  let historyError: string | null = null;
+
+  const [piDraft, templateDraft, peDraft, historyDraft] = await Promise.all([
+    generatePi(
       structured,
       inputs.map((i) => ({ rawText: i.raw_text, timeTag: i.time_tag })),
       cc
-    );
-  } catch (e) {
-    piError = e instanceof Error ? e.message : String(e);
-    console.error("[generate] Stage 2 P.I 실패:", piError);
-  }
-
-  // Stage 3: 상용구 생성 (cc_has_template && template_key 있을 때만, 실패 허용)
-  let templateDraft = "";
-  let templateError: string | null = null;
-  if (caseRow.cc_has_template && caseRow.template_key) {
-    try {
-      templateDraft = await generateTemplate(
-        structured,
-        caseRow.template_key,
-        cc
-      );
-    } catch (e) {
-      templateError = e instanceof Error ? e.message : String(e);
-      console.error("[generate] Stage 3 Template 실패:", templateError);
-    }
-  }
-
-  // Stage 4: P/E 생성 (cc_has_template && template_key 있을 때만, 실패 허용)
-  let peDraft = "";
-  let peError: string | null = null;
-  if (caseRow.cc_has_template && caseRow.template_key) {
-    try {
-      peDraft = await generatePe(structured, caseRow.template_key, cc);
-    } catch (e) {
-      peError = e instanceof Error ? e.message : String(e);
-      console.error("[generate] Stage 4 P/E 실패:", peError);
-    }
-  }
-
-  // Stage 5: History 생성 (template.json history 섹션 기반, 없으면 generic 포맷 폴백)
-  let historyDraft = "";
-  let historyError: string | null = null;
-  try {
-    historyDraft = await generateHistory(structured, caseRow.template_key, cc);
-  } catch (e) {
-    historyError = e instanceof Error ? e.message : String(e);
-    console.error("[generate] Stage 5 History 실패:", historyError);
-    historyDraft = buildHistoryDraft(structured);
-  }
+    ).catch((e) => {
+      piError = e instanceof Error ? e.message : String(e);
+      console.error("[generate] Stage 2 P.I 실패:", piError);
+      return "";
+    }),
+    caseRow.cc_has_template && caseRow.template_key
+      ? generateTemplate(structured, caseRow.template_key, cc).catch((e) => {
+          templateError = e instanceof Error ? e.message : String(e);
+          console.error("[generate] Stage 3 Template 실패:", templateError);
+          return "";
+        })
+      : Promise.resolve(""),
+    caseRow.cc_has_template && caseRow.template_key
+      ? generatePe(structured, caseRow.template_key, cc).catch((e) => {
+          peError = e instanceof Error ? e.message : String(e);
+          console.error("[generate] Stage 4 P/E 실패:", peError);
+          return "";
+        })
+      : Promise.resolve(""),
+    generateHistory(structured, caseRow.template_key, cc).catch((e) => {
+      historyError = e instanceof Error ? e.message : String(e);
+      console.error("[generate] Stage 5 History 실패:", historyError);
+      return buildHistoryDraft(structured);
+    }),
+  ]);
 
   // Stage 2/3/4/5 부분 실패 메시지 합산 (Stage 1 성공이므로 status는 completed 유지)
   const partialErrorMessage =

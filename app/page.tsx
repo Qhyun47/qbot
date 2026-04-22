@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { InstallBanner } from "@/components/pwa/install-banner";
 
 // 로그인된 사용자를 대시보드로 리다이렉트하는 서버 컴포넌트
 // getUser()를 사용해 Supabase 서버에서 실제 토큰 유효성을 검증
@@ -42,6 +43,7 @@ export default function Home() {
           회원가입
         </Link>
       </div>
+      <InstallBanner />
     </main>
   );
 }

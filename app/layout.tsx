@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { SwRegister } from "@/components/pwa/sw-register";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -11,6 +12,17 @@ export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: "규봇",
   description: "응급실 의사를 위한 AI 차팅 어시스턴트",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "규봇",
+  },
+  icons: { apple: "/icons/apple-touch-icon.png" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#09090b",
 };
 
 const geistSans = Geist({
@@ -33,6 +45,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <SwRegister />
           {children}
         </ThemeProvider>
       </body>

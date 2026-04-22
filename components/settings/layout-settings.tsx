@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import {
   LayoutTemplate,
   Rows2,
@@ -91,7 +91,12 @@ export function LayoutSettings({
   const [foldFallbackLayout, setFoldFallbackLayout] =
     useState<FoldFallbackLayout>(defaultFoldFallbackLayout);
   const [, startTransition] = useTransition();
+  const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const isSplit = selectedLayout !== "single";
 
@@ -130,17 +135,17 @@ export function LayoutSettings({
         </div>
         <div className="flex gap-3">
           {THEME_OPTIONS.map(({ value, label, Icon }) => {
-            const isSelected = theme === value;
+            const isSelected = mounted && theme === value;
             return (
               <button
                 key={value}
                 type="button"
                 onClick={() => setTheme(value)}
                 className={cn(
-                  "relative flex flex-1 flex-col items-center gap-2 rounded-lg border p-4 text-center transition-all",
+                  "relative flex flex-1 flex-col items-center gap-2 rounded-lg border-2 p-4 text-center transition-all",
                   isSelected
-                    ? "border-foreground bg-card shadow-sm"
-                    : "border-border bg-card hover:border-foreground/30 hover:bg-muted/30"
+                    ? "border-zinc-900 bg-zinc-100 shadow-sm dark:border-zinc-100 dark:bg-zinc-800"
+                    : "border-zinc-300 bg-white hover:border-zinc-500 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-900 dark:hover:border-zinc-400"
                 )}
               >
                 {isSelected && (
@@ -151,10 +156,21 @@ export function LayoutSettings({
                 <Icon
                   className={cn(
                     "size-6",
-                    isSelected ? "text-foreground" : "text-muted-foreground"
+                    isSelected
+                      ? "text-zinc-900 dark:text-zinc-100"
+                      : "text-zinc-400 dark:text-zinc-500"
                   )}
                 />
-                <p className="text-xs font-medium text-foreground">{label}</p>
+                <p
+                  className={cn(
+                    "text-xs font-medium",
+                    isSelected
+                      ? "text-zinc-900 dark:text-zinc-100"
+                      : "text-zinc-500 dark:text-zinc-400"
+                  )}
+                >
+                  {label}
+                </p>
               </button>
             );
           })}
@@ -178,10 +194,10 @@ export function LayoutSettings({
                 type="button"
                 onClick={() => setSelectedLayout(value)}
                 className={cn(
-                  "relative flex flex-col items-center gap-3 rounded-lg border p-5 text-center transition-all",
+                  "relative flex flex-col items-center gap-3 rounded-lg border-2 p-5 text-center transition-all",
                   isSelected
-                    ? "border-foreground bg-card shadow-sm"
-                    : "border-border bg-card hover:border-foreground/30 hover:bg-muted/30"
+                    ? "border-zinc-900 bg-zinc-100 shadow-sm dark:border-zinc-100 dark:bg-zinc-800"
+                    : "border-zinc-300 bg-white hover:border-zinc-500 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-900 dark:hover:border-zinc-400"
                 )}
               >
                 {isSelected && (
@@ -192,11 +208,20 @@ export function LayoutSettings({
                 <Icon
                   className={cn(
                     "size-8",
-                    isSelected ? "text-foreground" : "text-muted-foreground"
+                    isSelected
+                      ? "text-zinc-900 dark:text-zinc-100"
+                      : "text-zinc-400 dark:text-zinc-500"
                   )}
                 />
                 <div>
-                  <p className="text-sm font-semibold text-foreground">
+                  <p
+                    className={cn(
+                      "text-sm font-semibold",
+                      isSelected
+                        ? "text-zinc-900 dark:text-zinc-100"
+                        : "text-zinc-500 dark:text-zinc-400"
+                    )}
+                  >
                     {label}
                   </p>
                   <p className="mt-0.5 text-xs text-muted-foreground">
@@ -240,7 +265,7 @@ export function LayoutSettings({
       )}
 
       {selectedLayout === "split_horizontal" && (
-        <div className="space-y-4 rounded-lg border p-4">
+        <div className="space-y-4 rounded-lg border-2 border-zinc-300 p-4 dark:border-zinc-600">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium">갤럭시 폴드 자동 전환</p>
@@ -256,13 +281,8 @@ export function LayoutSettings({
             />
           </div>
 
-          <div
-            className={cn(
-              "space-y-2",
-              !foldAutoSwitch && "pointer-events-none opacity-40"
-            )}
-          >
-            <p className="text-xs font-medium text-muted-foreground">
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
               접었을 때 전환할 레이아웃
             </p>
             <div className="flex gap-3">
@@ -272,18 +292,23 @@ export function LayoutSettings({
                   split_vertical: "상하 분할",
                 };
                 const isSelected = foldFallbackLayout === value;
+                const isDisabled = !foldAutoSwitch;
                 return (
                   <button
                     key={value}
                     type="button"
-                    disabled={!foldAutoSwitch}
+                    disabled={isDisabled}
                     onClick={() => setFoldFallbackLayout(value)}
-                    className={cn(
-                      "flex flex-1 items-center justify-center rounded-md border px-3 py-2 text-sm transition-all",
-                      isSelected
-                        ? "border-foreground bg-card font-medium shadow-sm"
-                        : "border-border bg-card hover:border-foreground/30"
-                    )}
+                    style={{
+                      border: isSelected
+                        ? "2px solid #3f3f46"
+                        : "2px solid #a1a1aa",
+                      background: isSelected ? "#e4e4e7" : "#f4f4f5",
+                      color: isSelected ? "#18181b" : "#52525b",
+                      opacity: isDisabled ? 0.7 : 1,
+                      cursor: isDisabled ? "not-allowed" : "pointer",
+                    }}
+                    className="flex flex-1 items-center justify-center rounded-md px-3 py-2.5 text-sm font-medium transition-all"
                   >
                     {isSelected && (
                       <Check className="mr-1.5 size-3.5 shrink-0" />

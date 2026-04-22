@@ -5,6 +5,7 @@ import { getAiAccessInfo } from "@/lib/auth/ai-access";
 import { AiAccessRequestForm } from "@/components/ai-access/ai-access-request-form";
 import { createClient } from "@/lib/supabase/server";
 import { Separator } from "@/components/ui/separator";
+import { InstallSection } from "@/components/settings/install-section";
 
 async function SettingsContent() {
   const {
@@ -93,6 +94,8 @@ export default function SettingsPage() {
         <Suspense fallback={null}>
           <AiAccessSection />
         </Suspense>
+        <Separator />
+        <InstallSection />
       </div>
     </div>
   );

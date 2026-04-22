@@ -21,6 +21,6 @@ export async function normalizeInputs(
     userPrompt,
     NORMALIZE_SYSTEM_PROMPT,
     schema,
-    3000
+    8192
   );
 }

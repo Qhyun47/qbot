@@ -51,7 +51,7 @@
             "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. 카드-섹션 매핑 기준: onset/duration/location/character/severity/aggravating_relieving_factor → [hpi] | associated_symptom/prior_episode/vital_sign → [hpi] | past_history/medication_history/operation_history/family_history → [history] 전용 (HPI에 포함 금지)",
             "items": {
               "type": "string",
-              "enum": ["hpi", "history"]
+              "enum": ["pi", "template", "history", "pe"]
             },
             "minItems": 1
           }

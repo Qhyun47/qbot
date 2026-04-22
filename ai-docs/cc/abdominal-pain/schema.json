@@ -56,7 +56,7 @@
             "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. 카드-섹션 매핑 기준: onset/location/character/severity/progression/aggravating_factor/relieving_factor/food_related/associated_symptom → [hpi, template] | npo_status/bowel_habit/pregnancy_possibility/gi_procedure_history → [template] | prior_visit → [hpi] | past_history/medication_history/operation_history/family_history → [history] 전용 (HPI·상용구에 포함 금지)",
             "items": {
               "type": "string",
-              "enum": ["hpi", "template", "history"]
+              "enum": ["pi", "template", "history", "pe"]
             },
             "minItems": 1
           }

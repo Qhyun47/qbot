@@ -1,4 +1,4 @@
--- ER Scribe 데이터베이스 스키마 DDL 초안
+-- 규봇 데이터베이스 스키마 DDL 초안
 -- 실제 실행은 Task 009에서 Supabase MCP(apply_migration / execute_sql)로 수행
 -- PostgreSQL 기준. Supabase의 uuid, pg_crypto extension은 기본 활성화 상태로 가정
 
@@ -97,7 +97,7 @@ CREATE TABLE public.case_results (
 CREATE TABLE public.interview_guidelines (
   id          uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id     uuid        REFERENCES public.profiles(id) ON DELETE CASCADE,
-  cc          text        NOT NULL,
+  guide_key   text        NOT NULL,
   content     text        NOT NULL,
   created_at  timestamptz NOT NULL DEFAULT now(),
   updated_at  timestamptz NOT NULL DEFAULT now()
@@ -163,5 +163,40 @@ CREATE INDEX IF NOT EXISTS case_inputs_case_id_display_order_idx
 CREATE INDEX IF NOT EXISTS case_results_case_id_generated_at_idx
   ON public.case_results(case_id, generated_at DESC);
 
-CREATE INDEX IF NOT EXISTS interview_guidelines_user_id_cc_idx
-  ON public.interview_guidelines(user_id, cc);
+CREATE INDEX IF NOT EXISTS interview_guidelines_user_id_guide_key_idx
+  ON public.interview_guidelines(user_id, guide_key);
+
+CREATE INDEX IF NOT EXISTS ai_usage_logs_user_id_created_at_idx
+  ON public.ai_usage_logs(user_id, created_at DESC);
+
+-- ============================================================
+-- error_logs 테이블 — 사용자 제출 에러 로그
+-- ============================================================
+
+CREATE TABLE public.error_logs (
+  id            uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id       uuid        REFERENCES public.profiles(id) ON DELETE SET NULL,
+  page_url      text        NOT NULL,
+  error_message text        NOT NULL,
+  stack_trace   text,
+  user_agent    text,
+  created_at    timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.error_logs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can insert own error logs"
+  ON public.error_logs FOR INSERT
+  WITH CHECK (auth.uid() = user_id OR user_id IS NULL);
+
+CREATE POLICY "Admins can select all error logs"
+  ON public.error_logs FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() AND is_admin = true
+    )
+  );
+
+CREATE INDEX IF NOT EXISTS error_logs_created_at_idx
+  ON public.error_logs(created_at DESC);

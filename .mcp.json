@@ -24,7 +24,7 @@
         "C:/Users/kh047/workspaces/mcp-shrimp-task-manager/dist/index.js"
       ],
       "env": {
-        "DATA_DIR": "C:/Users/kh047/workspaces/er-scribe/shrimp_data",
+        "DATA_DIR": "C:/Users/kh047/workspaces/qbot/shrimp_data",
         "TEMPLATES_USE": "en",
         "ENABLE_GUI": "true"
       }

@@ -1,5 +1,6 @@
 import { Suspense, type ReactNode } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Toaster } from "sonner";
 import { LogoutButton } from "@/components/logout-button";
 import { MobileNav } from "@/components/mobile-nav";
@@ -48,9 +49,17 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             </Suspense>
             <Link
               href="/dashboard"
-              className="ml-2 text-sm font-bold tracking-tight lg:ml-0"
+              className="ml-2 lg:ml-0"
+              aria-label="규봇 홈으로 이동"
             >
-              규봇
+              <Image
+                src="/icons/icon-transparent.png"
+                alt="규봇"
+                width={32}
+                height={32}
+                className="dark:invert"
+                priority
+              />
             </Link>
             <Suspense fallback={<div className="ml-8 hidden lg:flex" />}>
               <NavLinksWithAdmin />

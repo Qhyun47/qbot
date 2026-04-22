@@ -71,7 +71,9 @@ export function CaseInputView({
   const [bedPickerOpen, setBedPickerOpen] = useState(false);
   const [cc, setCc] = useState<string | null>(defaultCc);
   const [ccEditing, setCcEditing] = useState(defaultCc === null);
-  const [guidelineContent, setGuidelineContent] = useState<string | null>(null);
+  const [_guidelineContent, setGuidelineContent] = useState<string | null>(
+    null
+  );
   const [selectedTemplateKey, setSelectedTemplateKey] = useState<string | null>(
     defaultTemplateKey
   );
@@ -91,8 +93,8 @@ export function CaseInputView({
   useEffect(() => {
     if (defaultCc) {
       loadGuideline(defaultCc)
-        .then(({ customContent, systemContent }) => {
-          setGuidelineContent(customContent ?? systemContent);
+        .then((result) => {
+          setGuidelineContent(result.mode === "auto" ? result.content : null);
         })
         .catch(() => setGuidelineContent(null));
     }
@@ -121,9 +123,8 @@ export function CaseInputView({
       setSelectedTemplateKey(null);
       startTransition(async () => {
         try {
-          const { customContent, systemContent } =
-            await loadGuideline(selectedCc);
-          setGuidelineContent(customContent ?? systemContent);
+          const result = await loadGuideline(selectedCc);
+          setGuidelineContent(result.mode === "auto" ? result.content : null);
         } catch {
           setGuidelineContent(null);
         }
@@ -135,9 +136,8 @@ export function CaseInputView({
       startTransition(async () => {
         await updateCaseCc(caseId, selectedCc, hasTemplate, key);
         try {
-          const { customContent, systemContent } =
-            await loadGuideline(selectedCc);
-          setGuidelineContent(customContent ?? systemContent);
+          const result = await loadGuideline(selectedCc);
+          setGuidelineContent(result.mode === "auto" ? result.content : null);
         } catch {
           setGuidelineContent(null);
         }
@@ -268,7 +268,6 @@ export function CaseInputView({
   const GuideArea = (
     <div className="h-full">
       <GuidelinePanel
-        content={guidelineContent}
         cc={cc}
         templateKey={selectedTemplateKey}
         onGuidelineChange={handleGuidelineChange}

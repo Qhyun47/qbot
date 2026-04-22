@@ -1,0 +1,7 @@
+[
+  { "guideKey": "chest-pain", "displayName": "Chest pain" },
+  { "guideKey": "dyspnea", "displayName": "Dyspnea" },
+  { "guideKey": "hemoptysis", "displayName": "Hemoptysis" },
+  { "guideKey": "abdominal-pain", "displayName": "Abdominal pain" },
+  { "guideKey": "gi-bleeding", "displayName": "GI bleeding" }
+]

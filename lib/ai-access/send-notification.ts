@@ -52,9 +52,9 @@ export async function sendAiRequestNotification(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "ER Scribe <noreply@er-scribe.com>",
+        from: "규봇 <noreply@qbot.app>",
         to: [ADMIN_EMAIL],
-        subject: `[ER Scribe] AI 사용 신청: ${name}`,
+        subject: `[규봇] AI 사용 신청: ${name}`,
         html,
       }),
     });

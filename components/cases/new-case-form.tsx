@@ -28,7 +28,6 @@ import {
   deleteCase,
   overrideTemplateKey,
 } from "@/lib/cases/actions";
-import { loadGuideline } from "@/lib/guidelines/actions";
 import type {
   BedZone,
   CaseInput,
@@ -68,7 +67,6 @@ export function NewCaseForm({
   const [bedPickerOpen, setBedPickerOpen] = useState(true);
   const [cc, setCc] = useState<string | null>(null);
   const [ccEditing, setCcEditing] = useState(true);
-  const [guidelineContent, setGuidelineContent] = useState<string | null>(null);
   const [selectedTemplateKey, setSelectedTemplateKey] = useState<string | null>(
     null
   );
@@ -123,33 +121,16 @@ export function NewCaseForm({
   ) => {
     setCc(selectedCc);
     setCcEditing(false);
-    setGuidelineContent(null);
 
     if (templateKeys.length >= 2) {
       setPendingTemplateKeys(templateKeys);
       setSelectedTemplateKey(null);
-      startTransition(async () => {
-        try {
-          const { customContent, systemContent } =
-            await loadGuideline(selectedCc);
-          setGuidelineContent(customContent ?? systemContent);
-        } catch {
-          setGuidelineContent(null);
-        }
-      });
     } else {
       const key = templateKeys[0] ?? null;
       setPendingTemplateKeys(null);
       setSelectedTemplateKey(key);
-      startTransition(async () => {
-        if (caseId) await updateCaseCc(caseId, selectedCc, hasTemplate, key);
-        try {
-          const { customContent, systemContent } =
-            await loadGuideline(selectedCc);
-          setGuidelineContent(customContent ?? systemContent);
-        } catch {
-          setGuidelineContent(null);
-        }
+      startTransition(() => {
+        if (caseId) updateCaseCc(caseId, selectedCc, hasTemplate, key);
       });
     }
   };
@@ -162,7 +143,7 @@ export function NewCaseForm({
     }
   };
 
-  const handleGuidelineChange = (_guidelineCc: string) => {
+  const handleGuidelineChange = (_guideKey: string) => {
     // GuidelinePanel 내부에서 콘텐츠 로드까지 처리
   };
 
@@ -211,7 +192,7 @@ export function NewCaseForm({
         const data = await res.json().catch(() => ({}));
         alert(
           data.error ??
-            "오늘 AI 차팅 생성 한도(30회)를 초과했습니다. 내일 다시 시도해주세요."
+            "오늘 AI 차팅 생성 한도(50회)를 초과했습니다. 내일 다시 시도해주세요."
         );
         setGenerating(false);
         return;
@@ -296,7 +277,6 @@ export function NewCaseForm({
   const GuideArea = (
     <div className="h-full">
       <GuidelinePanel
-        content={guidelineContent}
         cc={cc}
         templateKey={selectedTemplateKey}
         onGuidelineChange={handleGuidelineChange}

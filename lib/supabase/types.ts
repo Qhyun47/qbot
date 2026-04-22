@@ -182,26 +182,32 @@ export type Database = {
       };
       interview_guidelines: {
         Row: {
-          cc: string;
+          guide_key: string;
           content: string;
           created_at: string;
           id: string;
+          pdf_path: string | null;
+          source_type: string;
           updated_at: string;
           user_id: string | null;
         };
         Insert: {
-          cc: string;
+          guide_key: string;
           content: string;
           created_at?: string;
           id?: string;
+          pdf_path?: string | null;
+          source_type?: string;
           updated_at?: string;
           user_id?: string | null;
         };
         Update: {
-          cc?: string;
+          guide_key?: string;
           content?: string;
           created_at?: string;
           id?: string;
+          pdf_path?: string | null;
+          source_type?: string;
           updated_at?: string;
           user_id?: string | null;
         };
@@ -457,6 +463,44 @@ export type Database = {
           },
         ];
       };
+      error_logs: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          page_url: string;
+          error_message: string;
+          stack_trace: string | null;
+          user_agent: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          page_url: string;
+          error_message: string;
+          stack_trace?: string | null;
+          user_agent?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          page_url?: string;
+          error_message?: string | null;
+          stack_trace?: string | null;
+          user_agent?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "error_logs_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       ai_access_requests: {
@@ -663,6 +707,11 @@ export type AiDocumentInsert =
 // 편의 타입 — ai_document_versions
 export type AiDocumentVersion =
   Database["public"]["Tables"]["ai_document_versions"]["Row"];
+
+// 편의 타입 — error_logs
+export type ErrorLog = Database["public"]["Tables"]["error_logs"]["Row"];
+export type ErrorLogInsert =
+  Database["public"]["Tables"]["error_logs"]["Insert"];
 
 // 편의 타입 — enum
 export type CaseStatus = Database["public"]["Enums"]["case_status"];

@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import ccList from "@/lib/ai/resources/cc-list.json";
+import guideList from "@/lib/ai/resources/guide-list.json";
 import { GuidelinesEditor } from "@/components/guidelines/guidelines-editor";
 import { getAllCustomGuidelines } from "@/lib/guidelines/actions";
 import { loadGuide } from "@/lib/ai/load-resources";
@@ -7,23 +7,19 @@ import { loadGuide } from "@/lib/ai/load-resources";
 async function GuidelinesContent() {
   const initialGuidelines = await getAllCustomGuidelines();
 
-  const primaryList = ccList.filter((item) => !("aliasOf" in item));
   const systemGuides: Record<string, string> = {};
-  for (const item of primaryList) {
-    const templateKey = (item as { guideKeys?: string[] }).guideKeys?.[0];
-    if (templateKey) {
-      try {
-        const guide = loadGuide(templateKey);
-        if (guide) systemGuides[item.cc] = guide;
-      } catch {
-        // 가이드 파일 없으면 스킵
-      }
+  for (const item of guideList) {
+    try {
+      const guide = loadGuide(item.guideKey);
+      if (guide) systemGuides[item.guideKey] = guide;
+    } catch {
+      // 가이드 파일 없으면 스킵
     }
   }
 
   return (
     <GuidelinesEditor
-      ccList={ccList}
+      guideList={guideList}
       initialGuidelines={initialGuidelines}
       systemGuides={systemGuides}
     />

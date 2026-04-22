@@ -21,6 +21,7 @@ export function NavLinks({ isAdmin }: NavLinksProps) {
     ? [
         { href: "/admin/users", label: "사용자 관리" },
         { href: "/admin/documents", label: "문서 관리" },
+        { href: "/admin/error-logs", label: "에러 로그" },
       ]
     : [];
 
