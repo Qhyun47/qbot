@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
 import typography from "@tailwindcss/typography";
+import plugin from "tailwindcss/plugin";
 
 export default {
   darkMode: ["class"],
@@ -61,5 +62,12 @@ export default {
       },
     },
   },
-  plugins: [tailwindcssAnimate, typography],
+  plugins: [
+    tailwindcssAnimate,
+    typography,
+    plugin(({ addVariant }) => {
+      addVariant("is-desktop", '[data-view="desktop"] &');
+      addVariant("is-mobile", ':not([data-view="desktop"]) &');
+    }),
+  ],
 } satisfies Config;

@@ -24,11 +24,19 @@ export function CcRetryForm({ caseId, currentCc }: CcRetryFormProps) {
 
     setLoading(true);
     try {
-      const found = (ccList as { cc: string; templateKeys: string[] }[]).find(
+      const list = ccList as {
+        cc: string;
+        templateKeys: string[];
+        aliasOf?: string;
+      }[];
+      const found = list.find(
         (item) => item.cc.toLowerCase() === cc.trim().toLowerCase()
       );
-      const hasTemplate = (found?.templateKeys?.length ?? 0) > 0;
-      const templateKey = found?.templateKeys?.[0] ?? null;
+      const resolved = found?.aliasOf
+        ? (list.find((i) => i.cc === found.aliasOf) ?? found)
+        : found;
+      const hasTemplate = (resolved?.templateKeys?.length ?? 0) > 0;
+      const templateKey = resolved?.templateKeys?.[0] ?? null;
       await updateCaseCc(caseId, cc.trim(), hasTemplate, templateKey);
       const res = await fetch(`/api/cases/${caseId}/generate`, {
         method: "POST",

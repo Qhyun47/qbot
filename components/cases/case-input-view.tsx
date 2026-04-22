@@ -315,7 +315,7 @@ export function CaseInputView({
         )}
 
         <div className="flex flex-1 items-center justify-end gap-2">
-          <div className="hidden items-center gap-0.5 rounded-md border p-0.5 lg:flex">
+          <div className="hidden items-center gap-0.5 rounded-md border p-0.5 is-desktop:flex">
             {LAYOUT_OPTIONS.map(({ value, Icon, label }) => (
               <button
                 key={value}

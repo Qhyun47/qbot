@@ -306,3 +306,7 @@ html[data-view="desktop"] .lg\:inline-flex {
     0px 8px 10px -6px hsl(0 0% 0% / 0.35);
   --shadow-2xl: 0px 25px 50px -12px hsl(0 0% 0% / 0.55);
 }
+
+[data-view="desktop"] main {
+  min-width: 680px;
+}

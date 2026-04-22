@@ -64,7 +64,9 @@ export async function listCasesByBed(): Promise<Case[]> {
     .select("*")
     .eq("user_id", user.id)
     .is("board_hidden_at", null)
-    .or("status.neq.draft,cc.not.is.null,has_inputs.eq.true")
+    .or(
+      "status.neq.draft,cc.not.is.null,has_inputs.eq.true,bed_explicitly_set.eq.true"
+    )
     .order("bed_zone", { ascending: true })
     .order("bed_number", { ascending: true });
 
@@ -85,7 +87,9 @@ export async function listCasesWithin12h(): Promise<Case[]> {
     .select("*")
     .eq("user_id", user.id)
     .gte("created_at", since)
-    .or("status.neq.draft,cc.not.is.null,has_inputs.eq.true")
+    .or(
+      "status.neq.draft,cc.not.is.null,has_inputs.eq.true,bed_explicitly_set.eq.true"
+    )
     .order("created_at", { ascending: false });
 
   return data ?? [];

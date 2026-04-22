@@ -69,6 +69,7 @@ export function StatusBoardCard({ case: c }: StatusBoardCardProps) {
           <BedBadge
             bedZone={c.bed_zone as BedZone}
             bedNumber={c.bed_number}
+            bedExplicitlySet={c.bed_explicitly_set}
             size="sm"
           />
           <StatusBadge status={c.status as CaseStatus} />

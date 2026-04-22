@@ -104,56 +104,79 @@ import { Button } from "@/components/ui/button";
 
 사용자가 C.C., 가이드라인, 상용구, 케이스 예시 데이터를 추가하거나 수정을 요청할 때 아래 절차를 따릅니다.
 
+**C.C. / 가이드라인 / 상용구는 완전히 독립적으로 등록됩니다.** 하나를 등록한다고 다른 것의 등록을 강요하지 않으며, 단순히 커넥션(연결) 여부만 확인합니다.
+
 ### 핵심 파일 위치
 
 | 파일                                  | 역할                                                                        |
 | ------------------------------------- | --------------------------------------------------------------------------- |
 | `lib/ai/resources/cc-list.json`       | 정형 C.C. 목록 (단일 소스, `{ cc, guideKeys[], templateKeys[], aliasOf? }`) |
+| `lib/ai/resources/guide-list.json`    | 가이드라인 표시명 목록 (`{ guideKey, displayName }`)                        |
 | `lib/ai/resources/template-list.json` | 상용구 표시명 목록 (`{ templateKey, displayName }`)                         |
 | `ai-docs/cc/{key}/guide.md`           | 시스템 가이드라인 파일                                                      |
 | `ai-docs/cc/{key}/template.json`      | 상용구 템플릿 파일 (`fields`, `pe`, `history` 섹션 포함)                    |
 | `ai-docs/cc/{key}/schema.json`        | AI 정규화 스키마 파일                                                       |
-| `ai-docs/pending-matches.md`          | 미매칭 C.C. 추적 파일                                                       |
+| `ai-docs/pending-matches.md`          | 대기 중인 커넥션 추적 파일 (C.C./가이드라인/상용구 간 4방향)                |
 | `fixtures/{cc-key}-{n}.json`          | AI 품질 검증용 케이스 예시 데이터                                           |
+
+---
+
+### 용어 정의
+
+- **HPI**: AI가 줄글로 생성하는 현병력(Present Illness) 서술 영역
+- **P.I. template**: 상용구 중 현병력 영역 (`template.json`의 `fields` 섹션 — chest-pain 기준 "NTG response?"로 시작하는 구조화된 필드)
+- **상용구**: P.I. template + History + P/E 3개 섹션을 통합하는 단어. `template.json` 파일 전체를 지칭
+- **커넥션**: C.C.와 가이드라인/상용구 간의 연결. C.C. 입력 시 연결된 가이드라인/상용구를 자동 추천하는 데 사용
 
 ---
 
 ### 정형 C.C. 추가 절차
 
 1. `lib/ai/resources/cc-list.json`에 항목 추가:
+
    ```json
    { "cc": "Dizziness", "guideKeys": [], "templateKeys": [] }
    ```
 
    - C.C. 표기는 Sentence case (의학 약어 제외), key는 kebab-case
-2. 가이드라인/상용구 키를 사용자가 함께 알려준 경우:
-   - **1개**: 즉시 해당 키를 guideKeys/templateKeys에 추가
-   - **2개 이상**: 추천 목록으로 제시만 하고 자동 연결하지 않음. 사용자가 선택하면 그때 추가
-3. 가이드라인/상용구 없이 C.C.만 등록하는 경우:
-   - `ai-docs/pending-matches.md`를 읽어 동일/유사 항목이 이미 있는지 확인
-   - 없으면 아래 양식으로 새 항목 추가:
-     ```
-     ### {C.C. 이름}
-     - 등록일: YYYY-MM-DD
-     - 가이드라인: 없음
-     - 상용구: 없음
-     - 메모: -
-     ```
-4. 상용구(templateKeys)가 추가된 경우 → 케이스 예시 데이터 절차 참조
+   - `aliasOf`가 있는 C.C.는 직접 커넥션 추가 불가 — 원본 C.C.의 guideKeys/templateKeys를 통해 연결
+
+2. 사용자가 **guideKey** 커넥션을 언급한 경우:
+   - `guide-list.json`에 해당 key **존재** → `guideKeys`에 즉시 추가
+   - `guide-list.json`에 해당 key **없음** → `ai-docs/pending-matches.md` 섹션 1(C.C.→가이드라인 대기)에 기록 (중복 확인 후)
+
+3. 사용자가 **templateKey** 커넥션을 언급한 경우:
+   - `template-list.json`에 해당 key **존재** → `templateKeys`에 즉시 추가
+   - `template-list.json`에 해당 key **없음** → `ai-docs/pending-matches.md` 섹션 2(C.C.→상용구 대기)에 기록 (중복 확인 후)
+
+4. 커넥션 언급이 없으면 pending 기록 없음
+
+5. `ai-docs/pending-matches.md` 섹션 3(가이드라인→C.C. 대기)에서 이 C.C.를 기다리는 항목 조회
+   - 있으면: "이 C.C.를 {guideKey} 가이드라인과 연결할까요?" 질문 → 수락/거절 처리
+
+6. `ai-docs/pending-matches.md` 섹션 4(상용구→C.C. 대기)에서 이 C.C.를 기다리는 항목 조회
+   - 있으면: "이 C.C.를 {templateKey} 상용구와 연결할까요?" 질문 → 수락/거절 처리
 
 ---
 
 ### 가이드라인 추가 절차
 
 1. `ai-docs/cc/{guideKey}/guide.md` 파일 생성 (Markdown, 문진 체크리스트 + 감별진단 + 위험신호 포함)
-2. **`ai-docs/pending-matches.md`를 읽는다** → 새 가이드라인 이름과 동일/유사한 미매칭 C.C.가 있는지 확인
-   - 있으면: "이 가이드라인을 {C.C.}와 매칭할까요?" 사용자에게 질문
-   - 없으면: 이름 기반으로 적절한 C.C.를 추천하며 매칭 여부 질문
-3. 매칭할 C.C.가 결정되면:
-   - `lib/ai/resources/cc-list.json`에서 해당 C.C. 항목의 `guideKeys`에 키 추가
-   - `cc-list.json`에 해당 C.C.가 없으면: 즉시 정형 C.C. 추가 여부를 사용자에게 질문
-4. 매칭 완료 시 `ai-docs/pending-matches.md` 업데이트:
-   - 미매칭 항목에서 제거 → 매칭 완료 기록 테이블에 추가
+
+2. `lib/ai/resources/guide-list.json`에 항목 추가:
+
+   ```json
+   { "guideKey": "new-key", "displayName": "Display Name" }
+   ```
+
+3. 사용자가 **C.C. 커넥션**을 언급한 경우:
+   - `cc-list.json`에 해당 C.C. **존재** → 해당 C.C.의 `guideKeys`에 즉시 추가
+   - `cc-list.json`에 해당 C.C. **없음** → `ai-docs/pending-matches.md` 섹션 3(가이드라인→C.C. 대기)에 기록 (중복 확인 후)
+   - 커넥션 언급이 없으면 아무것도 기록하지 않음
+
+4. `ai-docs/pending-matches.md` 섹션 1(C.C.→가이드라인 대기)에서 이 guideKey를 기다리는 C.C. 조회
+   - 있으면: "이 가이드라인을 {C.C.}와 연결할까요?" 질문 → 수락/거절 처리
+
 5. **가이드라인 추가 시 케이스 예시 데이터는 불필요** (AI 파이프라인에 직접 영향 없음)
 
 ---
@@ -162,18 +185,31 @@ import { Button } from "@/components/ui/button";
 
 1. 아래 파일들을 생성:
    - `ai-docs/cc/{templateKey}/template.json` — 상용구 템플릿 (기존 chest-pain.json 구조 참조)
-     - **`pe` 섹션 필수**: `fields[]` + `output_example` 구조. 사용자에게 P/E 양식을 요청해 입력받아야 함
+     - **`fields` 섹션 필수 (P.I. template)**: `fields[]` + `output_example` 구조. 사용자에게 P.I. template 양식을 요청해 입력받아야 함
      - **`history` 섹션 필수**: `fields[]` + `output_example` 구조. 사용자에게 History 양식을 요청해 입력받아야 함
+     - **`pe` 섹션 필수**: `fields[]` + `output_example` 구조. 사용자에게 P/E 양식을 요청해 입력받아야 함
    - `ai-docs/cc/{templateKey}/schema.json` — AI 정규화 스키마 (기존 chest-pain.json 구조 참조)
+
 2. `lib/ai/resources/template-list.json`에 항목 추가:
+
    ```json
    { "templateKey": "new-key", "displayName": "Display Name" }
    ```
-3. **`ai-docs/pending-matches.md`를 읽는다** → 가이드라인 추가 절차의 2~4단계와 동일하게 C.C. 매칭 처리. 단, `templateKeys`에 추가
-4. **P/E 및 History 양식 수집**: 상용구 파일 생성 전 반드시 사용자에게 순서대로 요청:
-   - "이 상용구의 P/E 양식(기본값 상태의 출력 포맷)을 알려주세요."
-   - "이 상용구의 History 양식(기본값 상태의 출력 포맷)을 알려주세요."
-5. **케이스 예시 데이터 요청**: 상용구 추가가 완료되면 반드시 사용자에게 다음을 요청:
+
+3. 사용자가 **C.C. 커넥션**을 언급한 경우:
+   - `cc-list.json`에 해당 C.C. **존재** → 해당 C.C.의 `templateKeys`에 즉시 추가
+   - `cc-list.json`에 해당 C.C. **없음** → `ai-docs/pending-matches.md` 섹션 4(상용구→C.C. 대기)에 기록 (중복 확인 후)
+   - 커넥션 언급이 없으면 아무것도 기록하지 않음
+
+4. `ai-docs/pending-matches.md` 섹션 2(C.C.→상용구 대기)에서 이 templateKey를 기다리는 C.C. 조회
+   - 있으면: "이 상용구를 {C.C.}와 연결할까요?" 질문 → 수락/거절 처리
+
+5. **양식 수집**: 상용구 파일 생성 전 반드시 사용자에게 순서대로 요청:
+   1. "이 상용구의 P.I. template 양식(기본값 상태의 출력 포맷)을 알려주세요."
+   2. "이 상용구의 History 양식(기본값 상태의 출력 포맷)을 알려주세요."
+   3. "이 상용구의 P/E 양식(기본값 상태의 출력 포맷)을 알려주세요."
+
+6. **케이스 예시 데이터 요청**: 상용구 추가가 완료되면 반드시 사용자에게 다음을 요청:
    > "AI 차팅 품질 향상을 위해 {C.C.} 케이스 예시 데이터가 필요합니다. `fixtures/{cc-key}-{n}.json` 형식으로 실제 문진 카드 입력 예시를 제공해 주실 수 있나요?"
 
 ---
@@ -192,6 +228,27 @@ import { Button } from "@/components/ui/button";
 
 ---
 
+### 커넥션 처리 공통 규칙
+
+**수락 시**: `cc-list.json`에서 해당 C.C.의 `guideKeys` 또는 `templateKeys` 업데이트 + `ai-docs/pending-matches.md` 해당 행 삭제
+
+**거절 시**: `ai-docs/pending-matches.md` 해당 행 삭제만 (재연결 필요 시 수동 처리)
+
+**중복 방지**: pending 기록 전 동일 (C.C., key) 쌍이 이미 해당 섹션에 존재하는지 확인
+
+**리소스 삭제 시**:
+
+- 가이드라인 삭제 → `guide-list.json`에서 제거 + `cc-list.json`의 모든 `guideKeys`에서 해당 key 제거 + `ai-docs/pending-matches.md` 섹션 1/3에서 해당 key 관련 행 모두 삭제
+- 상용구 삭제 → `template-list.json`에서 제거 + `cc-list.json`의 모든 `templateKeys`에서 해당 key 제거 + `ai-docs/pending-matches.md` 섹션 2/4에서 해당 key 관련 행 모두 삭제
+
+---
+
+### guide-list.json 동기화 규칙
+
+- 가이드라인(guideKey)을 추가하거나 삭제할 때마다 `lib/ai/resources/guide-list.json`을 **항상 동기화**
+- `cc-list.json`의 `guideKeys`에 키가 있으면 `guide-list.json`에도 반드시 항목 존재해야 함
+- `guide-list.json`에 없는 가이드라인은 가이드라인 관리 페이지 드롭다운과 문진 패널 전체 목록에 **표시되지 않음**
+
 ### template-list.json 동기화 규칙
 
 - 상용구(templateKey)를 추가하거나 삭제할 때마다 `lib/ai/resources/template-list.json`을 **항상 동기화**
@@ -199,17 +256,15 @@ import { Button } from "@/components/ui/button";
 
 ---
 
-### pending-matches.md 확인 규칙 요약
+### pending-matches.md 확인 시점 요약
 
-아래 작업을 수행할 때 **반드시** `ai-docs/pending-matches.md`를 먼저 읽는다:
+아래 작업 시 **반드시** `ai-docs/pending-matches.md`를 읽는다:
 
-- 가이드라인을 추가할 때
-- 상용구를 추가할 때
-
-읽은 후 판단:
-
-1. 새로 추가하는 리소스 이름과 같거나 유사한 미매칭 C.C.가 있으면 → 사용자에게 매칭 여부 질문
-2. 매칭이 확정되면 → cc-list.json 업데이트 + pending-matches.md 업데이트
+| 작업            | 확인할 섹션                                              |
+| --------------- | -------------------------------------------------------- |
+| C.C. 등록       | 섹션 3 (가이드라인→C.C. 대기), 섹션 4 (상용구→C.C. 대기) |
+| 가이드라인 등록 | 섹션 1 (C.C.→가이드라인 대기)                            |
+| 상용구 등록     | 섹션 2 (C.C.→상용구 대기)                                |
 
 ## 테스트 계정
 

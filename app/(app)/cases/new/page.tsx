@@ -3,14 +3,23 @@ import { getLayoutSettings } from "@/lib/settings/actions";
 import { getAiAccessInfo } from "@/lib/auth/ai-access";
 import { NewCaseForm } from "@/components/cases/new-case-form";
 
-async function NewCaseFormLoader() {
+async function NewCaseFormLoader({
+  searchParams,
+}: {
+  searchParams: Promise<{ fresh?: string }>;
+}) {
   const [
     { layout, splitRatio, foldAutoSwitch, foldFallbackLayout },
     { status },
-  ] = await Promise.all([getLayoutSettings(), getAiAccessInfo()]);
+    { fresh },
+  ] = await Promise.all([getLayoutSettings(), getAiAccessInfo(), searchParams]);
+
+  // fresh가 없는 경우(URL 직접 접근 등)에도 항상 고유한 key를 보장
+  const formKey = fresh ?? String(Date.now());
 
   return (
     <NewCaseForm
+      key={formKey}
       defaultLayout={layout}
       defaultSplitRatio={splitRatio}
       foldAutoSwitch={foldAutoSwitch}
@@ -20,7 +29,11 @@ async function NewCaseFormLoader() {
   );
 }
 
-export default function NewCasePage() {
+export default function NewCasePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ fresh?: string }>;
+}) {
   return (
     <Suspense
       fallback={
@@ -29,7 +42,7 @@ export default function NewCasePage() {
         </div>
       }
     >
-      <NewCaseFormLoader />
+      <NewCaseFormLoader searchParams={searchParams} />
     </Suspense>
   );
 }

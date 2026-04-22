@@ -21,6 +21,7 @@ export function NavLinks({ isAdmin }: NavLinksProps) {
     ? [
         { href: "/admin/users", label: "사용자 관리" },
         { href: "/admin/documents", label: "문서 관리" },
+        { href: "/admin/resources", label: "AI 리소스" },
         { href: "/admin/error-logs", label: "에러 로그" },
       ]
     : [];
@@ -49,16 +50,23 @@ export function NavLinks({ isAdmin }: NavLinksProps) {
         );
       })}
 
-      {/* force-desktop 모드일 때만 모바일 복귀 버튼 표시 */}
-      {viewMode === "desktop" && (
-        <button
-          onClick={() => setViewMode("auto")}
-          className="ml-2 flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs text-muted-foreground ring-1 ring-border transition-colors hover:text-foreground"
-        >
-          <Smartphone className="size-3.5" />
-          모바일 버전으로 보기
-        </button>
-      )}
+      {/* 모바일/PC 버전 전환 버튼 (항상 표시) */}
+      <button
+        onClick={() =>
+          viewMode === "mobile" ? setViewMode("auto") : setViewMode("mobile")
+        }
+        className={cn(
+          "ml-2 flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs ring-1 ring-border transition-colors hover:text-foreground",
+          viewMode === "mobile"
+            ? "font-medium text-foreground"
+            : "text-muted-foreground"
+        )}
+      >
+        <Smartphone className="size-3.5" />
+        {viewMode === "mobile"
+          ? "모바일 버전 보는 중 (취소)"
+          : "모바일 버전으로 보기"}
+      </button>
     </nav>
   );
 }

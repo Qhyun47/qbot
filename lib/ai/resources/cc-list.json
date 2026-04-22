@@ -41,5 +41,20 @@
     "guideKeys": [],
     "templateKeys": [],
     "aliasOf": "GI bleeding"
+  },
+  {
+    "cc": "Abnormal lab",
+    "guideKeys": [],
+    "templateKeys": []
+  },
+  {
+    "cc": "Fever",
+    "guideKeys": [],
+    "templateKeys": []
+  },
+  {
+    "cc": "General weakness",
+    "guideKeys": [],
+    "templateKeys": []
   }
 ]

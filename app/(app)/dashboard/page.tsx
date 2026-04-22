@@ -1,7 +1,7 @@
 import { Suspense } from "react";
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { Plus, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { NewCaseButton } from "@/components/cases/new-case-button";
 import { StatusBoard } from "@/components/cases/status-board";
 import { HideAllFromBoardButton } from "@/components/cases/hide-all-from-board-button";
 import { listCasesByBed } from "@/lib/cases/queries";
@@ -41,28 +41,22 @@ export default function DashboardPage() {
       </Suspense>
 
       {/* 모바일 새 케이스 CTA */}
-      <Button
-        asChild
+      <NewCaseButton
         size="lg"
-        className="h-14 w-full text-base font-semibold lg:hidden"
+        className="h-14 w-full text-base font-semibold is-desktop:hidden"
       >
-        <Link href="/cases/new">+ 환자 추가</Link>
-      </Button>
+        + 환자 추가
+      </NewCaseButton>
 
       {/* 페이지 헤더 (데스크탑) */}
-      <div className="hidden items-center justify-between lg:flex">
+      <div className="hidden items-center justify-between is-desktop:flex">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">대시보드</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             현재 응급실 환자를 베드 순으로 확인합니다.
           </p>
         </div>
-        <Button asChild className="gap-1.5">
-          <Link href="/cases/new">
-            <Plus className="size-4" />
-            환자 추가
-          </Link>
-        </Button>
+        <NewCaseButton className="gap-1.5" />
       </div>
 
       {/* 현황판 섹션 */}

@@ -116,6 +116,7 @@ export type Database = {
       };
       cases: {
         Row: {
+          bed_explicitly_set: boolean;
           bed_number: number;
           bed_zone: Database["public"]["Enums"]["bed_zone"];
           board_hidden_at: string | null;
@@ -132,6 +133,7 @@ export type Database = {
           user_id: string;
         };
         Insert: {
+          bed_explicitly_set?: boolean;
           bed_number?: number;
           bed_zone?: Database["public"]["Enums"]["bed_zone"];
           board_hidden_at?: string | null;
@@ -148,6 +150,7 @@ export type Database = {
           user_id: string;
         };
         Update: {
+          bed_explicitly_set?: boolean;
           bed_number?: number;
           bed_zone?: Database["public"]["Enums"]["bed_zone"];
           board_hidden_at?: string | null;

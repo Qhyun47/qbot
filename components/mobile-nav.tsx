@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, Monitor, Smartphone } from "lucide-react";
+import { Menu, X, Monitor } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -24,6 +24,7 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
     ? [
         { href: "/admin/users", label: "사용자 관리" },
         { href: "/admin/documents", label: "문서 관리" },
+        { href: "/admin/resources", label: "AI 리소스" },
         { href: "/admin/error-logs", label: "에러 로그" },
       ]
     : [];
@@ -34,8 +35,8 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
     setOpen(false);
   }
 
-  function handleViewModeToggle(mode: "mobile" | "desktop") {
-    setViewMode(viewMode === mode ? "auto" : mode);
+  function handleDesktopToggle() {
+    setViewMode(viewMode === "desktop" ? "auto" : "desktop");
     handleClose();
   }
 
@@ -78,7 +79,7 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
             {/* 뷰 모드 전환 버튼 */}
             <div className="my-2 border-t pt-2">
               <button
-                onClick={() => handleViewModeToggle("desktop")}
+                onClick={handleDesktopToggle}
                 className={cn(
                   "flex w-full items-center gap-2 rounded-md px-2 py-3 text-sm transition-colors",
                   viewMode === "desktop"
@@ -90,20 +91,6 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
                 {viewMode === "desktop"
                   ? "PC 버전 보는 중 (취소)"
                   : "PC 버전으로 보기"}
-              </button>
-              <button
-                onClick={() => handleViewModeToggle("mobile")}
-                className={cn(
-                  "flex w-full items-center gap-2 rounded-md px-2 py-3 text-sm transition-colors",
-                  viewMode === "mobile"
-                    ? "font-medium text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <Smartphone className="size-4 shrink-0" />
-                {viewMode === "mobile"
-                  ? "모바일 버전 보는 중 (취소)"
-                  : "모바일 버전으로 보기"}
               </button>
             </div>
           </nav>

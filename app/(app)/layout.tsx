@@ -1,11 +1,10 @@
 import { Suspense, type ReactNode } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { Logo } from "@/components/icons/logo";
 import { Toaster } from "sonner";
 import { LogoutButton } from "@/components/logout-button";
 import { MobileNav } from "@/components/mobile-nav";
 import { NavLinks } from "@/components/nav-links";
-import { ViewModeInit } from "@/components/view-mode-init";
 import { FontSizeInit } from "@/components/font-size-init";
 import { ConditionalHeader } from "@/components/layout/conditional-header";
 import { getIsAdmin } from "@/lib/auth/is-admin";
@@ -37,7 +36,6 @@ async function FontSizeInitWithData() {
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
-      <ViewModeInit />
       <Suspense fallback={null}>
         <FontSizeInitWithData />
       </Suspense>
@@ -52,14 +50,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               className="ml-2 lg:ml-0"
               aria-label="규봇 홈으로 이동"
             >
-              <Image
-                src="/icons/icon-transparent.png"
-                alt="규봇"
-                width={32}
-                height={32}
-                className="dark:invert"
-                priority
-              />
+              <Logo className="size-6" />
             </Link>
             <Suspense fallback={<div className="ml-8 hidden lg:flex" />}>
               <NavLinksWithAdmin />

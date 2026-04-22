@@ -21,13 +21,36 @@ function getServerSnapshot(): ViewMode {
   return "auto";
 }
 
+const COOKIE_KEY = "x-device-type";
+
 function applyToHtml(mode: ViewMode) {
   const html = document.documentElement;
-  if (mode === "auto") {
+  if (mode === "mobile") {
     html.removeAttribute("data-view");
+  } else if (mode === "desktop") {
+    html.setAttribute("data-view", "desktop");
   } else {
-    html.setAttribute("data-view", mode);
+    // auto: 쿠키 → pointer:fine fallback 순으로 복원
+    const cookieVal = document.cookie
+      .split(";")
+      .find((c) => c.trim().startsWith(COOKIE_KEY + "="))
+      ?.split("=")[1]
+      ?.trim();
+    if (cookieVal === "desktop") {
+      html.setAttribute("data-view", "desktop");
+    } else if (
+      !cookieVal &&
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches
+    ) {
+      html.setAttribute("data-view", "desktop");
+    } else {
+      html.removeAttribute("data-view");
+    }
   }
+}
+
+function setCookie(value: string, maxAge: number) {
+  document.cookie = `${COOKIE_KEY}=${value}; path=/; max-age=${maxAge}; samesite=lax`;
 }
 
 export function useViewMode() {
@@ -40,8 +63,11 @@ export function useViewMode() {
   const setViewMode = useCallback((mode: ViewMode) => {
     if (mode === "auto") {
       localStorage.removeItem(LS_KEY);
+      // 쿠키 삭제 → 다음 미들웨어 실행 시 UA 재감지
+      setCookie("", 0);
     } else {
       localStorage.setItem(LS_KEY, mode);
+      setCookie(mode, 31536000);
     }
     applyToHtml(mode);
     window.dispatchEvent(new CustomEvent(EVENT));

@@ -16,6 +16,12 @@ interface CcListEntry {
   aliasOf?: string;
 }
 
+function resolveTemplateKeys(item: CcListEntry): string[] {
+  if (!item.aliasOf) return item.templateKeys;
+  const parent = ccList.find((i) => i.cc === item.aliasOf);
+  return parent?.templateKeys ?? item.templateKeys;
+}
+
 interface CcAutocompleteProps {
   value: string;
   onSelect: (cc: string, hasTemplate: boolean, templateKeys: string[]) => void;
@@ -76,8 +82,9 @@ export function CcAutocomplete({ value, onSelect }: CcAutocompleteProps) {
       if (open && filtered.length > 0 && highlightedIndex >= 0) {
         e.preventDefault();
         const item = filtered[highlightedIndex];
-        const hasTemplate = item.templateKeys.length > 0;
-        onSelect(item.cc, hasTemplate, item.templateKeys);
+        const resolved = resolveTemplateKeys(item);
+        const hasTemplate = resolved.length > 0;
+        onSelect(item.cc, hasTemplate, resolved);
         setInputValue(item.cc);
         setOpen(false);
       } else if (inputValue.trim()) {
@@ -144,14 +151,15 @@ export function CcAutocomplete({ value, onSelect }: CcAutocompleteProps) {
                   : "hover:bg-accent/60"
               )}
               onClick={() => {
-                const hasTemplate = item.templateKeys.length > 0;
-                onSelect(item.cc, hasTemplate, item.templateKeys);
+                const resolved = resolveTemplateKeys(item);
+                const hasTemplate = resolved.length > 0;
+                onSelect(item.cc, hasTemplate, resolved);
                 setInputValue(item.cc);
                 setOpen(false);
               }}
             >
               <span>{item.cc}</span>
-              {item.templateKeys.length > 0 && (
+              {resolveTemplateKeys(item).length > 0 && (
                 <span className="flex items-center gap-1 text-xs text-muted-foreground">
                   <CheckSquare className="size-3 text-emerald-600" />
                   상용구 있음

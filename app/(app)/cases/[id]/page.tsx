@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import {
   AlertCircle,
   AlertTriangle,
@@ -13,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BedChangeButton } from "@/components/cases/bed-change-button";
 import { StatusBadge } from "@/components/cases/status-badge";
 import { CaseInputView } from "@/components/cases/case-input-view";
+import { CardInputSection } from "@/components/cases/card-input-section";
 import { ResultSection } from "@/components/cases/result-section";
 import { GenerationPoller } from "@/components/cases/generation-poller";
 import { RegenerateButton } from "@/components/cases/regenerate-button";
@@ -22,11 +24,17 @@ import { getCase, getCaseInputs, getCurrentResult } from "@/lib/cases/queries";
 import {
   updatePiEdited,
   updatePeEdited,
-  updateTemplateEdited,
   updateHistoryEdited,
 } from "@/lib/cases/actions";
+
+function buildCombinedPi(pi: string, template: string): string {
+  if (!template) return pi;
+  if (!pi) return template;
+  return `${pi}\n\n${template}`;
+}
 import { getIsAdmin } from "@/lib/auth/is-admin";
 import { getLayoutSettings } from "@/lib/settings/actions";
+import { Separator } from "@/components/ui/separator";
 import type { CaseStatus, BedZone } from "@/lib/supabase/types";
 
 function GeneratingSkeleton() {
@@ -95,6 +103,10 @@ async function CaseContent({
   const [{ id }, { view, from }] = await Promise.all([params, searchParams]);
   const showResultView = view === "result";
 
+  const cookieStore = await cookies();
+  const deviceTypeCookie = cookieStore.get("x-device-type")?.value;
+  const isDesktopDevice = deviceTypeCookie !== "mobile";
+
   const [caseData, inputs, result, isAdmin, layoutSettings] = await Promise.all(
     [
       getCase(id),
@@ -116,32 +128,24 @@ async function CaseContent({
 
       {/* 헤더 */}
       <header className="flex shrink-0 flex-wrap items-center gap-3 border-b px-4 py-3">
-        {/* 모바일에서 view=result일 때만 뒤로가기 버튼 표시 */}
-        {showResultView && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="-ml-2 gap-1 lg:hidden"
-            asChild
-          >
+        {/* 모바일(view=result)에서만 입력 화면으로 뒤로가기 표시 */}
+        {!isDesktopDevice && showResultView && (
+          <Button variant="ghost" size="sm" className="-ml-2 gap-1" asChild>
             <Link href={`/cases/${id}${from ? `?from=${from}` : ""}`} replace>
               <ArrowLeft className="size-4" />
               입력 화면
             </Link>
           </Button>
         )}
-        {/* PC에서 항상 뒤로가기 버튼 표시 */}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="-ml-2 hidden gap-1 lg:flex"
-          asChild
-        >
-          <Link href={from === "cases" ? "/cases" : "/dashboard"}>
-            <ArrowLeft className="size-4" />
-            {from === "cases" ? "케이스 목록" : "대시보드"}
-          </Link>
-        </Button>
+        {/* PC에서 항상 목록/대시보드 뒤로가기 표시 */}
+        {isDesktopDevice && (
+          <Button variant="ghost" size="sm" className="-ml-2 gap-1" asChild>
+            <Link href={from === "cases" ? "/cases" : "/dashboard"}>
+              <ArrowLeft className="size-4" />
+              {from === "cases" ? "케이스 목록" : "대시보드"}
+            </Link>
+          </Button>
+        )}
         <BedChangeButton
           caseId={caseData.id}
           bedZone={caseData.bed_zone as BedZone}
@@ -186,7 +190,13 @@ async function CaseContent({
               )}
               <ResultSection
                 title="P.I"
-                value={result.pi_edited ?? result.pi_draft ?? ""}
+                value={
+                  result.pi_edited ??
+                  buildCombinedPi(
+                    result.pi_draft ?? "",
+                    result.template_draft ?? ""
+                  )
+                }
                 onSave={updatePiEdited.bind(null, result.id)}
                 correctionSlot={
                   isAdmin && result.pi_draft ? (
@@ -204,54 +214,6 @@ async function CaseContent({
                       caseId={caseData.id}
                       caseInputsJson={inputs}
                       apiOutput={result.pi_draft}
-                    />
-                  ) : undefined
-                }
-              />
-              <ResultSection
-                title="상용구"
-                value={result.template_edited ?? result.template_draft ?? ""}
-                onSave={updateTemplateEdited.bind(null, result.id)}
-                correctionSlot={
-                  isAdmin && result.template_draft ? (
-                    <CorrectionModal
-                      trigger={
-                        <Button variant="ghost" size="sm">
-                          <Pencil className="mr-1 h-4 w-4" />
-                          교정
-                        </Button>
-                      }
-                      sectionType="template"
-                      sectionLabel="상용구"
-                      cc={caseData.cc ?? ""}
-                      templateKey={caseData.template_key ?? undefined}
-                      caseId={caseData.id}
-                      caseInputsJson={inputs}
-                      apiOutput={result.template_draft}
-                    />
-                  ) : undefined
-                }
-              />
-              <ResultSection
-                title="P/E"
-                value={result.pe_edited ?? result.pe_draft ?? ""}
-                onSave={updatePeEdited.bind(null, result.id)}
-                correctionSlot={
-                  isAdmin && result.pe_draft ? (
-                    <CorrectionModal
-                      trigger={
-                        <Button variant="ghost" size="sm">
-                          <Pencil className="mr-1 h-4 w-4" />
-                          교정
-                        </Button>
-                      }
-                      sectionType="pe"
-                      sectionLabel="P/E"
-                      cc={caseData.cc ?? ""}
-                      templateKey={caseData.template_key ?? undefined}
-                      caseId={caseData.id}
-                      caseInputsJson={inputs}
-                      apiOutput={result.pe_draft}
                     />
                   ) : undefined
                 }
@@ -280,9 +242,46 @@ async function CaseContent({
                   ) : undefined
                 }
               />
+              <ResultSection
+                title="P/E"
+                value={result.pe_edited ?? result.pe_draft ?? ""}
+                onSave={updatePeEdited.bind(null, result.id)}
+                correctionSlot={
+                  isAdmin && result.pe_draft ? (
+                    <CorrectionModal
+                      trigger={
+                        <Button variant="ghost" size="sm">
+                          <Pencil className="mr-1 h-4 w-4" />
+                          교정
+                        </Button>
+                      }
+                      sectionType="pe"
+                      sectionLabel="P/E"
+                      cc={caseData.cc ?? ""}
+                      templateKey={caseData.template_key ?? undefined}
+                      caseId={caseData.id}
+                      caseInputsJson={inputs}
+                      apiOutput={result.pe_draft}
+                    />
+                  ) : undefined
+                }
+              />
             </>
           )}
           {status === "draft" && <DraftState />}
+        </div>
+
+        <Separator className="my-2" />
+
+        <div className="flex flex-col gap-2 pb-4 pt-4">
+          <h2 className="text-sm font-semibold text-muted-foreground">
+            문진 키워드
+          </h2>
+          <CardInputSection
+            caseId={caseData.id}
+            initialCards={inputs}
+            generatedAt={result?.generated_at ?? undefined}
+          />
         </div>
       </div>
     </div>
@@ -290,29 +289,25 @@ async function CaseContent({
 
   return (
     <>
-      {/* 모바일 입력 화면: 데스크탑에서는 숨김, view=result일 때도 숨김 */}
-      {!showResultView && (
-        <div className="lg:hidden">
-          <CaseInputView
-            caseId={caseData.id}
-            defaultBedZone={caseData.bed_zone as BedZone}
-            defaultBedNumber={caseData.bed_number}
-            defaultCc={caseData.cc}
-            defaultTemplateKey={caseData.template_key ?? null}
-            initialCards={inputs}
-            defaultLayout={inputLayout}
-            defaultSplitRatio={splitRatio}
-            status={status}
-            generatedAt={result?.generated_at ?? undefined}
-            from={from}
-          />
-        </div>
+      {/* 모바일 입력 화면: 데스크탑에서는 렌더링하지 않음 */}
+      {!isDesktopDevice && !showResultView && (
+        <CaseInputView
+          caseId={caseData.id}
+          defaultBedZone={caseData.bed_zone as BedZone}
+          defaultBedNumber={caseData.bed_number}
+          defaultCc={caseData.cc}
+          defaultTemplateKey={caseData.template_key ?? null}
+          initialCards={inputs}
+          defaultLayout={inputLayout}
+          defaultSplitRatio={splitRatio}
+          status={status}
+          generatedAt={result?.generated_at ?? undefined}
+          from={from}
+        />
       )}
 
-      {/* AI 결과 화면: 데스크탑에서는 항상 표시, 모바일에서는 view=result일 때만 표시 */}
-      <div className={showResultView ? "block" : "hidden lg:block"}>
-        {ResultView}
-      </div>
+      {/* AI 결과 화면: 데스크탑은 항상, 모바일은 view=result일 때만 */}
+      {(isDesktopDevice || showResultView) && ResultView}
     </>
   );
 }

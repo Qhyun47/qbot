@@ -73,5 +73,20 @@ export async function updateSession(request: NextRequest) {
   // If this is not done, you may be causing the browser and server to go out
   // of sync and terminate the user's session prematurely!
 
+  // UA 기반 기기 타입 감지 — 쿠키가 없을 때만 설정(수동 오버라이드 보호)
+  if (!request.cookies.get("x-device-type")) {
+    const ua = request.headers.get("user-agent") ?? "";
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod|Tablet|Touch/i.test(ua);
+    const deviceType = isMobile ? "mobile" : "desktop";
+    supabaseResponse.cookies.set("x-device-type", deviceType, {
+      path: "/",
+      maxAge: 31536000,
+      httpOnly: false,
+      sameSite: "lax",
+    });
+    // 서버 컴포넌트(app/layout.tsx)가 같은 요청에서 읽을 수 있도록 요청 객체에도 반영
+    request.cookies.set("x-device-type", deviceType);
+  }
+
   return supabaseResponse;
 }

@@ -40,7 +40,7 @@ export function CasesTable({ cases }: CasesTableProps) {
   return (
     <>
       {/* 모바일 카드 리스트 */}
-      <div className="lg:hidden">
+      <div className="is-desktop:hidden">
         <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
           {cases.map((c, idx) => {
             const isHidden = c.board_hidden_at !== null;
@@ -62,6 +62,7 @@ export function CasesTable({ cases }: CasesTableProps) {
                   <BedBadge
                     bedZone={c.bed_zone as BedZone}
                     bedNumber={c.bed_number}
+                    bedExplicitlySet={c.bed_explicitly_set}
                     size="md"
                   />
                 </div>
@@ -100,7 +101,7 @@ export function CasesTable({ cases }: CasesTableProps) {
       </div>
 
       {/* 데스크탑 테이블 */}
-      <div className="hidden lg:block">
+      <div className="hidden is-desktop:block">
         <div className="rounded-lg border">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -134,6 +135,7 @@ export function CasesTable({ cases }: CasesTableProps) {
                         <BedBadge
                           bedZone={c.bed_zone as BedZone}
                           bedNumber={c.bed_number}
+                          bedExplicitlySet={c.bed_explicitly_set}
                           size="sm"
                         />
                       </td>

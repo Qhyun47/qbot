@@ -31,25 +31,20 @@ const bedSchema = z
 export async function createCase(): Promise<string> {
   const { supabase, user } = await getAuthUser();
 
-  // CC 없는 빈 draft 정리 (입력 카드가 없는 경우만)
+  // 사용자가 아무것도 입력하지 않은 빈 draft 정리
+  // (cc=null, has_inputs=false, bed_explicitly_set=false 인 경우만 삭제)
   const { data: emptyDrafts } = await supabase
     .from("cases")
     .select("id")
     .eq("user_id", user.id)
     .eq("status", "draft")
-    .is("cc", null);
+    .is("cc", null)
+    .eq("has_inputs", false)
+    .eq("bed_explicitly_set", false);
 
   if (emptyDrafts && emptyDrafts.length > 0) {
     const ids = emptyDrafts.map((d) => d.id);
-    const { data: withInputs } = await supabase
-      .from("case_inputs")
-      .select("case_id")
-      .in("case_id", ids);
-    const idsWithInputs = new Set((withInputs ?? []).map((i) => i.case_id));
-    const toDelete = ids.filter((id) => !idsWithInputs.has(id));
-    if (toDelete.length > 0) {
-      await supabase.from("cases").delete().in("id", toDelete);
-    }
+    await supabase.from("cases").delete().in("id", ids);
   }
 
   const { data, error } = await supabase
@@ -72,7 +67,11 @@ export async function updateCaseBed(
 
   const { error } = await supabase
     .from("cases")
-    .update({ bed_zone: parsed.bedZone, bed_number: parsed.bedNumber })
+    .update({
+      bed_zone: parsed.bedZone,
+      bed_number: parsed.bedNumber,
+      bed_explicitly_set: true,
+    })
     .eq("id", caseId)
     .eq("user_id", user.id);
 
