@@ -248,70 +248,76 @@ export function NewCaseForm({
   };
 
   const InputArea = (
-    <div className="flex h-full flex-col overflow-hidden">
-      {bedPickerOpen && (
-        <>
-          <div className="shrink-0 p-4">
-            <BedPicker
-              bedZone={bedZone}
-              bedNumber={bedNumber}
-              onChange={handleBedChange}
-            />
-          </div>
-          <Separator />
-        </>
-      )}
-      {ccEditing && (
-        <>
-          <div className="shrink-0 p-4">
-            <CcAutocomplete value={cc ?? ""} onSelect={handleCcSelect} />
-          </div>
-          <Separator />
-        </>
-      )}
-      {!ccEditing && pendingTemplateKeys && pendingTemplateKeys.length >= 2 && (
-        <>
-          <div className="shrink-0 p-4">
-            <p className="mb-2 text-sm font-medium">
-              어떤 상용구로 생성할까요?
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {pendingTemplateKeys.map((key) => {
-                const label =
-                  (
-                    templateListJson as {
-                      templateKey: string;
-                      displayName: string;
-                    }[]
-                  ).find((t) => t.templateKey === key)?.displayName ?? key;
-                return (
-                  <Button
-                    key={key}
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleTemplateKeyConfirm(key)}
-                  >
-                    {label}
-                  </Button>
-                );
-              })}
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="text-muted-foreground"
-                onClick={() => handleTemplateKeyConfirm(null)}
-              >
-                상용구 없이 진행
-              </Button>
+    <div className="flex h-full flex-col">
+      {/* BedPicker·CC·카드 타임라인을 하나의 스크롤 영역으로 묶음 —
+          키보드가 올라와 공간이 줄어들어도 잘리지 않고 스크롤로 접근 가능 */}
+      <div className="flex-1 overflow-y-auto overscroll-y-contain">
+        {bedPickerOpen && (
+          <>
+            <div className="p-4">
+              <BedPicker
+                bedZone={bedZone}
+                bedNumber={bedNumber}
+                onChange={handleBedChange}
+              />
             </div>
-          </div>
-          <Separator />
-        </>
-      )}
-      <div className="flex-1 overflow-y-auto overscroll-y-contain p-4">
-        <CardTimeline cards={optimisticCards} />
+            <Separator />
+          </>
+        )}
+        {ccEditing && (
+          <>
+            <div className="p-4">
+              <CcAutocomplete value={cc ?? ""} onSelect={handleCcSelect} />
+            </div>
+            <Separator />
+          </>
+        )}
+        {!ccEditing &&
+          pendingTemplateKeys &&
+          pendingTemplateKeys.length >= 2 && (
+            <>
+              <div className="p-4">
+                <p className="mb-2 text-sm font-medium">
+                  어떤 상용구로 생성할까요?
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {pendingTemplateKeys.map((key) => {
+                    const label =
+                      (
+                        templateListJson as {
+                          templateKey: string;
+                          displayName: string;
+                        }[]
+                      ).find((t) => t.templateKey === key)?.displayName ?? key;
+                    return (
+                      <Button
+                        key={key}
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleTemplateKeyConfirm(key)}
+                      >
+                        {label}
+                      </Button>
+                    );
+                  })}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground"
+                    onClick={() => handleTemplateKeyConfirm(null)}
+                  >
+                    상용구 없이 진행
+                  </Button>
+                </div>
+              </div>
+              <Separator />
+            </>
+          )}
+        <div className="p-4">
+          <CardTimeline cards={optimisticCards} />
+        </div>
       </div>
       <CardInputBar onSubmit={handleCardSubmit} />
     </div>
