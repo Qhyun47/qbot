@@ -211,6 +211,7 @@ export function CaseInputView({
       raw_text: rawText,
       time_tag: timeTag,
       time_offset_minutes: timeOffsetMinutes,
+      section_override: null,
       display_order: cards.length + 1,
       created_at: new Date().toISOString(),
     };

@@ -265,6 +265,40 @@ export async function restoreToBoard(caseId: string): Promise<void> {
   revalidatePath("/cases");
 }
 
+export async function reorderCaseInputs(
+  updates: { id: string; displayOrder: number }[]
+): Promise<void> {
+  const { supabase } = await getAuthUser();
+  await Promise.all(
+    updates.map(({ id, displayOrder }) =>
+      supabase
+        .from("case_inputs")
+        .update({ display_order: displayOrder })
+        .eq("id", id)
+    )
+  );
+}
+
+export async function moveCaseInputSection(
+  cardId: string,
+  targetSection: "timed" | "untimed"
+): Promise<void> {
+  const { supabase } = await getAuthUser();
+  const { error } = await supabase
+    .from("case_inputs")
+    .update(
+      targetSection === "untimed"
+        ? {
+            section_override: "untimed",
+            time_tag: null,
+            time_offset_minutes: null,
+          }
+        : { section_override: "timed" }
+    )
+    .eq("id", cardId);
+  if (error) throw new Error(error.message);
+}
+
 export async function deleteCase(caseId: string): Promise<void> {
   const { supabase, user } = await getAuthUser();
 

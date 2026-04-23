@@ -21,6 +21,7 @@ export type Database = {
           display_order: number;
           id: string;
           raw_text: string;
+          section_override: "timed" | "untimed" | null;
           time_offset_minutes: number | null;
           time_tag: string | null;
         };
@@ -30,6 +31,7 @@ export type Database = {
           display_order: number;
           id?: string;
           raw_text: string;
+          section_override?: "timed" | "untimed" | null;
           time_offset_minutes?: number | null;
           time_tag?: string | null;
         };
@@ -39,6 +41,7 @@ export type Database = {
           display_order?: number;
           id?: string;
           raw_text?: string;
+          section_override?: "timed" | "untimed" | null;
           time_offset_minutes?: number | null;
           time_tag?: string | null;
         };

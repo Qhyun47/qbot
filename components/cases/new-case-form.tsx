@@ -37,6 +37,8 @@ import {
   addCaseInput,
   deleteCase,
   overrideTemplateKey,
+  reorderCaseInputs,
+  moveCaseInputSection,
 } from "@/lib/cases/actions";
 import type {
   BedZone,
@@ -221,6 +223,24 @@ export function NewCaseForm({
     }
   };
 
+  const handleCardReorder = (
+    newCards: CaseInput[],
+    movedId: string,
+    targetSection: "timed" | "untimed" | null
+  ) => {
+    setCards(newCards);
+    startTransition(async () => {
+      const orderUpdates = newCards.map((c) => ({
+        id: c.id,
+        displayOrder: c.display_order,
+      }));
+      await reorderCaseInputs(orderUpdates);
+      if (targetSection) {
+        await moveCaseInputSection(movedId, targetSection);
+      }
+    });
+  };
+
   const handleCardSubmit = (
     rawText: string,
     timeTag: string | null,
@@ -233,6 +253,7 @@ export function NewCaseForm({
       raw_text: rawText,
       time_tag: timeTag,
       time_offset_minutes: timeOffsetMinutes,
+      section_override: null,
       display_order: cards.length + 1,
       created_at: new Date().toISOString(),
     };
@@ -340,7 +361,7 @@ export function NewCaseForm({
             </>
           )}
         <div className="p-4">
-          <CardTimeline cards={optimisticCards} />
+          <CardTimeline cards={optimisticCards} onReorder={handleCardReorder} />
         </div>
       </div>
       <CardInputBar onSubmit={handleCardSubmit} />
