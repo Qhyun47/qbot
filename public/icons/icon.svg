@@ -1,1 +1,31 @@
-<!-- 실제 아이콘: 채팅 말풍선 + 빨간 의료 십자(+) 디자인. PNG 파일(icon-192.png, icon-512.png)이 실제 사용 아이콘이며 이 SVG는 참조용입니다. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#18181b"/>
+
+  <!-- 채팅 말풍선 (꼬리: 좌측 하단) -->
+  <path fill="#ffffff" d="
+    M 116 83
+    H 396
+    Q 448 83 448 135
+    V 301
+    Q 448 353 396 353
+    H 218
+    L 106 415
+    L 131 353
+    H 116
+    Q 64 353 64 301
+    V 135
+    Q 64 83 116 83
+    Z
+  "/>
+
+  <!-- 내용 줄 (메모/차트 느낌) -->
+  <rect x="122" y="145" width="192" height="26" rx="13" fill="#e4e4e7"/>
+  <rect x="122" y="198" width="248" height="26" rx="13" fill="#e4e4e7"/>
+  <rect x="122" y="251" width="170" height="26" rx="13" fill="#e4e4e7"/>
+
+  <!-- 빨간 의료 십자 배지 (우측 하단, 말풍선 모서리에 겹침) -->
+  <circle cx="402" cy="339" r="68" fill="#18181b"/>
+  <circle cx="402" cy="339" r="58" fill="#e5534b"/>
+  <rect x="362" y="323" width="80" height="32" rx="8" fill="#ffffff"/>
+  <rect x="386" y="299" width="32" height="80" rx="8" fill="#ffffff"/>
+</svg>
