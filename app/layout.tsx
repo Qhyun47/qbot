@@ -5,14 +5,28 @@ import { SwRegister } from "@/components/pwa/sw-register";
 import { cookies } from "next/headers";
 import "./globals.css";
 
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
+const defaultUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: "규봇",
   description: "응급실 인턴을 위한 AI 차팅 어시스턴트",
+  openGraph: {
+    title: "규봇",
+    description: "응급실 인턴을 위한 AI 차팅 어시스턴트",
+    siteName: "규봇",
+    locale: "ko_KR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "규봇",
+    description: "응급실 인턴을 위한 AI 차팅 어시스턴트",
+  },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
