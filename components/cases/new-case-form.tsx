@@ -2,7 +2,7 @@
 
 import { useEffect, useOptimistic, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Rows2, Columns2, Square, Zap } from "lucide-react";
+import { ArrowLeft, Rows2, Columns2, Square, Zap, Loader2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -88,6 +88,7 @@ export function NewCaseForm({
   const [cards, setCards] = useState<CaseInput[]>([]);
   const [layout, setLayout] = useState<InputLayout>(defaultLayout);
   const [generating, setGenerating] = useState(false);
+  const [navigatingBack, setNavigatingBack] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [, startTransition] = useTransition();
 
@@ -99,6 +100,25 @@ export function NewCaseForm({
   useEffect(() => {
     createCase().then((id) => setCaseId(id));
   }, []);
+
+  useEffect(() => {
+    const original =
+      document.documentElement.style.getPropertyValue("--mobile-font-size");
+    document.documentElement.style.setProperty(
+      "--mobile-font-size",
+      `${caseInputFontSize}px`
+    );
+    return () => {
+      if (original) {
+        document.documentElement.style.setProperty(
+          "--mobile-font-size",
+          original
+        );
+      } else {
+        document.documentElement.style.removeProperty("--mobile-font-size");
+      }
+    };
+  }, [caseInputFontSize]);
 
   useEffect(() => {
     if (!foldAutoSwitch) return;
@@ -136,12 +156,14 @@ export function NewCaseForm({
 
     // 아무것도 입력하지 않은 상태 → 자동 삭제
     if (!hasBed && !hasCC && !hasCards) {
+      setNavigatingBack(true);
       await handleDeleteCase();
       return;
     }
 
     // 3가지 조건 모두 충족 → 자동 저장
     if (hasBed && hasCC && hasCards) {
+      setNavigatingBack(true);
       navigateToDashboard();
       return;
     }
@@ -380,9 +402,14 @@ export function NewCaseForm({
             size="icon"
             className="shrink-0"
             onClick={handleBack}
+            disabled={navigatingBack}
             aria-label="뒤로 가기"
           >
-            <ArrowLeft className="size-4" />
+            {navigatingBack ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <ArrowLeft className="size-4" />
+            )}
           </Button>
 
           <span className="shrink-0 text-sm font-semibold">새 케이스 입력</span>

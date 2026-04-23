@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { InstallBanner } from "@/components/pwa/install-banner";
+import { Logo } from "@/components/icons/logo";
 
 // 로그인된 사용자를 대시보드로 리다이렉트하는 서버 컴포넌트
 // getUser()를 사용해 Supabase 서버에서 실제 토큰 유효성을 검증
@@ -25,10 +26,8 @@ export default function Home() {
       <Suspense fallback={null}>
         <AuthRedirect />
       </Suspense>
+      <Logo className="size-16" />
       <h1 className="text-2xl font-bold">규봇</h1>
-      <p className="text-muted-foreground">
-        응급실 의사를 위한 AI 차팅 어시스턴트
-      </p>
       <div className="flex gap-4">
         <Link
           href="/auth/login"

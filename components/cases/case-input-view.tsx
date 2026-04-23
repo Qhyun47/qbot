@@ -2,7 +2,7 @@
 
 import { useEffect, useOptimistic, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Rows2, Columns2, Square, Zap } from "lucide-react";
+import { ArrowLeft, Rows2, Columns2, Square, Zap, Loader2 } from "lucide-react";
 import { ResizableSplit } from "@/components/cases/resizable-split";
 import { CardInputBar } from "@/components/cases/card-input-bar";
 import { CardTimeline } from "@/components/cases/card-timeline";
@@ -90,6 +90,7 @@ export function CaseInputView({
   const [cards, setCards] = useState<CaseInput[]>(initialCards);
   const [layout, setLayout] = useState<InputLayout>(defaultLayout);
   const [generating, setGenerating] = useState(false);
+  const [navigatingBack, setNavigatingBack] = useState(false);
   const [, startTransition] = useTransition();
 
   useEffect(() => {
@@ -102,6 +103,25 @@ export function CaseInputView({
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
   }, [foldAutoSwitch, defaultLayout, foldFallbackLayout]);
+
+  useEffect(() => {
+    const original =
+      document.documentElement.style.getPropertyValue("--mobile-font-size");
+    document.documentElement.style.setProperty(
+      "--mobile-font-size",
+      `${caseInputFontSize}px`
+    );
+    return () => {
+      if (original) {
+        document.documentElement.style.setProperty(
+          "--mobile-font-size",
+          original
+        );
+      } else {
+        document.documentElement.style.removeProperty("--mobile-font-size");
+      }
+    };
+  }, [caseInputFontSize]);
 
   const [optimisticCards, addOptimisticCard] = useOptimistic(
     cards,
@@ -305,12 +325,18 @@ export function CaseInputView({
           variant="ghost"
           size="icon"
           className="shrink-0"
-          onClick={() =>
-            router.push(from === "cases" ? "/cases" : "/dashboard")
-          }
+          onClick={() => {
+            setNavigatingBack(true);
+            router.push(from === "cases" ? "/cases" : "/dashboard");
+          }}
+          disabled={navigatingBack}
           aria-label="뒤로 가기"
         >
-          <ArrowLeft className="size-4" />
+          {navigatingBack ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <ArrowLeft className="size-4" />
+          )}
         </Button>
 
         {/* 헤더 칩: 베드 배지 */}
