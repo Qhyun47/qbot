@@ -48,7 +48,7 @@ export function CaseInputPanel({
         timeTag,
         timeOffsetMinutes
       );
-      setCards((prev) => [saved, ...prev]);
+      setCards((prev) => [...prev, saved]);
     });
   };
 

@@ -145,20 +145,46 @@ export function CardTimeline({
 
     if (overedId === "droppable-timed" || overedId === "droppable-untimed") {
       const dest = overedId === "droppable-timed" ? "timed" : "untimed";
-      if (
+      const sameSection =
         (dest === "timed" && draggedInTimed) ||
-        (dest === "untimed" && !draggedInTimed)
-      )
-        return;
-      targetSection = dest;
-      const updatedCard: CaseInput = {
-        ...draggedCard,
-        section_override: dest,
-        time_tag: dest === "untimed" ? null : draggedCard.time_tag,
-        time_offset_minutes:
-          dest === "untimed" ? null : draggedCard.time_offset_minutes,
-      };
-      newCards = cards.map((c) => (c.id === draggedId ? updatedCard : c));
+        (dest === "untimed" && !draggedInTimed);
+
+      if (sameSection) {
+        // 같은 영역 드롭존에 드롭 → 해당 섹션 맨 끝으로 이동
+        const sectionCards = draggedInTimed ? timedCards : untimedCards;
+        const fromIndex = sectionCards.findIndex((c) => c.id === draggedId);
+        const toIndex = sectionCards.length - 1;
+        if (fromIndex === -1 || fromIndex === toIndex) return;
+        const reordered = [...sectionCards];
+        reordered.splice(fromIndex, 1);
+        reordered.push(draggedCard);
+        const otherCards = cards.filter((c) =>
+          draggedInTimed ? !isInTimedSection(c) : isInTimedSection(c)
+        );
+        const combined = draggedInTimed
+          ? [...reordered, ...otherCards]
+          : [...otherCards, ...reordered];
+        newCards = combined.map((c, i) => ({ ...c, display_order: i + 1 }));
+        if (draggedInTimed) {
+          targetSection = "timed";
+          newCards = newCards.map((c) =>
+            c.id === draggedId
+              ? { ...c, section_override: "timed" as const }
+              : c
+          );
+        }
+      } else {
+        // 다른 영역 드롭존에 드롭 → 섹션 이동 (맨 끝에 추가)
+        targetSection = dest;
+        const updatedCard: CaseInput = {
+          ...draggedCard,
+          section_override: dest,
+          time_tag: dest === "untimed" ? null : draggedCard.time_tag,
+          time_offset_minutes:
+            dest === "untimed" ? null : draggedCard.time_offset_minutes,
+        };
+        newCards = cards.map((c) => (c.id === draggedId ? updatedCard : c));
+      }
     } else {
       const overCard = cards.find((c) => c.id === overedId);
       if (!overCard) return;
