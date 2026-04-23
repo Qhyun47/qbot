@@ -108,7 +108,7 @@ export function NewCaseForm({
       document.documentElement.style.getPropertyValue("--mobile-font-size");
     document.documentElement.style.setProperty(
       "--mobile-font-size",
-      `${caseInputFontSize}px`
+      `${activeFontSize}px`
     );
     return () => {
       if (original) {
@@ -120,7 +120,7 @@ export function NewCaseForm({
         document.documentElement.style.removeProperty("--mobile-font-size");
       }
     };
-  }, [caseInputFontSize]);
+  }, [activeFontSize]);
 
   useEffect(() => {
     if (!foldAutoSwitch || defaultLayout !== "split_horizontal") return;
