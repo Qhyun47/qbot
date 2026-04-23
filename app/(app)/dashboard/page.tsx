@@ -10,6 +10,7 @@ import { getIsAdmin } from "@/lib/auth/is-admin";
 import { getPendingCount } from "@/lib/admin/user-access-actions";
 import { AiAccessOnboardingAlert } from "@/components/ai-access/ai-access-onboarding-alert";
 import { AdminPendingAlert } from "@/components/ai-access/admin-pending-alert";
+import { RealtimeRefresh } from "@/components/cases/realtime-refresh";
 
 async function StatusBoardSection() {
   const cases = await listCasesByBed();
@@ -30,9 +31,20 @@ async function AdminAlertSection() {
   return <AdminPendingAlert count={count} />;
 }
 
+async function VersionBadge() {
+  const isAdmin = await getIsAdmin();
+  if (!isAdmin) return null;
+  const hash =
+    process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "local";
+  return (
+    <p className="text-center text-xs text-muted-foreground">버전 {hash}</p>
+  );
+}
+
 export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-8 p-4 lg:p-8">
+      <RealtimeRefresh table="cases" />
       <Suspense fallback={null}>
         <AdminAlertSection />
       </Suspense>
@@ -84,6 +96,9 @@ export default function DashboardPage() {
           <StatusBoardSection />
         </Suspense>
       </section>
+      <Suspense fallback={null}>
+        <VersionBadge />
+      </Suspense>
     </div>
   );
 }

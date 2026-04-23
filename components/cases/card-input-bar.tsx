@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { SendHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,15 +17,12 @@ interface CardInputBarProps {
 
 export function CardInputBar({ onSubmit }: CardInputBarProps) {
   const [text, setText] = useState("");
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const parsed = parseTimeTag(text);
 
   const handleSubmit = () => {
     if (!text.trim()) return;
     onSubmit(text.trim(), parsed.timeTag, parsed.timeOffsetMinutes);
     setText("");
-    // 전송 후 포커스 유지 → 키보드가 내려가지 않음
-    setTimeout(() => textareaRef.current?.focus(), 0);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -47,7 +44,6 @@ export function CardInputBar({ onSubmit }: CardInputBarProps) {
       )}
       <div className="flex items-end gap-2 p-3">
         <Textarea
-          ref={textareaRef}
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -60,7 +56,10 @@ export function CardInputBar({ onSubmit }: CardInputBarProps) {
         />
         <Button
           size="icon"
-          onClick={handleSubmit}
+          onPointerDown={(e) => {
+            e.preventDefault(); // 버튼이 포커스를 가져가지 않아 키보드가 유지됨
+            handleSubmit();
+          }}
           disabled={!text.trim()}
           aria-label="전송"
           className="shrink-0"
