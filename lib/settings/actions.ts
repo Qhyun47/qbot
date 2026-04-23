@@ -46,11 +46,13 @@ export async function updateLayoutSettings(
   splitRatio: number,
   mobileFontSize: number,
   foldAutoSwitch: boolean,
-  foldFallbackLayout: FoldFallbackLayout
+  foldFallbackLayout: FoldFallbackLayout,
+  caseInputFontSize: number
 ): Promise<void> {
   const parsedLayout = layoutSchema.parse(layout);
   const parsedRatio = splitRatioSchema.parse(splitRatio);
   const parsedFontSize = mobileFontSizeSchema.parse(mobileFontSize);
+  const parsedCaseInputFontSize = mobileFontSizeSchema.parse(caseInputFontSize);
   const parsedFoldFallback = foldFallbackLayoutSchema.parse(foldFallbackLayout);
   const { supabase, user } = await getAuthUser();
 
@@ -60,6 +62,7 @@ export async function updateLayoutSettings(
       input_layout: parsedLayout,
       split_ratio: parsedRatio,
       mobile_font_size: parsedFontSize,
+      case_input_font_size: parsedCaseInputFontSize,
       fold_auto_switch: foldAutoSwitch,
       fold_fallback_layout: parsedFoldFallback,
     })
@@ -87,6 +90,7 @@ export async function getLayoutSettings(): Promise<{
   layout: InputLayout;
   splitRatio: number;
   mobileFontSize: number;
+  caseInputFontSize: number;
   foldAutoSwitch: boolean;
   foldFallbackLayout: FoldFallbackLayout;
 }> {
@@ -95,7 +99,7 @@ export async function getLayoutSettings(): Promise<{
   const { data } = await supabase
     .from("profiles")
     .select(
-      "input_layout, split_ratio, mobile_font_size, fold_auto_switch, fold_fallback_layout"
+      "input_layout, split_ratio, mobile_font_size, case_input_font_size, fold_auto_switch, fold_fallback_layout"
     )
     .eq("id", user.id)
     .maybeSingle();
@@ -104,6 +108,7 @@ export async function getLayoutSettings(): Promise<{
     layout: data?.input_layout ?? "single",
     splitRatio: data?.split_ratio ?? 50,
     mobileFontSize: data?.mobile_font_size ?? 16,
+    caseInputFontSize: data?.case_input_font_size ?? 16,
     foldAutoSwitch: data?.fold_auto_switch ?? false,
     foldFallbackLayout:
       (data?.fold_fallback_layout as FoldFallbackLayout) ?? "single",

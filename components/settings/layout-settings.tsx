@@ -68,6 +68,7 @@ interface LayoutSettingsProps {
   defaultLayout: InputLayout;
   defaultSplitRatio: number;
   defaultMobileFontSize: number;
+  defaultCaseInputFontSize: number;
   defaultFoldAutoSwitch: boolean;
   defaultFoldFallbackLayout: FoldFallbackLayout;
 }
@@ -82,6 +83,7 @@ export function LayoutSettings({
   defaultLayout,
   defaultSplitRatio,
   defaultMobileFontSize,
+  defaultCaseInputFontSize,
   defaultFoldAutoSwitch,
   defaultFoldFallbackLayout,
 }: LayoutSettingsProps) {
@@ -89,6 +91,9 @@ export function LayoutSettings({
     useState<InputLayout>(defaultLayout);
   const [splitRatio, setSplitRatio] = useState(defaultSplitRatio);
   const [mobileFontSize, setMobileFontSize] = useState(defaultMobileFontSize);
+  const [caseInputFontSize, setCaseInputFontSize] = useState(
+    defaultCaseInputFontSize
+  );
   const [foldAutoSwitch, setFoldAutoSwitch] = useState(defaultFoldAutoSwitch);
   const [foldFallbackLayout, setFoldFallbackLayout] =
     useState<FoldFallbackLayout>(defaultFoldFallbackLayout);
@@ -113,7 +118,8 @@ export function LayoutSettings({
           splitRatio,
           mobileFontSize,
           foldAutoSwitch,
-          foldFallbackLayout
+          foldFallbackLayout,
+          caseInputFontSize
         );
         document.documentElement.style.setProperty(
           "--mobile-font-size",
@@ -326,14 +332,41 @@ export function LayoutSettings({
 
       <div className="space-y-3 md:hidden">
         <div>
-          <p className="text-sm font-medium">모바일 글자 크기</p>
+          <p className="text-sm font-medium">기본 글자 크기</p>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            모바일 화면에서만 적용됩니다. PC에서는 브라우저 기본값을 따릅니다.
+            앱 전반에 적용되는 글자 크기입니다. PC에서는 브라우저 기본값을
+            따릅니다.
           </p>
         </div>
         <Select
           value={String(mobileFontSize)}
           onValueChange={(v) => setMobileFontSize(Number(v))}
+        >
+          <SelectTrigger className="w-48">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {FONT_SIZE_OPTIONS.map(({ value, label }) => (
+              <SelectItem key={value} value={value}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-3 md:hidden">
+        <div>
+          <p className="text-sm font-medium">케이스 입력 글자 크기</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            케이스 입력 화면에만 별도로 적용됩니다. 두 영역을 동시에 보거나
+            키보드가 올라와 있을 때 더 작은 글자로 설정하면 화면을 넓게 쓸 수
+            있습니다.
+          </p>
+        </div>
+        <Select
+          value={String(caseInputFontSize)}
+          onValueChange={(v) => setCaseInputFontSize(Number(v))}
         >
           <SelectTrigger className="w-48">
             <SelectValue />

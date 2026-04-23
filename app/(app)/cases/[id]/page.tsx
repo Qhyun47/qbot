@@ -121,6 +121,7 @@ async function CaseContent({
     splitRatio,
     foldAutoSwitch,
     foldFallbackLayout,
+    caseInputFontSize,
   } = layoutSettings;
 
   if (!caseData) notFound();
@@ -307,6 +308,7 @@ async function CaseContent({
           defaultSplitRatio={splitRatio}
           foldAutoSwitch={foldAutoSwitch}
           foldFallbackLayout={foldFallbackLayout}
+          caseInputFontSize={caseInputFontSize}
           status={status}
           generatedAt={result?.generated_at ?? undefined}
           from={from}

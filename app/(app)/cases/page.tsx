@@ -8,7 +8,7 @@ async function CasesLoader() {
   return (
     <>
       <p className="mt-1 text-sm text-muted-foreground">
-        최근 12시간 · {cases.length}개 케이스
+        최근 24시간 · {cases.length}개 케이스
       </p>
       <div className="mt-6">
         <CasesTable cases={cases} />

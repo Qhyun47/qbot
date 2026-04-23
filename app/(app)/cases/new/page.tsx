@@ -9,7 +9,13 @@ async function NewCaseFormLoader({
   searchParams: Promise<{ fresh?: string }>;
 }) {
   const [
-    { layout, splitRatio, foldAutoSwitch, foldFallbackLayout },
+    {
+      layout,
+      splitRatio,
+      foldAutoSwitch,
+      foldFallbackLayout,
+      caseInputFontSize,
+    },
     { status },
     { fresh },
   ] = await Promise.all([getLayoutSettings(), getAiAccessInfo(), searchParams]);
@@ -24,6 +30,7 @@ async function NewCaseFormLoader({
       defaultSplitRatio={splitRatio}
       foldAutoSwitch={foldAutoSwitch}
       foldFallbackLayout={foldFallbackLayout}
+      caseInputFontSize={caseInputFontSize}
       canUseAi={status === "approved"}
     />
   );

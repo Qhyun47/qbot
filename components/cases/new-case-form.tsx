@@ -60,6 +60,7 @@ interface NewCaseFormProps {
   defaultSplitRatio: number;
   foldAutoSwitch: boolean;
   foldFallbackLayout: FoldFallbackLayout;
+  caseInputFontSize: number;
   canUseAi?: boolean;
 }
 
@@ -68,6 +69,7 @@ export function NewCaseForm({
   defaultSplitRatio,
   foldAutoSwitch,
   foldFallbackLayout,
+  caseInputFontSize,
   canUseAi = false,
 }: NewCaseFormProps) {
   const router = useRouter();
@@ -366,7 +368,10 @@ export function NewCaseForm({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <div className="fixed inset-0 flex flex-col">
+      <div
+        className="fixed inset-0 flex flex-col"
+        style={{ fontSize: `${caseInputFontSize}px` }}
+      >
         {/* 페이지 헤더 */}
         <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
           {/* 뒤로가기 */}

@@ -12,6 +12,7 @@ async function SettingsContent() {
     layout,
     splitRatio,
     mobileFontSize,
+    caseInputFontSize,
     foldAutoSwitch,
     foldFallbackLayout,
   } = await getLayoutSettings();
@@ -20,6 +21,7 @@ async function SettingsContent() {
       defaultLayout={layout}
       defaultSplitRatio={splitRatio}
       defaultMobileFontSize={mobileFontSize}
+      defaultCaseInputFontSize={caseInputFontSize}
       defaultFoldAutoSwitch={foldAutoSwitch}
       defaultFoldFallbackLayout={foldFallbackLayout}
     />

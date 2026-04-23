@@ -50,6 +50,7 @@ interface CaseInputViewProps {
   defaultSplitRatio: number;
   foldAutoSwitch: boolean;
   foldFallbackLayout: FoldFallbackLayout;
+  caseInputFontSize: number;
   status: CaseStatus;
   generatedAt?: string;
   from?: string;
@@ -66,6 +67,7 @@ export function CaseInputView({
   defaultSplitRatio,
   foldAutoSwitch,
   foldFallbackLayout,
+  caseInputFontSize,
   status,
   generatedAt,
   from,
@@ -293,7 +295,10 @@ export function CaseInputView({
   );
 
   return (
-    <div className="fixed inset-0 flex flex-col">
+    <div
+      className="fixed inset-0 flex flex-col"
+      style={{ fontSize: `${caseInputFontSize}px` }}
+    >
       <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
         {/* 뒤로가기 */}
         <Button

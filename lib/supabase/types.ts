@@ -238,6 +238,7 @@ export type Database = {
           id: string;
           input_layout: Database["public"]["Enums"]["input_layout"];
           is_admin: boolean;
+          case_input_font_size: number;
           mobile_font_size: number;
           split_ratio: number;
           updated_at: string;
@@ -248,6 +249,7 @@ export type Database = {
           ai_access_requested_at?: string | null;
           ai_access_status?: "none" | "pending" | "approved" | "denied";
           avatar_url?: string | null;
+          case_input_font_size?: number;
           created_at?: string;
           fold_auto_switch?: boolean;
           fold_fallback_layout?: "single" | "split_vertical";
@@ -265,6 +267,7 @@ export type Database = {
           ai_access_requested_at?: string | null;
           ai_access_status?: "none" | "pending" | "approved" | "denied";
           avatar_url?: string | null;
+          case_input_font_size?: number;
           created_at?: string;
           fold_auto_switch?: boolean;
           fold_fallback_layout?: "single" | "split_vertical";
