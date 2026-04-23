@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { InstallBanner } from "@/components/pwa/install-banner";
+import { PwaInstallGuide } from "@/components/pwa/pwa-install-guide";
 import { Logo } from "@/components/icons/logo";
 
 // 로그인된 사용자를 대시보드로 리다이렉트하는 서버 컴포넌트
@@ -42,6 +43,7 @@ export default function Home() {
           회원가입
         </Link>
       </div>
+      <PwaInstallGuide />
       <InstallBanner />
     </main>
   );

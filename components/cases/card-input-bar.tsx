@@ -48,7 +48,7 @@ export function CardInputBar({ onSubmit }: CardInputBarProps) {
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
           rows={2}
-          placeholder="문진 키워드를 입력하세요... (Enter 전송, Shift+Enter 줄바꿈)"
+          placeholder="문진 정보 입력"
           className={cn(
             "flex-1 resize-none text-sm transition-colors",
             "focus-visible:ring-1 focus-visible:ring-foreground"
