@@ -327,7 +327,7 @@ html[data-view="desktop"] .lg\:inline-flex {
 
 .guideline-html,
 .guideline-html * {
-  letter-spacing: -0.3pt !important;
+  letter-spacing: 0.3pt !important;
 }
 
 /* 다크모드: HWP 인라인 색상을 가시성 있는 밝은 색으로 조정 */

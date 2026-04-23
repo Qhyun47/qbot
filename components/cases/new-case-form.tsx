@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Rows2, Columns2, Square, Zap, Loader2 } from "lucide-react";
 import {
@@ -104,6 +104,8 @@ export function NewCaseForm({
   const [navigatingBack, setNavigatingBack] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [, startTransition] = useTransition();
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const prevCardsLengthRef = useRef(0);
 
   useEffect(() => {
     createCase().then((id) => setCaseId(id));
@@ -151,6 +153,13 @@ export function NewCaseForm({
     guidelineFontSize,
     foldGuidelineFontSize,
   ]);
+
+  useEffect(() => {
+    if (cards.length > prevCardsLengthRef.current && scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+    }
+    prevCardsLengthRef.current = cards.length;
+  }, [cards.length]);
 
   const navigateToDashboard = () => {
     // router.refresh()로 라우터 캐시를 무효화한 후 이동 → 현황판에 최신 케이스 반영
@@ -330,7 +339,10 @@ export function NewCaseForm({
     <div className="flex h-full flex-col">
       {/* BedPicker·CC·카드 타임라인을 하나의 스크롤 영역으로 묶음 —
           키보드가 올라와 공간이 줄어들어도 잘리지 않고 스크롤로 접근 가능 */}
-      <div className="flex-1 overflow-y-auto overscroll-y-contain">
+      <div
+        ref={scrollAreaRef}
+        className="flex-1 overflow-y-auto overscroll-y-contain"
+      >
         {bedPickerOpen && (
           <>
             <div className="p-4">
