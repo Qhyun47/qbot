@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -22,7 +22,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Clock, GripVertical } from "lucide-react";
+import { Clock, Pencil, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { formatTimeDisplay } from "@/lib/time/parse-time-tag";
@@ -37,6 +37,8 @@ interface CardTimelineProps {
     movedId: string,
     targetSection: "timed" | "untimed" | null
   ) => void;
+  onDelete?: (cardId: string) => void;
+  onEdit?: (cardId: string, newText: string) => void;
 }
 
 function isInTimedSection(card: CaseInput): boolean {
@@ -50,6 +52,8 @@ export function CardTimeline({
   readOnly = false,
   generatedAt,
   onReorder,
+  onDelete,
+  onEdit,
 }: CardTimelineProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
@@ -150,7 +154,6 @@ export function CardTimeline({
         (dest === "untimed" && !draggedInTimed);
 
       if (sameSection) {
-        // 같은 영역 드롭존에 드롭 → 해당 섹션 맨 끝으로 이동
         const sectionCards = draggedInTimed ? timedCards : untimedCards;
         const fromIndex = sectionCards.findIndex((c) => c.id === draggedId);
         const toIndex = sectionCards.length - 1;
@@ -174,7 +177,6 @@ export function CardTimeline({
           );
         }
       } else {
-        // 다른 영역 드롭존에 드롭 → 섹션 이동 (맨 끝에 추가)
         targetSection = dest;
         const updatedCard: CaseInput = {
           ...draggedCard,
@@ -223,7 +225,6 @@ export function CardTimeline({
           ? [...reordered, ...otherCards]
           : [...otherCards, ...reordered];
         newCards = combined.map((c, i) => ({ ...c, display_order: i + 1 }));
-        // 시간 순 영역 내 수동 드래그 → 다음 렌더에서도 display_order 정렬 유지
         if (draggedInTimed) {
           targetSection = "timed";
           newCards = newCards.map((c) =>
@@ -331,6 +332,8 @@ export function CardTimeline({
                     }
                     generatedAt={generatedAt}
                     isDragging={activeId === card.id}
+                    onDelete={onDelete}
+                    onEdit={onEdit}
                   />
                 ))}
               </DroppableZone>
@@ -358,6 +361,8 @@ export function CardTimeline({
                     card={card}
                     generatedAt={generatedAt}
                     isDragging={activeId === card.id}
+                    onDelete={onDelete}
+                    onEdit={onEdit}
                   />
                 ))}
               </DroppableZone>
@@ -416,12 +421,16 @@ function SortableCard({
   displayLabel,
   generatedAt,
   isDragging,
+  onDelete,
+  onEdit,
 }: {
   card: CaseInput;
   showTime?: boolean;
   displayLabel?: string;
   generatedAt?: string;
   isDragging?: boolean;
+  onDelete?: (cardId: string) => void;
+  onEdit?: (cardId: string, newText: string) => void;
 }) {
   const {
     attributes,
@@ -438,7 +447,13 @@ function SortableCard({
   };
 
   return (
-    <div ref={setNodeRef} style={style}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="cursor-grab active:cursor-grabbing"
+      {...attributes}
+      {...listeners}
+    >
       <InputCard
         card={card}
         showTime={showTime}
@@ -449,7 +464,8 @@ function SortableCard({
             : false
         }
         isDragging={isDragging ?? isSortableDragging}
-        dragHandleProps={{ ...attributes, ...listeners }}
+        onDelete={onDelete}
+        onEdit={onEdit}
       />
     </div>
   );
@@ -462,7 +478,8 @@ function InputCard({
   referenced,
   isDragging,
   isDragOverlay,
-  dragHandleProps,
+  onDelete,
+  onEdit,
 }: {
   card: CaseInput;
   showTime?: boolean;
@@ -470,32 +487,155 @@ function InputCard({
   referenced?: boolean;
   isDragging?: boolean;
   isDragOverlay?: boolean;
-  dragHandleProps?: React.HTMLAttributes<HTMLElement>;
+  onDelete?: (cardId: string) => void;
+  onEdit?: (cardId: string, newText: string) => void;
 }) {
+  const [isRevealed, setIsRevealed] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(card.raw_text);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const hasActions = !!(onDelete || onEdit) && !isDragOverlay;
+
+  // 외부 클릭 시 reveal 닫기
+  useEffect(() => {
+    if (!isRevealed) return;
+    const handlePointerDown = (e: PointerEvent) => {
+      if (cardRef.current && !cardRef.current.contains(e.target as Node)) {
+        setIsRevealed(false);
+      }
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [isRevealed]);
+
+  // 편집 모드 진입 시 textarea 포커스
+  useEffect(() => {
+    if (isEditing) {
+      textareaRef.current?.focus();
+      textareaRef.current?.select();
+    }
+  }, [isEditing]);
+
+  // 드래그 중에는 reveal 상태 닫기
+  useEffect(() => {
+    if (isDragging) setIsRevealed(false);
+  }, [isDragging]);
+
+  const handleCardClick = () => {
+    if (!hasActions || isEditing || isDragging) return;
+    setIsRevealed((prev) => !prev);
+  };
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditText(card.raw_text);
+    setIsEditing(true);
+    setIsRevealed(false);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsRevealed(false);
+    onDelete?.(card.id);
+  };
+
+  const handleEditKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      const trimmed = editText.trim();
+      if (trimmed && trimmed !== card.raw_text) {
+        onEdit?.(card.id, trimmed);
+      }
+      setIsEditing(false);
+    }
+    if (e.key === "Escape") {
+      setEditText(card.raw_text);
+      setIsEditing(false);
+    }
+  };
+
+  if (isEditing) {
+    return (
+      <div
+        ref={cardRef}
+        className={cn(
+          "shadow-xs rounded-md border bg-card px-2 py-2 text-xs",
+          isDragging && !isDragOverlay && "opacity-40"
+        )}
+      >
+        <textarea
+          ref={textareaRef}
+          value={editText}
+          onChange={(e) => setEditText(e.target.value)}
+          onKeyDown={handleEditKeyDown}
+          onBlur={() => {
+            setEditText(card.raw_text);
+            setIsEditing(false);
+          }}
+          rows={2}
+          className="w-full resize-none bg-transparent leading-normal outline-none"
+        />
+        <p className="mt-1 text-muted-foreground/60">
+          Enter로 저장 · Esc로 취소
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div
+      ref={cardRef}
       className={cn(
-        "shadow-xs flex items-start gap-1.5 rounded-md border px-2 py-2 text-xs",
+        "shadow-xs relative overflow-hidden rounded-md border text-xs",
         referenced ? "bg-muted/40 text-muted-foreground" : "bg-card",
         isDragging && !isDragOverlay && "opacity-40",
         isDragOverlay && "shadow-lg ring-1 ring-primary/20"
       )}
+      onClick={handleCardClick}
     >
-      <span className="flex-1 leading-normal">{card.raw_text}</span>
-      {showTime && displayLabel && (
-        <span className="shrink-0 rounded bg-secondary px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
-          {displayLabel}
-        </span>
-      )}
-      {dragHandleProps && (
-        <button
-          type="button"
-          className="mt-0.5 shrink-0 cursor-grab touch-none text-muted-foreground/40 hover:text-muted-foreground active:cursor-grabbing"
-          aria-label="드래그하여 순서 변경"
-          {...dragHandleProps}
+      <div
+        className={cn(
+          "flex items-start gap-1.5 px-2 py-2 transition-transform duration-200",
+          isRevealed && hasActions && "-translate-x-[72px]"
+        )}
+      >
+        <span className="flex-1 leading-normal">{card.raw_text}</span>
+        {showTime && displayLabel && (
+          <span className="shrink-0 rounded bg-secondary px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
+            {displayLabel}
+          </span>
+        )}
+      </div>
+
+      {hasActions && (
+        <div
+          className={cn(
+            "absolute inset-y-0 right-0 flex items-center gap-1 pr-1 transition-opacity duration-200",
+            isRevealed ? "opacity-100" : "pointer-events-none opacity-0"
+          )}
         >
-          <GripVertical className="size-3.5" />
-        </button>
+          {onEdit && (
+            <button
+              type="button"
+              aria-label="카드 수정"
+              onClick={handleEditClick}
+              className="rounded p-1.5 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950"
+            >
+              <Pencil className="size-3.5" />
+            </button>
+          )}
+          {onDelete && (
+            <button
+              type="button"
+              aria-label="카드 삭제"
+              onClick={handleDeleteClick}
+              className="rounded p-1.5 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950"
+            >
+              <Trash2 className="size-3.5" />
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

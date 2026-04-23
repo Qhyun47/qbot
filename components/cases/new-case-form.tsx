@@ -39,6 +39,8 @@ import {
   overrideTemplateKey,
   reorderCaseInputs,
   moveCaseInputSection,
+  deleteCaseInput,
+  updateCaseInputText,
 } from "@/lib/cases/actions";
 import type {
   BedZone,
@@ -241,6 +243,18 @@ export function NewCaseForm({
     });
   };
 
+  const handleCardDelete = (cardId: string) => {
+    setCards((prev) => prev.filter((c) => c.id !== cardId));
+    startTransition(() => deleteCaseInput(cardId));
+  };
+
+  const handleCardEdit = (cardId: string, newText: string) => {
+    startTransition(async () => {
+      const updated = await updateCaseInputText(cardId, newText);
+      setCards((prev) => prev.map((c) => (c.id === cardId ? updated : c)));
+    });
+  };
+
   const handleCardSubmit = (
     rawText: string,
     timeTag: string | null,
@@ -361,7 +375,12 @@ export function NewCaseForm({
             </>
           )}
         <div className="p-4">
-          <CardTimeline cards={optimisticCards} onReorder={handleCardReorder} />
+          <CardTimeline
+            cards={optimisticCards}
+            onReorder={handleCardReorder}
+            onDelete={handleCardDelete}
+            onEdit={handleCardEdit}
+          />
         </div>
       </div>
       <CardInputBar onSubmit={handleCardSubmit} />

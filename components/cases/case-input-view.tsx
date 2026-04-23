@@ -19,6 +19,10 @@ import {
   updateCaseCc,
   addCaseInput,
   overrideTemplateKey,
+  reorderCaseInputs,
+  moveCaseInputSection,
+  deleteCaseInput,
+  updateCaseInputText,
 } from "@/lib/cases/actions";
 import { loadGuideline } from "@/lib/guidelines/actions";
 import type {
@@ -227,6 +231,36 @@ export function CaseInputView({
     });
   };
 
+  const handleCardReorder = (
+    newCards: CaseInput[],
+    movedId: string,
+    targetSection: "timed" | "untimed" | null
+  ) => {
+    setCards(newCards);
+    startTransition(async () => {
+      const orderUpdates = newCards.map((c) => ({
+        id: c.id,
+        displayOrder: c.display_order,
+      }));
+      await reorderCaseInputs(orderUpdates);
+      if (targetSection) {
+        await moveCaseInputSection(movedId, targetSection);
+      }
+    });
+  };
+
+  const handleCardDelete = (cardId: string) => {
+    setCards((prev) => prev.filter((c) => c.id !== cardId));
+    startTransition(() => deleteCaseInput(cardId));
+  };
+
+  const handleCardEdit = (cardId: string, newText: string) => {
+    startTransition(async () => {
+      const updated = await updateCaseInputText(cardId, newText);
+      setCards((prev) => prev.map((c) => (c.id === cardId ? updated : c)));
+    });
+  };
+
   const handleGenerate = async () => {
     setGenerating(true);
     await fetch(`/api/cases/${caseId}/generate`, { method: "POST" });
@@ -298,7 +332,13 @@ export function CaseInputView({
         </>
       )}
       <div className="flex-1 overflow-y-auto p-4">
-        <CardTimeline cards={optimisticCards} generatedAt={generatedAt} />
+        <CardTimeline
+          cards={optimisticCards}
+          generatedAt={generatedAt}
+          onReorder={handleCardReorder}
+          onDelete={handleCardDelete}
+          onEdit={handleCardEdit}
+        />
       </div>
       <CardInputBar onSubmit={handleCardSubmit} />
     </div>

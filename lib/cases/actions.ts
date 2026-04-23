@@ -313,3 +313,27 @@ export async function deleteCase(caseId: string): Promise<void> {
   revalidatePath("/cases");
   revalidatePath("/dashboard");
 }
+
+export async function deleteCaseInput(cardId: string): Promise<void> {
+  const { supabase } = await getAuthUser();
+  const { error } = await supabase
+    .from("case_inputs")
+    .delete()
+    .eq("id", cardId);
+  if (error) throw new Error(error.message);
+}
+
+export async function updateCaseInputText(
+  cardId: string,
+  rawText: string
+): Promise<CaseInput> {
+  const { supabase } = await getAuthUser();
+  const { data, error } = await supabase
+    .from("case_inputs")
+    .update({ raw_text: rawText })
+    .eq("id", cardId)
+    .select()
+    .single();
+  if (error) throw new Error(error.message);
+  return data as CaseInput;
+}
