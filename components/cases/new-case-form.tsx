@@ -120,7 +120,7 @@ export function NewCaseForm({
   }, [caseInputFontSize]);
 
   useEffect(() => {
-    if (!foldAutoSwitch) return;
+    if (!foldAutoSwitch || defaultLayout !== "split_horizontal") return;
     const mq = window.matchMedia("(max-width: 600px)");
     const handler = (e: MediaQueryListEvent) => {
       setLayout(e.matches ? foldFallbackLayout : defaultLayout);
