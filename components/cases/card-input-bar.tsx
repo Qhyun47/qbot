@@ -33,7 +33,7 @@ export function CardInputBar({ onSubmit }: CardInputBarProps) {
   };
 
   return (
-    <div className="border-t bg-background pb-[env(safe-area-inset-bottom)]">
+    <div className="shrink-0 border-t bg-background pb-[env(safe-area-inset-bottom)]">
       {parsed.timeTag && (
         <div className="flex items-center gap-1.5 border-b bg-blue-50 px-3 py-1.5 text-xs dark:bg-blue-950">
           <span className="text-muted-foreground">감지된 시간:</span>

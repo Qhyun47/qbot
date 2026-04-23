@@ -310,7 +310,7 @@ export function NewCaseForm({
           <Separator />
         </>
       )}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto overscroll-y-contain p-4">
         <CardTimeline cards={optimisticCards} />
       </div>
       <CardInputBar onSubmit={handleCardSubmit} />

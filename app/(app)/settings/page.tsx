@@ -96,6 +96,12 @@ export default function SettingsPage() {
         </Suspense>
         <Separator />
         <InstallSection />
+        <Separator />
+        <p className="text-center text-xs text-muted-foreground">
+          버전{" "}
+          {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ??
+            "local"}
+        </p>
       </div>
     </div>
   );

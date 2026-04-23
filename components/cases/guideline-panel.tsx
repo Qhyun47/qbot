@@ -152,7 +152,7 @@ export function GuidelinePanel({
   );
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto bg-muted/30">
+    <div className="flex h-full flex-col overflow-y-auto overscroll-y-contain bg-muted/30">
       {/* 가이드라인 chip */}
       <button
         type="button"
