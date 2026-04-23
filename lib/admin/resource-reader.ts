@@ -128,7 +128,7 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
         entry.guideKeys.map(async (key) => ({
           key,
           exists: await fileExists(
-            path.join(ROOT, "ai-docs/cc", key, "guide.md")
+            path.join(ROOT, "ai-docs/cc", key, "guide.html")
           ),
         }))
       );
@@ -193,7 +193,7 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
   const allGuideKeys = [...new Set(ccList.flatMap((e) => e.guideKeys))];
   const guideItems = await Promise.all(
     allGuideKeys.map(async (key) => {
-      const guidePath = path.join(ROOT, "ai-docs/cc", key, "guide.md");
+      const guidePath = path.join(ROOT, "ai-docs/cc", key, "guide.html");
       let content = "";
       try {
         content = await fs.readFile(guidePath, "utf-8");

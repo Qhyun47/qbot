@@ -10,6 +10,11 @@
 
 이후 CLAUDE.md "가이드라인 추가 절차"를 단계별로 따릅니다.
 
+**C.C. 커넥션 확인:**
+
+파일 읽기 후, 사용자에게 명시적으로 질문합니다:
+"이 가이드라인을 연결할 C.C.가 있나요? (있으면 C.C. 이름을 알려주세요)"
+
 **커넥션 처리 흐름:**
 
 - 사용자가 C.C. 커넥션을 언급한 경우:
@@ -22,9 +27,27 @@
 - pending-matches.md 섹션 1에서 이 guideKey를 기다리는 C.C.가 있으면 → 연결 여부 질문
 - 수락: cc-list.json 업데이트 + 해당 행 삭제 / 거절: 해당 행 삭제만
 
+**HTML 가이드라인 원본 요청:**
+
+커넥션 처리가 끝나면 사용자에게 요청합니다:
+"HWP에서 내보낸 HTML 전체를 붙여주세요."
+
+받은 HTML을 저장하기 전에 **색상 코드 확인**을 반드시 수행합니다:
+
+1. HTML에서 `color:#` 또는 `color: #` 패턴으로 사용된 모든 색상 코드를 추출합니다.
+2. 아래 **이미 등록된 색상** 목록과 대조합니다:
+   - `#ff0000` / `rgb(255,0,0)` — 빨강 → 다크모드 `#ff7070`
+   - `#0000ff` / `rgb(0,0,255)` — 파랑 → 다크모드 `#7eb6ff`
+   - `#008000` / `rgb(0,128,0)` — 초록 → 다크모드 `#5dbf6a`
+   - `#000000` / `rgb(0,0,0)` — 검정 → 다크모드 전경색
+3. **미등록 색상이 있으면**: 저장을 중단하고 사용자에게 해당 색상과 다크모드 대응 색상 제안을 보여준 뒤 `app/globals.css`의 `.guideline-html` 다크모드 섹션에 CSS 추가 여부를 먼저 묻습니다.
+4. **모든 색상이 등록된 색상이면**: 별도 확인 없이 바로 진행합니다.
+
+색상 확인이 끝나면 `processGuideHtml()` (`lib/utils/html-utils.ts`)을 적용하여 정리한 후 `ai-docs/cc/{guideKey}/guide.html`로 저장합니다.
+
 **반드시 수행해야 하는 필수 파일 업데이트:**
 
-- `ai-docs/cc/{guideKey}/guide.md` 생성
+- `ai-docs/cc/{guideKey}/guide.html` 생성 (processGuideHtml() 적용 후 저장)
 - `lib/ai/resources/guide-list.json`에 항목 추가 (누락 시 가이드라인 관리 페이지와 문진 패널에 표시되지 않음)
 - C.C. 커넥션이 확정된 경우에만 → `lib/ai/resources/cc-list.json`의 해당 C.C. `guideKeys`에 키 추가
 - `ai-docs/pending-matches.md` 업데이트 (해당 시)

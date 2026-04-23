@@ -5,6 +5,7 @@ import { BookOpen, ChevronsUpDown, FileText } from "lucide-react";
 import { loadGuideline, loadGuideByKey } from "@/lib/guidelines/actions";
 import { cn } from "@/lib/utils";
 import { MarkdownPreview } from "@/components/ui/markdown-preview";
+import { HtmlPreview } from "@/components/ui/html-preview";
 import ccListRaw from "@/lib/ai/resources/cc-list.json";
 import templateListRaw from "@/lib/ai/resources/template-list.json";
 import guideListRaw from "@/lib/ai/resources/guide-list.json";
@@ -343,7 +344,11 @@ export function GuidelinePanel({
             가이드라인 불러오는 중...
           </p>
         ) : guideContent ? (
-          <MarkdownPreview content={guideContent} />
+          guideContent.trimStart().startsWith("<") ? (
+            <HtmlPreview content={guideContent} />
+          ) : (
+            <MarkdownPreview content={guideContent} />
+          )
         ) : (
           <p className="text-sm text-muted-foreground">
             해당 C.C.에 대한 가이드라인이 없습니다. 위 버튼으로 직접 선택하세요.

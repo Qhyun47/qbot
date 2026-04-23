@@ -316,3 +316,81 @@ html[data-view="desktop"] .lg\:inline-flex {
 [data-view="desktop"] main {
   min-width: 680px;
 }
+
+/* ───── HWP→HTML 가이드라인 컴팩트 렌더링 ───── */
+.guideline-html {
+  font-size: 12.5px;
+  line-height: 1.35;
+  letter-spacing: 0;
+  word-spacing: normal;
+}
+
+/* 다크모드: HWP 인라인 색상을 가시성 있는 밝은 색으로 조정 */
+/* 파란색 #0000ff / rgb(0,0,255) → 밝은 파란색 */
+.dark .guideline-html [style*="color: rgb(0, 0, 255)"],
+.dark .guideline-html [style*="color:rgb(0,0,255)"],
+.dark .guideline-html [style*="color: #0000ff"],
+.dark .guideline-html [style*="color:#0000ff"] {
+  color: #7eb6ff !important;
+}
+
+/* 초록색 rgb(0,128,0) / #008000 → 밝은 초록색 */
+.dark .guideline-html [style*="color: rgb(0, 128, 0)"],
+.dark .guideline-html [style*="color:rgb(0,128,0)"],
+.dark .guideline-html [style*="color: #008000"],
+.dark .guideline-html [style*="color:#008000"] {
+  color: #5dbf6a !important;
+}
+
+/* 빨간색 → 약간 밝게 */
+.dark .guideline-html [style*="color: rgb(255, 0, 0)"],
+.dark .guideline-html [style*="color:rgb(255,0,0)"],
+.dark .guideline-html [style*="color: #ff0000"],
+.dark .guideline-html [style*="color:#ff0000"] {
+  color: #ff7070 !important;
+}
+
+/* 검정색 → 테마 기본 글자색(연한 흰색)으로 */
+.dark .guideline-html [style*="color: rgb(0, 0, 0)"],
+.dark .guideline-html [style*="color:rgb(0,0,0)"],
+.dark .guideline-html [style*="color: #000000"],
+.dark .guideline-html [style*="color:#000000"] {
+  color: hsl(var(--foreground)) !important;
+}
+
+.guideline-html p,
+.guideline-html div {
+  margin-top: 0;
+  margin-bottom: 2px;
+  line-height: 1.35;
+}
+
+.guideline-html table {
+  border-collapse: collapse;
+  margin: 2px 0;
+  font-size: inherit;
+  line-height: 1.35;
+}
+
+.guideline-html td,
+.guideline-html th {
+  padding: 1px 4px;
+  line-height: 1.35;
+  vertical-align: top;
+}
+
+.guideline-html span,
+.guideline-html a,
+.guideline-html b,
+.guideline-html u,
+.guideline-html strong {
+  line-height: inherit;
+}
+
+/* 배경색 제거 (HWP 흰 배경 제거) */
+.guideline-html *,
+.guideline-html *::before,
+.guideline-html *::after {
+  background-color: transparent !important;
+  background: transparent !important;
+}

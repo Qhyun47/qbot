@@ -73,7 +73,7 @@
   - ✅ `style_guide.md` 생성 (혼용 언어 원칙, 문장 구조, 필수 포함 요소 등)
   - ✅ `lib/ai/resources/templates/` — C.C.별 5개 상용구 템플릿 JSON (chest-pain, dyspnea, hemoptysis, abdominal-pain, gi-bleeding)
   - ✅ `lib/ai/resources/schemas/` — C.C.별 5개 정규화 스키마 JSON (JSON Schema draft-07, `structured_schema.json` 단일 파일 방식 대신 C.C.별 분리)
-  - ✅ `lib/ai/resources/guides/` — C.C.별 5개 문진 가이드라인 Markdown (핵심 문진 체크리스트 + 감별 진단 + 위험 신호)
+  - ✅ `ai-docs/cc/{key}/guide.html` — C.C.별 문진 가이드라인 HTML (HWP→HTML 변환, processGuideHtml() 적용 후 저장. /guide 커맨드로 추가)
   - ✅ `lib/ai/resources/examples/` — C.C.별 5개 빈 `.jsonl` 파일 (few-shot 예시 준비 공간)
   - ✅ `lib/ai/load-resources.ts` 매핑 함수 스텁 생성 (`loadSchema` / `loadTemplate` / `loadGuide` / `loadExamples` + `CC_TEMPLATE_KEYS`)
   - ✅ `fixtures/case-01.json` (Chest pain, 12개 입력 카드, NTG 무반응 시나리오)

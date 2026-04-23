@@ -41,9 +41,9 @@ export function loadHistory(templateKey: string): object | null {
 }
 
 export function loadGuide(templateKey: string): string {
-  const filePath = path.join(AI_DOCS_DIR, "cc", templateKey, "guide.md");
-  if (fs.existsSync(filePath)) {
-    return fs.readFileSync(filePath, "utf-8");
+  const htmlPath = path.join(AI_DOCS_DIR, "cc", templateKey, "guide.html");
+  if (fs.existsSync(htmlPath)) {
+    return fs.readFileSync(htmlPath, "utf-8");
   }
   return "";
 }

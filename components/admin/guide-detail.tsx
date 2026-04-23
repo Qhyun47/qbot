@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { MarkdownPreview } from "@/components/ui/markdown-preview";
+import { HtmlPreview } from "@/components/ui/html-preview";
 import { XCircle } from "lucide-react";
 import type { GuideItem } from "@/lib/admin/resource-reader";
 
@@ -36,12 +37,16 @@ export function GuideDetail({ item }: GuideDetailProps) {
 
       {/* 가이드라인 내용 */}
       {item.content ? (
-        <MarkdownPreview content={item.content} />
+        item.content.trimStart().startsWith("<") ? (
+          <HtmlPreview content={item.content} />
+        ) : (
+          <MarkdownPreview content={item.content} />
+        )
       ) : (
         <div className="flex items-center gap-2 text-sm text-destructive">
           <XCircle className="size-4 shrink-0" />
           <span>
-            <code className="text-xs">ai-docs/cc/{item.key}/guide.md</code>{" "}
+            <code className="text-xs">ai-docs/cc/{item.key}/guide.html</code>{" "}
             파일을 찾을 수 없습니다.
           </span>
         </div>

@@ -92,7 +92,7 @@ export function CcResourceDetail({ item, parentItem }: CcResourceDetailProps) {
                 <FileExistsBadge
                   key={g.key}
                   exists={g.exists}
-                  path={`ai-docs/cc/${g.key}/guide.md`}
+                  path={`ai-docs/cc/${g.key}/guide.html`}
                 />
               ))}
             </div>
@@ -111,7 +111,7 @@ export function CcResourceDetail({ item, parentItem }: CcResourceDetailProps) {
               <FileExistsBadge
                 key={g.key}
                 exists={g.exists}
-                path={`ai-docs/cc/${g.key}/guide.md`}
+                path={`ai-docs/cc/${g.key}/guide.html`}
               />
             ))}
           </div>

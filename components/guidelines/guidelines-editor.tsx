@@ -14,14 +14,17 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { MarkdownPreview } from "@/components/ui/markdown-preview";
+import { HtmlPreview } from "@/components/ui/html-preview";
 import {
   upsertGuideline,
   deleteGuideline,
   deleteGuidelinePdf,
 } from "@/lib/guidelines/actions";
+import { processGuideHtml } from "@/lib/utils/html-utils";
 import type { Guideline } from "@/lib/supabase/types";
 
-type InputMode = "text" | "markdown" | "pdf";
+type InputMode = "text" | "markdown" | "html" | "pdf";
 
 interface GuideListItem {
   guideKey: string;
@@ -80,7 +83,9 @@ export function GuidelinesEditor({
         let pdfPath: string | null | undefined = undefined;
         let content = customContent;
 
-        if (inputMode === "pdf") {
+        if (inputMode === "html") {
+          content = processGuideHtml(customContent);
+        } else if (inputMode === "pdf") {
           if (pdfFile) {
             // 미저장 PDF → 업로드 처리
             setIsFileLoading(true);
@@ -246,6 +251,12 @@ export function GuidelinesEditor({
               Markdown
             </ToggleGroupItem>
             <ToggleGroupItem
+              value="html"
+              className="rounded-none border-x-0 px-3 text-xs"
+            >
+              HTML
+            </ToggleGroupItem>
+            <ToggleGroupItem
               value="pdf"
               className="rounded-l-none px-3 text-xs"
             >
@@ -257,9 +268,11 @@ export function GuidelinesEditor({
         {/* 콘텐츠 행 — 시스템 기본 박스 */}
         <div className="h-72 overflow-y-auto rounded-lg border bg-muted/50 p-4">
           {systemContent ? (
-            <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-muted-foreground">
-              {systemContent}
-            </pre>
+            systemContent.trimStart().startsWith("<") ? (
+              <HtmlPreview content={systemContent} />
+            ) : (
+              <MarkdownPreview content={systemContent} />
+            )
           ) : (
             <p className="text-sm text-muted-foreground">
               이 가이드라인에 대한 시스템 기본 내용이 없습니다.
@@ -314,7 +327,9 @@ export function GuidelinesEditor({
               placeholder={
                 inputMode === "markdown"
                   ? "Markdown 형식으로 커스텀 가이드라인을 작성하세요..."
-                  : "커스텀 가이드라인을 작성하세요..."
+                  : inputMode === "html"
+                    ? "HWP에서 내보낸 HTML을 붙여넣으세요..."
+                    : "커스텀 가이드라인을 작성하세요..."
               }
               className="h-72 resize-none font-mono text-sm"
             />

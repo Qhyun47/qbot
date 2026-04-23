@@ -113,7 +113,7 @@ import { Button } from "@/components/ui/button";
 | `lib/ai/resources/cc-list.json`       | 정형 C.C. 목록 (단일 소스, `{ cc, guideKeys[], templateKeys[], aliasOf? }`) |
 | `lib/ai/resources/guide-list.json`    | 가이드라인 표시명 목록 (`{ guideKey, displayName }`)                        |
 | `lib/ai/resources/template-list.json` | 상용구 표시명 목록 (`{ templateKey, displayName }`)                         |
-| `ai-docs/cc/{key}/guide.md`           | 시스템 가이드라인 파일                                                      |
+| `ai-docs/cc/{key}/guide.html`         | 시스템 가이드라인 파일 (HWP→HTML, processGuideHtml() 적용 후 저장)          |
 | `ai-docs/cc/{key}/template.json`      | 상용구 템플릿 파일 (`fields`, `pe`, `history` 섹션 포함)                    |
 | `ai-docs/cc/{key}/schema.json`        | AI 정규화 스키마 파일                                                       |
 | `ai-docs/pending-matches.md`          | 대기 중인 커넥션 추적 파일 (C.C./가이드라인/상용구 간 4방향)                |
@@ -161,7 +161,7 @@ import { Button } from "@/components/ui/button";
 
 ### 가이드라인 추가 절차
 
-1. `ai-docs/cc/{guideKey}/guide.md` 파일 생성 (Markdown, 문진 체크리스트 + 감별진단 + 위험신호 포함)
+1. 사용자에게 "HWP에서 내보낸 HTML 전체를 붙여주세요"를 요청한 후, 받은 HTML에 `processGuideHtml()` (`lib/utils/html-utils.ts`)을 적용하여 `ai-docs/cc/{guideKey}/guide.html`로 저장
 
 2. `lib/ai/resources/guide-list.json`에 항목 추가:
 
