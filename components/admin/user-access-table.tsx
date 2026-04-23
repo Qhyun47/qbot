@@ -5,8 +5,15 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
+import { ChevronDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -88,6 +95,30 @@ function UserRow({ user }: { user: AiAccessUser }) {
       ? user.created_at
       : user.ai_access_requested_at;
 
+  const statusCell =
+    user.ai_access_status === "approved" ? (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild disabled={isPending}>
+          <button className="flex items-center gap-0.5 rounded focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+            <Badge variant="default">승인됨</Badge>
+            <ChevronDown className="size-3 text-muted-foreground" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          <DropdownMenuItem
+            className="text-destructive focus:text-destructive"
+            onSelect={handleRevoke}
+          >
+            차단 (거부 처리)
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    ) : (
+      <Badge variant={STATUS_VARIANTS[user.ai_access_status]}>
+        {STATUS_LABELS[user.ai_access_status]}
+      </Badge>
+    );
+
   return (
     <TableRow>
       <TableCell className="font-medium">
@@ -101,45 +132,29 @@ function UserRow({ user }: { user: AiAccessUser }) {
           ? format(new Date(dateLabel), "MM/dd HH:mm", { locale: ko })
           : "-"}
       </TableCell>
-      <TableCell>
-        <Badge variant={STATUS_VARIANTS[user.ai_access_status]}>
-          {STATUS_LABELS[user.ai_access_status]}
-        </Badge>
-      </TableCell>
+      <TableCell>{statusCell}</TableCell>
       <TableCell>
         <div className="flex items-center gap-2">
-          {user.ai_access_status === "approved" ? (
+          {user.ai_access_status !== "approved" &&
+            user.ai_access_status !== "none" && (
+              <Button
+                size="sm"
+                variant="default"
+                onClick={handleApprove}
+                disabled={isPending}
+              >
+                승인
+              </Button>
+            )}
+          {user.ai_access_status === "pending" && (
             <Button
               size="sm"
-              variant="destructive"
-              onClick={handleRevoke}
+              variant="outline"
+              onClick={handleDeny}
               disabled={isPending}
             >
-              차단
+              거부
             </Button>
-          ) : (
-            <>
-              {user.ai_access_status !== "none" && (
-                <Button
-                  size="sm"
-                  variant="default"
-                  onClick={handleApprove}
-                  disabled={isPending}
-                >
-                  승인
-                </Button>
-              )}
-              {user.ai_access_status === "pending" && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleDeny}
-                  disabled={isPending}
-                >
-                  거부
-                </Button>
-              )}
-            </>
           )}
         </div>
       </TableCell>
