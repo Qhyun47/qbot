@@ -30,6 +30,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#09090b",
+  interactiveWidget: "resizes-content",
 };
 
 const geistSans = Geist({
