@@ -293,77 +293,6 @@ export type Database = {
         };
         Relationships: [];
       };
-      ai_documents: {
-        Row: {
-          doc_path: string;
-          doc_type: "md" | "json";
-          content: string;
-          is_editable: boolean;
-          version: number;
-          synced_at: string | null;
-          updated_at: string;
-          updated_by: string;
-        };
-        Insert: {
-          doc_path: string;
-          doc_type: "md" | "json";
-          content: string;
-          is_editable?: boolean;
-          version?: number;
-          synced_at?: string | null;
-          updated_at?: string;
-          updated_by?: string;
-        };
-        Update: {
-          doc_path?: string;
-          doc_type?: "md" | "json";
-          content?: string;
-          is_editable?: boolean;
-          version?: number;
-          synced_at?: string | null;
-          updated_at?: string;
-          updated_by?: string;
-        };
-        Relationships: [];
-      };
-      ai_document_versions: {
-        Row: {
-          id: string;
-          doc_path: string;
-          content: string;
-          version: number;
-          changed_by: string;
-          change_summary: string | null;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          doc_path: string;
-          content: string;
-          version: number;
-          changed_by?: string;
-          change_summary?: string | null;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          doc_path?: string;
-          content?: string;
-          version?: number;
-          changed_by?: string;
-          change_summary?: string | null;
-          created_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "ai_document_versions_doc_path_fkey";
-            columns: ["doc_path"];
-            isOneToOne: false;
-            referencedRelation: "ai_documents";
-            referencedColumns: ["doc_path"];
-          },
-        ];
-      };
       ai_usage_logs: {
         Row: {
           id: string;
@@ -624,15 +553,6 @@ export type GuidelineInsert =
   Database["public"]["Tables"]["interview_guidelines"]["Insert"];
 export type GuidelineUpdate =
   Database["public"]["Tables"]["interview_guidelines"]["Update"];
-
-// 편의 타입 — ai_documents
-export type AiDocument = Database["public"]["Tables"]["ai_documents"]["Row"];
-export type AiDocumentInsert =
-  Database["public"]["Tables"]["ai_documents"]["Insert"];
-
-// 편의 타입 — ai_document_versions
-export type AiDocumentVersion =
-  Database["public"]["Tables"]["ai_document_versions"]["Row"];
 
 // 편의 타입 — error_logs
 export type ErrorLog = Database["public"]["Tables"]["error_logs"]["Row"];

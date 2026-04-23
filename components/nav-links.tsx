@@ -8,7 +8,7 @@ import { NAV_LINKS } from "@/lib/nav-config";
 import { useViewMode } from "@/lib/hooks/use-view-mode";
 
 interface NavLinksProps {
-  /** 관리자 여부 — true이면 "문서 관리" 메뉴를 추가로 표시합니다. */
+  /** 관리자 여부 — true이면 관리자 메뉴를 추가로 표시합니다. */
   isAdmin?: boolean;
 }
 
@@ -20,7 +20,6 @@ export function NavLinks({ isAdmin }: NavLinksProps) {
   const adminLinks = isAdmin
     ? [
         { href: "/admin/users", label: "사용자 관리" },
-        { href: "/admin/documents", label: "문서 관리" },
         { href: "/admin/resources", label: "AI 리소스" },
         { href: "/admin/error-logs", label: "에러 로그" },
       ]

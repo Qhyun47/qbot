@@ -11,7 +11,7 @@ import { useViewMode } from "@/lib/hooks/use-view-mode";
 import { createClient } from "@/lib/supabase/client";
 
 interface MobileNavProps {
-  /** 관리자 여부 — true이면 "문서 관리" 메뉴를 추가로 표시합니다. */
+  /** 관리자 여부 — true이면 관리자 메뉴를 추가로 표시합니다. */
   isAdmin?: boolean;
 }
 
@@ -25,7 +25,6 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
   const adminLinks = isAdmin
     ? [
         { href: "/admin/users", label: "사용자 관리" },
-        { href: "/admin/documents", label: "문서 관리" },
         { href: "/admin/resources", label: "AI 리소스" },
         { href: "/admin/error-logs", label: "에러 로그" },
       ]
