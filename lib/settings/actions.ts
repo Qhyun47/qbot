@@ -24,6 +24,13 @@ const mobileFontSizeSchema = z.union([
   z.literal(18),
   z.literal(20),
 ]);
+const guidelineFontSizeSchema = z.union([
+  z.literal(8),
+  z.literal(10),
+  z.literal(12),
+  z.literal(14),
+  z.literal(16),
+]);
 const foldFallbackLayoutSchema = z.enum(["single", "split_vertical"]);
 
 export async function updateInputLayout(layout: InputLayout): Promise<void> {
@@ -48,7 +55,9 @@ export async function updateLayoutSettings(
   foldAutoSwitch: boolean,
   foldFallbackLayout: FoldFallbackLayout,
   caseInputFontSize: number,
-  foldCaseInputFontSize: number
+  foldCaseInputFontSize: number,
+  guidelineFontSize: number,
+  foldGuidelineFontSize: number
 ): Promise<void> {
   const parsedLayout = layoutSchema.parse(layout);
   const parsedRatio = splitRatioSchema.parse(splitRatio);
@@ -58,6 +67,11 @@ export async function updateLayoutSettings(
     foldCaseInputFontSize
   );
   const parsedFoldFallback = foldFallbackLayoutSchema.parse(foldFallbackLayout);
+  const parsedGuidelineFontSize =
+    guidelineFontSizeSchema.parse(guidelineFontSize);
+  const parsedFoldGuidelineFontSize = guidelineFontSizeSchema.parse(
+    foldGuidelineFontSize
+  );
   const { supabase, user } = await getAuthUser();
 
   const { error } = await supabase
@@ -70,6 +84,8 @@ export async function updateLayoutSettings(
       fold_auto_switch: foldAutoSwitch,
       fold_fallback_layout: parsedFoldFallback,
       fold_case_input_font_size: parsedFoldCaseInputFontSize,
+      guideline_font_size: parsedGuidelineFontSize,
+      fold_guideline_font_size: parsedFoldGuidelineFontSize,
     })
     .eq("id", user.id);
 
@@ -99,18 +115,21 @@ export async function getLayoutSettings(): Promise<{
   foldAutoSwitch: boolean;
   foldFallbackLayout: FoldFallbackLayout;
   foldCaseInputFontSize: number;
+  guidelineFontSize: number;
+  foldGuidelineFontSize: number;
 }> {
   const { supabase, user } = await getAuthUser();
 
   const { data } = await supabase
     .from("profiles")
     .select(
-      "input_layout, split_ratio, mobile_font_size, case_input_font_size, fold_auto_switch, fold_fallback_layout, fold_case_input_font_size"
+      "input_layout, split_ratio, mobile_font_size, case_input_font_size, fold_auto_switch, fold_fallback_layout, fold_case_input_font_size, guideline_font_size, fold_guideline_font_size"
     )
     .eq("id", user.id)
     .maybeSingle();
 
   const caseInputFontSize = data?.case_input_font_size ?? 16;
+  const guidelineFontSize = data?.guideline_font_size ?? 12;
   return {
     layout: data?.input_layout ?? "single",
     splitRatio: data?.split_ratio ?? 50,
@@ -120,5 +139,7 @@ export async function getLayoutSettings(): Promise<{
     foldFallbackLayout:
       (data?.fold_fallback_layout as FoldFallbackLayout) ?? "single",
     foldCaseInputFontSize: data?.fold_case_input_font_size ?? caseInputFontSize,
+    guidelineFontSize,
+    foldGuidelineFontSize: data?.fold_guideline_font_size ?? guidelineFontSize,
   };
 }

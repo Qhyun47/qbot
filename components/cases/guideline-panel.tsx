@@ -36,6 +36,7 @@ interface GuidelinePanelProps {
   templateKey: string | null;
   onGuidelineChange: (guideKey: string) => void;
   onTemplateChange: (templateKey: string | null) => void;
+  guidelineFontSize?: number;
 }
 
 function getSuggestedGuideKeys(cc: string | null): string[] {
@@ -86,6 +87,7 @@ export function GuidelinePanel({
   templateKey,
   onGuidelineChange,
   onTemplateChange,
+  guidelineFontSize,
 }: GuidelinePanelProps) {
   const [showGuideSelector, setShowGuideSelector] = useState(false);
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
@@ -345,7 +347,14 @@ export function GuidelinePanel({
           </p>
         ) : guideContent ? (
           guideContent.trimStart().startsWith("<") ? (
-            <HtmlPreview content={guideContent} />
+            <HtmlPreview
+              content={guideContent}
+              zoom={
+                guidelineFontSize !== undefined
+                  ? guidelineFontSize / 12.5
+                  : undefined
+              }
+            />
           ) : (
             <MarkdownPreview content={guideContent} />
           )

@@ -122,6 +122,7 @@ async function CaseContent({
     foldAutoSwitch,
     foldFallbackLayout,
     caseInputFontSize,
+    guidelineFontSize,
   } = layoutSettings;
 
   if (!caseData) notFound();
@@ -309,6 +310,7 @@ async function CaseContent({
           foldAutoSwitch={foldAutoSwitch}
           foldFallbackLayout={foldFallbackLayout}
           caseInputFontSize={caseInputFontSize}
+          guidelineFontSize={guidelineFontSize}
           status={status}
           generatedAt={result?.generated_at ?? undefined}
           from={from}

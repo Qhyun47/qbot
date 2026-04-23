@@ -55,6 +55,7 @@ interface CaseInputViewProps {
   foldAutoSwitch: boolean;
   foldFallbackLayout: FoldFallbackLayout;
   caseInputFontSize: number;
+  guidelineFontSize?: number;
   status: CaseStatus;
   generatedAt?: string;
   from?: string;
@@ -72,6 +73,7 @@ export function CaseInputView({
   foldAutoSwitch,
   foldFallbackLayout,
   caseInputFontSize,
+  guidelineFontSize,
   status,
   generatedAt,
   from,
@@ -349,6 +351,7 @@ export function CaseInputView({
         templateKey={selectedTemplateKey}
         onGuidelineChange={handleGuidelineChange}
         onTemplateChange={handleTemplateChange}
+        guidelineFontSize={guidelineFontSize}
       />
     </div>
   );

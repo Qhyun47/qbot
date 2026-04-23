@@ -66,6 +66,8 @@ interface NewCaseFormProps {
   foldFallbackLayout: FoldFallbackLayout;
   caseInputFontSize: number;
   foldCaseInputFontSize: number;
+  guidelineFontSize?: number;
+  foldGuidelineFontSize?: number;
   canUseAi?: boolean;
 }
 
@@ -76,6 +78,8 @@ export function NewCaseForm({
   foldFallbackLayout,
   caseInputFontSize,
   foldCaseInputFontSize,
+  guidelineFontSize,
+  foldGuidelineFontSize,
   canUseAi = false,
 }: NewCaseFormProps) {
   const router = useRouter();
@@ -94,6 +98,8 @@ export function NewCaseForm({
   const [cards, setCards] = useState<CaseInput[]>([]);
   const [layout, setLayout] = useState<InputLayout>(defaultLayout);
   const [activeFontSize, setActiveFontSize] = useState(caseInputFontSize);
+  const [activeGuidelineFontSize, setActiveGuidelineFontSize] =
+    useState(guidelineFontSize);
   const [generating, setGenerating] = useState(false);
   const [navigatingBack, setNavigatingBack] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
@@ -128,6 +134,9 @@ export function NewCaseForm({
     const applyFoldState = (isFolded: boolean) => {
       setLayout(isFolded ? foldFallbackLayout : defaultLayout);
       setActiveFontSize(isFolded ? foldCaseInputFontSize : caseInputFontSize);
+      setActiveGuidelineFontSize(
+        isFolded ? foldGuidelineFontSize : guidelineFontSize
+      );
     };
     const handler = (e: MediaQueryListEvent) => applyFoldState(e.matches);
     applyFoldState(mq.matches);
@@ -139,6 +148,8 @@ export function NewCaseForm({
     foldFallbackLayout,
     foldCaseInputFontSize,
     caseInputFontSize,
+    guidelineFontSize,
+    foldGuidelineFontSize,
   ]);
 
   const navigateToDashboard = () => {
@@ -403,6 +414,7 @@ export function NewCaseForm({
         templateKey={selectedTemplateKey}
         onGuidelineChange={handleGuidelineChange}
         onTemplateChange={handleTemplateChange}
+        guidelineFontSize={activeGuidelineFontSize}
       />
     </div>
   );

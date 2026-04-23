@@ -238,7 +238,9 @@ export type Database = {
           fold_auto_switch: boolean;
           fold_case_input_font_size: number;
           fold_fallback_layout: "single" | "split_vertical";
+          fold_guideline_font_size: number;
           full_name: string | null;
+          guideline_font_size: number;
           id: string;
           input_layout: Database["public"]["Enums"]["input_layout"];
           is_admin: boolean;
@@ -258,7 +260,9 @@ export type Database = {
           fold_auto_switch?: boolean;
           fold_case_input_font_size?: number;
           fold_fallback_layout?: "single" | "split_vertical";
+          fold_guideline_font_size?: number;
           full_name?: string | null;
+          guideline_font_size?: number;
           id: string;
           input_layout?: Database["public"]["Enums"]["input_layout"];
           is_admin?: boolean;
@@ -277,7 +281,9 @@ export type Database = {
           fold_auto_switch?: boolean;
           fold_case_input_font_size?: number;
           fold_fallback_layout?: "single" | "split_vertical";
+          fold_guideline_font_size?: number;
           full_name?: string | null;
+          guideline_font_size?: number;
           id?: string;
           input_layout?: Database["public"]["Enums"]["input_layout"];
           is_admin?: boolean;

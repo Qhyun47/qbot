@@ -325,6 +325,11 @@ html[data-view="desktop"] .lg\:inline-flex {
   word-spacing: normal;
 }
 
+.guideline-html,
+.guideline-html * {
+  letter-spacing: -0.3pt !important;
+}
+
 /* 다크모드: HWP 인라인 색상을 가시성 있는 밝은 색으로 조정 */
 /* 파란색 #0000ff / rgb(0,0,255) → 밝은 파란색 */
 .dark .guideline-html [style*="color: rgb(0, 0, 255)"],
@@ -377,6 +382,12 @@ html[data-view="desktop"] .lg\:inline-flex {
   padding: 1px 4px;
   line-height: 1.35;
   vertical-align: top;
+}
+
+/* 다크모드: 표 테두리 가시성 확보 */
+.dark .guideline-html td,
+.dark .guideline-html th {
+  border-color: hsl(var(--muted-foreground)) !important;
 }
 
 .guideline-html span,

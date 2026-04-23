@@ -64,6 +64,14 @@ const FONT_SIZE_OPTIONS = [
   { value: "20", label: "매우 크게 (20px)" },
 ] as const;
 
+const GUIDELINE_FONT_SIZE_OPTIONS = [
+  { value: "8", label: "최소 (8px)" },
+  { value: "10", label: "작게 (10px)" },
+  { value: "12", label: "기본 (12px)" },
+  { value: "14", label: "크게 (14px)" },
+  { value: "16", label: "매우 크게 (16px)" },
+] as const;
+
 interface LayoutSettingsProps {
   defaultLayout: InputLayout;
   defaultSplitRatio: number;
@@ -72,6 +80,8 @@ interface LayoutSettingsProps {
   defaultFoldAutoSwitch: boolean;
   defaultFoldFallbackLayout: FoldFallbackLayout;
   defaultFoldCaseInputFontSize: number;
+  defaultGuidelineFontSize: number;
+  defaultFoldGuidelineFontSize: number;
 }
 
 const THEME_OPTIONS = [
@@ -88,6 +98,8 @@ export function LayoutSettings({
   defaultFoldAutoSwitch,
   defaultFoldFallbackLayout,
   defaultFoldCaseInputFontSize,
+  defaultGuidelineFontSize,
+  defaultFoldGuidelineFontSize,
 }: LayoutSettingsProps) {
   const [selectedLayout, setSelectedLayout] =
     useState<InputLayout>(defaultLayout);
@@ -101,6 +113,12 @@ export function LayoutSettings({
     useState<FoldFallbackLayout>(defaultFoldFallbackLayout);
   const [foldCaseInputFontSize, setFoldCaseInputFontSize] = useState(
     defaultFoldCaseInputFontSize
+  );
+  const [guidelineFontSize, setGuidelineFontSize] = useState(
+    defaultGuidelineFontSize
+  );
+  const [foldGuidelineFontSize, setFoldGuidelineFontSize] = useState(
+    defaultFoldGuidelineFontSize
   );
   const [mounted, setMounted] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">(
@@ -130,7 +148,9 @@ export function LayoutSettings({
           foldAutoSwitch,
           foldFallbackLayout,
           caseInputFontSize,
-          foldCaseInputFontSize
+          foldCaseInputFontSize,
+          guidelineFontSize,
+          foldGuidelineFontSize
         );
         document.documentElement.style.setProperty(
           "--mobile-font-size",
@@ -154,6 +174,8 @@ export function LayoutSettings({
     foldFallbackLayout,
     caseInputFontSize,
     foldCaseInputFontSize,
+    guidelineFontSize,
+    foldGuidelineFontSize,
   ]);
 
   const isSplit = selectedLayout !== "single";
@@ -401,6 +423,28 @@ export function LayoutSettings({
               </SelectContent>
             </Select>
           </div>
+
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+              접었을 때 가이드라인 글자 크기
+            </p>
+            <Select
+              value={String(foldGuidelineFontSize)}
+              onValueChange={(v) => setFoldGuidelineFontSize(Number(v))}
+              disabled={!foldAutoSwitch}
+            >
+              <SelectTrigger className="w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {GUIDELINE_FONT_SIZE_OPTIONS.map(({ value, label }) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       )}
 
@@ -447,6 +491,31 @@ export function LayoutSettings({
           </SelectTrigger>
           <SelectContent>
             {FONT_SIZE_OPTIONS.map(({ value, label }) => (
+              <SelectItem key={value} value={value}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-3">
+        <div>
+          <p className="text-sm font-medium">가이드라인 글자 크기</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            가이드라인 패널에 표시되는 글자 크기입니다. 문서 내 크고 작은 글자의
+            비율은 그대로 유지하면서 전체 크기만 조정됩니다.
+          </p>
+        </div>
+        <Select
+          value={String(guidelineFontSize)}
+          onValueChange={(v) => setGuidelineFontSize(Number(v))}
+        >
+          <SelectTrigger className="w-48">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {GUIDELINE_FONT_SIZE_OPTIONS.map(({ value, label }) => (
               <SelectItem key={value} value={value}>
                 {label}
               </SelectItem>
