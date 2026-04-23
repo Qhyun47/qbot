@@ -163,6 +163,29 @@ export function LayoutSettings({
 
   return (
     <div className="space-y-8">
+      {saveStatus !== "idle" && (
+        <div
+          className={cn(
+            "sticky top-0 z-10 flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium shadow-sm",
+            saveStatus === "saving"
+              ? "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+              : "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300"
+          )}
+        >
+          {saveStatus === "saving" ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              저장 중...
+            </>
+          ) : (
+            <>
+              <Check className="size-4" />
+              저장됨
+            </>
+          )}
+        </div>
+      )}
+
       <div className="space-y-3">
         <div>
           <p className="text-sm font-medium">화면 테마</p>
@@ -430,21 +453,6 @@ export function LayoutSettings({
             ))}
           </SelectContent>
         </Select>
-      </div>
-
-      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        {saveStatus === "saving" && (
-          <>
-            <Loader2 className="size-3 animate-spin" />
-            <span>저장 중...</span>
-          </>
-        )}
-        {saveStatus === "saved" && (
-          <>
-            <Check className="size-3 text-green-500" />
-            <span className="text-green-600 dark:text-green-400">저장됨</span>
-          </>
-        )}
       </div>
     </div>
   );
