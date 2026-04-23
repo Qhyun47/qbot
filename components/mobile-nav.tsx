@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, Monitor } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { Menu, X, Monitor, LogOut } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { NAV_LINKS } from "@/lib/nav-config";
 import { useViewMode } from "@/lib/hooks/use-view-mode";
+import { createClient } from "@/lib/supabase/client";
 
 interface MobileNavProps {
   /** 관리자 여부 — true이면 "문서 관리" 메뉴를 추가로 표시합니다. */
@@ -17,6 +18,7 @@ interface MobileNavProps {
 export function MobileNav({ isAdmin }: MobileNavProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const { viewMode, setViewMode } = useViewMode();
 
   // 관리자 전용 링크
@@ -38,6 +40,13 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
   function handleDesktopToggle() {
     setViewMode(viewMode === "desktop" ? "auto" : "desktop");
     handleClose();
+  }
+
+  async function handleLogout() {
+    handleClose();
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/auth/login");
   }
 
   return (
@@ -91,6 +100,17 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
                 {viewMode === "desktop"
                   ? "PC 버전 보는 중 (취소)"
                   : "PC 버전으로 보기"}
+              </button>
+            </div>
+
+            {/* 로그아웃 */}
+            <div className="mb-2 border-t pt-2">
+              <button
+                onClick={handleLogout}
+                className="flex w-full items-center gap-2 rounded-md px-2 py-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <LogOut className="size-4 shrink-0" />
+                로그아웃
               </button>
             </div>
           </nav>

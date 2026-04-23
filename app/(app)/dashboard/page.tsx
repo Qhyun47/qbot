@@ -52,14 +52,6 @@ export default function DashboardPage() {
         <OnboardingAlertSection />
       </Suspense>
 
-      {/* 모바일 새 케이스 CTA */}
-      <NewCaseButton
-        size="lg"
-        className="h-14 w-full text-base font-semibold is-desktop:hidden"
-      >
-        + 환자 추가
-      </NewCaseButton>
-
       {/* 페이지 헤더 (데스크탑) */}
       <div className="hidden items-center justify-between is-desktop:flex">
         <div>

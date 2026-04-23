@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Logo } from "@/components/icons/logo";
 import { Toaster } from "sonner";
 import { LogoutButton } from "@/components/logout-button";
+import { NewCaseButton } from "@/components/cases/new-case-button";
 import { MobileNav } from "@/components/mobile-nav";
 import { NavLinks } from "@/components/nav-links";
 import { FontSizeInit } from "@/components/font-size-init";
@@ -55,8 +56,15 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             <Suspense fallback={<div className="ml-8 hidden lg:flex" />}>
               <NavLinksWithAdmin />
             </Suspense>
-            <div className="ml-auto">
-              <LogoutButton />
+            <div className="ml-auto flex items-center gap-2">
+              {/* 모바일: 환자 추가 버튼 */}
+              <div className="lg:hidden">
+                <NewCaseButton size="sm" />
+              </div>
+              {/* 데스크탑: 로그아웃 버튼 */}
+              <div className="hidden lg:block">
+                <LogoutButton />
+              </div>
             </div>
           </header>
         </ConditionalHeader>

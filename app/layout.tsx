@@ -12,7 +12,7 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: "규봇",
-  description: "응급실 의사를 위한 AI 차팅 어시스턴트",
+  description: "응급실 인턴을 위한 AI 차팅 어시스턴트",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
