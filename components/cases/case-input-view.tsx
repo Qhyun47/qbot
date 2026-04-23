@@ -25,6 +25,7 @@ import type {
   BedZone,
   CaseInput,
   CaseStatus,
+  FoldFallbackLayout,
   InputLayout,
 } from "@/lib/supabase/types";
 
@@ -47,6 +48,8 @@ interface CaseInputViewProps {
   initialCards: CaseInput[];
   defaultLayout: InputLayout;
   defaultSplitRatio: number;
+  foldAutoSwitch: boolean;
+  foldFallbackLayout: FoldFallbackLayout;
   status: CaseStatus;
   generatedAt?: string;
   from?: string;
@@ -61,6 +64,8 @@ export function CaseInputView({
   initialCards,
   defaultLayout,
   defaultSplitRatio,
+  foldAutoSwitch,
+  foldFallbackLayout,
   status,
   generatedAt,
   from,
@@ -84,6 +89,17 @@ export function CaseInputView({
   const [layout, setLayout] = useState<InputLayout>(defaultLayout);
   const [generating, setGenerating] = useState(false);
   const [, startTransition] = useTransition();
+
+  useEffect(() => {
+    if (!foldAutoSwitch) return;
+    const mq = window.matchMedia("(max-width: 600px)");
+    const handler = (e: MediaQueryListEvent) => {
+      setLayout(e.matches ? foldFallbackLayout : defaultLayout);
+    };
+    setLayout(mq.matches ? foldFallbackLayout : defaultLayout);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, [foldAutoSwitch, defaultLayout, foldFallbackLayout]);
 
   const [optimisticCards, addOptimisticCard] = useOptimistic(
     cards,

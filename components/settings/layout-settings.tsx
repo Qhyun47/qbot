@@ -56,6 +56,8 @@ const LAYOUT_OPTIONS: LayoutOptionItem[] = [
 ];
 
 const FONT_SIZE_OPTIONS = [
+  { value: "10", label: "최소 (10px)" },
+  { value: "12", label: "아주 작게 (12px)" },
   { value: "14", label: "작게 (14px)" },
   { value: "16", label: "기본 (16px)" },
   { value: "18", label: "크게 (18px)" },

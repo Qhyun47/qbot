@@ -17,6 +17,8 @@ async function getAuthUser() {
 const layoutSchema = z.enum(["single", "split_vertical", "split_horizontal"]);
 const splitRatioSchema = z.number().int().min(30).max(70);
 const mobileFontSizeSchema = z.union([
+  z.literal(10),
+  z.literal(12),
   z.literal(14),
   z.literal(16),
   z.literal(18),

@@ -116,7 +116,12 @@ async function CaseContent({
       getLayoutSettings(),
     ]
   );
-  const { layout: inputLayout, splitRatio } = layoutSettings;
+  const {
+    layout: inputLayout,
+    splitRatio,
+    foldAutoSwitch,
+    foldFallbackLayout,
+  } = layoutSettings;
 
   if (!caseData) notFound();
 
@@ -300,6 +305,8 @@ async function CaseContent({
           initialCards={inputs}
           defaultLayout={inputLayout}
           defaultSplitRatio={splitRatio}
+          foldAutoSwitch={foldAutoSwitch}
+          foldFallbackLayout={foldFallbackLayout}
           status={status}
           generatedAt={result?.generated_at ?? undefined}
           from={from}
