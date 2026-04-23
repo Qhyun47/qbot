@@ -66,7 +66,7 @@ export function CardInputBar({ onSubmit }: CardInputBarProps) {
           placeholder="문진 정보 입력"
           className={cn(
             "flex-1 resize-none overflow-hidden text-sm transition-colors",
-            "focus-visible:ring-1 focus-visible:ring-foreground"
+            "min-h-0 focus-visible:ring-1 focus-visible:ring-foreground"
           )}
         />
         <Button
