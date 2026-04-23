@@ -265,7 +265,7 @@ export function NewCaseForm({
         timeTag,
         timeOffsetMinutes
       );
-      setCards((prev) => [saved, ...prev]);
+      setCards((prev) => [...prev, saved]);
     });
   };
 
