@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useOptimistic, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Rows2, Columns2, Square, Zap, Loader2 } from "lucide-react";
 import {
@@ -95,11 +95,6 @@ export function NewCaseForm({
   const [navigatingBack, setNavigatingBack] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [, startTransition] = useTransition();
-
-  const [optimisticCards, addOptimisticCard] = useOptimistic(
-    cards,
-    (state: CaseInput[], newCard: CaseInput) => [...state, newCard]
-  );
 
   useEffect(() => {
     createCase().then((id) => setCaseId(id));
@@ -255,14 +250,15 @@ export function NewCaseForm({
     });
   };
 
-  const handleCardSubmit = (
+  const handleCardSubmit = async (
     rawText: string,
     timeTag: string | null,
     timeOffsetMinutes: number | null
   ) => {
     if (!caseId) return;
+    const tempId = crypto.randomUUID();
     const tempCard: CaseInput = {
-      id: crypto.randomUUID(),
+      id: tempId,
       case_id: caseId,
       raw_text: rawText,
       time_tag: timeTag,
@@ -271,16 +267,18 @@ export function NewCaseForm({
       display_order: cards.length + 1,
       created_at: new Date().toISOString(),
     };
-    startTransition(async () => {
-      addOptimisticCard(tempCard);
+    setCards((prev) => [...prev, tempCard]);
+    try {
       const saved = await addCaseInput(
         caseId,
         rawText,
         timeTag,
         timeOffsetMinutes
       );
-      setCards((prev) => [...prev, saved]);
-    });
+      setCards((prev) => prev.map((c) => (c.id === tempId ? saved : c)));
+    } catch {
+      setCards((prev) => prev.filter((c) => c.id !== tempId));
+    }
   };
 
   const handleGenerate = async () => {
@@ -376,7 +374,7 @@ export function NewCaseForm({
           )}
         <div className="p-4">
           <CardTimeline
-            cards={optimisticCards}
+            cards={cards}
             onReorder={handleCardReorder}
             onDelete={handleCardDelete}
             onEdit={handleCardEdit}

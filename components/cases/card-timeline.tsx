@@ -22,7 +22,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Clock, Pencil, Trash2 } from "lucide-react";
+import { Clock, GripVertical, Pencil, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { formatTimeDisplay } from "@/lib/time/parse-time-tag";
@@ -436,6 +436,7 @@ function SortableCard({
     attributes,
     listeners,
     setNodeRef,
+    setActivatorNodeRef,
     transform,
     transition,
     isDragging: isSortableDragging,
@@ -447,13 +448,7 @@ function SortableCard({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="cursor-grab active:cursor-grabbing"
-      {...attributes}
-      {...listeners}
-    >
+    <div ref={setNodeRef} style={style}>
       <InputCard
         card={card}
         showTime={showTime}
@@ -464,6 +459,8 @@ function SortableCard({
             : false
         }
         isDragging={isDragging ?? isSortableDragging}
+        dragHandleRef={setActivatorNodeRef}
+        dragHandleProps={{ ...attributes, ...(listeners ?? {}) }}
         onDelete={onDelete}
         onEdit={onEdit}
       />
@@ -478,6 +475,8 @@ function InputCard({
   referenced,
   isDragging,
   isDragOverlay,
+  dragHandleRef,
+  dragHandleProps,
   onDelete,
   onEdit,
 }: {
@@ -487,6 +486,8 @@ function InputCard({
   referenced?: boolean;
   isDragging?: boolean;
   isDragOverlay?: boolean;
+  dragHandleRef?: (node: HTMLElement | null) => void;
+  dragHandleProps?: React.HTMLAttributes<HTMLElement>;
   onDelete?: (cardId: string) => void;
   onEdit?: (cardId: string, newText: string) => void;
 }) {
@@ -587,32 +588,48 @@ function InputCard({
     <div
       ref={cardRef}
       className={cn(
-        "shadow-xs relative overflow-hidden rounded-md border text-xs",
-        referenced ? "bg-muted/40 text-muted-foreground" : "bg-card",
-        isDragging && !isDragOverlay && "opacity-40",
-        isDragOverlay && "shadow-lg ring-1 ring-primary/20"
+        "flex items-stretch gap-0 text-xs",
+        isDragging && !isDragOverlay && "opacity-40"
       )}
-      onClick={handleCardClick}
     >
+      {/* 카드 본체 */}
       <div
         className={cn(
-          "flex items-start gap-1.5 px-2 py-2 transition-transform duration-200",
-          isRevealed && hasActions && "-translate-x-[72px]"
+          "shadow-xs min-w-0 flex-1 overflow-hidden border transition-[border-radius] duration-200",
+          referenced ? "bg-muted/40 text-muted-foreground" : "bg-card",
+          isDragOverlay && "shadow-lg ring-1 ring-primary/20",
+          isRevealed && hasActions
+            ? "rounded-l-md rounded-r-none"
+            : "rounded-md"
         )}
+        onClick={handleCardClick}
       >
-        <span className="flex-1 leading-normal">{card.raw_text}</span>
-        {showTime && displayLabel && (
-          <span className="shrink-0 rounded bg-secondary px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
-            {displayLabel}
-          </span>
-        )}
+        <div className="flex items-start gap-1.5 px-2 py-2">
+          {hasActions && dragHandleRef && (
+            <div
+              ref={dragHandleRef}
+              {...dragHandleProps}
+              className="shrink-0 cursor-grab touch-none self-center text-muted-foreground/40 hover:text-muted-foreground"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <GripVertical className="size-3.5" />
+            </div>
+          )}
+          <span className="flex-1 leading-normal">{card.raw_text}</span>
+          {showTime && displayLabel && (
+            <span className="shrink-0 rounded bg-secondary px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
+              {displayLabel}
+            </span>
+          )}
+        </div>
       </div>
 
+      {/* 수정·삭제 버튼 영역 (카드 외부 오른쪽) */}
       {hasActions && (
         <div
           className={cn(
-            "absolute inset-y-0 right-0 flex items-center gap-1 pr-1 transition-opacity duration-200",
-            isRevealed ? "opacity-100" : "pointer-events-none opacity-0"
+            "flex items-stretch overflow-hidden transition-all duration-200",
+            isRevealed ? "w-[88px]" : "pointer-events-none w-0"
           )}
         >
           {onEdit && (
@@ -620,7 +637,7 @@ function InputCard({
               type="button"
               aria-label="카드 수정"
               onClick={handleEditClick}
-              className="rounded p-1.5 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950"
+              className="flex w-11 shrink-0 items-center justify-center self-stretch bg-blue-500 text-white hover:bg-blue-600"
             >
               <Pencil className="size-3.5" />
             </button>
@@ -630,7 +647,7 @@ function InputCard({
               type="button"
               aria-label="카드 삭제"
               onClick={handleDeleteClick}
-              className="rounded p-1.5 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950"
+              className="flex w-11 shrink-0 items-center justify-center self-stretch rounded-r-md bg-red-500 text-white hover:bg-red-600"
             >
               <Trash2 className="size-3.5" />
             </button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useOptimistic, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Rows2, Columns2, Square, Zap, Loader2 } from "lucide-react";
 import { ResizableSplit } from "@/components/cases/resizable-split";
@@ -127,11 +127,6 @@ export function CaseInputView({
     };
   }, [caseInputFontSize]);
 
-  const [optimisticCards, addOptimisticCard] = useOptimistic(
-    cards,
-    (state: CaseInput[], newCard: CaseInput) => [...state, newCard]
-  );
-
   useEffect(() => {
     if (defaultCc) {
       loadGuideline(defaultCc)
@@ -204,13 +199,14 @@ export function CaseInputView({
     startTransition(() => overrideTemplateKey(caseId, newTemplateKey));
   };
 
-  const handleCardSubmit = (
+  const handleCardSubmit = async (
     rawText: string,
     timeTag: string | null,
     timeOffsetMinutes: number | null
   ) => {
+    const tempId = crypto.randomUUID();
     const tempCard: CaseInput = {
-      id: crypto.randomUUID(),
+      id: tempId,
       case_id: caseId,
       raw_text: rawText,
       time_tag: timeTag,
@@ -219,16 +215,18 @@ export function CaseInputView({
       display_order: cards.length + 1,
       created_at: new Date().toISOString(),
     };
-    startTransition(async () => {
-      addOptimisticCard(tempCard);
+    setCards((prev) => [...prev, tempCard]);
+    try {
       const saved = await addCaseInput(
         caseId,
         rawText,
         timeTag,
         timeOffsetMinutes
       );
-      setCards((prev) => [...prev, saved]);
-    });
+      setCards((prev) => prev.map((c) => (c.id === tempId ? saved : c)));
+    } catch {
+      setCards((prev) => prev.filter((c) => c.id !== tempId));
+    }
   };
 
   const handleCardReorder = (
@@ -333,7 +331,7 @@ export function CaseInputView({
       )}
       <div className="flex-1 overflow-y-auto p-4">
         <CardTimeline
-          cards={optimisticCards}
+          cards={cards}
           generatedAt={generatedAt}
           onReorder={handleCardReorder}
           onDelete={handleCardDelete}
