@@ -82,6 +82,8 @@ export function GuidelinesEditor({
     setSavedPdfPath(existing?.pdf_path ?? "");
     setPdfFile(null);
     setPdfFileName("");
+    setRawHtmlInput("");
+    setEncodingHelpOpen(false);
   }
 
   function handleSave() {
@@ -146,16 +148,19 @@ export function GuidelinesEditor({
   function handleDelete() {
     startTransition(async () => {
       try {
-        await deleteGuideline(selectedGuideKey);
-        setCustomGuidelines((prev) =>
-          prev.filter((g) => g.guide_key !== selectedGuideKey)
-        );
+        if (currentCustomRow) {
+          await deleteGuideline(selectedGuideKey);
+          setCustomGuidelines((prev) =>
+            prev.filter((g) => g.guide_key !== selectedGuideKey)
+          );
+          toast.success("가이드라인이 삭제되었습니다.");
+        }
         setCustomContent("");
         setSavedPdfPath("");
         setPdfFile(null);
         setPdfFileName("");
         setInputMode("text");
-        toast.success("가이드라인이 삭제되었습니다.");
+        setRawHtmlInput("");
       } catch {
         toast.error("삭제에 실패했습니다.");
       }
@@ -194,8 +199,17 @@ export function GuidelinesEditor({
   const [rawHtmlInput, setRawHtmlInput] = useState("");
   const [encodingHelpOpen, setEncodingHelpOpen] = useState(false);
 
+  function handleHtmlProcess() {
+    const processed = processGuideHtml(rawHtmlInput);
+    setCustomContent(processed);
+    setRawHtmlInput("");
+    setEncodingHelpOpen(false);
+    setHtmlDialogOpen(false);
+  }
+
   const hasPdf = !!pdfFile || !!savedPdfPath;
   const hasHtml = inputMode === "html" && customContent.trim() !== "";
+  const htmlPending = inputMode === "html" && rawHtmlInput.trim() !== "";
   const displayPdfName =
     pdfFileName || (savedPdfPath ? savedPdfPath.split("/").pop() : "");
   const systemContent = systemGuides[selectedGuideKey] ?? "";
@@ -228,120 +242,172 @@ export function GuidelinesEditor({
         </Select>
       </div>
 
-      {/* 에디터 영역: 모바일 세로 / 데스크탑 가로 2컬럼 */}
-      <div className="flex flex-col gap-4 md:flex-row">
-        {/* 시스템 섹션 */}
-        <div className="flex flex-1 flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium">시스템 기본 가이드라인</p>
-            <span className="rounded-md bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
-              읽기 전용
-            </span>
-          </div>
-          <div className="h-72 overflow-y-auto rounded-lg border bg-muted/50 p-4">
-            {systemContent ? (
-              systemContent.trimStart().startsWith("<") ? (
-                <HtmlPreview content={systemContent} />
-              ) : (
-                <MarkdownPreview content={systemContent} />
-              )
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                이 가이드라인에 대한 시스템 기본 내용이 없습니다.
-              </p>
-            )}
-          </div>
+      {/* 에디터 영역
+          모바일: order로 [시스템 헤더 → 시스템 콘텐츠 → 커스텀 헤더 → 커스텀 콘텐츠] 순 렌더
+          데스크탑: grid-cols-2로 좌(시스템)/우(커스텀) 2컬럼, 같은 행의 헤더 높이가 자동 동기화 */}
+      <div className="flex flex-col gap-y-2 md:grid md:grid-cols-2 md:gap-x-4 md:gap-y-2">
+        {/* 시스템 헤더 — mobile order 1 / desktop grid (1,1) */}
+        <div className="order-1 flex items-center justify-between md:order-1">
+          <p className="text-sm font-medium">시스템 기본 가이드라인</p>
+          <span className="rounded-md bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
+            읽기 전용
+          </span>
         </div>
 
-        {/* 커스텀 섹션 */}
-        <div className="flex flex-1 flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium">커스텀 가이드라인 편집</p>
-            <ToggleGroup
-              type="single"
-              size="sm"
-              value={inputMode}
-              onValueChange={(v) => {
-                if (v) setInputMode(v as InputMode);
-              }}
-              className="gap-0"
+        {/* 커스텀 헤더 — mobile order 3 / desktop grid (1,2) */}
+        <div className="order-3 flex items-center justify-between md:order-2">
+          <p className="text-sm font-medium">커스텀 가이드라인 편집</p>
+          <ToggleGroup
+            type="single"
+            size="sm"
+            value={inputMode}
+            onValueChange={(v) => {
+              if (v) setInputMode(v as InputMode);
+            }}
+            className="gap-0"
+          >
+            <ToggleGroupItem
+              value="text"
+              className="rounded-r-none px-3 text-xs"
             >
-              <ToggleGroupItem
-                value="text"
-                className="rounded-r-none px-3 text-xs"
-              >
-                Text
-              </ToggleGroupItem>
-              <ToggleGroupItem
-                value="markdown"
-                className="rounded-none border-x-0 px-3 text-xs"
-              >
-                Markdown
-              </ToggleGroupItem>
-              <ToggleGroupItem
-                value="html"
-                className="rounded-none border-x-0 px-3 text-xs"
-              >
-                HTML
-              </ToggleGroupItem>
-              <ToggleGroupItem
-                value="pdf"
-                className="rounded-l-none px-3 text-xs"
-              >
-                PDF
-              </ToggleGroupItem>
-            </ToggleGroup>
-          </div>
+              Text
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="markdown"
+              className="rounded-none border-x-0 px-3 text-xs"
+            >
+              Markdown
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="html"
+              className="rounded-none border-x-0 px-3 text-xs"
+            >
+              HTML
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="pdf"
+              className="rounded-l-none px-3 text-xs"
+            >
+              PDF
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
 
-          <div className="flex flex-col gap-2">
-            {inputMode === "pdf" ? (
-              <div className="flex h-72 items-center justify-center rounded-lg border bg-muted/50">
-                <input
-                  ref={pdfInputRef}
-                  type="file"
-                  accept=".pdf"
-                  className="hidden"
-                  onChange={handlePdfSelect}
-                />
-                {hasPdf ? (
-                  <div className="flex flex-col items-center gap-3 px-4 text-center">
-                    <p className="max-w-[240px] truncate text-sm font-medium">
-                      {displayPdfName}
-                    </p>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="gap-1.5"
-                      onClick={handlePdfChange}
-                    >
-                      <RefreshCw className="size-3.5" />
-                      변경
-                    </Button>
-                  </div>
-                ) : (
+        {/* 시스템 콘텐츠 — mobile order 2 / desktop grid (2,1) */}
+        <div className="order-2 h-72 overflow-y-auto rounded-lg border bg-muted/50 p-4 md:order-3">
+          {systemContent ? (
+            systemContent.trimStart().startsWith("<") ? (
+              <HtmlPreview content={systemContent} />
+            ) : (
+              <MarkdownPreview content={systemContent} />
+            )
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              이 가이드라인에 대한 시스템 기본 내용이 없습니다.
+            </p>
+          )}
+        </div>
+
+        {/* 커스텀 콘텐츠 — mobile order 4 / desktop grid (2,2) */}
+        <div className="order-4 flex flex-col gap-2 md:order-4">
+          {inputMode === "pdf" ? (
+            <div className="flex h-72 items-center justify-center rounded-lg border bg-muted/50">
+              <input
+                ref={pdfInputRef}
+                type="file"
+                accept=".pdf"
+                className="hidden"
+                onChange={handlePdfSelect}
+              />
+              {hasPdf ? (
+                <div className="flex flex-col items-center gap-3 px-4 text-center">
+                  <p className="max-w-[240px] truncate text-sm font-medium">
+                    {displayPdfName}
+                  </p>
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     className="gap-1.5"
-                    onClick={() => pdfInputRef.current?.click()}
+                    onClick={handlePdfChange}
                   >
-                    <FileUp className="size-3.5" />
-                    PDF 추가
+                    <RefreshCw className="size-3.5" />
+                    변경
                   </Button>
-                )}
+                </div>
+              ) : (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={() => pdfInputRef.current?.click()}
+                >
+                  <FileUp className="size-3.5" />
+                  PDF 추가
+                </Button>
+              )}
+            </div>
+          ) : inputMode === "html" ? (
+            hasHtml ? (
+              <div className="h-72 overflow-y-auto rounded-lg border bg-muted/50 p-4">
+                <HtmlPreview content={customContent} />
               </div>
-            ) : inputMode === "html" ? (
-              hasHtml ? (
-                <div className="relative h-72 overflow-y-auto rounded-lg border bg-muted/50 p-4">
-                  <HtmlPreview content={customContent} />
+            ) : htmlPending ? (
+              <div className="flex h-72 flex-col items-center justify-center gap-2 rounded-lg border bg-muted/50">
+                <p className="text-sm text-muted-foreground">
+                  HTML이 입력되었습니다.
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  아래 &apos;처리&apos; 버튼을 눌러 가이드라인을 적용하세요.
+                </p>
+              </div>
+            ) : (
+              <div className="flex h-72 items-center justify-center rounded-lg border bg-muted/50">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={() => {
+                    setRawHtmlInput("");
+                    setHtmlDialogOpen(true);
+                  }}
+                >
+                  <FileUp className="size-3.5" />
+                  HTML 추가
+                </Button>
+              </div>
+            )
+          ) : (
+            <Textarea
+              value={customContent}
+              onChange={(e) => setCustomContent(e.target.value)}
+              placeholder={
+                inputMode === "markdown"
+                  ? "Markdown 형식으로 커스텀 가이드라인을 작성하세요..."
+                  : "커스텀 가이드라인을 작성하세요..."
+              }
+              className="h-72 resize-none font-mono text-sm"
+            />
+          )}
+
+          <div className="flex gap-2">
+            {htmlPending ? (
+              <Button onClick={handleHtmlProcess} size="sm" className="gap-1.5">
+                <RefreshCw className="size-3.5" />
+                처리
+              </Button>
+            ) : (
+              <>
+                {hasHtml && (
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="absolute bottom-3 right-3 gap-1.5"
+                    className="gap-1.5"
                     onClick={() => {
+                      setCustomContent("");
                       setRawHtmlInput("");
                       setHtmlDialogOpen(true);
                     }}
@@ -349,66 +415,41 @@ export function GuidelinesEditor({
                     <RefreshCw className="size-3.5" />
                     변경
                   </Button>
-                </div>
-              ) : (
-                <div className="flex h-72 items-center justify-center rounded-lg border bg-muted/50">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="gap-1.5"
-                    onClick={() => setHtmlDialogOpen(true)}
-                  >
-                    <FileUp className="size-3.5" />
-                    HTML 추가
-                  </Button>
-                </div>
-              )
-            ) : (
-              <Textarea
-                value={customContent}
-                onChange={(e) => setCustomContent(e.target.value)}
-                placeholder={
-                  inputMode === "markdown"
-                    ? "Markdown 형식으로 커스텀 가이드라인을 작성하세요..."
-                    : "커스텀 가이드라인을 작성하세요..."
-                }
-                className="h-72 resize-none font-mono text-sm"
-              />
-            )}
-
-            <div className="flex gap-2">
-              <Button
-                onClick={handleSave}
-                size="sm"
-                className="gap-1.5"
-                disabled={isSaveDisabled}
-              >
-                {isFileLoading ? (
-                  <Loader2 className="size-3.5 animate-spin" />
-                ) : (
-                  <Save className="size-3.5" />
                 )}
-                {isFileLoading ? "처리 중..." : "저장"}
-              </Button>
-              <Button
-                onClick={handleDelete}
-                variant="outline"
-                size="sm"
-                className="gap-1.5"
-                disabled={!currentCustomRow}
-              >
-                <Trash2 className="size-3.5" />
-                삭제
-              </Button>
-            </div>
+                <Button
+                  onClick={handleSave}
+                  size="sm"
+                  className="gap-1.5"
+                  disabled={isSaveDisabled}
+                >
+                  {isFileLoading ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : (
+                    <Save className="size-3.5" />
+                  )}
+                  {isFileLoading ? "처리 중..." : "저장"}
+                </Button>
+              </>
+            )}
+            <Button
+              onClick={handleDelete}
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              disabled={!currentCustomRow && !customContent.trim() && !hasPdf}
+            >
+              <Trash2 className="size-3.5" />
+              삭제
+            </Button>
           </div>
         </div>
       </div>
 
-      {/* HTML 붙여넣기 다이얼로그 */}
+      {/* HTML 붙여넣기 다이얼로그
+          sm:max-w-2xl로 기본값 sm:max-w-lg 오버라이드.
+          bg-popover + 명시적 border/shadow로 다크모드에서도 오버레이와 구분되게 */}
       <Dialog open={htmlDialogOpen} onOpenChange={setHtmlDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="border bg-popover shadow-xl sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>가이드라인 HTML 붙여넣기</DialogTitle>
           </DialogHeader>
@@ -417,7 +458,7 @@ export function GuidelinesEditor({
               value={rawHtmlInput}
               onChange={(e) => setRawHtmlInput(e.target.value)}
               placeholder="HWP에서 내보낸 HTML 전체를 붙여넣으세요..."
-              className="h-64 resize-none font-mono text-xs"
+              className="h-72 resize-none font-mono text-xs"
             />
             <div>
               <button
@@ -437,15 +478,16 @@ export function GuidelinesEditor({
           </div>
           <DialogFooter>
             <Button
-              disabled={rawHtmlInput.trim() === ""}
+              variant="outline"
               onClick={() => {
-                const processed = processGuideHtml(rawHtmlInput);
-                setCustomContent(processed);
                 setHtmlDialogOpen(false);
                 setRawHtmlInput("");
                 setEncodingHelpOpen(false);
               }}
             >
+              취소
+            </Button>
+            <Button onClick={handleHtmlProcess} disabled={!rawHtmlInput.trim()}>
               처리
             </Button>
           </DialogFooter>
