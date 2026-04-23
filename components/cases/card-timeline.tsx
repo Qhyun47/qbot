@@ -82,12 +82,15 @@ export function CardTimeline({
     );
   }
 
-  const timedCards = cards.filter(isInTimedSection).sort((a, b) => {
-    if (a.section_override == null && b.section_override == null) {
-      return (b.time_offset_minutes ?? 0) - (a.time_offset_minutes ?? 0);
-    }
-    return a.display_order - b.display_order;
-  });
+  const timedCardsAll = cards.filter(isInTimedSection);
+  const hasManualTimedOrder = timedCardsAll.some(
+    (c) => c.section_override !== null
+  );
+  const timedCards = timedCardsAll.sort((a, b) =>
+    hasManualTimedOrder
+      ? a.display_order - b.display_order
+      : (b.time_offset_minutes ?? 0) - (a.time_offset_minutes ?? 0)
+  );
 
   const untimedCards = cards
     .filter((c) => !isInTimedSection(c))
@@ -194,6 +197,15 @@ export function CardTimeline({
           ? [...reordered, ...otherCards]
           : [...otherCards, ...reordered];
         newCards = combined.map((c, i) => ({ ...c, display_order: i + 1 }));
+        // 시간 순 영역 내 수동 드래그 → 다음 렌더에서도 display_order 정렬 유지
+        if (draggedInTimed) {
+          targetSection = "timed";
+          newCards = newCards.map((c) =>
+            c.id === draggedId
+              ? { ...c, section_override: "timed" as const }
+              : c
+          );
+        }
       }
     }
 
@@ -443,6 +455,12 @@ function InputCard({
         isDragOverlay && "shadow-lg ring-1 ring-primary/20"
       )}
     >
+      <span className="flex-1 leading-normal">{card.raw_text}</span>
+      {showTime && displayLabel && (
+        <span className="shrink-0 rounded bg-secondary px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
+          {displayLabel}
+        </span>
+      )}
       {dragHandleProps && (
         <button
           type="button"
@@ -452,12 +470,6 @@ function InputCard({
         >
           <GripVertical className="size-3.5" />
         </button>
-      )}
-      <span className="flex-1 leading-normal">{card.raw_text}</span>
-      {showTime && displayLabel && (
-        <span className="shrink-0 rounded bg-secondary px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
-          {displayLabel}
-        </span>
       )}
     </div>
   );
