@@ -125,7 +125,7 @@ export function CaseInputView({
 
   const [optimisticCards, addOptimisticCard] = useOptimistic(
     cards,
-    (state: CaseInput[], newCard: CaseInput) => [newCard, ...state]
+    (state: CaseInput[], newCard: CaseInput) => [...state, newCard]
   );
 
   useEffect(() => {
