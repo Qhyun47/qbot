@@ -1,10 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getIsAdmin } from "@/lib/auth/is-admin";
-import {
-  getPendingUsers,
-  getAllAiUsers,
-} from "@/lib/admin/user-access-actions";
+import { getPendingUsers, getAllUsers } from "@/lib/admin/user-access-actions";
 import { UserAccessTable } from "@/components/admin/user-access-table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,7 +14,7 @@ async function UserAccessContent() {
 
   const [pendingUsers, allUsers] = await Promise.all([
     getPendingUsers(),
-    getAllAiUsers(),
+    getAllUsers(),
   ]);
 
   return (
@@ -32,7 +29,7 @@ async function UserAccessContent() {
               </span>
             )}
           </TabsTrigger>
-          <TabsTrigger value="all">전체 이력</TabsTrigger>
+          <TabsTrigger value="all">전체 회원</TabsTrigger>
         </TabsList>
         <TabsContent value="pending">
           <UserAccessTable users={pendingUsers} />

@@ -15,7 +15,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { approveAiAccess, denyAiAccess } from "@/lib/admin/user-access-actions";
+import {
+  approveAiAccess,
+  denyAiAccess,
+  revokeAiAccess,
+} from "@/lib/admin/user-access-actions";
 import type { AiAccessUser } from "@/lib/admin/user-access-actions";
 
 const STATUS_LABELS = {
@@ -40,6 +44,7 @@ interface UserAccessTableProps {
 function UserRow({ user }: { user: AiAccessUser }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const displayName = user.ai_access_name ?? user.email ?? user.id;
 
   function handleApprove() {
     startTransition(async () => {
@@ -47,7 +52,7 @@ function UserRow({ user }: { user: AiAccessUser }) {
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success(`${user.ai_access_name ?? user.email}님을 승인했습니다.`);
+        toast.success(`${displayName}님을 승인했습니다.`);
         router.refresh();
       }
     });
@@ -59,11 +64,29 @@ function UserRow({ user }: { user: AiAccessUser }) {
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success(`${user.ai_access_name ?? user.email}님을 거부했습니다.`);
+        toast.success(`${displayName}님을 거부했습니다.`);
         router.refresh();
       }
     });
   }
+
+  function handleRevoke() {
+    startTransition(async () => {
+      const result = await revokeAiAccess(user.id);
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success(`${displayName}님을 차단했습니다.`);
+        router.refresh();
+      }
+    });
+  }
+
+  // "none" 상태는 신청일 대신 가입일 표시
+  const dateLabel =
+    user.ai_access_status === "none"
+      ? user.created_at
+      : user.ai_access_requested_at;
 
   return (
     <TableRow>
@@ -74,10 +97,8 @@ function UserRow({ user }: { user: AiAccessUser }) {
         {user.email ?? "-"}
       </TableCell>
       <TableCell className="text-muted-foreground">
-        {user.ai_access_requested_at
-          ? format(new Date(user.ai_access_requested_at), "MM/dd HH:mm", {
-              locale: ko,
-            })
+        {dateLabel
+          ? format(new Date(dateLabel), "MM/dd HH:mm", { locale: ko })
           : "-"}
       </TableCell>
       <TableCell>
@@ -87,25 +108,38 @@ function UserRow({ user }: { user: AiAccessUser }) {
       </TableCell>
       <TableCell>
         <div className="flex items-center gap-2">
-          {user.ai_access_status !== "approved" && (
+          {user.ai_access_status === "approved" ? (
             <Button
               size="sm"
-              variant="default"
-              onClick={handleApprove}
+              variant="destructive"
+              onClick={handleRevoke}
               disabled={isPending}
             >
-              승인
+              차단
             </Button>
-          )}
-          {user.ai_access_status !== "denied" && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleDeny}
-              disabled={isPending}
-            >
-              거부
-            </Button>
+          ) : (
+            <>
+              {user.ai_access_status !== "none" && (
+                <Button
+                  size="sm"
+                  variant="default"
+                  onClick={handleApprove}
+                  disabled={isPending}
+                >
+                  승인
+                </Button>
+              )}
+              {user.ai_access_status === "pending" && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleDeny}
+                  disabled={isPending}
+                >
+                  거부
+                </Button>
+              )}
+            </>
           )}
         </div>
       </TableCell>
@@ -120,7 +154,7 @@ export function UserAccessTable({
   if (users.length === 0) {
     return (
       <p className="py-8 text-center text-sm text-muted-foreground">
-        {showAll ? "신청 이력이 없습니다." : "대기 중인 신청이 없습니다."}
+        {showAll ? "가입된 회원이 없습니다." : "대기 중인 신청이 없습니다."}
       </p>
     );
   }

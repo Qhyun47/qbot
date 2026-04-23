@@ -9,6 +9,7 @@ export interface AiAccessUser {
   ai_access_name: string | null;
   ai_access_status: "none" | "pending" | "approved" | "denied";
   ai_access_requested_at: string | null;
+  created_at: string;
   email: string | null;
 }
 
@@ -37,6 +38,50 @@ export async function getAllAiUsers(): Promise<AiAccessUser[]> {
     .order("ai_access_requested_at", { ascending: false });
 
   return (data ?? []) as AiAccessUser[];
+}
+
+export async function getAllUsers(): Promise<AiAccessUser[]> {
+  const isAdmin = await getIsAdmin();
+  if (!isAdmin) return [];
+
+  const supabase = await createClient();
+
+  const [{ data: profiles }, { data: requests }] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select(
+        "id, ai_access_name, ai_access_status, ai_access_requested_at, created_at"
+      )
+      .order("created_at", { ascending: false }),
+    supabase.from("ai_access_requests").select("id, email"),
+  ]);
+
+  const emailMap = Object.fromEntries(
+    (requests ?? []).map((r) => [r.id, r.email ?? null])
+  );
+
+  return (profiles ?? []).map((p) => ({
+    ...p,
+    email: emailMap[p.id] ?? null,
+  })) as AiAccessUser[];
+}
+
+export async function revokeAiAccess(
+  userId: string
+): Promise<{ error?: string }> {
+  const isAdmin = await getIsAdmin();
+  if (!isAdmin) return { error: "권한이 없습니다." };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("profiles")
+    .update({ ai_access_status: "denied", ai_access_alert_dismissed: false })
+    .eq("id", userId);
+
+  if (error) return { error: "차단 처리에 실패했습니다." };
+
+  revalidatePath("/admin/users");
+  return {};
 }
 
 export async function approveAiAccess(
