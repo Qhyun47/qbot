@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   LayoutTemplate,
   Rows2,
@@ -9,10 +9,10 @@ import {
   Sun,
   Moon,
   Monitor,
+  Loader2,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -97,21 +97,26 @@ export function LayoutSettings({
   const [foldAutoSwitch, setFoldAutoSwitch] = useState(defaultFoldAutoSwitch);
   const [foldFallbackLayout, setFoldFallbackLayout] =
     useState<FoldFallbackLayout>(defaultFoldFallbackLayout);
-  const [, startTransition] = useTransition();
   const [mounted, setMounted] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">(
+    "idle"
+  );
   const { theme, setTheme } = useTheme();
+  const isFirstRender = useRef(true);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const isSplit = selectedLayout !== "single";
-
-  const firstLabel = selectedLayout === "split_vertical" ? "가이드" : "입력";
-  const secondLabel = selectedLayout === "split_vertical" ? "입력" : "가이드";
-
-  function handleSave() {
-    startTransition(async () => {
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    setSaveStatus("saving");
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(async () => {
       try {
         await updateLayoutSettings(
           selectedLayout,
@@ -125,12 +130,29 @@ export function LayoutSettings({
           "--mobile-font-size",
           `${mobileFontSize}px`
         );
-        toast.success("설정이 저장되었습니다.");
+        setSaveStatus("saved");
+        setTimeout(() => setSaveStatus("idle"), 2000);
       } catch {
         toast.error("저장에 실패했습니다.");
+        setSaveStatus("idle");
       }
-    });
-  }
+    }, 600);
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
+  }, [
+    selectedLayout,
+    splitRatio,
+    mobileFontSize,
+    foldAutoSwitch,
+    foldFallbackLayout,
+    caseInputFontSize,
+  ]);
+
+  const isSplit = selectedLayout !== "single";
+
+  const firstLabel = selectedLayout === "split_vertical" ? "가이드" : "입력";
+  const secondLabel = selectedLayout === "split_vertical" ? "입력" : "가이드";
 
   return (
     <div className="space-y-8">
@@ -381,9 +403,20 @@ export function LayoutSettings({
         </Select>
       </div>
 
-      <Button onClick={handleSave} size="sm">
-        저장
-      </Button>
+      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        {saveStatus === "saving" && (
+          <>
+            <Loader2 className="size-3 animate-spin" />
+            <span>저장 중...</span>
+          </>
+        )}
+        {saveStatus === "saved" && (
+          <>
+            <Check className="size-3 text-green-500" />
+            <span className="text-green-600 dark:text-green-400">저장됨</span>
+          </>
+        )}
+      </div>
     </div>
   );
 }
