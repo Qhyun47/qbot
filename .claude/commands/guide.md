@@ -12,15 +12,15 @@
 
 **C.C. 커넥션 확인:**
 
-파일 읽기 후, 사용자에게 명시적으로 질문합니다:
-"이 가이드라인을 연결할 C.C.가 있나요? (있으면 C.C. 이름을 알려주세요)"
+파일 읽기 후, 반드시 사용자에게 명시적으로 질문합니다:
+"이 가이드라인을 연결할 C.C.가 있나요? (있으면 C.C. 이름을 알려주세요. 없으면 '없음'이라고 답해주세요.)"
 
 **커넥션 처리 흐름:**
 
-- 사용자가 C.C. 커넥션을 언급한 경우:
+- 사용자가 C.C.를 답한 경우:
   - cc-list.json에 해당 C.C. 존재 → 해당 C.C.의 guideKeys에 즉시 추가
   - 존재하지 않음 → pending-matches.md 섹션 3(가이드라인→C.C. 대기)에 기록 (중복 확인 후)
-  - 커넥션 언급이 없으면 아무것도 기록하지 않음
+- 사용자가 '없음'이라고 답한 경우: 아무것도 기록하지 않음
 
 **대기 커넥션 확인:**
 
@@ -43,11 +43,11 @@
 3. **미등록 색상이 있으면**: 저장을 중단하고 사용자에게 해당 색상과 다크모드 대응 색상 제안을 보여준 뒤 `app/globals.css`의 `.guideline-html` 다크모드 섹션에 CSS 추가 여부를 먼저 묻습니다.
 4. **모든 색상이 등록된 색상이면**: 별도 확인 없이 바로 진행합니다.
 
-색상 확인이 끝나면 `processGuideHtml()` (`lib/utils/html-utils.ts`)을 적용하여 정리한 후 `ai-docs/cc/{guideKey}/guide.html`로 저장합니다.
+색상 확인이 끝나면 `processGuideHtml()` (`lib/utils/html-utils.ts`)을 적용하여 정리한 후 `ai-docs/guides/{guideKey}/guide.html`로 저장합니다.
 
 **반드시 수행해야 하는 필수 파일 업데이트:**
 
-- `ai-docs/cc/{guideKey}/guide.html` 생성 (processGuideHtml() 적용 후 저장)
+- `ai-docs/guides/{guideKey}/guide.html` 생성 (processGuideHtml() 적용 후 저장)
 - `lib/ai/resources/guide-list.json`에 항목 추가 (누락 시 가이드라인 관리 페이지와 문진 패널에 표시되지 않음)
 - C.C. 커넥션이 확정된 경우에만 → `lib/ai/resources/cc-list.json`의 해당 C.C. `guideKeys`에 키 추가
 - `ai-docs/pending-matches.md` 업데이트 (해당 시)

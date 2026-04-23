@@ -30,6 +30,7 @@
 - historyInputs: StructuredCase에서 sections에 'history'가 포함된 카드 목록 (normalized_text, category 포함)
 - ccSpecificFields: C.C. 특화 필드 (past_history, medication_history, operation_history, family_history 배열 포함)
 - historyTemplate: History 양식 정의 (fields 배열 + output_example)
+- referenceExamples: (선택적, 배열) 동일 C.C.의 모범 History 출력 예시. **스타일(줄 순서·공백·기본값 표기)만 참고**할 것. 예시 안의 병력·약물은 절대 현재 차팅에 차용하지 말 것
 
 historyTemplate.output_example 형식을 기준으로 출력하세요.
 출력은 History 텍스트만 반환하고 다른 설명은 추가하지 마세요.

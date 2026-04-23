@@ -2,13 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
-import {
-  AlertCircle,
-  AlertTriangle,
-  ArrowLeft,
-  FileText,
-  Pencil,
-} from "lucide-react";
+import { AlertCircle, AlertTriangle, ArrowLeft, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BedChangeButton } from "@/components/cases/bed-change-button";
@@ -19,7 +13,6 @@ import { ResultSection } from "@/components/cases/result-section";
 import { GenerationPoller } from "@/components/cases/generation-poller";
 import { RegenerateButton } from "@/components/cases/regenerate-button";
 import { CcRetryForm } from "@/components/cases/cc-retry-form";
-import { CorrectionModal } from "@/components/cases/correction-modal";
 import { getCase, getCaseInputs, getCurrentResult } from "@/lib/cases/queries";
 import {
   updatePiEdited,
@@ -32,7 +25,6 @@ function buildCombinedPi(pi: string, template: string): string {
   if (!pi) return template;
   return `${pi}\n\n${template}`;
 }
-import { getIsAdmin } from "@/lib/auth/is-admin";
 import { getLayoutSettings } from "@/lib/settings/actions";
 import { Separator } from "@/components/ui/separator";
 import type { CaseStatus, BedZone } from "@/lib/supabase/types";
@@ -107,15 +99,12 @@ async function CaseContent({
   const deviceTypeCookie = cookieStore.get("x-device-type")?.value;
   const isDesktopDevice = deviceTypeCookie !== "mobile";
 
-  const [caseData, inputs, result, isAdmin, layoutSettings] = await Promise.all(
-    [
-      getCase(id),
-      getCaseInputs(id),
-      getCurrentResult(id),
-      getIsAdmin(),
-      getLayoutSettings(),
-    ]
-  );
+  const [caseData, inputs, result, layoutSettings] = await Promise.all([
+    getCase(id),
+    getCaseInputs(id),
+    getCurrentResult(id),
+    getLayoutSettings(),
+  ]);
   const {
     layout: inputLayout,
     splitRatio,
@@ -205,73 +194,16 @@ async function CaseContent({
                   )
                 }
                 onSave={updatePiEdited.bind(null, result.id)}
-                correctionSlot={
-                  isAdmin && result.pi_draft ? (
-                    <CorrectionModal
-                      trigger={
-                        <Button variant="ghost" size="sm">
-                          <Pencil className="mr-1 h-4 w-4" />
-                          교정
-                        </Button>
-                      }
-                      sectionType="pi"
-                      sectionLabel="P.I"
-                      cc={caseData.cc ?? ""}
-                      templateKey={caseData.template_key ?? undefined}
-                      caseId={caseData.id}
-                      caseInputsJson={inputs}
-                      apiOutput={result.pi_draft}
-                    />
-                  ) : undefined
-                }
               />
               <ResultSection
                 title="History"
                 value={result.history_edited ?? result.history_draft ?? ""}
                 onSave={updateHistoryEdited.bind(null, result.id)}
-                correctionSlot={
-                  isAdmin && result.history_draft ? (
-                    <CorrectionModal
-                      trigger={
-                        <Button variant="ghost" size="sm">
-                          <Pencil className="mr-1 h-4 w-4" />
-                          교정
-                        </Button>
-                      }
-                      sectionType="history"
-                      sectionLabel="History"
-                      cc={caseData.cc ?? ""}
-                      templateKey={caseData.template_key ?? undefined}
-                      caseId={caseData.id}
-                      caseInputsJson={inputs}
-                      apiOutput={result.history_draft}
-                    />
-                  ) : undefined
-                }
               />
               <ResultSection
                 title="P/E"
                 value={result.pe_edited ?? result.pe_draft ?? ""}
                 onSave={updatePeEdited.bind(null, result.id)}
-                correctionSlot={
-                  isAdmin && result.pe_draft ? (
-                    <CorrectionModal
-                      trigger={
-                        <Button variant="ghost" size="sm">
-                          <Pencil className="mr-1 h-4 w-4" />
-                          교정
-                        </Button>
-                      }
-                      sectionType="pe"
-                      sectionLabel="P/E"
-                      cc={caseData.cc ?? ""}
-                      templateKey={caseData.template_key ?? undefined}
-                      caseId={caseData.id}
-                      caseInputsJson={inputs}
-                      apiOutput={result.pe_draft}
-                    />
-                  ) : undefined
-                }
               />
             </>
           )}

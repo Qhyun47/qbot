@@ -1,12 +1,14 @@
 import { generateText } from "@/lib/ai/gemini-client";
 import { GENERATE_PI_SYSTEM_PROMPT } from "@/lib/ai/prompts/generate-pi";
-import { loadCorrections, loadStyleRules } from "@/lib/ai/load-resources";
+import { FEW_SHOT_GUARD } from "@/lib/ai/prompts/few-shot-guard";
+import { loadExamples } from "@/lib/ai/load-resources";
 import type { StructuredCase } from "@/lib/ai/types";
 
 export async function generatePi(
   structuredCase: StructuredCase,
   rawInputs: Array<{ rawText: string; timeTag: string | null }>,
-  cc: string
+  _cc: string,
+  templateKey?: string | null
 ): Promise<string> {
   const piInputs = structuredCase.inputs.filter((i) =>
     i.sections.includes("pi")
@@ -14,27 +16,22 @@ export async function generatePi(
 
   const { inputs: _inputs, ...ccSpecificFields } = structuredCase;
 
-  const [corrections, styleRules] = await Promise.all([
-    loadCorrections(cc, "pi"),
-    loadStyleRules(cc, "pi"),
-  ]);
+  const referenceExamples = templateKey
+    ? loadExamples(templateKey).hpi.slice(0, 10)
+    : [];
 
-  let systemPrompt = GENERATE_PI_SYSTEM_PROMPT;
-  if (styleRules.length > 0) {
-    const rulesList = styleRules
-      .map((rule, i) => `${i + 1}. ${rule}`)
-      .join("\n");
-    systemPrompt += `\n\n## Additional Rules (follow strictly):\n${rulesList}`;
-  }
+  const systemPrompt =
+    referenceExamples.length > 0
+      ? `${GENERATE_PI_SYSTEM_PROMPT}\n\n## Style Reference\n\n${FEW_SHOT_GUARD}`
+      : GENERATE_PI_SYSTEM_PROMPT;
 
   const promptData: Record<string, unknown> = {
     piInputs,
     ccSpecificFields,
     rawInputs,
   };
-
-  if (corrections.length > 0) {
-    promptData.correctionExamples = corrections;
+  if (referenceExamples.length > 0) {
+    promptData.referenceExamples = referenceExamples;
   }
 
   const userPrompt = JSON.stringify(promptData, null, 2);

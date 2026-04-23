@@ -1,10 +1,7 @@
 import { generateText } from "@/lib/ai/gemini-client";
 import { GENERATE_HISTORY_SYSTEM_PROMPT } from "@/lib/ai/prompts/generate-history";
-import {
-  loadTemplate,
-  loadCorrections,
-  loadStyleRules,
-} from "@/lib/ai/load-resources";
+import { FEW_SHOT_GUARD } from "@/lib/ai/prompts/few-shot-guard";
+import { loadTemplate, loadExamples } from "@/lib/ai/load-resources";
 import type { StructuredCase } from "@/lib/ai/types";
 
 export function buildHistoryDraft(structured: StructuredCase | null): string {
@@ -25,7 +22,7 @@ export function buildHistoryDraft(structured: StructuredCase | null): string {
 export async function generateHistory(
   structuredCase: StructuredCase,
   templateKey: string | null | undefined,
-  cc: string
+  _cc: string
 ): Promise<string> {
   if (!templateKey) return buildHistoryDraft(structuredCase);
 
@@ -37,27 +34,20 @@ export async function generateHistory(
   const { inputs, ...ccSpecificFields } = structuredCase;
   const historyInputs = inputs.filter((i) => i.sections.includes("history"));
 
-  const [corrections, styleRules] = await Promise.all([
-    loadCorrections(cc, "history"),
-    loadStyleRules(cc, "history"),
-  ]);
+  const referenceExamples = loadExamples(templateKey).history.slice(0, 10);
 
-  let systemPrompt = GENERATE_HISTORY_SYSTEM_PROMPT;
-  if (styleRules.length > 0) {
-    const rulesList = styleRules
-      .map((rule, i) => `${i + 1}. ${rule}`)
-      .join("\n");
-    systemPrompt += `\n\n## Additional Rules (follow strictly):\n${rulesList}`;
-  }
+  const systemPrompt =
+    referenceExamples.length > 0
+      ? `${GENERATE_HISTORY_SYSTEM_PROMPT}\n\n## Style Reference\n\n${FEW_SHOT_GUARD}`
+      : GENERATE_HISTORY_SYSTEM_PROMPT;
 
   const promptData: Record<string, unknown> = {
     historyInputs,
     ccSpecificFields,
     historyTemplate,
   };
-
-  if (corrections.length > 0) {
-    promptData.correctionExamples = corrections;
+  if (referenceExamples.length > 0) {
+    promptData.referenceExamples = referenceExamples;
   }
 
   const userPrompt = JSON.stringify(promptData, null, 2);

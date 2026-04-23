@@ -29,6 +29,7 @@
 - peInputs: StructuredCase에서 sections에 'pe'가 포함된 카드 목록 (normalized_text, category 포함)
 - ccSpecificFields: C.C. 특화 필드
 - peTemplate: P/E 양식 정의 (fields 배열 + output_example)
+- referenceExamples: (선택적, 배열) 동일 C.C.의 모범 P/E 출력 예시. **스타일(항목 순서·기호·비정상 소견 표기 방식)만 참고**할 것. 예시 안의 소견 수치는 절대 현재 차팅에 차용하지 말 것
 
 peTemplate.output_example 형식을 기준으로 출력하세요.
 출력은 P/E 텍스트만 반환하고 다른 설명은 추가하지 마세요.

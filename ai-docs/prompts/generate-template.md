@@ -39,6 +39,6 @@
 - templateInputs: StructuredCase에서 sections에 'template'이 포함된 카드 목록 (normalized_text, category 포함)
 - ccSpecificFields: C.C. 특화 필드 (onset, character, ntg_response 등 C.C.별 상이)
 - template: 템플릿 전체 JSON (instructions, fields, special_questions, output_example 포함)
-- fewShotExamples: 예시 입출력 목록 (비어있을 수 있음)
+- referenceExamples: (선택적, 배열) 동일 C.C.의 모범 상용구 출력 예시. **스타일(문체·어휘·약어·기호·줄바꿈)만 참고**할 것. 예시 안의 수치·증상·병력은 절대 현재 차팅에 차용하지 말 것
 
 template.instructions의 지시사항을 따르고, template.output_example의 형식을 정확히 재현하세요.

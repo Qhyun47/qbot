@@ -128,14 +128,19 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
         entry.guideKeys.map(async (key) => ({
           key,
           exists: await fileExists(
-            path.join(ROOT, "ai-docs/cc", key, "guide.html")
+            path.join(ROOT, "ai-docs/guides", key, "guide.html")
           ),
         }))
       );
 
       const templates = await Promise.all(
         entry.templateKeys.map(async (key) => {
-          const tplPath = path.join(ROOT, "ai-docs/cc", key, "template.json");
+          const tplPath = path.join(
+            ROOT,
+            "ai-docs/templates",
+            key,
+            "template.json"
+          );
           const exists = await fileExists(tplPath);
           if (!exists) {
             return {
@@ -193,7 +198,7 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
   const allGuideKeys = [...new Set(ccList.flatMap((e) => e.guideKeys))];
   const guideItems = await Promise.all(
     allGuideKeys.map(async (key) => {
-      const guidePath = path.join(ROOT, "ai-docs/cc", key, "guide.html");
+      const guidePath = path.join(ROOT, "ai-docs/guides", key, "guide.html");
       let content = "";
       try {
         content = await fs.readFile(guidePath, "utf-8");
@@ -213,7 +218,12 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
   const allTemplateKeys = [...new Set(ccList.flatMap((e) => e.templateKeys))];
   const templateItems = await Promise.all(
     allTemplateKeys.map(async (key) => {
-      const tplPath = path.join(ROOT, "ai-docs/cc", key, "template.json");
+      const tplPath = path.join(
+        ROOT,
+        "ai-docs/templates",
+        key,
+        "template.json"
+      );
       const exists = await fileExists(tplPath);
       if (!exists) {
         return {

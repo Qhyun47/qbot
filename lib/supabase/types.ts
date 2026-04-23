@@ -293,87 +293,6 @@ export type Database = {
         };
         Relationships: [];
       };
-      ai_corrections: {
-        Row: {
-          id: string;
-          user_id: string;
-          case_id: string | null;
-          section_type: "pi" | "template" | "history" | "pe";
-          cc: string;
-          template_key: string | null;
-          case_inputs_json: Json;
-          api_output: string;
-          corrected_output: string;
-          comment: string | null;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          case_id?: string | null;
-          section_type: "pi" | "template" | "history" | "pe";
-          cc: string;
-          template_key?: string | null;
-          case_inputs_json: Json;
-          api_output: string;
-          corrected_output: string;
-          comment?: string | null;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          case_id?: string | null;
-          section_type?: "pi" | "template" | "history" | "pe";
-          cc?: string;
-          template_key?: string | null;
-          case_inputs_json?: Json;
-          api_output?: string;
-          corrected_output?: string;
-          comment?: string | null;
-          created_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "ai_corrections_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "ai_corrections_case_id_fkey";
-            columns: ["case_id"];
-            isOneToOne: false;
-            referencedRelation: "cases";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      ai_style_rules: {
-        Row: {
-          id: string;
-          rule_text: string;
-          cc: string | null;
-          section_type: "pi" | "template" | "history" | "pe" | "all";
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          rule_text: string;
-          cc?: string | null;
-          section_type: "pi" | "template" | "history" | "pe" | "all";
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          rule_text?: string;
-          cc?: string | null;
-          section_type?: "pi" | "template" | "history" | "pe" | "all";
-          created_at?: string;
-        };
-        Relationships: [];
-      };
       ai_documents: {
         Row: {
           doc_path: string;
@@ -705,17 +624,6 @@ export type GuidelineInsert =
   Database["public"]["Tables"]["interview_guidelines"]["Insert"];
 export type GuidelineUpdate =
   Database["public"]["Tables"]["interview_guidelines"]["Update"];
-
-// 편의 타입 — ai_corrections
-export type AiCorrection =
-  Database["public"]["Tables"]["ai_corrections"]["Row"];
-export type AiCorrectionInsert =
-  Database["public"]["Tables"]["ai_corrections"]["Insert"];
-
-// 편의 타입 — ai_style_rules
-export type AiStyleRule = Database["public"]["Tables"]["ai_style_rules"]["Row"];
-export type AiStyleRuleInsert =
-  Database["public"]["Tables"]["ai_style_rules"]["Insert"];
 
 // 편의 타입 — ai_documents
 export type AiDocument = Database["public"]["Tables"]["ai_documents"]["Row"];

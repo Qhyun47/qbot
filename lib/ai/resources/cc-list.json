@@ -44,17 +44,17 @@
   },
   {
     "cc": "Abnormal lab",
-    "guideKeys": [],
+    "guideKeys": ["im-basic"],
     "templateKeys": []
   },
   {
     "cc": "Fever",
-    "guideKeys": [],
+    "guideKeys": ["im-basic"],
     "templateKeys": []
   },
   {
     "cc": "General weakness",
-    "guideKeys": [],
+    "guideKeys": ["im-basic"],
     "templateKeys": []
   }
 ]

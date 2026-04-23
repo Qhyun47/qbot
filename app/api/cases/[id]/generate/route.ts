@@ -164,7 +164,8 @@ export async function POST(
     generatePi(
       structured,
       inputs.map((i) => ({ rawText: i.raw_text, timeTag: i.time_tag })),
-      cc
+      cc,
+      caseRow.template_key
     ).catch((e) => {
       piError = e instanceof Error ? e.message : String(e);
       console.error("[generate] Stage 2 P.I 실패:", piError);

@@ -11,8 +11,6 @@ interface ResultSectionProps {
   value: string;
   onSave?: (text: string) => void;
   className?: string;
-  /** 헤더 영역 복사 버튼 옆에 추가로 렌더링할 슬롯 (예: 교정 버튼) */
-  correctionSlot?: React.ReactNode;
 }
 
 export function ResultSection({
@@ -20,7 +18,6 @@ export function ResultSection({
   value,
   onSave,
   className,
-  correctionSlot,
 }: ResultSectionProps) {
   const [localValue, setLocalValue] = useState(value);
 
@@ -47,7 +44,6 @@ export function ResultSection({
       <div className="flex items-center justify-between border-b bg-muted/30 px-4 py-2.5">
         <h2 className="text-sm font-semibold">{title}</h2>
         <div className="flex items-center gap-1">
-          {correctionSlot}
           <CopyButton text={localValue} label={`${title} 복사`} />
         </div>
       </div>

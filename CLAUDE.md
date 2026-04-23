@@ -108,16 +108,16 @@ import { Button } from "@/components/ui/button";
 
 ### 핵심 파일 위치
 
-| 파일                                  | 역할                                                                        |
-| ------------------------------------- | --------------------------------------------------------------------------- |
-| `lib/ai/resources/cc-list.json`       | 정형 C.C. 목록 (단일 소스, `{ cc, guideKeys[], templateKeys[], aliasOf? }`) |
-| `lib/ai/resources/guide-list.json`    | 가이드라인 표시명 목록 (`{ guideKey, displayName }`)                        |
-| `lib/ai/resources/template-list.json` | 상용구 표시명 목록 (`{ templateKey, displayName }`)                         |
-| `ai-docs/cc/{key}/guide.html`         | 시스템 가이드라인 파일 (HWP→HTML, processGuideHtml() 적용 후 저장)          |
-| `ai-docs/cc/{key}/template.json`      | 상용구 템플릿 파일 (`fields`, `pe`, `history` 섹션 포함)                    |
-| `ai-docs/cc/{key}/schema.json`        | AI 정규화 스키마 파일                                                       |
-| `ai-docs/pending-matches.md`          | 대기 중인 커넥션 추적 파일 (C.C./가이드라인/상용구 간 4방향)                |
-| `fixtures/{cc-key}-{n}.json`          | AI 품질 검증용 케이스 예시 데이터                                           |
+| 파일                                            | 역할                                                                        |
+| ----------------------------------------------- | --------------------------------------------------------------------------- |
+| `lib/ai/resources/cc-list.json`                 | 정형 C.C. 목록 (단일 소스, `{ cc, guideKeys[], templateKeys[], aliasOf? }`) |
+| `lib/ai/resources/guide-list.json`              | 가이드라인 표시명 목록 (`{ guideKey, displayName }`)                        |
+| `lib/ai/resources/template-list.json`           | 상용구 표시명 목록 (`{ templateKey, displayName }`)                         |
+| `ai-docs/guides/{guideKey}/guide.html`          | 시스템 가이드라인 파일 (HWP→HTML, processGuideHtml() 적용 후 저장)          |
+| `ai-docs/templates/{templateKey}/template.json` | 상용구 템플릿 파일 (`fields`, `pe`, `history` 섹션 포함)                    |
+| `ai-docs/templates/{templateKey}/schema.json`   | AI 정규화 스키마 파일                                                       |
+| `ai-docs/templates/{templateKey}/examples.md`   | 케이스 예시 파일 (4섹션 형식: HPI/P.I template/History/P/E)                 |
+| `ai-docs/pending-matches.md`                    | 대기 중인 커넥션 추적 파일 (C.C./가이드라인/상용구 간 4방향)                |
 
 ---
 
@@ -161,7 +161,7 @@ import { Button } from "@/components/ui/button";
 
 ### 가이드라인 추가 절차
 
-1. 사용자에게 "HWP에서 내보낸 HTML 전체를 붙여주세요"를 요청한 후, 받은 HTML에 `processGuideHtml()` (`lib/utils/html-utils.ts`)을 적용하여 `ai-docs/cc/{guideKey}/guide.html`로 저장
+1. 사용자에게 "HWP에서 내보낸 HTML 전체를 붙여주세요"를 요청한 후, 받은 HTML에 `processGuideHtml()` (`lib/utils/html-utils.ts`)을 적용하여 `ai-docs/guides/{guideKey}/guide.html`로 저장
 
 2. `lib/ai/resources/guide-list.json`에 항목 추가:
 
@@ -184,11 +184,11 @@ import { Button } from "@/components/ui/button";
 ### 상용구 추가 절차
 
 1. 아래 파일들을 생성:
-   - `ai-docs/cc/{templateKey}/template.json` — 상용구 템플릿 (기존 chest-pain.json 구조 참조)
+   - `ai-docs/templates/{templateKey}/template.json` — 상용구 템플릿 (기존 chest-pain.json 구조 참조)
      - **`fields` 섹션 필수 (P.I. template)**: `fields[]` + `output_example` 구조. 사용자에게 P.I. template 양식을 요청해 입력받아야 함
      - **`history` 섹션 필수**: `fields[]` + `output_example` 구조. 사용자에게 History 양식을 요청해 입력받아야 함
      - **`pe` 섹션 필수**: `fields[]` + `output_example` 구조. 사용자에게 P/E 양식을 요청해 입력받아야 함
-   - `ai-docs/cc/{templateKey}/schema.json` — AI 정규화 스키마 (기존 chest-pain.json 구조 참조)
+   - `ai-docs/templates/{templateKey}/schema.json` — AI 정규화 스키마 (기존 chest-pain.json 구조 참조)
 
 2. `lib/ai/resources/template-list.json`에 항목 추가:
 
@@ -210,18 +210,33 @@ import { Button } from "@/components/ui/button";
    3. "이 상용구의 P/E 양식(기본값 상태의 출력 포맷)을 알려주세요."
 
 6. **케이스 예시 데이터 요청**: 상용구 추가가 완료되면 반드시 사용자에게 다음을 요청:
-   > "AI 차팅 품질 향상을 위해 {C.C.} 케이스 예시 데이터가 필요합니다. `fixtures/{cc-key}-{n}.json` 형식으로 실제 문진 카드 입력 예시를 제공해 주실 수 있나요?"
+   > "AI 차팅 품질 향상을 위해 케이스 예시 데이터가 필요합니다. 아래 4섹션 형식으로 제공해 주세요. 케이스가 여러 개일수록 AI 품질이 향상됩니다."
+   >
+   > ```
+   > # Case 1
+   > ## HPI (줄글)
+   > (HPI 줄글 예시)
+   >
+   > ## P.I template
+   > (실제 출력 예시)
+   >
+   > ## History
+   > (실제 출력 예시)
+   >
+   > ## P/E
+   > (실제 출력 예시)
+   > ```
 
 ---
 
 ### 케이스 예시 데이터 추가 절차
 
-- **저장 위치**: `fixtures/{cc-key}-{n}.json` (예: `fixtures/dizziness-01.json`)
-- **형식**: 기존 `fixtures/case-01.json` 구조 참조 (`case`, `inputs`, `expectedHpi?`, `expectedTemplate?`)
-- **검증**: 데이터 제공 즉시 하네스로 실행:
-  ```bash
-  npx tsx --env-file=.env.local scripts/ai-harness.ts fixtures/{파일명}.json
-  ```
+- **명령어**: `/add-example {templateKey}` — 기존 상용구에 예시만 추가하는 전용 명령어
+- **저장 위치**: `ai-docs/templates/{templateKey}/examples.md`
+- **형식**: `# Case N` 단위, 4섹션 (`## HPI (줄글)` / `## P.I template` / `## History` / `## P/E`)
+- **저장 방법**: 기존 파일이 있으면 append, 없으면 새로 생성
+- **10개 초과 시**: Claude가 품질·다양성 기준으로 10개 추천 → 사용자 승인 후 pruning
+- **저장 후**: 메타 학습 분석 step 수행 (generate-pi.md 등 4개 프롬프트 파일에서 새 패턴 식별 → 발견 시 변경안 제시)
 - **추가 기준**:
   - 상용구(templateKeys)가 있는 C.C.: **필수** (최소 1개)
   - 가이드라인만 있고 상용구 없는 C.C.: 불필요
@@ -238,8 +253,8 @@ import { Button } from "@/components/ui/button";
 
 **리소스 삭제 시**:
 
-- 가이드라인 삭제 → `guide-list.json`에서 제거 + `cc-list.json`의 모든 `guideKeys`에서 해당 key 제거 + `ai-docs/pending-matches.md` 섹션 1/3에서 해당 key 관련 행 모두 삭제
-- 상용구 삭제 → `template-list.json`에서 제거 + `cc-list.json`의 모든 `templateKeys`에서 해당 key 제거 + `ai-docs/pending-matches.md` 섹션 2/4에서 해당 key 관련 행 모두 삭제
+- 가이드라인 삭제 → `guide-list.json`에서 제거 + `cc-list.json`의 모든 `guideKeys`에서 해당 key 제거 + `ai-docs/guides/{guideKey}/` 폴더 삭제 + `ai-docs/pending-matches.md` 섹션 1/3에서 해당 key 관련 행 모두 삭제
+- 상용구 삭제 → `template-list.json`에서 제거 + `cc-list.json`의 모든 `templateKeys`에서 해당 key 제거 + `ai-docs/templates/{templateKey}/` 폴더 삭제 + `ai-docs/pending-matches.md` 섹션 2/4에서 해당 key 관련 행 모두 삭제
 
 ---
 

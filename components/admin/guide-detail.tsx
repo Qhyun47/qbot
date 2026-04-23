@@ -46,7 +46,9 @@ export function GuideDetail({ item }: GuideDetailProps) {
         <div className="flex items-center gap-2 text-sm text-destructive">
           <XCircle className="size-4 shrink-0" />
           <span>
-            <code className="text-xs">ai-docs/cc/{item.key}/guide.html</code>{" "}
+            <code className="text-xs">
+              ai-docs/guides/{item.key}/guide.html
+            </code>{" "}
             파일을 찾을 수 없습니다.
           </span>
         </div>

@@ -91,7 +91,7 @@ async function run() {
     rawText: i.rawText,
     timeTag: i.timeTag,
   }));
-  const pi = await generatePi(structuredCase, rawInputs, cc);
+  const pi = await generatePi(structuredCase, rawInputs, cc, templateKey);
 
   console.log("\n[생성된 P.I]");
   console.log(pi);

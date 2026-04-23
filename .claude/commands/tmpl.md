@@ -7,17 +7,22 @@
 1. `lib/ai/resources/template-list.json` — 중복 및 기존 항목 확인
 2. `lib/ai/resources/cc-list.json` — 사용자가 언급한 C.C. 존재 여부 확인용
 3. `ai-docs/pending-matches.md` — 대기 커넥션 확인 (섹션 2: C.C.→상용구 대기)
-4. `ai-docs/cc/chest-pain/template.json` — 템플릿 구조 참조 (fields, pe, history 섹션 구조 포함)
-5. `ai-docs/cc/chest-pain/schema.json` — 스키마 구조 참조
+4. `ai-docs/templates/chest-pain/template.json` — 템플릿 구조 참조 (fields, pe, history 섹션 구조 포함)
+5. `ai-docs/templates/chest-pain/schema.json` — 스키마 구조 참조
 
 이후 CLAUDE.md "상용구 추가 절차"를 단계별로 따릅니다.
 
+**C.C. 커넥션 확인:**
+
+파일 읽기 후, 반드시 사용자에게 명시적으로 질문합니다:
+"이 상용구를 연결할 C.C.가 있나요? (있으면 C.C. 이름을 알려주세요. 없으면 '없음'이라고 답해주세요.)"
+
 **커넥션 처리 흐름:**
 
-- 사용자가 C.C. 커넥션을 언급한 경우:
+- 사용자가 C.C.를 답한 경우:
   - cc-list.json에 해당 C.C. 존재 → 해당 C.C.의 templateKeys에 즉시 추가
   - 존재하지 않음 → pending-matches.md 섹션 4(상용구→C.C. 대기)에 기록 (중복 확인 후)
-  - 커넥션 언급이 없으면 아무것도 기록하지 않음
+- 사용자가 '없음'이라고 답한 경우: 아무것도 기록하지 않음
 
 **대기 커넥션 확인:**
 
@@ -29,4 +34,42 @@
 1. P.I. template 양식 (현병력 구조화 필드 + output_example) → fields 섹션에 저장
 2. History 양식 (기본값 상태의 출력 포맷) → history 섹션에 저장
 3. P/E 양식 (기본값 상태의 출력 포맷) → pe 섹션에 저장
-4. 케이스 예시 데이터 (fixtures/{cc-key}-{n}.json)
+4. 케이스 예시 데이터 (ai-docs/templates/{templateKey}/examples.md에 저장)
+
+**케이스 예시 데이터 요청 시 아래 양식을 명시적으로 안내합니다:**
+
+> AI가 각 섹션이 실제로 어떻게 채워지는지 학습할 수 있도록, HPI / P.I. template / History / P/E가 모두 포함된 케이스 예시를 아래 양식으로 제공해 주세요. 케이스가 여러 개일수록 AI 품질이 향상됩니다.
+>
+> ```
+> # Case 1
+> ## HPI (줄글)
+> (AI가 생성한 또는 직접 작성한 HPI 줄글 예시)
+>
+> ## P.I template
+> (실제 출력 예시)
+>
+> ## History
+> (실제 출력 예시)
+>
+> ## P/E
+> (실제 출력 예시)
+>
+> # Case 2
+> ...
+> ```
+
+예시를 받으면 `ai-docs/templates/{templateKey}/examples.md`에 append합니다. 파일이 없으면 새로 생성합니다.
+
+**메타 학습 분석 step:**
+
+예시 저장 후, 방금 받은 예시를 다시 읽고 아래 4개 프롬프트 파일에서 보완 가치가 있는 패턴이 있는지 분석합니다:
+
+- `ai-docs/prompts/generate-pi.md`
+- `ai-docs/prompts/generate-template.md`
+- `ai-docs/prompts/generate-history.md`
+- `ai-docs/prompts/generate-pe.md`
+
+분석 결과:
+
+- **새 패턴 발견 시**: 변경안(diff 형식)을 사용자에게 제시 → 승인 시 해당 파일 업데이트, 거절 시 건너뜀
+- **새 패턴 없음**: "기존 프롬프트와 잘 일치합니다. 추가 변경 없음."으로 보고

@@ -60,7 +60,7 @@ export function TemplateDetail({ item }: TemplateDetailProps) {
           <CardHeader className="px-4 py-3">
             <CardTitle className="text-sm">
               <code className="font-mono text-xs text-muted-foreground">
-                ai-docs/cc/{item.key}/template.json
+                ai-docs/templates/{item.key}/template.json
               </code>
             </CardTitle>
           </CardHeader>
@@ -83,7 +83,9 @@ export function TemplateDetail({ item }: TemplateDetailProps) {
         <div className="flex items-center gap-2 text-sm text-destructive">
           <XCircle className="size-4 shrink-0" />
           <span>
-            <code className="text-xs">ai-docs/cc/{item.key}/template.json</code>{" "}
+            <code className="text-xs">
+              ai-docs/templates/{item.key}/template.json
+            </code>{" "}
             파일을 찾을 수 없습니다.
           </span>
         </div>

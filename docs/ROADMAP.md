@@ -73,7 +73,7 @@
   - ✅ `style_guide.md` 생성 (혼용 언어 원칙, 문장 구조, 필수 포함 요소 등)
   - ✅ `lib/ai/resources/templates/` — C.C.별 5개 상용구 템플릿 JSON (chest-pain, dyspnea, hemoptysis, abdominal-pain, gi-bleeding)
   - ✅ `lib/ai/resources/schemas/` — C.C.별 5개 정규화 스키마 JSON (JSON Schema draft-07, `structured_schema.json` 단일 파일 방식 대신 C.C.별 분리)
-  - ✅ `ai-docs/cc/{key}/guide.html` — C.C.별 문진 가이드라인 HTML (HWP→HTML 변환, processGuideHtml() 적용 후 저장. /guide 커맨드로 추가)
+  - ✅ `ai-docs/guides/{guideKey}/guide.html` — 가이드라인 HTML (HWP→HTML 변환, processGuideHtml() 적용 후 저장. /guide 커맨드로 추가)
   - ✅ `lib/ai/resources/examples/` — C.C.별 5개 빈 `.jsonl` 파일 (few-shot 예시 준비 공간)
   - ✅ `lib/ai/load-resources.ts` 매핑 함수 스텁 생성 (`loadSchema` / `loadTemplate` / `loadGuide` / `loadExamples` + `CC_TEMPLATE_KEYS`)
   - ✅ `fixtures/case-01.json` (Chest pain, 12개 입력 카드, NTG 무반응 시나리오)
@@ -276,40 +276,27 @@
 
 ---
 
-### Phase 3.5: 관리자 AI 교정 피드백 루프
+### Phase 3.5: 관리자 AI 교정 피드백 루프 ⚠️ DEPRECATED
 
-관리자가 AI 생성 결과를 직접 교정하고, 그 교정 데이터가 다음 AI 생성에 자동으로 반영되는 피드백 루프를 구축합니다.
-
-- ✅ **Task A01: DB 마이그레이션 - 관리자 및 교정 테이블 신설** - 완료 (2026-04-19)
-  - `profiles` 테이블에 `is_admin` boolean 컬럼 추가 (DEFAULT false)
-  - `ai_corrections` 테이블 생성 (교정 전/후 텍스트, 입력 카드, 섹션 타입 저장)
-  - `ai_style_rules` 테이블 생성 (추가 요청사항을 스타일 규칙으로 등록)
-  - RLS 정책: `is_admin=true`인 사용자만 SELECT/INSERT 가능
-  - `lib/supabase/types.ts`에 `AiCorrection`, `AiStyleRule` 타입 추가
-  - 관리자 계정(`tadybear047@gmail.com`) `is_admin=true` 설정
-
-- ✅ **Task A02: 관리자 헬퍼 및 교정 Server Actions 구현** - 완료 (2026-04-19)
-  - `lib/auth/is-admin.ts`: `getIsAdmin()` — 현재 사용자의 `is_admin` 조회
-  - `lib/corrections/actions.ts`: `saveCorrection()` — 관리자 권한 체크 + `ai_corrections` 저장 + `comment` 있으면 `ai_style_rules`에도 등록
-  - `lib/ai/load-resources.ts`: `loadCorrections(cc, sectionType)` + `loadStyleRules(cc, sectionType)` 함수 추가 (DB 조회)
-
-- ✅ **Task A03: 교정 모달 UI 컴포넌트 구현** - 완료 (2026-04-19)
-  - `components/cases/correction-modal.tsx` — shadcn/ui Dialog 기반
-    - 좌측: AI 원본 텍스트 (읽기 전용, 배경색 구분)
-    - 우측: 교정 버전 입력 textarea
-    - 하단: 추가 요청사항 (스타일 규칙으로 저장 안내)
-    - 저장 완료 시 toast + 모달 닫기, 저장 중 로딩 상태 표시
-  - `components/cases/result-section.tsx`: `correctionSlot?: React.ReactNode` prop 추가
-
-- ✅ **Task A04: 결과 페이지에 관리자 교정 버튼 통합** - 완료 (2026-04-19)
-  - `app/(app)/cases/[id]/page.tsx`에서 `getIsAdmin()` 호출 (`Promise.all` 병렬)
-  - `completed` 상태의 HPI / 상용구 / History 각 섹션에 `CorrectionModal` 연결
-  - 일반 계정에서는 교정 버튼 미표시
-
-- ✅ **Task A05: AI 파이프라인에 교정 데이터 few-shot 주입** - 완료 (2026-04-19)
-  - `lib/ai/generate-hpi.ts`: `loadCorrections` + `loadStyleRules` 병렬 로드 → system prompt에 규칙 append, user prompt에 교정 예시 포함
-  - `lib/ai/generate-template.ts`: 기존 `loadExamples()` 대신 `loadCorrections` 사용, 스타일 규칙 추가
-  - 교정 데이터 없을 때 기존 동작 동일 유지 (backwards compatible)
+> **⚠️ 이 Phase는 2026-04-23에 전면 제거되었습니다.**
+>
+> **제거 사유**: DB 기반 교정 시스템이 프로젝트 복잡도를 과하게 높였고, 사용자가 상용구 추가 시점에 직접 제공하는 파일 기반 few-shot 예시 구조가 더 단순하고 Git으로 버전 관리 가능하다고 판단.
+>
+> **대체 시스템**: 파일 기반 few-shot 예시 시스템 (`ai-docs/templates/{templateKey}/examples.md`). 상세 내용은 `docs/ai-charting-architecture.md` 참조.
+>
+> **제거된 구성요소**:
+>
+> - DB 테이블: `ai_corrections`, `ai_style_rules` (마이그레이션 `drop_ai_corrections_and_ai_style_rules`로 DROP)
+> - 코드: `lib/corrections/`, `components/cases/correction-modal.tsx`, `lib/ai/load-resources.ts`의 `loadCorrections`/`loadStyleRules`, `lib/supabase/types.ts`의 `AiCorrection`/`AiStyleRule` 타입
+> - UI: 결과 페이지(`app/(app)/cases/[id]/page.tsx`)의 교정 버튼 3개 (P.I/History/P/E)
+>
+> **유지된 구성요소**:
+>
+> - `profiles.is_admin` 컬럼 (AI 사용량 무제한 권한 체크에 사용)
+> - `lib/auth/is-admin.ts` (admin 라우트에서 공유)
+> - `app/(app)/admin/*` 라우트 전체 (users/resources/error-logs/documents)
+>
+> 과거 Phase 3.5에서 완료되었던 Task A01~A05(관리자 및 교정 테이블 신설, Server Actions, 교정 모달, 결과 페이지 통합, AI 파이프라인 few-shot 주입)는 모두 신규 시스템으로 대체되어 제거되었습니다.
 
 ---
 
