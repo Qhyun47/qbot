@@ -47,12 +47,16 @@ export async function updateLayoutSettings(
   mobileFontSize: number,
   foldAutoSwitch: boolean,
   foldFallbackLayout: FoldFallbackLayout,
-  caseInputFontSize: number
+  caseInputFontSize: number,
+  foldCaseInputFontSize: number
 ): Promise<void> {
   const parsedLayout = layoutSchema.parse(layout);
   const parsedRatio = splitRatioSchema.parse(splitRatio);
   const parsedFontSize = mobileFontSizeSchema.parse(mobileFontSize);
   const parsedCaseInputFontSize = mobileFontSizeSchema.parse(caseInputFontSize);
+  const parsedFoldCaseInputFontSize = mobileFontSizeSchema.parse(
+    foldCaseInputFontSize
+  );
   const parsedFoldFallback = foldFallbackLayoutSchema.parse(foldFallbackLayout);
   const { supabase, user } = await getAuthUser();
 
@@ -65,6 +69,7 @@ export async function updateLayoutSettings(
       case_input_font_size: parsedCaseInputFontSize,
       fold_auto_switch: foldAutoSwitch,
       fold_fallback_layout: parsedFoldFallback,
+      fold_case_input_font_size: parsedFoldCaseInputFontSize,
     })
     .eq("id", user.id);
 
@@ -93,24 +98,27 @@ export async function getLayoutSettings(): Promise<{
   caseInputFontSize: number;
   foldAutoSwitch: boolean;
   foldFallbackLayout: FoldFallbackLayout;
+  foldCaseInputFontSize: number;
 }> {
   const { supabase, user } = await getAuthUser();
 
   const { data } = await supabase
     .from("profiles")
     .select(
-      "input_layout, split_ratio, mobile_font_size, case_input_font_size, fold_auto_switch, fold_fallback_layout"
+      "input_layout, split_ratio, mobile_font_size, case_input_font_size, fold_auto_switch, fold_fallback_layout, fold_case_input_font_size"
     )
     .eq("id", user.id)
     .maybeSingle();
 
+  const caseInputFontSize = data?.case_input_font_size ?? 16;
   return {
     layout: data?.input_layout ?? "single",
     splitRatio: data?.split_ratio ?? 50,
     mobileFontSize: data?.mobile_font_size ?? 16,
-    caseInputFontSize: data?.case_input_font_size ?? 16,
+    caseInputFontSize,
     foldAutoSwitch: data?.fold_auto_switch ?? false,
     foldFallbackLayout:
       (data?.fold_fallback_layout as FoldFallbackLayout) ?? "single",
+    foldCaseInputFontSize: data?.fold_case_input_font_size ?? caseInputFontSize,
   };
 }

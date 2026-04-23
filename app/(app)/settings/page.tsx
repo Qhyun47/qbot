@@ -15,6 +15,7 @@ async function SettingsContent() {
     caseInputFontSize,
     foldAutoSwitch,
     foldFallbackLayout,
+    foldCaseInputFontSize,
   } = await getLayoutSettings();
   return (
     <LayoutSettings
@@ -24,6 +25,7 @@ async function SettingsContent() {
       defaultCaseInputFontSize={caseInputFontSize}
       defaultFoldAutoSwitch={foldAutoSwitch}
       defaultFoldFallbackLayout={foldFallbackLayout}
+      defaultFoldCaseInputFontSize={foldCaseInputFontSize}
     />
   );
 }

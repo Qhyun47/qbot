@@ -15,6 +15,7 @@ async function NewCaseFormLoader({
       foldAutoSwitch,
       foldFallbackLayout,
       caseInputFontSize,
+      foldCaseInputFontSize,
     },
     { status },
     { fresh },
@@ -31,6 +32,7 @@ async function NewCaseFormLoader({
       foldAutoSwitch={foldAutoSwitch}
       foldFallbackLayout={foldFallbackLayout}
       caseInputFontSize={caseInputFontSize}
+      foldCaseInputFontSize={foldCaseInputFontSize}
       canUseAi={status === "approved"}
     />
   );

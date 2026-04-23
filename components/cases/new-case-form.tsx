@@ -65,6 +65,7 @@ interface NewCaseFormProps {
   foldAutoSwitch: boolean;
   foldFallbackLayout: FoldFallbackLayout;
   caseInputFontSize: number;
+  foldCaseInputFontSize: number;
   canUseAi?: boolean;
 }
 
@@ -74,6 +75,7 @@ export function NewCaseForm({
   foldAutoSwitch,
   foldFallbackLayout,
   caseInputFontSize,
+  foldCaseInputFontSize,
   canUseAi = false,
 }: NewCaseFormProps) {
   const router = useRouter();
@@ -91,6 +93,7 @@ export function NewCaseForm({
   >(null);
   const [cards, setCards] = useState<CaseInput[]>([]);
   const [layout, setLayout] = useState<InputLayout>(defaultLayout);
+  const [activeFontSize, setActiveFontSize] = useState(caseInputFontSize);
   const [generating, setGenerating] = useState(false);
   const [navigatingBack, setNavigatingBack] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
@@ -122,13 +125,21 @@ export function NewCaseForm({
   useEffect(() => {
     if (!foldAutoSwitch || defaultLayout !== "split_horizontal") return;
     const mq = window.matchMedia("(max-width: 600px)");
-    const handler = (e: MediaQueryListEvent) => {
-      setLayout(e.matches ? foldFallbackLayout : defaultLayout);
+    const applyFoldState = (isFolded: boolean) => {
+      setLayout(isFolded ? foldFallbackLayout : defaultLayout);
+      setActiveFontSize(isFolded ? foldCaseInputFontSize : caseInputFontSize);
     };
-    setLayout(mq.matches ? foldFallbackLayout : defaultLayout);
+    const handler = (e: MediaQueryListEvent) => applyFoldState(e.matches);
+    applyFoldState(mq.matches);
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
-  }, [foldAutoSwitch, defaultLayout, foldFallbackLayout]);
+  }, [
+    foldAutoSwitch,
+    defaultLayout,
+    foldFallbackLayout,
+    foldCaseInputFontSize,
+    caseInputFontSize,
+  ]);
 
   const navigateToDashboard = () => {
     // router.refresh()로 라우터 캐시를 무효화한 후 이동 → 현황판에 최신 케이스 반영
@@ -430,7 +441,7 @@ export function NewCaseForm({
       </AlertDialog>
       <div
         className="fixed inset-0 flex flex-col"
-        style={{ fontSize: `${caseInputFontSize}px` }}
+        style={{ fontSize: `${activeFontSize}px` }}
       >
         {/* 페이지 헤더 */}
         <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">

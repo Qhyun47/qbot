@@ -71,6 +71,7 @@ interface LayoutSettingsProps {
   defaultCaseInputFontSize: number;
   defaultFoldAutoSwitch: boolean;
   defaultFoldFallbackLayout: FoldFallbackLayout;
+  defaultFoldCaseInputFontSize: number;
 }
 
 const THEME_OPTIONS = [
@@ -86,6 +87,7 @@ export function LayoutSettings({
   defaultCaseInputFontSize,
   defaultFoldAutoSwitch,
   defaultFoldFallbackLayout,
+  defaultFoldCaseInputFontSize,
 }: LayoutSettingsProps) {
   const [selectedLayout, setSelectedLayout] =
     useState<InputLayout>(defaultLayout);
@@ -97,6 +99,9 @@ export function LayoutSettings({
   const [foldAutoSwitch, setFoldAutoSwitch] = useState(defaultFoldAutoSwitch);
   const [foldFallbackLayout, setFoldFallbackLayout] =
     useState<FoldFallbackLayout>(defaultFoldFallbackLayout);
+  const [foldCaseInputFontSize, setFoldCaseInputFontSize] = useState(
+    defaultFoldCaseInputFontSize
+  );
   const [mounted, setMounted] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">(
     "idle"
@@ -124,7 +129,8 @@ export function LayoutSettings({
           mobileFontSize,
           foldAutoSwitch,
           foldFallbackLayout,
-          caseInputFontSize
+          caseInputFontSize,
+          foldCaseInputFontSize
         );
         document.documentElement.style.setProperty(
           "--mobile-font-size",
@@ -147,6 +153,7 @@ export function LayoutSettings({
     foldAutoSwitch,
     foldFallbackLayout,
     caseInputFontSize,
+    foldCaseInputFontSize,
   ]);
 
   const isSplit = selectedLayout !== "single";
@@ -348,6 +355,28 @@ export function LayoutSettings({
                 );
               })}
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+              접었을 때 케이스 입력 글자 크기
+            </p>
+            <Select
+              value={String(foldCaseInputFontSize)}
+              onValueChange={(v) => setFoldCaseInputFontSize(Number(v))}
+              disabled={!foldAutoSwitch}
+            >
+              <SelectTrigger className="w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {FONT_SIZE_OPTIONS.map(({ value, label }) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       )}

@@ -236,6 +236,7 @@ export type Database = {
           avatar_url: string | null;
           created_at: string;
           fold_auto_switch: boolean;
+          fold_case_input_font_size: number;
           fold_fallback_layout: "single" | "split_vertical";
           full_name: string | null;
           id: string;
@@ -255,6 +256,7 @@ export type Database = {
           case_input_font_size?: number;
           created_at?: string;
           fold_auto_switch?: boolean;
+          fold_case_input_font_size?: number;
           fold_fallback_layout?: "single" | "split_vertical";
           full_name?: string | null;
           id: string;
@@ -273,6 +275,7 @@ export type Database = {
           case_input_font_size?: number;
           created_at?: string;
           fold_auto_switch?: boolean;
+          fold_case_input_font_size?: number;
           fold_fallback_layout?: "single" | "split_vertical";
           full_name?: string | null;
           id?: string;
