@@ -289,7 +289,7 @@ html[data-view="desktop"] .lg\:inline-flex {
 }
 
 [data-view="desktop"] main {
-  min-width: 680px;
+  min-width: min(680px, 100vw);
 }
 
 /* ───── HWP→HTML 가이드라인 컴팩트 렌더링 ───── */
