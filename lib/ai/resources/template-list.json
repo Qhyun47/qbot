@@ -34,5 +34,10 @@
     "templateKey": "skin-lesion",
     "displayName": "피부 병변",
     "category": "0. IM"
+  },
+  {
+    "templateKey": "og-basic",
+    "displayName": "OG 기본",
+    "category": "4. OG"
   }
 ]

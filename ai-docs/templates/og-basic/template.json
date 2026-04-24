@@ -1,0 +1,224 @@
+{
+  "templateKey": "og-basic",
+  "cc": "Vaginal bleeding",
+  "description": "산부인과 기본 EMR 상용구 템플릿",
+  "hpi_hints": "주 호소 및 관련 증상 서술. EDC/임신 주수, LMP 등 산부인과 기본 정보 포함.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "fields": [
+    {
+      "key": "fever_chill",
+      "label": "F/C",
+      "type": "symptom_check",
+      "format": "F/C({fever}/{chill})",
+      "slots": [
+        {
+          "key": "fever",
+          "symptom": "Fever",
+          "description": "발열",
+          "default": "-"
+        },
+        {
+          "key": "chill",
+          "symptom": "Chill",
+          "description": "오한",
+          "default": "-"
+        }
+      ],
+      "description": "발열/오한 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "cough_sputum_rhinorrhea",
+      "label": "C/S/R",
+      "type": "symptom_check",
+      "format": "C/S/R({cough}/{sputum}/{rhinorrhea})",
+      "slots": [
+        {
+          "key": "cough",
+          "symptom": "Cough",
+          "description": "기침",
+          "default": "-"
+        },
+        {
+          "key": "sputum",
+          "symptom": "Sputum",
+          "description": "가래",
+          "default": "-"
+        },
+        {
+          "key": "rhinorrhea",
+          "symptom": "Rhinorrhea",
+          "description": "콧물",
+          "default": "-"
+        }
+      ],
+      "description": "기침/가래/콧물 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "anvdc",
+      "label": "A/N/V/D/C",
+      "type": "symptom_check",
+      "format": "A/N/V/D/C({anorexia}/{nausea}/{vomiting}/{diarrhea}/{constipation})",
+      "slots": [
+        {
+          "key": "anorexia",
+          "symptom": "Anorexia",
+          "description": "식욕부진",
+          "default": "-"
+        },
+        {
+          "key": "nausea",
+          "symptom": "Nausea",
+          "description": "구역",
+          "default": "-"
+        },
+        {
+          "key": "vomiting",
+          "symptom": "Vomiting",
+          "description": "구토",
+          "default": "-"
+        },
+        {
+          "key": "diarrhea",
+          "symptom": "Diarrhea",
+          "description": "설사",
+          "default": "-"
+        },
+        {
+          "key": "constipation",
+          "symptom": "Constipation",
+          "description": "변비",
+          "default": "-"
+        }
+      ],
+      "description": "식욕부진/구역/구토/설사/변비 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "dizziness_dyspnea_abdpain",
+      "label": "Dizziness/Dyspnea/Abd.pain",
+      "type": "symptom_check",
+      "format": "Dizziness ({dizziness}) Dyspnea ({dyspnea}) Abd.pain ({abdpain})",
+      "slots": [
+        {
+          "key": "dizziness",
+          "symptom": "Dizziness",
+          "description": "어지럼증",
+          "default": "-"
+        },
+        {
+          "key": "dyspnea",
+          "symptom": "Dyspnea",
+          "description": "호흡곤란",
+          "default": "-"
+        },
+        {
+          "key": "abdpain",
+          "symptom": "Abdominal pain",
+          "description": "복통",
+          "default": "-"
+        }
+      ],
+      "description": "어지럼증/호흡곤란/복통 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "edc",
+      "label": "출산예정일(EDC)",
+      "type": "open",
+      "description": "출산예정일(EDC). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "gestational_age",
+      "label": "임신시 주수",
+      "type": "open",
+      "description": "내원 시 임신 주수 (예: '32+3주'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "lmp",
+      "label": "최종월경일(LMP)",
+      "type": "open",
+      "description": "최종월경일(Last Menstrual Period). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "pmp",
+      "label": "직전월경일(PMP)",
+      "type": "open",
+      "description": "직전월경일(Previous Menstrual Period). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "marital_status",
+      "label": "marital status",
+      "type": "open",
+      "description": "결혼 상태. 입력에 언급된 경우 해당 값 기재 (virgin / single / married / divorced / widowed 중 하나). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "obstetric_history",
+      "label": "출산력",
+      "type": "open",
+      "description": "산과력(G-P-A-L 형식, 예: '2-1-0-1') 및 마지막 분만일(LD). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "menstrual_history",
+      "label": "생리력",
+      "type": "open",
+      "description": "생리력 (interval 일수, regular/irregular, duration 일수, amount(scanty/moderate/profuse), Menarche 연령). 정보 없으면 각 항목 빈 문자열."
+    },
+    {
+      "key": "vaginal_discharge_bleeding",
+      "label": "Vaginal discharge / Vaginal bleeding",
+      "type": "symptom_check",
+      "format": "Vaginal discharge / Vaginal  bleeding({discharge}/{bleeding})",
+      "slots": [
+        {
+          "key": "discharge",
+          "symptom": "Vaginal discharge",
+          "description": "질 분비물 이상",
+          "default": "-"
+        },
+        {
+          "key": "bleeding",
+          "symptom": "Vaginal bleeding",
+          "description": "질 출혈",
+          "default": "-"
+        }
+      ],
+      "description": "질 분비물/출혈 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "last_intercourse_contraception",
+      "label": "마지막 성관계/피임법",
+      "type": "open",
+      "description": "마지막 성관계 날짜 및 피임법. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "last_pap",
+      "label": "last pap",
+      "type": "open",
+      "description": "마지막 자궁경부암 검사(pap smear) 날짜 및 결과. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "npo",
+      "label": "NPO",
+      "type": "open",
+      "description": "금식 시작 시각. 정보 없으면 빈 문자열."
+    }
+  ],
+  "output_example": "F/C(-/-)  C/S/R(-/-/-)  A/N/V/D/C(-/-/-/-/-)\nDizziness (-) Dyspnea (-) Abd.pain (-)  \n\n출산예정일(EDC) :\n임신시 주수 : \n\n최종월경일(LMP) :\n직전월경일(PMP) :\n\nmarital status : virgin / single / married / divorced / widowed\n출산력 0-0-0-0 , LD: \n생리력 interval :  일  regular / irregular \nduration :   일 \namount :  scanty / moderate / profuse \nMenarche:  세\nVaginal discharge / Vaginal  bleeding(-/-)\n마지막 성관계/피임법\n\nlast pap : \n\nNPO :",
+  "pe": {
+    "fields": [
+      { "key": "lung_sound", "label": "Lung sound", "default": "clear" },
+      { "key": "abd_tenderness", "label": "Abd. Td", "default": "(-)" },
+      { "key": "abd_rebound", "label": "rTd", "default": "(-)" },
+      { "key": "cvat", "label": "CVAT", "default": "(-)" },
+      { "key": "pitting_edema", "label": "Pitting edema", "default": "(-)" }
+    ],
+    "output_example": "Lung sound : clear \nAbd. Td(-),  rTd(-)\nCVAT (-)\nPitting edema (-)"
+  },
+  "history": {
+    "fields": [
+      { "key": "past", "label": "Past Hx", "default": "" },
+      { "key": "medication", "label": "Med Hx", "default": "" },
+      { "key": "og_history", "label": "OG Hx", "default": "" },
+      { "key": "operation", "label": "OP Hx", "default": "" }
+    ],
+    "output_example": "Past Hx : \nMed Hx :\nOG Hx :\nOP Hx :"
+  }
+}

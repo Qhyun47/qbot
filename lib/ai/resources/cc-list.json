@@ -133,5 +133,35 @@
     "cc": "Skin rash",
     "guideKeys": [],
     "templateKeys": ["urticaria", "skin-lesion"]
+  },
+  {
+    "cc": "Vaginal bleeding",
+    "guideKeys": ["og"],
+    "templateKeys": ["og-basic"]
+  },
+  {
+    "cc": "Vaginal discharge",
+    "guideKeys": ["og"],
+    "templateKeys": ["og-basic"]
+  },
+  {
+    "cc": "PROM",
+    "guideKeys": ["og"],
+    "templateKeys": ["og-basic"]
+  },
+  {
+    "cc": "PPROM",
+    "guideKeys": ["og"],
+    "templateKeys": ["og-basic"]
+  },
+  {
+    "cc": "Preterm labor",
+    "guideKeys": ["og"],
+    "templateKeys": ["og-basic"]
+  },
+  {
+    "cc": "Labor pain",
+    "guideKeys": ["og"],
+    "templateKeys": ["og-basic"]
   }
 ]

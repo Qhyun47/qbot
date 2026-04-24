@@ -1,0 +1,205 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OGBasicCase",
+  "description": "산부인과(OG) 기본 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history",
+    "og_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류. 아래 enum 값 중 가장 적합한 것 하나를 선택.",
+            "enum": [
+              "onset",
+              "character",
+              "severity",
+              "associated_symptom",
+              "vaginal_bleeding_character",
+              "vaginal_discharge_character",
+              "gestational_age",
+              "edc",
+              "lmp_pmp",
+              "obstetric_history",
+              "menstrual_history",
+              "marital_status",
+              "last_intercourse",
+              "rupture_of_membrane",
+              "contraction",
+              "fetal_movement",
+              "npo",
+              "vital_sign",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "og_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. 카드-섹션 매핑 기준: onset/character/severity/associated_symptom/vaginal_bleeding_character/vaginal_discharge_character/gestational_age/edc/lmp_pmp/rupture_of_membrane/contraction/fetal_movement → [pi, template] | obstetric_history/menstrual_history/marital_status/last_intercourse/npo → [template] | vital_sign → [pi] | past_history/medication_history/operation_history/og_history → [history] 전용 (HPI·상용구에 포함 금지)",
+            "items": {
+              "type": "string",
+              "enum": ["pi", "template", "history", "pe"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "증상 발생 시점 (예: '3일 전', '금일 오전'). 없으면 null."
+    },
+    "character": {
+      "type": ["string", "null"],
+      "description": "증상 양상/성질 (예: '간헐적', '지속적', '점점 심해짐'). 없으면 null."
+    },
+    "severity": {
+      "type": ["string", "null"],
+      "description": "증상 강도 표현 (예: 'NRS 6/10', 'mild', 'severe'). 없으면 null."
+    },
+    "associated_symptoms": {
+      "type": ["array", "null"],
+      "description": "동반 증상 목록 (예: dizziness, dyspnea, abdominal pain, fever 등). 없으면 null.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "edc": {
+      "type": ["string", "null"],
+      "description": "출산예정일(EDC). 없으면 null."
+    },
+    "gestational_age": {
+      "type": ["string", "null"],
+      "description": "내원 시 임신 주수 (예: '32+3주', '28주'). 없으면 null."
+    },
+    "lmp": {
+      "type": ["string", "null"],
+      "description": "최종월경일(Last Menstrual Period). 없으면 null."
+    },
+    "pmp": {
+      "type": ["string", "null"],
+      "description": "직전월경일(Previous Menstrual Period). 없으면 null."
+    },
+    "marital_status": {
+      "type": ["string", "null"],
+      "description": "결혼 상태 (virgin / single / married / divorced / widowed). 없으면 null."
+    },
+    "obstetric_history": {
+      "type": ["string", "null"],
+      "description": "산과력 G-P-A-L 형식 (예: 'G2P1A0L1'). 없으면 null."
+    },
+    "last_delivery": {
+      "type": ["string", "null"],
+      "description": "마지막 분만일(LD). 없으면 null."
+    },
+    "menstrual_interval": {
+      "type": ["string", "null"],
+      "description": "생리 주기 일수 (예: '28'). 없으면 null."
+    },
+    "menstrual_regularity": {
+      "type": ["string", "null"],
+      "description": "생리 규칙성 ('regular' 또는 'irregular'). 없으면 null."
+    },
+    "menstrual_duration": {
+      "type": ["string", "null"],
+      "description": "생리 기간 일수 (예: '5'). 없으면 null."
+    },
+    "menstrual_amount": {
+      "type": ["string", "null"],
+      "description": "생리량 ('scanty', 'moderate', 'profuse'). 없으면 null."
+    },
+    "menarche": {
+      "type": ["string", "null"],
+      "description": "초경 나이 (세, 예: '13'). 없으면 null."
+    },
+    "vaginal_bleeding": {
+      "type": ["boolean", "null"],
+      "description": "질 출혈 유무. true/false/null."
+    },
+    "vaginal_discharge": {
+      "type": ["boolean", "null"],
+      "description": "질 분비물 이상 유무. true/false/null."
+    },
+    "last_intercourse": {
+      "type": ["string", "null"],
+      "description": "마지막 성관계 날짜. 없으면 null."
+    },
+    "contraception": {
+      "type": ["string", "null"],
+      "description": "피임법. 없으면 null."
+    },
+    "rupture_of_membrane": {
+      "type": ["boolean", "null"],
+      "description": "양막 파열(PROM/PPROM) 여부. true/false/null."
+    },
+    "contraction": {
+      "type": ["boolean", "null"],
+      "description": "자궁 수축/진통 유무. true/false/null."
+    },
+    "fetal_movement": {
+      "type": ["boolean", "null"],
+      "description": "태동 유무. true/false/null."
+    },
+    "npo_time": {
+      "type": ["string", "null"],
+      "description": "금식 시작 시각. 없으면 null."
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "og_history": {
+      "type": ["array", "null"],
+      "description": "산부인과 과거력 목록 (예: 이전 임신 관련 시술, 부인과 수술 등). History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "family_history": {
+      "type": ["array", "null"],
+      "description": "가족력 목록. null이면 History 출력 시 해당 항목 생략.",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
