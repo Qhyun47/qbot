@@ -1,0 +1,168 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PdSeizureCase",
+  "description": "소아과 경련(Seizure) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history",
+    "family_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류. 아래 enum 값 중 가장 적합한 것 하나를 선택.",
+            "enum": [
+              "onset",
+              "duration",
+              "seizure_character",
+              "posture_limb",
+              "eyeball_deviation",
+              "postictal_confusion",
+              "autonomic_symptom",
+              "prior_episode",
+              "family_history_seizure",
+              "birth_history",
+              "associated_symptom",
+              "vital_sign",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "family_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. 카드-섹션 매핑 기준: onset/duration/seizure_character/posture_limb/eyeball_deviation/postictal_confusion/autonomic_symptom/prior_episode/family_history_seizure → [pi, template] | birth_history → [pi, template] | associated_symptom/vital_sign → [pi] | past_history/medication_history/operation_history/family_history → [history] 전용",
+            "items": {
+              "type": "string",
+              "enum": ["pi", "template", "history", "pe"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "경련 발생 시점 (예: '금일 오전 10시', '2시간 전'). 없으면 null."
+    },
+    "duration": {
+      "type": ["string", "null"],
+      "description": "경련 지속 시간 (예: '2분', '5분 이상', '자연 소실'). 없으면 null."
+    },
+    "seizure_type": {
+      "type": ["string", "null"],
+      "description": "경련 유형 (예: 'GTC', 'focal', 'tonic', 'clonic', 'atonic', 'myoclonic', 'febrile seizure'). 없으면 null."
+    },
+    "posture_limb": {
+      "type": ["string", "null"],
+      "description": "경련 시 자세 및 사지 움직임 (예: '양측 상하지 강직-간대', '팔 굴곡 다리 신전'). 없으면 null."
+    },
+    "eyeball_deviation": {
+      "type": ["boolean", "null"],
+      "description": "안구 편위 여부. true/false/null."
+    },
+    "postictal_confusion": {
+      "type": ["boolean", "null"],
+      "description": "경련 후 혼돈 여부. true/false/null."
+    },
+    "postictal_paralysis": {
+      "type": ["boolean", "null"],
+      "description": "경련 후 마비증상(Todd's palsy 등) 여부. true/false/null."
+    },
+    "urination": {
+      "type": ["boolean", "null"],
+      "description": "경련 중 요실금 여부. true/false/null."
+    },
+    "defecation": {
+      "type": ["boolean", "null"],
+      "description": "경련 중 변실금 여부. true/false/null."
+    },
+    "salivation": {
+      "type": ["boolean", "null"],
+      "description": "경련 중 침 흘림 여부. true/false/null."
+    },
+    "first_episode": {
+      "type": ["boolean", "null"],
+      "description": "첫 경련 발작 여부. true=첫 경련, false=재발. 없으면 null."
+    },
+    "prior_episode_count": {
+      "type": ["integer", "null"],
+      "description": "과거 경련 발작 횟수. 없으면 null."
+    },
+    "family_hx_seizure": {
+      "type": ["string", "null"],
+      "description": "경련 관련 가족력 (예: '부: 소아 열성경련'). 없으면 null."
+    },
+    "birth_ga_weeks": {
+      "type": ["integer", "null"],
+      "description": "재태주수(주). 없으면 null."
+    },
+    "birth_weight_kg": {
+      "type": ["number", "null"],
+      "description": "출생체중(kg). 없으면 null."
+    },
+    "birth_order": {
+      "type": ["string", "null"],
+      "description": "출생순서 (예: '1st', '2nd'). 없으면 null."
+    },
+    "delivery_method": {
+      "type": ["string", "null"],
+      "description": "분만방법 (예: 'NSVD', 'C-sec'). 없으면 null."
+    },
+    "associated_symptoms": {
+      "type": ["array", "null"],
+      "description": "동반 증상 목록 (예: fever, vomiting, headache, altered consciousness 등). 없으면 null.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록 (예: ['뇌전증', '열성경련', '발달지연']). History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록 (예: ['valproate', 'levetiracetam']). History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "family_history": {
+      "type": ["array", "null"],
+      "description": "일반 가족력 목록. null이면 History 출력 시 해당 항목 전체 생략.",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

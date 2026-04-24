@@ -1,0 +1,190 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PdFeverCase",
+  "description": "소아 발열(Fever) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history",
+    "family_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류.",
+            "enum": [
+              "onset",
+              "duration",
+              "fever_degree",
+              "antipyretic",
+              "antipyretic_last_time",
+              "axillary_bt",
+              "associated_symptom",
+              "activity",
+              "oral_intake",
+              "urination_defecation",
+              "family_uri_hx",
+              "birth_history",
+              "vaccination",
+              "vital_sign",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "family_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 카드-섹션 매핑 기준: onset/duration/fever_degree/antipyretic/antipyretic_last_time/axillary_bt → [pi, template] | associated_symptom/activity/oral_intake/urination_defecation/family_uri_hx/birth_history/vaccination/vital_sign → [pi, template] | past_history/medication_history/operation_history/family_history → [history] 전용",
+            "items": {
+              "type": "string",
+              "enum": ["pi", "template", "history", "pe"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "발열 시작 시점 (예: '2일 전', '금일 오전'). 없으면 null."
+    },
+    "duration": {
+      "type": ["string", "null"],
+      "description": "발열 지속 형태 (예: '지속적', '간헐적'). 없으면 null."
+    },
+    "max_fever": {
+      "type": ["string", "null"],
+      "description": "최고 체온 (예: '39.5℃'). 없으면 null."
+    },
+    "axillary_bt": {
+      "type": ["string", "null"],
+      "description": "내원 시 겨드랑이 체온 (예: '38.5℃'). 없으면 null."
+    },
+    "antipyretic_used": {
+      "type": ["string", "null"],
+      "description": "사용한 해열제 종류 (예: '타이레놀', '부루펜', '타이레놀+부루펜 교대'). 미사용이면 null."
+    },
+    "antipyretic_last_time": {
+      "type": ["string", "null"],
+      "description": "마지막 해열제 투여 시간 (예: '3시간 전', '오전 8시'). 미사용이면 null."
+    },
+    "fever": {
+      "type": ["boolean", "null"],
+      "description": "발열 유무. true/false/null."
+    },
+    "chill": {
+      "type": ["boolean", "null"],
+      "description": "오한 유무. true/false/null."
+    },
+    "cough": {
+      "type": ["boolean", "null"],
+      "description": "기침 유무. true/false/null."
+    },
+    "sputum": {
+      "type": ["boolean", "null"],
+      "description": "가래 유무. true/false/null."
+    },
+    "rhinorrhea": {
+      "type": ["boolean", "null"],
+      "description": "콧물 유무. true/false/null."
+    },
+    "anorexia": {
+      "type": ["boolean", "null"],
+      "description": "식욕부진 유무. true/false/null."
+    },
+    "nausea": {
+      "type": ["boolean", "null"],
+      "description": "구역 유무. true/false/null."
+    },
+    "vomiting": {
+      "type": ["boolean", "null"],
+      "description": "구토 유무. true/false/null."
+    },
+    "diarrhea": {
+      "type": ["boolean", "null"],
+      "description": "설사 유무. true/false/null."
+    },
+    "constipation": {
+      "type": ["boolean", "null"],
+      "description": "변비 유무. true/false/null."
+    },
+    "activity": {
+      "type": ["string", "null"],
+      "description": "활동도 (예: '정상', '저하', '기면'). 없으면 null."
+    },
+    "oral_intake": {
+      "type": ["string", "null"],
+      "description": "수유/식이 섭취 상태 (예: '정상', '감소', '거부'). 없으면 null."
+    },
+    "urination_defecation": {
+      "type": ["string", "null"],
+      "description": "배뇨·배변 상태 (예: '정상', '소변량 감소'). 없으면 null."
+    },
+    "family_uri_hx": {
+      "type": ["string", "null"],
+      "description": "가족 내 URI 이력 (예: '형 감기', '아빠 URI'). 없으면 null."
+    },
+    "birth_history": {
+      "type": ["string", "null"],
+      "description": "출생력 (예: '38wks 3.2kg 1st NSVD'). 없으면 null."
+    },
+    "vaccination": {
+      "type": ["string", "null"],
+      "description": "예방접종 상태 및 최근 접종 이력. 없으면 null."
+    },
+    "associated_symptoms": {
+      "type": ["array", "null"],
+      "description": "기타 동반 증상 목록 (예: seizure, rash, sore throat, ear pain 등). 없으면 null.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "family_history": {
+      "type": ["array", "null"],
+      "description": "가족력 목록. null이면 History 출력 시 해당 항목 전체 생략.",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

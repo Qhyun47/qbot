@@ -59,7 +59,10 @@
       { "key": "im-basic", "rank": 0 },
       { "key": "pd-fever-vomiting", "rank": 1 }
     ],
-    "templateKeys": [{ "key": "im-basic", "rank": 0 }]
+    "templateKeys": [
+      { "key": "im-basic", "rank": 0 },
+      { "key": "pd-fever", "rank": 1 }
+    ]
   },
   {
     "cc": "General weakness",

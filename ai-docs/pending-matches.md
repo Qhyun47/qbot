@@ -60,5 +60,8 @@ C.C.가 등록될 때 이 섹션을 확인합니다.
 상용구 등록 시 연결하려 했으나 해당 C.C.가 아직 존재하지 않는 항목입니다.
 C.C.가 등록될 때 이 섹션을 확인합니다.
 
-| templateKey | displayName | 대기 중인 C.C. | 등록일 |
-| ----------- | ----------- | -------------- | ------ |
+| templateKey | displayName | 대기 중인 C.C.       | rank | 등록일     |
+| ----------- | ----------- | -------------------- | ---- | ---------- |
+| pd-seizure  | PD seizure  | Involuntary movement | 1    | 2026-04-24 |
+| pd-seizure  | PD seizure  | Convulsive movement  | 1    | 2026-04-24 |
+| pd-seizure  | PD seizure  | Seizure              | 1    | 2026-04-24 |

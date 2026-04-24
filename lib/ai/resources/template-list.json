@@ -36,6 +36,16 @@
     "category": "0. IM"
   },
   {
+    "templateKey": "pd-fever",
+    "displayName": "PD fever",
+    "category": "3. PD"
+  },
+  {
+    "templateKey": "pd-seizure",
+    "displayName": "PD seizure",
+    "category": "3. PD"
+  },
+  {
     "templateKey": "og-basic",
     "displayName": "OG 기본",
     "category": "4. OG"

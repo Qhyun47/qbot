@@ -1,0 +1,234 @@
+{
+  "templateKey": "pd-seizure",
+  "cc": "Seizure",
+  "description": "소아과 경련(Seizure) 환자 EMR 상용구 템플릿",
+  "hpi_hints": "경련 발생 시점, 지속시간, 양상(자세/사지/안구)을 포함. 첫 경련 여부, 경련 관련 가족력, 출생력 확인.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 default 값 또는 빈 문자열을 유지하라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "fields": [
+    {
+      "key": "onset",
+      "label": "Onset",
+      "type": "open",
+      "description": "경련 발생 시점 (예: '금일 오전', '2시간 전'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "duration",
+      "label": "Duration",
+      "type": "open",
+      "description": "경련 지속 시간 (예: '2분', '5분 이상'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "experience",
+      "label": "Experience",
+      "type": "open",
+      "default": "1st",
+      "description": "경련 과거력. 첫 경련이면 '1st', 재발이면 횟수 또는 기재 (예: '2nd', '3회째'). 정보 없으면 '1st' 유지."
+    },
+    {
+      "key": "family_hx_seizure",
+      "label": "Family. Hx",
+      "type": "open",
+      "description": "경련 관련 가족력 (예: '부: 소아 열성경련 과거력'). 있으면 기재, 없으면 빈 문자열."
+    },
+    {
+      "key": "character",
+      "label": "Character",
+      "type": "open",
+      "description": "경련 양상 (예: 'GTC', 'focal', 'tonic', 'clonic', 'atonic', 'myoclonic'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "posture_limb",
+      "label": "자세, 팔/다리",
+      "type": "open",
+      "description": "경련 시 자세 및 팔다리 움직임 서술 (예: '양측 상하지 강직-간대', '팔 굴곡 다리 신전'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "eyeball_deviation",
+      "label": "Eyeball Deviation",
+      "type": "symptom_check",
+      "format": "Eyeball Deviation : ({eyeball})",
+      "slots": [
+        {
+          "key": "eyeball",
+          "symptom": "Eyeball deviation",
+          "description": "안구 편위 여부",
+          "default": "-"
+        }
+      ],
+      "description": "안구 편위 여부. 명시적 언급 있을 때만 '+', 없으면 '-' 유지."
+    },
+    {
+      "key": "postictal_confusion",
+      "label": "Postictal Confusion",
+      "type": "open",
+      "default": "마비증상(-)",
+      "description": "경련 후 혼돈 및 마비증상 여부. 마비증상이 있으면 '마비증상(+)'. 정보 없으면 기본값 '마비증상(-)' 유지."
+    },
+    {
+      "key": "urination_defecation_salivation",
+      "label": "Urination/Defecation/Salivation",
+      "type": "symptom_check",
+      "format": "Urination /Defecation /Salivation ({urination}/{defecation}/{salivation})",
+      "slots": [
+        {
+          "key": "urination",
+          "symptom": "Urination",
+          "description": "경련 중 요실금",
+          "default": "-"
+        },
+        {
+          "key": "defecation",
+          "symptom": "Defecation",
+          "description": "경련 중 변실금",
+          "default": "-"
+        },
+        {
+          "key": "salivation",
+          "symptom": "Salivation",
+          "description": "경련 중 침 흘림",
+          "default": "-"
+        }
+      ],
+      "description": "자율신경계 증상(요실금/변실금/침 흘림). 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "fever_chill",
+      "label": "F/C",
+      "type": "symptom_check",
+      "format": "F/C({fever}/{chill})",
+      "slots": [
+        {
+          "key": "fever",
+          "symptom": "Fever",
+          "description": "발열",
+          "default": "-"
+        },
+        {
+          "key": "chill",
+          "symptom": "Chill",
+          "description": "오한",
+          "default": "-"
+        }
+      ],
+      "description": "발열/오한 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "cough_sputum_rhinorrhea",
+      "label": "C/S/R",
+      "type": "symptom_check",
+      "format": "C/S/R({cough}/{sputum}/{rhinorrhea})",
+      "slots": [
+        {
+          "key": "cough",
+          "symptom": "Cough",
+          "description": "기침",
+          "default": "-"
+        },
+        {
+          "key": "sputum",
+          "symptom": "Sputum",
+          "description": "가래",
+          "default": "-"
+        },
+        {
+          "key": "rhinorrhea",
+          "symptom": "Rhinorrhea",
+          "description": "콧물",
+          "default": "-"
+        }
+      ],
+      "description": "기침/가래/콧물 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "anvdc",
+      "label": "A/N/V/D/C",
+      "type": "symptom_check",
+      "format": "A/N/V/D/C({anorexia}/{nausea}/{vomiting}/{diarrhea}/{constipation})",
+      "slots": [
+        {
+          "key": "anorexia",
+          "symptom": "Anorexia",
+          "description": "식욕부진",
+          "default": "-"
+        },
+        {
+          "key": "nausea",
+          "symptom": "Nausea",
+          "description": "구역",
+          "default": "-"
+        },
+        {
+          "key": "vomiting",
+          "symptom": "Vomiting",
+          "description": "구토",
+          "default": "-"
+        },
+        {
+          "key": "diarrhea",
+          "symptom": "Diarrhea",
+          "description": "설사",
+          "default": "-"
+        },
+        {
+          "key": "constipation",
+          "symptom": "Constipation",
+          "description": "변비",
+          "default": "-"
+        }
+      ],
+      "description": "식욕부진/구역/구토/설사/변비 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "birth_history",
+      "label": "Birth History",
+      "type": "open",
+      "description": "출생력. 재태주수(주), 출생체중(kg), 출생순서(1st/2nd 등), 분만방법(NSVD/C-sec) 순으로 기재. 정보 없으면 빈 문자열."
+    }
+  ],
+  "output_example": "Onset : \nDuration : \nExperience : 1st\nFamily. Hx : \n\nCharacter : \n자세, 팔/다리 : \n\nEyeball Deviation : (-)\nPostictal Confusion : 마비증상(-)\nUrination /Defecation /Salivation (-/-/-)\n\nF/C (-/-)  C/S/R (-/-/-)  A/N/V/D/C (-/-/-/-/-)\n\n\nBirth History :  주  kg 1st 2nd NSVD C-sec",
+  "pe": {
+    "fields": [
+      {
+        "key": "lung_throat",
+        "label": "Lung/Throat",
+        "default": "Lung sound : clear  / Throat inj. (-)"
+      },
+      {
+        "key": "bowel",
+        "label": "Bowel sound",
+        "default": "N-S"
+      },
+      {
+        "key": "abdomen",
+        "label": "Abdomen",
+        "default": "Abd. soft & flat / Tr(-) rTr(-) /CVA Tr(-)"
+      },
+      {
+        "key": "lymph_node",
+        "label": "Palpable LN",
+        "default": "귀,턱 -"
+      }
+    ],
+    "output_example": "Lung sound : clear  / Throat inj. (-)\nBowel sound : N-S\nAbd. soft & flat / Tr(-) rTr(-) /CVA Tr(-)\nPalpable LN (귀,턱 -)"
+  },
+  "history": {
+    "fields": [
+      {
+        "key": "past",
+        "label": "PHx",
+        "default": ""
+      },
+      {
+        "key": "medication",
+        "label": "Med Hx",
+        "default": ""
+      },
+      {
+        "key": "operation",
+        "label": "OP Hx.",
+        "default": ""
+      }
+    ],
+    "output_example": "PHx: \nMed Hx:\nOP Hx.:"
+  }
+}
