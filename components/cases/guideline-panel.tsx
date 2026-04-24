@@ -271,279 +271,289 @@ export function GuidelinePanel({
   const showPdf =
     activeView === "guide" && !showSelector && guidePdfUrl && !isGuideLoading;
 
+  const tabBar = (
+    <div className="flex border-b bg-muted/20">
+      <TabButton
+        icon={<BookOpen className="size-3 shrink-0" />}
+        label="가이드라인"
+        subLabel={activeGuideKey ? getGuideLabel(activeGuideKey) : undefined}
+        active={activeView === "guide"}
+        disabled={!cc}
+        onClick={handleGuideTabClick}
+      />
+      <div className="w-px shrink-0 self-stretch bg-border" />
+      <TabButton
+        icon={<FileText className="size-3 shrink-0" />}
+        label="상용구"
+        subLabel={templateLabel}
+        active={activeView === "template"}
+        disabled={!cc}
+        onClick={handleTemplateTabClick}
+      />
+    </div>
+  );
+
   return (
     <div className="flex h-full flex-col overflow-hidden bg-muted/30">
-      {/* 가로 탭 바 */}
-      <div className="flex shrink-0 border-b bg-muted/20">
-        <TabButton
-          icon={<BookOpen className="size-3 shrink-0" />}
-          label="가이드라인"
-          subLabel={activeGuideKey ? getGuideLabel(activeGuideKey) : undefined}
-          active={activeView === "guide"}
-          disabled={!cc}
-          onClick={handleGuideTabClick}
-        />
-        <div className="w-px shrink-0 self-stretch bg-border" />
-        <TabButton
-          icon={<FileText className="size-3 shrink-0" />}
-          label="상용구"
-          subLabel={templateLabel}
-          active={activeView === "template"}
-          disabled={!cc}
-          onClick={handleTemplateTabClick}
-        />
-      </div>
-
       {/* 콘텐츠 영역 */}
       {showPdf ? (
-        <div className="flex-1 overflow-hidden">
-          <PdfViewer url={guidePdfUrl!} />
-        </div>
+        <>
+          {/* PDF 모드: 탭 고정 (PDF 자체 스크롤) */}
+          <div className="shrink-0">{tabBar}</div>
+          <div className="flex-1 overflow-hidden">
+            <PdfViewer url={guidePdfUrl!} />
+          </div>
+        </>
       ) : (
-        <div className="flex-1 overflow-y-auto overscroll-y-contain p-4">
-          {showSelector ? (
-            /* 선택 목록 */
-            activeView === "guide" ? (
-              <div className="flex flex-col gap-1">
-                {suggestedGuideKeys.length > 0 && (
-                  <>
-                    <p className="mb-1 text-xs font-semibold text-muted-foreground">
-                      추천 가이드라인
-                    </p>
-                    {suggestedGuideKeys.map((key) => (
-                      <button
-                        key={key}
-                        type="button"
-                        disabled={loadingKey === key}
-                        onClick={() => handleGuidelineSelect(key)}
-                        className={cn(
-                          "rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
-                          "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
-                          "disabled:cursor-not-allowed disabled:opacity-50",
-                          activeGuideKey === key &&
-                            "border-primary bg-primary/5"
-                        )}
-                      >
-                        {loadingKey === key
-                          ? "불러오는 중..."
-                          : getGuideLabel(key)}
-                      </button>
-                    ))}
-                  </>
-                )}
-                {otherGuides.length > 0 && (
-                  <>
-                    <p
-                      className={cn(
-                        "text-xs font-semibold text-muted-foreground",
-                        suggestedGuideKeys.length > 0 && "mt-2"
-                      )}
-                    >
-                      전체 목록
-                    </p>
-                    {otherGuides.map((g) => (
-                      <button
-                        key={g.guideKey}
-                        type="button"
-                        disabled={loadingKey === g.guideKey}
-                        onClick={() => handleGuidelineSelect(g.guideKey)}
-                        className={cn(
-                          "rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
-                          "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
-                          "disabled:cursor-not-allowed disabled:opacity-50",
-                          activeGuideKey === g.guideKey &&
-                            "border-primary bg-primary/5"
-                        )}
-                      >
-                        {loadingKey === g.guideKey
-                          ? "불러오는 중..."
-                          : g.displayName}
-                      </button>
-                    ))}
-                  </>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setShowSelector(false)}
-                  className="mt-1 text-xs text-muted-foreground underline-offset-2 hover:underline"
-                >
-                  취소
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-1">
-                <button
-                  type="button"
-                  onClick={() => handleTemplateSelect(null)}
-                  className={cn(
-                    "rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
-                    "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
-                    templateKey === null && "border-primary bg-primary/5"
-                  )}
-                >
-                  없음
-                </button>
-                {suggestedTemplateKeys.length > 0 && (
-                  <>
-                    <p className="mt-2 text-xs font-semibold text-muted-foreground">
-                      추천 상용구
-                    </p>
-                    {suggestedTemplateKeys.map((key) => {
-                      const label = getTemplateLabel(key) ?? key;
-                      return (
+        <div className="flex-1 overflow-y-auto overscroll-y-contain">
+          {/* 탭 바: 스크롤과 함께 이동 */}
+          {tabBar}
+          <div className="p-4">
+            {showSelector ? (
+              /* 선택 목록 */
+              activeView === "guide" ? (
+                <div className="flex flex-col gap-1">
+                  {suggestedGuideKeys.length > 0 && (
+                    <>
+                      <p className="mb-1 text-xs font-semibold text-muted-foreground">
+                        추천 가이드라인
+                      </p>
+                      {suggestedGuideKeys.map((key) => (
                         <button
                           key={key}
                           type="button"
-                          onClick={() => handleTemplateSelect(key)}
+                          disabled={loadingKey === key}
+                          onClick={() => handleGuidelineSelect(key)}
                           className={cn(
                             "rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
                             "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
-                            templateKey === key && "border-primary bg-primary/5"
+                            "disabled:cursor-not-allowed disabled:opacity-50",
+                            activeGuideKey === key &&
+                              "border-primary bg-primary/5"
                           )}
                         >
-                          {label}
+                          {loadingKey === key
+                            ? "불러오는 중..."
+                            : getGuideLabel(key)}
                         </button>
-                      );
-                    })}
-                  </>
-                )}
-                {otherTemplates.length > 0 && (
-                  <>
-                    <p className="mt-2 text-xs font-semibold text-muted-foreground">
-                      전체 목록
-                    </p>
-                    {(() => {
-                      const grouped = allCategories
-                        .map((cat) => ({
-                          label: getCategoryLabel(cat),
-                          items: otherTemplates.filter(
-                            (t) => t.category === cat
-                          ),
-                        }))
-                        .filter((g) => g.items.length > 0);
-                      const uncategorized = otherTemplates.filter(
-                        (t) => !t.category
-                      );
-                      return (
-                        <>
-                          {grouped.map((group) => (
-                            <div key={group.label}>
-                              <p className="mt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
-                                {group.label}
-                              </p>
-                              {group.items.map((t) => (
-                                <button
-                                  key={t.templateKey}
-                                  type="button"
-                                  onClick={() =>
-                                    handleTemplateSelect(t.templateKey)
-                                  }
-                                  className={cn(
-                                    "w-full rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
-                                    "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
-                                    templateKey === t.templateKey &&
-                                      "border-primary bg-primary/5"
-                                  )}
-                                >
-                                  {t.displayName}
-                                </button>
-                              ))}
-                            </div>
-                          ))}
-                          {uncategorized.map((t) => (
-                            <button
-                              key={t.templateKey}
-                              type="button"
-                              onClick={() =>
-                                handleTemplateSelect(t.templateKey)
-                              }
-                              className={cn(
-                                "w-full rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
-                                "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
-                                templateKey === t.templateKey &&
-                                  "border-primary bg-primary/5"
-                              )}
-                            >
-                              {t.displayName}
-                            </button>
-                          ))}
-                        </>
-                      );
-                    })()}
-                  </>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setShowSelector(false)}
-                  className="mt-1 text-xs text-muted-foreground underline-offset-2 hover:underline"
-                >
-                  취소
-                </button>
-              </div>
-            )
-          ) : activeView === "guide" ? (
-            /* 가이드라인 뷰 */
+                      ))}
+                    </>
+                  )}
+                  {otherGuides.length > 0 && (
+                    <>
+                      <p
+                        className={cn(
+                          "text-xs font-semibold text-muted-foreground",
+                          suggestedGuideKeys.length > 0 && "mt-2"
+                        )}
+                      >
+                        전체 목록
+                      </p>
+                      {otherGuides.map((g) => (
+                        <button
+                          key={g.guideKey}
+                          type="button"
+                          disabled={loadingKey === g.guideKey}
+                          onClick={() => handleGuidelineSelect(g.guideKey)}
+                          className={cn(
+                            "rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
+                            "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
+                            "disabled:cursor-not-allowed disabled:opacity-50",
+                            activeGuideKey === g.guideKey &&
+                              "border-primary bg-primary/5"
+                          )}
+                        >
+                          {loadingKey === g.guideKey
+                            ? "불러오는 중..."
+                            : g.displayName}
+                        </button>
+                      ))}
+                    </>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setShowSelector(false)}
+                    className="mt-1 text-xs text-muted-foreground underline-offset-2 hover:underline"
+                  >
+                    취소
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-1">
+                  <button
+                    type="button"
+                    onClick={() => handleTemplateSelect(null)}
+                    className={cn(
+                      "rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
+                      "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
+                      templateKey === null && "border-primary bg-primary/5"
+                    )}
+                  >
+                    없음
+                  </button>
+                  {suggestedTemplateKeys.length > 0 && (
+                    <>
+                      <p className="mt-2 text-xs font-semibold text-muted-foreground">
+                        추천 상용구
+                      </p>
+                      {suggestedTemplateKeys.map((key) => {
+                        const label = getTemplateLabel(key) ?? key;
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            onClick={() => handleTemplateSelect(key)}
+                            className={cn(
+                              "rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
+                              "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
+                              templateKey === key &&
+                                "border-primary bg-primary/5"
+                            )}
+                          >
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </>
+                  )}
+                  {otherTemplates.length > 0 && (
+                    <>
+                      <p className="mt-2 text-xs font-semibold text-muted-foreground">
+                        전체 목록
+                      </p>
+                      {(() => {
+                        const grouped = allCategories
+                          .map((cat) => ({
+                            label: getCategoryLabel(cat),
+                            items: otherTemplates.filter(
+                              (t) => t.category === cat
+                            ),
+                          }))
+                          .filter((g) => g.items.length > 0);
+                        const uncategorized = otherTemplates.filter(
+                          (t) => !t.category
+                        );
+                        return (
+                          <>
+                            {grouped.map((group) => (
+                              <div key={group.label}>
+                                <p className="mt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+                                  {group.label}
+                                </p>
+                                {group.items.map((t) => (
+                                  <button
+                                    key={t.templateKey}
+                                    type="button"
+                                    onClick={() =>
+                                      handleTemplateSelect(t.templateKey)
+                                    }
+                                    className={cn(
+                                      "w-full rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
+                                      "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
+                                      templateKey === t.templateKey &&
+                                        "border-primary bg-primary/5"
+                                    )}
+                                  >
+                                    {t.displayName}
+                                  </button>
+                                ))}
+                              </div>
+                            ))}
+                            {uncategorized.map((t) => (
+                              <button
+                                key={t.templateKey}
+                                type="button"
+                                onClick={() =>
+                                  handleTemplateSelect(t.templateKey)
+                                }
+                                className={cn(
+                                  "w-full rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
+                                  "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
+                                  templateKey === t.templateKey &&
+                                    "border-primary bg-primary/5"
+                                )}
+                              >
+                                {t.displayName}
+                              </button>
+                            ))}
+                          </>
+                        );
+                      })()}
+                    </>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setShowSelector(false)}
+                    className="mt-1 text-xs text-muted-foreground underline-offset-2 hover:underline"
+                  >
+                    취소
+                  </button>
+                </div>
+              )
+            ) : activeView === "guide" ? (
+              /* 가이드라인 뷰 */
+              !cc ? (
+                <p className="text-sm text-muted-foreground">
+                  C.C.를 입력하면 해당 증상에 맞는 문진 가이드라인이 표시됩니다.
+                </p>
+              ) : isGuideLoading ? (
+                <p className="text-sm text-muted-foreground">
+                  가이드라인 불러오는 중...
+                </p>
+              ) : guideContent ? (
+                guideContent.trimStart().startsWith("<") ? (
+                  <HtmlPreview
+                    content={guideContent}
+                    zoom={
+                      guidelineFontSize !== undefined
+                        ? guidelineFontSize / 12.5
+                        : undefined
+                    }
+                  />
+                ) : (
+                  <MarkdownPreview content={guideContent} />
+                )
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  해당 C.C.에 대한 가이드라인이 없습니다. 위 탭을 클릭해 직접
+                  선택하세요.
+                </p>
+              )
+            ) : /* 상용구 뷰 */
             !cc ? (
               <p className="text-sm text-muted-foreground">
-                C.C.를 입력하면 해당 증상에 맞는 문진 가이드라인이 표시됩니다.
+                C.C.를 입력하면 상용구를 선택할 수 있습니다.
               </p>
-            ) : isGuideLoading ? (
+            ) : isTemplateLoading ? (
               <p className="text-sm text-muted-foreground">
-                가이드라인 불러오는 중...
+                상용구 불러오는 중...
               </p>
-            ) : guideContent ? (
-              guideContent.trimStart().startsWith("<") ? (
-                <HtmlPreview
-                  content={guideContent}
-                  zoom={
-                    guidelineFontSize !== undefined
-                      ? guidelineFontSize / 12.5
-                      : undefined
-                  }
+            ) : templateContent ? (
+              <div className="space-y-4">
+                <TemplateSectionBlock
+                  title="P.I. 상용구"
+                  content={templateContent.mainExample}
+                  fontSize={guidelineFontSize}
                 />
-              ) : (
-                <MarkdownPreview content={guideContent} />
-              )
+                <TemplateSectionBlock
+                  title="History"
+                  content={templateContent.historyExample}
+                  fontSize={guidelineFontSize}
+                />
+                <TemplateSectionBlock
+                  title="P/E"
+                  content={templateContent.peExample}
+                  fontSize={guidelineFontSize}
+                />
+              </div>
             ) : (
               <p className="text-sm text-muted-foreground">
-                해당 C.C.에 대한 가이드라인이 없습니다. 위 탭을 클릭해 직접
-                선택하세요.
+                {templateKey
+                  ? "상용구 내용을 불러올 수 없습니다."
+                  : "위 탭을 클릭해 상용구를 선택하세요."}
               </p>
-            )
-          ) : /* 상용구 뷰 */
-          !cc ? (
-            <p className="text-sm text-muted-foreground">
-              C.C.를 입력하면 상용구를 선택할 수 있습니다.
-            </p>
-          ) : isTemplateLoading ? (
-            <p className="text-sm text-muted-foreground">
-              상용구 불러오는 중...
-            </p>
-          ) : templateContent ? (
-            <div className="space-y-4">
-              <TemplateSectionBlock
-                title="P.I. 상용구"
-                content={templateContent.mainExample}
-                fontSize={guidelineFontSize}
-              />
-              <TemplateSectionBlock
-                title="History"
-                content={templateContent.historyExample}
-                fontSize={guidelineFontSize}
-              />
-              <TemplateSectionBlock
-                title="P/E"
-                content={templateContent.peExample}
-                fontSize={guidelineFontSize}
-              />
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              {templateKey
-                ? "상용구 내용을 불러올 수 없습니다."
-                : "위 탭을 클릭해 상용구를 선택하세요."}
-            </p>
-          )}
+            )}
+          </div>
         </div>
       )}
     </div>
