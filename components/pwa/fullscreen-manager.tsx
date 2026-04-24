@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { isStandalone } from "@/lib/pwa/is-standalone";
 
 function isIosDevice(): boolean {
@@ -12,8 +12,6 @@ interface FullscreenManagerProps {
 }
 
 export function FullscreenManager({ fullscreenMode }: FullscreenManagerProps) {
-  const activatedRef = useRef(false);
-
   useEffect(() => {
     if (!fullscreenMode || !isStandalone()) return;
 
@@ -30,25 +28,45 @@ export function FullscreenManager({ fullscreenMode }: FullscreenManagerProps) {
       };
     }
 
-    // Android: 첫 터치 시 requestFullscreen 호출 (보안 정책상 gesture 필요)
+    // Android: Fullscreen API
     if (!document.fullscreenEnabled) return;
 
-    async function enterFullscreen() {
-      if (activatedRef.current) return;
-      activatedRef.current = true;
+    let pendingRequest = false;
+
+    async function tryEnterFullscreen() {
+      if (document.fullscreenElement || pendingRequest) return;
+      pendingRequest = true;
       try {
         await document.documentElement.requestFullscreen();
       } catch {
-        // 실패 시 조용히 무시 (일부 브라우저 제한)
+        // 실패 시 무시 (gesture 컨텍스트 없을 때)
+      } finally {
+        pendingRequest = false;
       }
     }
 
-    document.addEventListener("click", enterFullscreen, { once: true });
-    document.addEventListener("touchstart", enterFullscreen, { once: true });
+    // 뒤로가기 등으로 fullscreen이 종료되면 즉시 재진입 시도
+    function handleFullscreenChange() {
+      if (!document.fullscreenElement) {
+        tryEnterFullscreen();
+      }
+    }
+
+    // fullscreenchange 내 재진입이 브라우저에서 막힐 경우 다음 제스처에서 재진입
+    function handleInteraction() {
+      if (!document.fullscreenElement) {
+        tryEnterFullscreen();
+      }
+    }
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("click", handleInteraction);
+    document.addEventListener("touchstart", handleInteraction);
 
     return () => {
-      document.removeEventListener("click", enterFullscreen);
-      document.removeEventListener("touchstart", enterFullscreen);
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener("click", handleInteraction);
+      document.removeEventListener("touchstart", handleInteraction);
       if (document.fullscreenElement) {
         document.exitFullscreen().catch(() => {});
       }

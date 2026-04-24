@@ -32,6 +32,16 @@ export function FullscreenSection({
 
   async function handleToggle(value: boolean) {
     setEnabled(value);
+
+    // requestFullscreen은 user gesture 직후 동기적으로 시작해야 함 (await 이전)
+    if (!isIos && document.fullscreenEnabled) {
+      if (value && !document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else if (!value && document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
     try {
       await updateFullscreenMode(value);
     } catch {
