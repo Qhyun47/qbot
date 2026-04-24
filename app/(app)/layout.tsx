@@ -10,6 +10,7 @@ import { FontSizeInit } from "@/components/font-size-init";
 import { ConditionalHeader } from "@/components/layout/conditional-header";
 import { getIsAdmin } from "@/lib/auth/is-admin";
 import { getLayoutSettings } from "@/lib/settings/actions";
+import { FullscreenManager } from "@/components/pwa/fullscreen-manager";
 
 /**
  * 관리자 여부를 확인하고 NavLinks에 isAdmin을 주입하는 Server Component.
@@ -34,11 +35,19 @@ async function FontSizeInitWithData() {
   return <FontSizeInit fontSize={mobileFontSize} />;
 }
 
+async function FullscreenManagerWithData() {
+  const { fullscreenMode } = await getLayoutSettings();
+  return <FullscreenManager fullscreenMode={fullscreenMode} />;
+}
+
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
       <Suspense fallback={null}>
         <FontSizeInitWithData />
+      </Suspense>
+      <Suspense fallback={null}>
+        <FullscreenManagerWithData />
       </Suspense>
       <Suspense fallback={null}>
         <ConditionalHeader>

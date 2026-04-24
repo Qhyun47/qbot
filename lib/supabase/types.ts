@@ -240,6 +240,7 @@ export type Database = {
           fold_fallback_layout: "single" | "split_vertical";
           fold_guideline_font_size: number;
           full_name: string | null;
+          fullscreen_mode: boolean;
           guideline_font_size: number;
           id: string;
           input_layout: Database["public"]["Enums"]["input_layout"];
@@ -262,6 +263,7 @@ export type Database = {
           fold_fallback_layout?: "single" | "split_vertical";
           fold_guideline_font_size?: number;
           full_name?: string | null;
+          fullscreen_mode?: boolean;
           guideline_font_size?: number;
           id: string;
           input_layout?: Database["public"]["Enums"]["input_layout"];
@@ -283,6 +285,7 @@ export type Database = {
           fold_fallback_layout?: "single" | "split_vertical";
           fold_guideline_font_size?: number;
           full_name?: string | null;
+          fullscreen_mode?: boolean;
           guideline_font_size?: number;
           id?: string;
           input_layout?: Database["public"]["Enums"]["input_layout"];

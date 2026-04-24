@@ -6,6 +6,7 @@ import { AiAccessRequestForm } from "@/components/ai-access/ai-access-request-fo
 import { createClient } from "@/lib/supabase/server";
 import { Separator } from "@/components/ui/separator";
 import { InstallSection } from "@/components/settings/install-section";
+import { FullscreenSection } from "@/components/settings/fullscreen-section";
 
 async function SettingsContent() {
   const {
@@ -32,6 +33,11 @@ async function SettingsContent() {
       defaultFoldGuidelineFontSize={foldGuidelineFontSize}
     />
   );
+}
+
+async function FullscreenSectionWrapper() {
+  const { fullscreenMode } = await getLayoutSettings();
+  return <FullscreenSection defaultFullscreenMode={fullscreenMode} />;
 }
 
 async function AiAccessSection() {
@@ -104,6 +110,10 @@ export default function SettingsPage() {
         </Suspense>
         <Separator />
         <InstallSection />
+        <Separator />
+        <Suspense fallback={null}>
+          <FullscreenSectionWrapper />
+        </Suspense>
         <Separator />
         <p className="text-center text-xs text-muted-foreground">
           버전{" "}
