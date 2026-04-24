@@ -246,7 +246,7 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
       let exampleCount = 0;
       if (examplesExists) {
         examplesContent = await fs.readFile(examplesPath, "utf-8");
-        exampleCount = (examplesContent.match(/^# Case /gm) ?? []).length;
+        exampleCount = (examplesContent.match(/^### \d+\./gm) ?? []).length;
       }
       if (!exists) {
         return {
