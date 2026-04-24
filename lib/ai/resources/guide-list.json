@@ -6,5 +6,6 @@
   { "guideKey": "abdominal-pain", "displayName": "IM/GS - Abd pain" },
   { "guideKey": "gi-bleeding", "displayName": "IM - GI bleeding" },
   { "guideKey": "ckd-hd-pd", "displayName": "IM - CKD, HD/PD" },
-  { "guideKey": "og", "displayName": "OG" }
+  { "guideKey": "og", "displayName": "OG" },
+  { "guideKey": "pd-fever-vomiting", "displayName": "PD - Fever ≒ Vomiting" }
 ]

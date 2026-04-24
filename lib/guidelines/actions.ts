@@ -10,14 +10,8 @@ import type { Guideline } from "@/lib/supabase/types";
 import ccListRaw from "@/lib/ai/resources/cc-list.json";
 import guideListRaw from "@/lib/ai/resources/guide-list.json";
 import templateListRaw from "@/lib/ai/resources/template-list.json";
-
-interface CcListEntry {
-  cc: string;
-  guideKeys: string[];
-  templateKeys: string[];
-  aliasOf?: string;
-  patternOf?: string;
-}
+import type { CcListEntry } from "@/lib/ai/resources/cc-types";
+import { resolveEntries } from "@/lib/ai/resources/cc-types";
 
 interface GuideListEntry {
   guideKey: string;
@@ -43,7 +37,11 @@ export type GuidelineData = {
 };
 
 export type GuidelineResult =
-  | ({ mode: "auto"; guideKey: string } & GuidelineData)
+  | ({
+      mode: "auto";
+      guideKey: string;
+      additionalSuggestions: { guideKey: string; displayName: string }[];
+    } & GuidelineData)
   | {
       mode: "recommendations";
       suggestions: { guideKey: string; displayName: string }[];
@@ -265,30 +263,46 @@ export async function loadGuideline(cc: string): Promise<GuidelineResult> {
   const item = findCcEntry(list, cc);
   if (!item) return { mode: "none" };
 
-  let guideKeys = item.guideKeys;
-  if (item.aliasOf) {
-    const parent = list.find((i) => i.cc === item.aliasOf);
-    guideKeys = parent?.guideKeys ?? [];
-  } else if (item.patternOf) {
-    const parent = list.find((i) => i.cc === item.patternOf);
-    guideKeys = parent?.guideKeys ?? [];
-  } else if (item.cc.includes("**")) {
-    // 패턴 항목 자체가 직접 조회된 경우 (폴백 매칭)
-    guideKeys = item.guideKeys;
+  const entries = resolveEntries(item, "guideKeys", list);
+  if (entries.length === 0) return { mode: "none" };
+
+  const rank0 = entries.find((e) => e.rank === 0);
+
+  if (rank0) {
+    const data = await loadGuideByKey(rank0.key);
+    if (!data.content && !data.pdfSignedUrl) {
+      // rank-0 콘텐츠 없으면 나머지 항목으로 추천 목록 폴백
+      const rest = entries
+        .filter((e) => e.rank !== 0)
+        .map((e) => ({
+          guideKey: e.key,
+          displayName:
+            guideList.find((g) => g.guideKey === e.key)?.displayName ?? e.key,
+        }));
+      if (rest.length === 0) return { mode: "none" };
+      return { mode: "recommendations", suggestions: rest };
+    }
+    const additionalSuggestions = entries
+      .filter((e) => e.rank !== 0)
+      .map((e) => ({
+        guideKey: e.key,
+        displayName:
+          guideList.find((g) => g.guideKey === e.key)?.displayName ?? e.key,
+      }));
+    return {
+      mode: "auto",
+      guideKey: rank0.key,
+      additionalSuggestions,
+      ...data,
+    };
   }
 
-  if (guideKeys.length === 0) return { mode: "none" };
-
-  if (guideKeys.length === 1) {
-    const data = await loadGuideByKey(guideKeys[0]);
-    if (!data.content && !data.pdfSignedUrl) return { mode: "none" };
-    return { mode: "auto", guideKey: guideKeys[0], ...data };
-  }
-
-  const suggestions = guideKeys.map((key) => {
-    const entry = guideList.find((g) => g.guideKey === key);
-    return { guideKey: key, displayName: entry?.displayName ?? key };
-  });
+  // rank-0 없음 → 전체 목록 추천
+  const suggestions = entries.map((e) => ({
+    guideKey: e.key,
+    displayName:
+      guideList.find((g) => g.guideKey === e.key)?.displayName ?? e.key,
+  }));
   return { mode: "recommendations", suggestions };
 }
 

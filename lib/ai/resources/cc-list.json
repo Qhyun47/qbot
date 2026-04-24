@@ -1,28 +1,28 @@
 [
   {
     "cc": "Chest pain",
-    "guideKeys": ["chest-pain"],
-    "templateKeys": ["chest-pain"]
+    "guideKeys": [{ "key": "chest-pain", "rank": 0 }],
+    "templateKeys": [{ "key": "chest-pain", "rank": 0 }]
   },
   {
     "cc": "Dyspnea",
-    "guideKeys": ["dyspnea"],
-    "templateKeys": ["dyspnea"]
+    "guideKeys": [{ "key": "dyspnea", "rank": 0 }],
+    "templateKeys": [{ "key": "dyspnea", "rank": 0 }]
   },
   {
     "cc": "Hemoptysis",
-    "guideKeys": ["hemoptysis"],
-    "templateKeys": ["hemoptysis"]
+    "guideKeys": [{ "key": "hemoptysis", "rank": 0 }],
+    "templateKeys": [{ "key": "hemoptysis", "rank": 0 }]
   },
   {
     "cc": "Abdominal pain",
-    "guideKeys": ["abdominal-pain"],
-    "templateKeys": ["abdominal-pain"]
+    "guideKeys": [{ "key": "abdominal-pain", "rank": 0 }],
+    "templateKeys": [{ "key": "abdominal-pain", "rank": 0 }]
   },
   {
     "cc": "GI bleeding",
-    "guideKeys": ["gi-bleeding"],
-    "templateKeys": ["gi-bleeding"]
+    "guideKeys": [{ "key": "gi-bleeding", "rank": 0 }],
+    "templateKeys": [{ "key": "gi-bleeding", "rank": 0 }]
   },
   {
     "cc": "Hematemesis",
@@ -44,43 +44,49 @@
   },
   {
     "cc": "Abnormal lab",
-    "guideKeys": ["im-basic"],
-    "templateKeys": ["im-basic"]
+    "guideKeys": [{ "key": "im-basic", "rank": 0 }],
+    "templateKeys": [{ "key": "im-basic", "rank": 0 }]
   },
   {
     "cc": "Fever",
-    "guideKeys": ["im-basic"],
-    "templateKeys": ["im-basic"]
+    "guideKeys": [
+      { "key": "im-basic", "rank": 0 },
+      { "key": "pd-fever-vomiting", "rank": 1 }
+    ],
+    "templateKeys": [{ "key": "im-basic", "rank": 0 }]
   },
   {
     "cc": "General weakness",
-    "guideKeys": ["im-basic"],
-    "templateKeys": ["im-basic"]
+    "guideKeys": [{ "key": "im-basic", "rank": 0 }],
+    "templateKeys": [{ "key": "im-basic", "rank": 0 }]
   },
   {
     "cc": "For paracentesis",
-    "guideKeys": ["ckd-hd-pd"],
+    "guideKeys": [{ "key": "ckd-hd-pd", "rank": 0 }],
     "templateKeys": []
   },
   {
     "cc": "Nausea",
-    "guideKeys": ["im-basic"],
-    "templateKeys": ["im-basic"]
+    "guideKeys": [{ "key": "im-basic", "rank": 0 }],
+    "templateKeys": [{ "key": "im-basic", "rank": 0 }]
   },
   {
     "cc": "Vomiting",
-    "guideKeys": ["im-basic"],
-    "templateKeys": ["im-basic"]
+    "guideKeys": [
+      { "key": "im-basic", "rank": 0 },
+      { "key": "pd-fever-vomiting", "rank": 1 }
+    ],
+    "templateKeys": [{ "key": "im-basic", "rank": 0 }]
   },
   {
     "cc": "Diarrhea",
-    "guideKeys": ["im-basic"],
-    "templateKeys": ["im-basic"]
+    "guideKeys": [{ "key": "im-basic", "rank": 0 }],
+    "templateKeys": [{ "key": "im-basic", "rank": 0 }]
   },
   {
     "cc": "Constipation",
-    "guideKeys": ["im-basic"],
-    "templateKeys": ["im-basic"]
+    "guideKeys": [{ "key": "im-basic", "rank": 0 }],
+    "templateKeys": [{ "key": "im-basic", "rank": 0 }]
   },
   {
     "cc": "Epigastric pain",
@@ -127,41 +133,44 @@
   {
     "cc": "Urticaria",
     "guideKeys": [],
-    "templateKeys": ["urticaria"]
+    "templateKeys": [{ "key": "urticaria", "rank": 0 }]
   },
   {
     "cc": "Skin rash",
     "guideKeys": [],
-    "templateKeys": ["urticaria", "skin-lesion"]
+    "templateKeys": [
+      { "key": "skin-lesion", "rank": 1 },
+      { "key": "urticaria", "rank": 2 }
+    ]
   },
   {
     "cc": "Vaginal bleeding",
-    "guideKeys": ["og"],
-    "templateKeys": ["og-basic"]
+    "guideKeys": [{ "key": "og", "rank": 0 }],
+    "templateKeys": [{ "key": "og-basic", "rank": 0 }]
   },
   {
     "cc": "Vaginal discharge",
-    "guideKeys": ["og"],
-    "templateKeys": ["og-basic"]
+    "guideKeys": [{ "key": "og", "rank": 0 }],
+    "templateKeys": [{ "key": "og-basic", "rank": 0 }]
   },
   {
     "cc": "PROM",
-    "guideKeys": ["og"],
-    "templateKeys": ["og-basic"]
+    "guideKeys": [{ "key": "og", "rank": 0 }],
+    "templateKeys": [{ "key": "og-basic", "rank": 0 }]
   },
   {
     "cc": "PPROM",
-    "guideKeys": ["og"],
-    "templateKeys": ["og-basic"]
+    "guideKeys": [{ "key": "og", "rank": 0 }],
+    "templateKeys": [{ "key": "og-basic", "rank": 0 }]
   },
   {
     "cc": "Preterm labor",
-    "guideKeys": ["og"],
-    "templateKeys": ["og-basic"]
+    "guideKeys": [{ "key": "og", "rank": 0 }],
+    "templateKeys": [{ "key": "og-basic", "rank": 0 }]
   },
   {
     "cc": "Labor pain",
-    "guideKeys": ["og"],
-    "templateKeys": ["og-basic"]
+    "guideKeys": [{ "key": "og", "rank": 0 }],
+    "templateKeys": [{ "key": "og-basic", "rank": 0 }]
   }
 ]

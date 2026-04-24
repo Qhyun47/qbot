@@ -25,6 +25,7 @@ import {
   updateCaseInputText,
 } from "@/lib/cases/actions";
 import { loadGuideline } from "@/lib/guidelines/actions";
+import type { CcConnectionEntry } from "@/lib/ai/resources/cc-types";
 import type {
   BedZone,
   CaseInput,
@@ -171,37 +172,48 @@ export function CaseInputView({
 
   const handleCcSelect = (
     selectedCc: string,
-    hasTemplate: boolean,
-    templateKeys: string[]
+    _hasTemplate: boolean,
+    templateEntries: CcConnectionEntry[]
   ) => {
     setCc(selectedCc);
     setCcEditing(false);
     setGuidelineContent(null);
 
-    if (templateKeys.length >= 2) {
-      setPendingTemplateKeys(templateKeys);
+    const loadGuide = async () => {
+      try {
+        const result = await loadGuideline(selectedCc);
+        setGuidelineContent(result.mode === "auto" ? result.content : null);
+      } catch {
+        setGuidelineContent(null);
+      }
+    };
+
+    if (templateEntries.length === 0) {
+      setPendingTemplateKeys(null);
       setSelectedTemplateKey(null);
       startTransition(async () => {
-        try {
-          const result = await loadGuideline(selectedCc);
-          setGuidelineContent(result.mode === "auto" ? result.content : null);
-        } catch {
-          setGuidelineContent(null);
-        }
+        await updateCaseCc(caseId, selectedCc, false, null);
+        await loadGuide();
       });
-    } else {
-      const key = templateKeys[0] ?? null;
+      return;
+    }
+
+    const rank0 = templateEntries.find((e) => e.rank === 0);
+    if (templateEntries.length === 1 || rank0) {
+      const key = rank0?.key ?? templateEntries[0].key;
       setPendingTemplateKeys(null);
       setSelectedTemplateKey(key);
       startTransition(async () => {
-        await updateCaseCc(caseId, selectedCc, hasTemplate, key);
-        try {
-          const result = await loadGuideline(selectedCc);
-          setGuidelineContent(result.mode === "auto" ? result.content : null);
-        } catch {
-          setGuidelineContent(null);
-        }
+        await updateCaseCc(caseId, selectedCc, true, key);
+        await loadGuide();
       });
+    } else {
+      const sortedKeys = [...templateEntries]
+        .sort((a, b) => a.rank - b.rank)
+        .map((e) => e.key);
+      setPendingTemplateKeys(sortedKeys);
+      setSelectedTemplateKey(null);
+      startTransition(loadGuide);
     }
   };
 

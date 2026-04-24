@@ -108,16 +108,17 @@ import { Button } from "@/components/ui/button";
 
 ### 핵심 파일 위치
 
-| 파일                                            | 역할                                                                        |
-| ----------------------------------------------- | --------------------------------------------------------------------------- |
-| `lib/ai/resources/cc-list.json`                 | 정형 C.C. 목록 (단일 소스, `{ cc, guideKeys[], templateKeys[], aliasOf? }`) |
-| `lib/ai/resources/guide-list.json`              | 가이드라인 표시명 목록 (`{ guideKey, displayName }`)                        |
-| `lib/ai/resources/template-list.json`           | 상용구 표시명 목록 (`{ templateKey, displayName }`)                         |
-| `ai-docs/guides/{guideKey}/guide.html`          | 시스템 가이드라인 파일 (HWP→HTML, processGuideHtml() 적용 후 저장)          |
-| `ai-docs/templates/{templateKey}/template.json` | 상용구 템플릿 파일 (`fields`, `pe`, `history` 섹션 포함)                    |
-| `ai-docs/templates/{templateKey}/schema.json`   | AI 정규화 스키마 파일                                                       |
-| `ai-docs/templates/{templateKey}/examples.md`   | 케이스 예시 파일 (4섹션 형식: HPI/P.I template/History/P/E)                 |
-| `ai-docs/pending-matches.md`                    | 대기 중인 커넥션 추적 파일 (C.C./가이드라인/상용구 간 4방향)                |
+| 파일                                            | 역할                                                                                                      |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `lib/ai/resources/cc-list.json`                 | 정형 C.C. 목록 (단일 소스, `{ cc, guideKeys: [{key, rank}][], templateKeys: [{key, rank}][], aliasOf? }`) |
+| `lib/ai/resources/cc-types.ts`                  | `CcConnectionEntry` 타입, `CcListEntry` 인터페이스, 헬퍼 함수                                             |
+| `lib/ai/resources/guide-list.json`              | 가이드라인 표시명 목록 (`{ guideKey, displayName }`)                                                      |
+| `lib/ai/resources/template-list.json`           | 상용구 표시명 목록 (`{ templateKey, displayName }`)                                                       |
+| `ai-docs/guides/{guideKey}/guide.html`          | 시스템 가이드라인 파일 (HWP→HTML, processGuideHtml() 적용 후 저장)                                        |
+| `ai-docs/templates/{templateKey}/template.json` | 상용구 템플릿 파일 (`fields`, `pe`, `history` 섹션 포함)                                                  |
+| `ai-docs/templates/{templateKey}/schema.json`   | AI 정규화 스키마 파일                                                                                     |
+| `ai-docs/templates/{templateKey}/examples.md`   | 케이스 예시 파일 (4섹션 형식: HPI/P.I template/History/P/E)                                               |
+| `ai-docs/pending-matches.md`                    | 대기 중인 커넥션 추적 파일 (C.C./가이드라인/상용구 간 4방향)                                              |
 
 ---
 
@@ -142,12 +143,12 @@ import { Button } from "@/components/ui/button";
    - `aliasOf`가 있는 C.C.는 직접 커넥션 추가 불가 — 원본 C.C.의 guideKeys/templateKeys를 통해 연결
 
 2. 사용자가 **guideKey** 커넥션을 언급한 경우:
-   - `guide-list.json`에 해당 key **존재** → `guideKeys`에 즉시 추가
-   - `guide-list.json`에 해당 key **없음** → `ai-docs/pending-matches.md` 섹션 1(C.C.→가이드라인 대기)에 기록 (중복 확인 후)
+   - `guide-list.json`에 해당 key **존재** → 현재 `guideKeys` 순위 목록 표시 후 순위 질문 → `guideKeys`에 `{ "key": "...", "rank": N }` 형태로 추가 (0순위 충돌 시 기존 0순위를 1순위로 재조정)
+   - `guide-list.json`에 해당 key **없음** → 순위 질문 후 `ai-docs/pending-matches.md` 섹션 1(C.C.→가이드라인 대기)에 rank 정보와 함께 기록 (중복 확인 후)
 
 3. 사용자가 **templateKey** 커넥션을 언급한 경우:
-   - `template-list.json`에 해당 key **존재** → `templateKeys`에 즉시 추가
-   - `template-list.json`에 해당 key **없음** → `ai-docs/pending-matches.md` 섹션 2(C.C.→상용구 대기)에 기록 (중복 확인 후)
+   - `template-list.json`에 해당 key **존재** → 현재 `templateKeys` 순위 목록 표시 후 순위 질문 → `templateKeys`에 `{ "key": "...", "rank": N }` 형태로 추가 (0순위 충돌 시 기존 0순위를 1순위로 재조정)
+   - `template-list.json`에 해당 key **없음** → 순위 질문 후 `ai-docs/pending-matches.md` 섹션 2(C.C.→상용구 대기)에 rank 정보와 함께 기록 (중복 확인 후)
 
 4. 커넥션 언급이 없으면 pending 기록 없음
 
@@ -170,8 +171,8 @@ import { Button } from "@/components/ui/button";
    ```
 
 3. 사용자가 **C.C. 커넥션**을 언급한 경우:
-   - `cc-list.json`에 해당 C.C. **존재** → 해당 C.C.의 `guideKeys`에 즉시 추가
-   - `cc-list.json`에 해당 C.C. **없음** → `ai-docs/pending-matches.md` 섹션 3(가이드라인→C.C. 대기)에 기록 (중복 확인 후)
+   - `cc-list.json`에 해당 C.C. **존재** → 해당 C.C.의 현재 `guideKeys` 순위 목록 표시 후 순위 질문 → `guideKeys`에 `{ "key": "...", "rank": N }` 형태로 추가 (0순위 충돌 시 기존 0순위를 1순위로 재조정)
+   - `cc-list.json`에 해당 C.C. **없음** → 순위 질문 후 `ai-docs/pending-matches.md` 섹션 3(가이드라인→C.C. 대기)에 rank 정보와 함께 기록 (중복 확인 후)
    - 커넥션 언급이 없으면 아무것도 기록하지 않음
 
 4. `ai-docs/pending-matches.md` 섹션 1(C.C.→가이드라인 대기)에서 이 guideKey를 기다리는 C.C. 조회
@@ -197,8 +198,8 @@ import { Button } from "@/components/ui/button";
    ```
 
 3. 사용자가 **C.C. 커넥션**을 언급한 경우:
-   - `cc-list.json`에 해당 C.C. **존재** → 해당 C.C.의 `templateKeys`에 즉시 추가
-   - `cc-list.json`에 해당 C.C. **없음** → `ai-docs/pending-matches.md` 섹션 4(상용구→C.C. 대기)에 기록 (중복 확인 후)
+   - `cc-list.json`에 해당 C.C. **존재** → 해당 C.C.의 현재 `templateKeys` 순위 목록 표시 후 순위 질문 → `templateKeys`에 `{ "key": "...", "rank": N }` 형태로 추가 (0순위 충돌 시 기존 0순위를 1순위로 재조정)
+   - `cc-list.json`에 해당 C.C. **없음** → 순위 질문 후 `ai-docs/pending-matches.md` 섹션 4(상용구→C.C. 대기)에 rank 정보와 함께 기록 (중복 확인 후)
    - 커넥션 언급이 없으면 아무것도 기록하지 않음
 
 4. `ai-docs/pending-matches.md` 섹션 2(C.C.→상용구 대기)에서 이 templateKey를 기다리는 C.C. 조회
@@ -248,6 +249,17 @@ import { Button } from "@/components/ui/button";
 - **추가 기준**:
   - 상용구(templateKeys)가 있는 C.C.: **필수** (최소 1개)
   - 가이드라인만 있고 상용구 없는 C.C.: 불필요
+
+---
+
+### 커넥션 순위 규칙
+
+- `guideKeys` / `templateKeys`의 각 항목은 `{ "key": "guideKey-or-templateKey", "rank": 0 }` 형태로 저장
+- **rank 0**: C.C. 입력 시 해당 가이드라인/상용구 자동 로드. C.C.당 가이드라인 0순위 최대 1개, 상용구 0순위 최대 1개
+- **rank 1 이상**: 자동 로드되지 않으며 추천 목록 또는 수동 선택으로만 접근
+- **연결이 1개뿐인 경우**: 자동으로 rank 0 동작
+- **0순위 충돌 처리**: 새 항목을 0순위로 지정하면 기존 0순위 항목이 1순위로 자동 재조정 (사용자 확인 후 진행)
+- **커넥션 추가 시 반드시 순위 지정**: 기존 연결 목록과 현재 순위를 먼저 보여준 후 새 항목의 순위를 질문
 
 ---
 

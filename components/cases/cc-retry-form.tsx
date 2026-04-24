@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { updateCaseCc } from "@/lib/cases/actions";
 import ccList from "@/lib/ai/resources/cc-list.json";
+import type { CcListEntry } from "@/lib/ai/resources/cc-types";
+import { getPrimaryKey } from "@/lib/ai/resources/cc-types";
 
 interface CcRetryFormProps {
   caseId: string;
@@ -24,11 +26,7 @@ export function CcRetryForm({ caseId, currentCc }: CcRetryFormProps) {
 
     setLoading(true);
     try {
-      const list = ccList as {
-        cc: string;
-        templateKeys: string[];
-        aliasOf?: string;
-      }[];
+      const list = ccList as CcListEntry[];
       const found = list.find(
         (item) => item.cc.toLowerCase() === cc.trim().toLowerCase()
       );
@@ -36,7 +34,10 @@ export function CcRetryForm({ caseId, currentCc }: CcRetryFormProps) {
         ? (list.find((i) => i.cc === found.aliasOf) ?? found)
         : found;
       const hasTemplate = (resolved?.templateKeys?.length ?? 0) > 0;
-      const templateKey = resolved?.templateKeys?.[0] ?? null;
+      const templateKey =
+        getPrimaryKey(resolved?.templateKeys ?? []) ??
+        resolved?.templateKeys?.[0]?.key ??
+        null;
       await updateCaseCc(caseId, cc.trim(), hasTemplate, templateKey);
       const res = await fetch(`/api/cases/${caseId}/generate`, {
         method: "POST",

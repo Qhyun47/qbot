@@ -16,13 +16,8 @@ import ccListRaw from "@/lib/ai/resources/cc-list.json";
 import templateListRaw from "@/lib/ai/resources/template-list.json";
 import guideListRaw from "@/lib/ai/resources/guide-list.json";
 import categoriesRaw from "@/lib/ai/resources/template-categories.json";
-
-interface CcListEntry {
-  cc: string;
-  guideKeys: string[];
-  templateKeys: string[];
-  aliasOf?: string;
-}
+import type { CcListEntry } from "@/lib/ai/resources/cc-types";
+import { resolveEntries } from "@/lib/ai/resources/cc-types";
 
 interface TemplateListEntry {
   templateKey: string;
@@ -52,17 +47,6 @@ interface GuidelinePanelProps {
   guidelineFontSize?: number;
 }
 
-function getSuggestedGuideKeys(cc: string | null): string[] {
-  if (!cc) return [];
-  const item = ccList.find((i) => i.cc.toLowerCase() === cc.toLowerCase());
-  if (!item) return [];
-  if (item.aliasOf) {
-    const parent = ccList.find((i) => i.cc === item.aliasOf);
-    return parent?.guideKeys ?? [];
-  }
-  return item.guideKeys;
-}
-
 function getGuideLabel(guideKey: string): string {
   return (
     guideList.find((g) => g.guideKey === guideKey)?.displayName ?? guideKey
@@ -74,15 +58,12 @@ function getTemplateLabel(key: string | null): string | null {
   return templateList.find((t) => t.templateKey === key)?.displayName ?? key;
 }
 
+/** rank 오름차순 정렬된 templateKey 문자열 배열 반환 */
 function getSuggestedTemplateKeys(cc: string | null): string[] {
   if (!cc) return [];
   const item = ccList.find((i) => i.cc.toLowerCase() === cc.toLowerCase());
   if (!item) return [];
-  if (item.aliasOf) {
-    const parent = ccList.find((i) => i.cc === item.aliasOf);
-    return parent?.templateKeys ?? [];
-  }
-  return item.templateKeys;
+  return resolveEntries(item, "templateKeys", ccList).map((e) => e.key);
 }
 
 function TabButton({
@@ -170,6 +151,15 @@ export function GuidelinePanel({
   const [isGuideLoading, setIsGuideLoading] = useState(false);
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
 
+  // auto 모드의 추가 추천 (rank > 0)
+  const [additionalGuideKeys, setAdditionalGuideKeys] = useState<
+    { guideKey: string; displayName: string }[]
+  >([]);
+  // recommendations 모드의 전체 추천 목록
+  const [recommendedGuideKeys, setRecommendedGuideKeys] = useState<
+    { guideKey: string; displayName: string }[]
+  >([]);
+
   const [templateContent, setTemplateContent] =
     useState<TemplateContent | null>(null);
   const [isTemplateLoading, setIsTemplateLoading] = useState(false);
@@ -180,6 +170,8 @@ export function GuidelinePanel({
       setGuideContent(null);
       setGuidePdfUrl(null);
       setActiveGuideKey(null);
+      setAdditionalGuideKeys([]);
+      setRecommendedGuideKeys([]);
       setActiveView("guide");
       setShowSelector(false);
       return;
@@ -194,16 +186,28 @@ export function GuidelinePanel({
           setGuideContent(result.content);
           setGuidePdfUrl(result.pdfSignedUrl);
           setActiveGuideKey(result.guideKey);
+          setAdditionalGuideKeys(result.additionalSuggestions);
+          setRecommendedGuideKeys([]);
+        } else if (result.mode === "recommendations") {
+          setGuideContent(null);
+          setGuidePdfUrl(null);
+          setActiveGuideKey(null);
+          setAdditionalGuideKeys([]);
+          setRecommendedGuideKeys(result.suggestions);
         } else {
           setGuideContent(null);
           setGuidePdfUrl(null);
           setActiveGuideKey(null);
+          setAdditionalGuideKeys([]);
+          setRecommendedGuideKeys([]);
         }
       })
       .catch(() => {
         setGuideContent(null);
         setGuidePdfUrl(null);
         setActiveGuideKey(null);
+        setAdditionalGuideKeys([]);
+        setRecommendedGuideKeys([]);
       })
       .finally(() => setIsGuideLoading(false));
   }, [cc]);
@@ -259,13 +263,35 @@ export function GuidelinePanel({
   };
 
   const templateLabel = getTemplateLabel(templateKey);
-  const suggestedGuideKeys = getSuggestedGuideKeys(cc);
-  const otherGuides = guideList.filter(
-    (g) => !suggestedGuideKeys.includes(g.guideKey)
-  );
   const suggestedTemplateKeys = getSuggestedTemplateKeys(cc);
   const otherTemplates = templateList.filter(
     (t) => !suggestedTemplateKeys.includes(t.templateKey)
+  );
+
+  // 선택기에 표시할 추천 가이드 목록: activeGuideKey + additional + recommended (중복 제거)
+  const selectorSuggestedGuides = (() => {
+    const result: { guideKey: string; displayName: string }[] = [];
+    const seen = new Set<string>();
+    if (activeGuideKey) {
+      result.push({
+        guideKey: activeGuideKey,
+        displayName: getGuideLabel(activeGuideKey),
+      });
+      seen.add(activeGuideKey);
+    }
+    for (const item of [...additionalGuideKeys, ...recommendedGuideKeys]) {
+      if (!seen.has(item.guideKey)) {
+        result.push(item);
+        seen.add(item.guideKey);
+      }
+    }
+    return result;
+  })();
+  const selectorSuggestedKeys = new Set(
+    selectorSuggestedGuides.map((g) => g.guideKey)
+  );
+  const otherGuides = guideList.filter(
+    (g) => !selectorSuggestedKeys.has(g.guideKey)
   );
 
   const showPdf =
@@ -312,28 +338,28 @@ export function GuidelinePanel({
               /* 선택 목록 */
               activeView === "guide" ? (
                 <div className="flex flex-col gap-1">
-                  {suggestedGuideKeys.length > 0 && (
+                  {selectorSuggestedGuides.length > 0 && (
                     <>
                       <p className="mb-1 text-xs font-semibold text-muted-foreground">
                         추천 가이드라인
                       </p>
-                      {suggestedGuideKeys.map((key) => (
+                      {selectorSuggestedGuides.map((g) => (
                         <button
-                          key={key}
+                          key={g.guideKey}
                           type="button"
-                          disabled={loadingKey === key}
-                          onClick={() => handleGuidelineSelect(key)}
+                          disabled={loadingKey === g.guideKey}
+                          onClick={() => handleGuidelineSelect(g.guideKey)}
                           className={cn(
                             "rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
                             "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
                             "disabled:cursor-not-allowed disabled:opacity-50",
-                            activeGuideKey === key &&
+                            activeGuideKey === g.guideKey &&
                               "border-primary bg-primary/5"
                           )}
                         >
-                          {loadingKey === key
+                          {loadingKey === g.guideKey
                             ? "불러오는 중..."
-                            : getGuideLabel(key)}
+                            : g.displayName}
                         </button>
                       ))}
                     </>
@@ -343,7 +369,7 @@ export function GuidelinePanel({
                       <p
                         className={cn(
                           "text-xs font-semibold text-muted-foreground",
-                          suggestedGuideKeys.length > 0 && "mt-2"
+                          selectorSuggestedGuides.length > 0 && "mt-2"
                         )}
                       >
                         전체 목록
@@ -512,6 +538,30 @@ export function GuidelinePanel({
                 ) : (
                   <MarkdownPreview content={guideContent} />
                 )
+              ) : recommendedGuideKeys.length > 0 ? (
+                /* recommendations 모드: 추천 목록 바로 표시 */
+                <div className="flex flex-col gap-1">
+                  <p className="mb-1 text-xs font-semibold text-muted-foreground">
+                    관련 가이드라인
+                  </p>
+                  {recommendedGuideKeys.map((g) => (
+                    <button
+                      key={g.guideKey}
+                      type="button"
+                      disabled={loadingKey === g.guideKey}
+                      onClick={() => handleGuidelineSelect(g.guideKey)}
+                      className={cn(
+                        "rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
+                        "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
+                        "disabled:cursor-not-allowed disabled:opacity-50"
+                      )}
+                    >
+                      {loadingKey === g.guideKey
+                        ? "불러오는 중..."
+                        : g.displayName}
+                    </button>
+                  ))}
+                </div>
               ) : (
                 <p className="text-sm text-muted-foreground">
                   해당 C.C.에 대한 가이드라인이 없습니다. 위 탭을 클릭해 직접

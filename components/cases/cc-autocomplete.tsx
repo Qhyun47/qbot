@@ -6,27 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import ccListRaw from "@/lib/ai/resources/cc-list.json";
+import type {
+  CcListEntry,
+  CcConnectionEntry,
+} from "@/lib/ai/resources/cc-types";
+import { resolveEntries } from "@/lib/ai/resources/cc-types";
 
 const ccList = ccListRaw as CcListEntry[];
 
-interface CcListEntry {
-  cc: string;
-  guideKeys: string[];
-  templateKeys: string[];
-  aliasOf?: string;
-  patternOf?: string;
-}
-
-function resolveTemplateKeys(item: CcListEntry): string[] {
-  if (item.aliasOf) {
-    const parent = ccList.find((i) => i.cc === item.aliasOf);
-    return parent?.templateKeys ?? item.templateKeys;
-  }
-  if (item.patternOf) {
-    const parent = ccList.find((i) => i.cc === item.patternOf);
-    return parent?.templateKeys ?? item.templateKeys;
-  }
-  return item.templateKeys;
+function resolveTemplateEntries(item: CcListEntry): CcConnectionEntry[] {
+  return resolveEntries(item, "templateKeys", ccList);
 }
 
 function matchesPattern(input: string, patternCc: string): boolean {
@@ -44,7 +33,11 @@ function matchesPattern(input: string, patternCc: string): boolean {
 
 interface CcAutocompleteProps {
   value: string;
-  onSelect: (cc: string, hasTemplate: boolean, templateKeys: string[]) => void;
+  onSelect: (
+    cc: string,
+    hasTemplate: boolean,
+    templateEntries: CcConnectionEntry[]
+  ) => void;
 }
 
 export function CcAutocomplete({ value, onSelect }: CcAutocompleteProps) {
@@ -114,7 +107,7 @@ export function CcAutocomplete({ value, onSelect }: CcAutocompleteProps) {
         e.preventDefault();
         const item = filtered[highlightedIndex];
         const selectedCc = item.displayCc ?? item.cc;
-        const resolved = resolveTemplateKeys(item);
+        const resolved = resolveTemplateEntries(item);
         const hasTemplate = resolved.length > 0;
         onSelect(selectedCc, hasTemplate, resolved);
         setInputValue(selectedCc);
@@ -184,7 +177,7 @@ export function CcAutocomplete({ value, onSelect }: CcAutocompleteProps) {
               )}
               onClick={() => {
                 const selectedCc = item.displayCc ?? item.cc;
-                const resolved = resolveTemplateKeys(item);
+                const resolved = resolveTemplateEntries(item);
                 const hasTemplate = resolved.length > 0;
                 onSelect(selectedCc, hasTemplate, resolved);
                 setInputValue(selectedCc);
@@ -192,7 +185,7 @@ export function CcAutocomplete({ value, onSelect }: CcAutocompleteProps) {
               }}
             >
               <span>{item.displayCc ?? item.cc}</span>
-              {resolveTemplateKeys(item).length > 0 && (
+              {resolveTemplateEntries(item).length > 0 && (
                 <span className="flex items-center gap-1 text-xs text-muted-foreground">
                   <CheckSquare className="size-3 text-emerald-600" />
                   상용구 있음

@@ -42,6 +42,7 @@ import {
   deleteCaseInput,
   updateCaseInputText,
 } from "@/lib/cases/actions";
+import type { CcConnectionEntry } from "@/lib/ai/resources/cc-types";
 import type {
   BedZone,
   CaseInput,
@@ -234,22 +235,35 @@ export function NewCaseForm({
 
   const handleCcSelect = (
     selectedCc: string,
-    hasTemplate: boolean,
-    templateKeys: string[]
+    _hasTemplate: boolean,
+    templateEntries: CcConnectionEntry[]
   ) => {
     setCc(selectedCc);
     setCcEditing(false);
 
-    if (templateKeys.length >= 2) {
-      setPendingTemplateKeys(templateKeys);
+    if (templateEntries.length === 0) {
+      setPendingTemplateKeys(null);
       setSelectedTemplateKey(null);
-    } else {
-      const key = templateKeys[0] ?? null;
+      startTransition(() => {
+        if (caseId) updateCaseCc(caseId, selectedCc, false, null);
+      });
+      return;
+    }
+
+    const rank0 = templateEntries.find((e) => e.rank === 0);
+    if (templateEntries.length === 1 || rank0) {
+      const key = rank0?.key ?? templateEntries[0].key;
       setPendingTemplateKeys(null);
       setSelectedTemplateKey(key);
       startTransition(() => {
-        if (caseId) updateCaseCc(caseId, selectedCc, hasTemplate, key);
+        if (caseId) updateCaseCc(caseId, selectedCc, true, key);
       });
+    } else {
+      const sortedKeys = [...templateEntries]
+        .sort((a, b) => a.rank - b.rank)
+        .map((e) => e.key);
+      setPendingTemplateKeys(sortedKeys);
+      setSelectedTemplateKey(null);
     }
   };
 

@@ -1,6 +1,7 @@
 import "server-only";
 import fs from "fs/promises";
 import path from "path";
+import type { CcListEntry } from "@/lib/ai/resources/cc-types";
 
 const ROOT = process.cwd();
 
@@ -113,12 +114,7 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
     templateList.map((t) => [t.templateKey, t.category])
   );
 
-  const ccList = JSON.parse(ccListRaw) as {
-    cc: string;
-    guideKeys: string[];
-    templateKeys: string[];
-    aliasOf?: string;
-  }[];
+  const ccList = JSON.parse(ccListRaw) as CcListEntry[];
 
   const reverseAliasMap: Record<string, string[]> = {};
   for (const entry of ccList) {
@@ -133,16 +129,17 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
   const items = await Promise.all(
     ccList.map(async (entry) => {
       const guides = await Promise.all(
-        entry.guideKeys.map(async (key) => ({
-          key,
+        entry.guideKeys.map(async (e) => ({
+          key: e.key,
           exists: await fileExists(
-            path.join(ROOT, "ai-docs/guides", key, "guide.html")
+            path.join(ROOT, "ai-docs/guides", e.key, "guide.html")
           ),
         }))
       );
 
       const templates = await Promise.all(
-        entry.templateKeys.map(async (key) => {
+        entry.templateKeys.map(async (e) => {
+          const key = e.key;
           const tplPath = path.join(
             ROOT,
             "ai-docs/templates",
@@ -178,8 +175,8 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
       return {
         cc: entry.cc,
         aliasOf: entry.aliasOf,
-        guideKeys: entry.guideKeys,
-        templateKeys: entry.templateKeys,
+        guideKeys: entry.guideKeys.map((e) => e.key),
+        templateKeys: entry.templateKeys.map((e) => e.key),
         guides,
         templates,
         aliasedBy: reverseAliasMap[entry.cc] ?? [],
@@ -195,10 +192,10 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
   for (const entry of ccList) {
     if (entry.aliasOf) continue;
     for (const gk of entry.guideKeys) {
-      guideToCcs[gk] = [...(guideToCcs[gk] ?? []), entry.cc];
+      guideToCcs[gk.key] = [...(guideToCcs[gk.key] ?? []), entry.cc];
     }
     for (const tk of entry.templateKeys) {
-      templateToCcs[tk] = [...(templateToCcs[tk] ?? []), entry.cc];
+      templateToCcs[tk.key] = [...(templateToCcs[tk.key] ?? []), entry.cc];
     }
   }
 
