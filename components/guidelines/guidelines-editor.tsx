@@ -474,11 +474,11 @@ export function GuidelinesEditor({
           sm:max-w-2xl로 기본값 sm:max-w-lg 오버라이드.
           bg-popover + 명시적 border/shadow로 다크모드에서도 오버레이와 구분되게 */}
       <Dialog open={htmlDialogOpen} onOpenChange={setHtmlDialogOpen}>
-        <DialogContent className="border bg-popover shadow-xl sm:max-w-2xl">
+        <DialogContent className="flex max-h-[90vh] flex-col border bg-popover shadow-xl sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>가이드라인 HTML 붙여넣기</DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col gap-3">
+          <div className="flex min-h-0 flex-col gap-3 overflow-y-auto">
             <Textarea
               value={rawHtmlInput}
               onChange={(e) => setRawHtmlInput(e.target.value)}
@@ -491,17 +491,43 @@ export function GuidelinesEditor({
                 className="text-xs text-muted-foreground underline"
                 onClick={() => setEncodingHelpOpen((v) => !v)}
               >
-                한글이 깨져 보이나요?
+                HWP 파일 변환 방법 안내
               </button>
               {encodingHelpOpen && (
                 <div className="mt-2 rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">
-                  <p className="mb-2 font-semibold text-foreground">
-                    왜 깨지나요?
+                  <p className="mb-1.5 font-semibold text-foreground">
+                    HWP → HTML 변환 방법
                   </p>
-                  <p className="mb-3">
+                  <ol className="mb-4 list-inside list-decimal space-y-1">
+                    <li>한글 프로그램에서 해당 문서 열기</li>
+                    <li>
+                      상단 메뉴 <strong>파일</strong> →{" "}
+                      <strong>다른 이름으로 저장</strong> 클릭
+                    </li>
+                    <li>
+                      저장 창에서 파일 형식을{" "}
+                      <strong>인터넷 문서 (*.htm)</strong> 으로 변경 후 저장
+                    </li>
+                    <li>
+                      저장된 <code>.htm</code> 파일을 <strong>메모장</strong>
+                      으로 열기
+                    </li>
+                    <li>
+                      <strong>Ctrl+A → Ctrl+C</strong> 로 전체 복사 후 이 창에{" "}
+                      <strong>Ctrl+V</strong> 로 붙여넣기
+                    </li>
+                  </ol>
+
+                  <p className="mb-1.5 font-semibold text-foreground">
+                    한글이 깨져 보이나요?{" "}
+                    <span className="font-normal text-muted-foreground">
+                      (깨질 때만 수행)
+                    </span>
+                  </p>
+                  <p className="mb-2">
                     HWP에서 내보낸 HTML 파일은 한글 인코딩(EUC-KR)으로 저장되는
-                    경우가 많습니다. 이 상태의 파일을 그대로 복사하면 글자가
-                    깨져 보입니다.
+                    경우가 많습니다. 아래 방법으로 UTF-8로 변환 후 다시
+                    붙여넣으세요.
                   </p>
 
                   <p className="mb-1.5 font-semibold text-foreground">
