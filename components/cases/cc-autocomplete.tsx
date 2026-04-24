@@ -14,12 +14,32 @@ interface CcListEntry {
   guideKeys: string[];
   templateKeys: string[];
   aliasOf?: string;
+  patternOf?: string;
 }
 
 function resolveTemplateKeys(item: CcListEntry): string[] {
-  if (!item.aliasOf) return item.templateKeys;
-  const parent = ccList.find((i) => i.cc === item.aliasOf);
-  return parent?.templateKeys ?? item.templateKeys;
+  if (item.aliasOf) {
+    const parent = ccList.find((i) => i.cc === item.aliasOf);
+    return parent?.templateKeys ?? item.templateKeys;
+  }
+  if (item.patternOf) {
+    const parent = ccList.find((i) => i.cc === item.patternOf);
+    return parent?.templateKeys ?? item.templateKeys;
+  }
+  return item.templateKeys;
+}
+
+function matchesPattern(input: string, patternCc: string): boolean {
+  const q = input.toLowerCase();
+  if (patternCc.endsWith(" **")) {
+    const prefix = patternCc.slice(0, -3).toLowerCase();
+    return q.startsWith(prefix + " ") && q.length > prefix.length + 1;
+  }
+  if (patternCc.startsWith("** ")) {
+    const suffix = patternCc.slice(3).toLowerCase();
+    return q.endsWith(" " + suffix) && q.length > suffix.length + 1;
+  }
+  return false;
 }
 
 interface CcAutocompleteProps {
@@ -37,20 +57,31 @@ export function CcAutocomplete({ value, onSelect }: CcAutocompleteProps) {
     setInputValue(value);
   }, [value]);
 
-  const filtered = inputValue
-    ? ccList
-        .filter((item) =>
-          item.cc.toLowerCase().includes(inputValue.toLowerCase())
-        )
-        .sort((a, b) => {
-          const q = inputValue.toLowerCase();
-          const aStarts = a.cc.toLowerCase().startsWith(q);
-          const bStarts = b.cc.toLowerCase().startsWith(q);
-          if (aStarts && !bStarts) return -1;
-          if (!aStarts && bStarts) return 1;
-          return a.cc.localeCompare(b.cc);
-        })
-        .slice(0, 8)
+  const filtered: (CcListEntry & { displayCc?: string })[] = inputValue
+    ? (() => {
+        const q = inputValue.toLowerCase();
+        const exact = ccList
+          .filter(
+            (item) =>
+              !item.cc.includes("**") && item.cc.toLowerCase().includes(q)
+          )
+          .sort((a, b) => {
+            const aStarts = a.cc.toLowerCase().startsWith(q);
+            const bStarts = b.cc.toLowerCase().startsWith(q);
+            if (aStarts && !bStarts) return -1;
+            if (!aStarts && bStarts) return 1;
+            return a.cc.localeCompare(b.cc);
+          });
+
+        const patternMatches = ccList
+          .filter(
+            (item) =>
+              item.cc.includes("**") && matchesPattern(inputValue, item.cc)
+          )
+          .map((item) => ({ ...item, displayCc: inputValue }));
+
+        return [...exact, ...patternMatches].slice(0, 8);
+      })()
     : [];
 
   useEffect(() => {
@@ -82,10 +113,11 @@ export function CcAutocomplete({ value, onSelect }: CcAutocompleteProps) {
       if (open && filtered.length > 0 && highlightedIndex >= 0) {
         e.preventDefault();
         const item = filtered[highlightedIndex];
+        const selectedCc = item.displayCc ?? item.cc;
         const resolved = resolveTemplateKeys(item);
         const hasTemplate = resolved.length > 0;
-        onSelect(item.cc, hasTemplate, resolved);
-        setInputValue(item.cc);
+        onSelect(selectedCc, hasTemplate, resolved);
+        setInputValue(selectedCc);
         setOpen(false);
       } else if (inputValue.trim()) {
         e.preventDefault();
@@ -142,7 +174,7 @@ export function CcAutocomplete({ value, onSelect }: CcAutocompleteProps) {
         <div className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-md border bg-white shadow-md dark:bg-zinc-900">
           {filtered.map((item, idx) => (
             <button
-              key={item.cc}
+              key={`${item.cc}__${item.displayCc ?? ""}`}
               type="button"
               className={cn(
                 "flex w-full items-center justify-between bg-white px-3 py-2.5 text-sm transition-colors dark:bg-zinc-900",
@@ -151,14 +183,15 @@ export function CcAutocomplete({ value, onSelect }: CcAutocompleteProps) {
                   : "hover:bg-accent/60"
               )}
               onClick={() => {
+                const selectedCc = item.displayCc ?? item.cc;
                 const resolved = resolveTemplateKeys(item);
                 const hasTemplate = resolved.length > 0;
-                onSelect(item.cc, hasTemplate, resolved);
-                setInputValue(item.cc);
+                onSelect(selectedCc, hasTemplate, resolved);
+                setInputValue(selectedCc);
                 setOpen(false);
               }}
             >
-              <span>{item.cc}</span>
+              <span>{item.displayCc ?? item.cc}</span>
               {resolveTemplateKeys(item).length > 0 && (
                 <span className="flex items-center gap-1 text-xs text-muted-foreground">
                   <CheckSquare className="size-3 text-emerald-600" />

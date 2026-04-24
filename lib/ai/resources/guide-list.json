@@ -5,5 +5,6 @@
   { "guideKey": "hemoptysis", "displayName": "IM - Hemoptysis" },
   { "guideKey": "abdominal-pain", "displayName": "IM/GS - Abd pain" },
   { "guideKey": "gi-bleeding", "displayName": "IM - GI bleeding" },
-  { "guideKey": "ckd-hd-pd", "displayName": "IM - CKD, HD/PD" }
+  { "guideKey": "ckd-hd-pd", "displayName": "IM - CKD, HD/PD" },
+  { "guideKey": "og", "displayName": "OG" }
 ]

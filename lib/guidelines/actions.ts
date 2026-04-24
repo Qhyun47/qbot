@@ -16,6 +16,7 @@ interface CcListEntry {
   guideKeys: string[];
   templateKeys: string[];
   aliasOf?: string;
+  patternOf?: string;
 }
 
 interface GuideListEntry {
@@ -239,17 +240,41 @@ export async function loadGuideByKey(guideKey: string): Promise<GuidelineData> {
   }
 }
 
+function findCcEntry(list: CcListEntry[], cc: string): CcListEntry | undefined {
+  const exact = list.find((i) => i.cc === cc);
+  if (exact) return exact;
+
+  const q = cc.toLowerCase();
+  return list.find((i) => {
+    if (i.cc.endsWith(" **")) {
+      const prefix = i.cc.slice(0, -3).toLowerCase();
+      return q.startsWith(prefix + " ") && q.length > prefix.length + 1;
+    }
+    if (i.cc.startsWith("** ")) {
+      const suffix = i.cc.slice(3).toLowerCase();
+      return q.endsWith(" " + suffix) && q.length > suffix.length + 1;
+    }
+    return false;
+  });
+}
+
 export async function loadGuideline(cc: string): Promise<GuidelineResult> {
   const list = ccListRaw as CcListEntry[];
   const guideList = guideListRaw as GuideListEntry[];
 
-  const item = list.find((i) => i.cc === cc);
+  const item = findCcEntry(list, cc);
   if (!item) return { mode: "none" };
 
   let guideKeys = item.guideKeys;
   if (item.aliasOf) {
     const parent = list.find((i) => i.cc === item.aliasOf);
     guideKeys = parent?.guideKeys ?? [];
+  } else if (item.patternOf) {
+    const parent = list.find((i) => i.cc === item.patternOf);
+    guideKeys = parent?.guideKeys ?? [];
+  } else if (item.cc.includes("**")) {
+    // 패턴 항목 자체가 직접 조회된 경우 (폴백 매칭)
+    guideKeys = item.guideKeys;
   }
 
   if (guideKeys.length === 0) return { mode: "none" };
