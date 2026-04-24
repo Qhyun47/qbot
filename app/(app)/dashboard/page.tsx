@@ -53,7 +53,7 @@ export default function DashboardPage() {
       </Suspense>
 
       {/* 페이지 헤더 (데스크탑) */}
-      <div className="hidden items-center justify-between is-desktop:flex">
+      <div className="hidden items-center justify-between lg:flex">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">대시보드</h1>
           <p className="mt-1 text-sm text-muted-foreground">
