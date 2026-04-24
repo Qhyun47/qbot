@@ -16,9 +16,11 @@ const SCALE_STEPS = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 2.5, 3.0];
 
 interface PdfViewerProps {
   url: string;
+  /** true이면 자체 스크롤 없이 부모 스크롤 컨테이너 안에서 콘텐츠가 자연스럽게 흐름 */
+  embedded?: boolean;
 }
 
-export function PdfViewer({ url }: PdfViewerProps) {
+export function PdfViewer({ url, embedded = false }: PdfViewerProps) {
   const [numPages, setNumPages] = useState<number>(0);
   const [scaleIdx, setScaleIdx] = useState<number>(2); // 1.0 = fit-width
   const [containerWidth, setContainerWidth] = useState<number>(600);
@@ -43,7 +45,7 @@ export function PdfViewer({ url }: PdfViewerProps) {
   const pageWidth = Math.floor(containerWidth * scale);
 
   return (
-    <div className="flex h-full flex-col">
+    <div className={embedded ? "flex flex-col" : "flex h-full flex-col"}>
       {/* 커스텀 컨트롤 바 */}
       <div className="flex shrink-0 items-center justify-end gap-1 border-b bg-muted/20 px-2 py-1">
         <Button
@@ -73,8 +75,13 @@ export function PdfViewer({ url }: PdfViewerProps) {
         </Button>
       </div>
 
-      {/* PDF 스크롤 영역 */}
-      <div ref={containerCallback} className="flex-1 overflow-auto bg-muted/10">
+      {/* PDF 콘텐츠 영역 (embedded 모드에서는 부모가 스크롤을 담당) */}
+      <div
+        ref={containerCallback}
+        className={
+          embedded ? "bg-muted/10" : "flex-1 overflow-auto bg-muted/10"
+        }
+      >
         <Document
           file={url}
           onLoadSuccess={({ numPages }) => setNumPages(numPages)}
