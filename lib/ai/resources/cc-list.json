@@ -16,8 +16,14 @@
   },
   {
     "cc": "Abdominal pain",
-    "guideKeys": [{ "key": "abdominal-pain", "rank": 0 }],
-    "templateKeys": [{ "key": "abdominal-pain", "rank": 0 }]
+    "guideKeys": [
+      { "key": "abdominal-pain", "rank": 0 },
+      { "key": "og", "rank": 1 }
+    ],
+    "templateKeys": [
+      { "key": "abdominal-pain", "rank": 0 },
+      { "key": "og-basic", "rank": 1 }
+    ]
   },
   {
     "cc": "GI bleeding",
