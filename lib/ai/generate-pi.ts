@@ -1,7 +1,7 @@
 import { generateText } from "@/lib/ai/gemini-client";
 import { GENERATE_PI_SYSTEM_PROMPT } from "@/lib/ai/prompts/generate-pi";
 import { FEW_SHOT_GUARD } from "@/lib/ai/prompts/few-shot-guard";
-import { loadExamples } from "@/lib/ai/load-resources";
+import { loadExamples, loadHpiHints } from "@/lib/ai/load-resources";
 import type { StructuredCase } from "@/lib/ai/types";
 
 export async function generatePi(
@@ -20,6 +20,8 @@ export async function generatePi(
     ? loadExamples(templateKey).hpi.slice(0, 10)
     : [];
 
+  const hpiHints = templateKey ? loadHpiHints(templateKey) : null;
+
   const systemPrompt =
     referenceExamples.length > 0
       ? `${GENERATE_PI_SYSTEM_PROMPT}\n\n## Style Reference\n\n${FEW_SHOT_GUARD}`
@@ -30,6 +32,9 @@ export async function generatePi(
     ccSpecificFields,
     rawInputs,
   };
+  if (hpiHints) {
+    promptData.hpiHints = hpiHints;
+  }
   if (referenceExamples.length > 0) {
     promptData.referenceExamples = referenceExamples;
   }

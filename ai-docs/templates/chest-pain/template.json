@@ -2,6 +2,7 @@
   "templateKey": "chest-pain",
   "cc": "Chest pain",
   "description": "흉통 환자 EMR 상용구 템플릿",
+  "hpi_hints": "NTG 반응 여부를 반드시 포함. 동반 증상(dyspnea, diaphoresis, palpitation)과 방사통이 확인된 경우 포함.",
   "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라. 단, '* Chest pain' 헤더는 입력된 C.C.를 그대로 사용하라 (예: C.C.가 'Chest discomfort'이면 '* Chest discomfort'로 출력).",
   "special_questions": [
     {

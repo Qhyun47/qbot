@@ -33,6 +33,7 @@
 - 마지막 문장은 반드시 '본원 응급실 내원함'으로 종결
 - 입력에 없는 사실은 절대 추가하지 않음
 - 객관적 보고체 유지 (~했다고 함, ~이라 함, ~보였고, ~동반되어, ~호전 없어, ~내원함)
+- 환자 주관적 진술과 객관적 소견(sat, 외관 등)이 불일치하는 경우: 양쪽을 모두 기술 (예: '본인은 숨찬 증상 없다고 하나 sat 92% 확인되어…')
 - 해석·추론·진단 단정·장식적 표현 금지
 - 날짜/시간 흐름이 크게 바뀌거나 외부 병원 평가를 분리할 때 줄바꿈 가능
 
@@ -48,14 +49,6 @@
 - **확인된 경우 포함**: prior evaluation 결과, associated symptoms, 수치/severity
 - **생략 가능**: 현재 episode와 직접 관계 없는 오래된 병력, ROS 전체, 과도한 배경 설명
 
-## C.C.별 특이사항
-
-- Chest pain: NTG 반응 여부, 동반 증상(dyspnea, diaphoresis, palpitation), 방사통 포함
-- Dyspnea: 과거 유사 episode, 기존 처방(흡입기 등) 사용 여부, 119 이송 시 산소 정보
-- Hemoptysis: 출혈 시작 시점, 혈액량(횟수/크기), 선홍색 여부, 동반 호흡기 증상
-- Abdominal pain: 식사 연관성, GI 동반 증상(N/V/D), 외부 CT 결과
-- GI bleeding: 출혈 횟수와 양, hematemesis/melena/hematochezia 구분, 내원 직접 계기, 음주력·NSAID 복용 여부(확인된 경우)
-
 ## 참고 예시 문장
 
 > 상기 환자 25.09.25 12:00 점심 먹은 이후부터 발생한 epigastric region pain이 완화 없이 지속되어 본원 응급실 내원함.
@@ -69,6 +62,7 @@
 - piInputs: StructuredCase에서 sections에 'pi'가 포함된 카드 목록 (normalized_text, category 포함)
 - ccSpecificFields: C.C. 특화 필드 (onset, character, ntg_response 등)
 - rawInputs: 원본 입력 텍스트 목록 (뉘앙스 보존용)
+- hpiHints: (선택적, 문자열) 이 C.C.에서 P.I 서술 시 반드시 고려해야 할 포함 기준. 확인된 정보가 있을 때만 적용하고, 없는 사실을 추가하지 말 것
 - referenceExamples: (선택적, 배열) 동일 C.C.의 모범 P.I 출력 예시. **스타일(문체·어휘·약어·줄바꿈)만 참고**할 것. 예시 안의 수치·증상·병력은 절대 현재 차팅에 차용하지 말 것
 
 rawInputs의 원본 표현을 최대한 살리되, P.I 구조 규칙에 맞게 정리하세요.

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Menu,
@@ -32,9 +32,25 @@ interface MobileNavProps {
 export function MobileNav({ isAdmin }: MobileNavProps) {
   const [open, setOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
+  // data-view="desktop" 여부: auto 모드에서 PC 기기로 판정된 경우 true
+  const [actuallyDesktop, setActuallyDesktop] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { viewMode, setViewMode } = useViewMode();
+
+  useEffect(() => {
+    const check = () =>
+      setActuallyDesktop(
+        document.documentElement.getAttribute("data-view") === "desktop"
+      );
+    check();
+    const obs = new MutationObserver(check);
+    obs.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-view"],
+    });
+    return () => obs.disconnect();
+  }, [viewMode]);
 
   function handleClose() {
     setOpen(false);
@@ -141,23 +157,28 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
               </div>
             )}
 
-            {/* 뷰 모드 전환 버튼 */}
-            <div className="my-2 border-t pt-2">
-              <button
-                onClick={handleDesktopToggle}
-                className={cn(
-                  "flex w-full items-center gap-2 rounded-md px-2 py-3 text-sm transition-colors",
-                  viewMode === "desktop"
-                    ? "font-medium text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <Monitor className="size-4 shrink-0" />
-                {viewMode === "desktop"
-                  ? "PC 버전 보는 중 (취소)"
-                  : "PC 버전으로 보기"}
-              </button>
-            </div>
+            {/* 뷰 모드 전환 버튼
+                - auto + PC 기기: data-view="desktop"이 자동으로 설정되어 있으므로 버튼 불필요
+                - auto + 모바일 기기: "PC 버전으로 보기" 표시
+                - 명시적 desktop 모드: "PC 버전 보는 중 (취소)" 표시 */}
+            {!(actuallyDesktop && viewMode === "auto") && (
+              <div className="my-2 border-t pt-2">
+                <button
+                  onClick={handleDesktopToggle}
+                  className={cn(
+                    "flex w-full items-center gap-2 rounded-md px-2 py-3 text-sm transition-colors",
+                    viewMode === "desktop"
+                      ? "font-medium text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Monitor className="size-4 shrink-0" />
+                  {viewMode === "desktop"
+                    ? "PC 버전 보는 중 (취소)"
+                    : "PC 버전으로 보기"}
+                </button>
+              </div>
+            )}
 
             {/* 로그아웃 */}
             <div className="mb-2 border-t pt-2">

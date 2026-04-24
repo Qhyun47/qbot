@@ -33,6 +33,11 @@ export function loadTemplate(templateKey: string): object {
   return JSON.parse(fs.readFileSync(filePath, "utf-8"));
 }
 
+export function loadHpiHints(templateKey: string): string | null {
+  const templateData = loadTemplate(templateKey) as Record<string, unknown>;
+  return (templateData.hpi_hints as string) ?? null;
+}
+
 export function loadPe(templateKey: string): object | null {
   const templateData = loadTemplate(templateKey) as Record<string, unknown>;
   return (templateData.pe as object) ?? null;
