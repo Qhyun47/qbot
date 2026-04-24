@@ -11,6 +11,7 @@ import { ConditionalHeader } from "@/components/layout/conditional-header";
 import { getIsAdmin } from "@/lib/auth/is-admin";
 import { getLayoutSettings } from "@/lib/settings/actions";
 import { FullscreenManager } from "@/components/pwa/fullscreen-manager";
+import { AiDisclaimerModal } from "@/components/ai-disclaimer-modal";
 
 /**
  * 관리자 여부를 확인하고 NavLinks에 isAdmin을 주입하는 Server Component.
@@ -77,6 +78,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         </ConditionalHeader>
       </Suspense>
       <main className="flex flex-1 flex-col">{children}</main>
+      <AiDisclaimerModal />
       <Toaster />
     </div>
   );
