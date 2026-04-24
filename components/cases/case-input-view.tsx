@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Rows2, Columns2, Square, Zap, Loader2 } from "lucide-react";
 import { ResizableSplit } from "@/components/cases/resizable-split";
@@ -79,6 +79,7 @@ export function CaseInputView({
   from,
 }: CaseInputViewProps) {
   const router = useRouter();
+  const rootRef = useRef<HTMLDivElement>(null);
   const [bedZone, setBedZone] = useState<BedZone>(defaultBedZone);
   const [bedNumber, setBedNumber] = useState<number>(defaultBedNumber);
   const [bedPickerOpen, setBedPickerOpen] = useState(false);
@@ -138,6 +139,26 @@ export function CaseInputView({
         .catch(() => setGuidelineContent(null));
     }
   }, [defaultCc]);
+
+  // Android Chrome: 키보드가 올라오면 visual viewport가 스크롤되어
+  // fixed 컨테이너가 화면 위로 밀려나는 문제를 보정
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      const el = rootRef.current;
+      if (!el) return;
+      el.style.top = `${vv.offsetTop}px`;
+      el.style.height = `${vv.height}px`;
+    };
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+    update();
+    return () => {
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
+    };
+  }, []);
 
   const handleBedChange = (zone: BedZone, number: number | null) => {
     setBedZone(zone);
@@ -366,6 +387,7 @@ export function CaseInputView({
 
   return (
     <div
+      ref={rootRef}
       className="fixed inset-0 flex flex-col"
       style={{ fontSize: `${caseInputFontSize}px` }}
     >

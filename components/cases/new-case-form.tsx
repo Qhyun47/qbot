@@ -104,11 +104,32 @@ export function NewCaseForm({
   const [navigatingBack, setNavigatingBack] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [, startTransition] = useTransition();
+  const rootRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const prevCardsLengthRef = useRef(0);
 
   useEffect(() => {
     createCase().then((id) => setCaseId(id));
+  }, []);
+
+  // Android Chrome: 키보드가 올라오면 visual viewport가 스크롤되어
+  // fixed 컨테이너가 화면 위로 밀려나는 문제를 보정
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      const el = rootRef.current;
+      if (!el) return;
+      el.style.top = `${vv.offsetTop}px`;
+      el.style.height = `${vv.height}px`;
+    };
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+    update();
+    return () => {
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
+    };
   }, []);
 
   useEffect(() => {
@@ -472,6 +493,7 @@ export function NewCaseForm({
         </AlertDialogContent>
       </AlertDialog>
       <div
+        ref={rootRef}
         className="fixed inset-0 flex flex-col"
         style={{ fontSize: `${activeFontSize}px` }}
       >

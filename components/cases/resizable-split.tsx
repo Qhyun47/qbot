@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { GripVertical, GripHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +24,25 @@ export function ResizableSplit({
   const [firstPercent, setFirstPercent] = useState(defaultFirstPercent);
   const [dragging, setDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  // 첫 번째 패널의 픽셀 크기를 기억 — 키보드 등으로 컨테이너가 줄어도 유지
+  const firstPxRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const observer = new ResizeObserver(() => {
+      if (firstPxRef.current === null) return;
+      const rect = container.getBoundingClientRect();
+      const total = direction === "horizontal" ? rect.width : rect.height;
+      if (total <= 0) return;
+      const minPx = (total * MIN_PERCENT) / 100;
+      const maxPx = (total * (100 - MIN_PERCENT)) / 100;
+      const clamped = Math.max(minPx, Math.min(maxPx, firstPxRef.current));
+      setFirstPercent((clamped / total) * 100);
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [direction]);
 
   const startDrag = useCallback(
     (startClientPos: number) => {
@@ -41,6 +60,7 @@ export function ResizableSplit({
         let pct = (offset / total) * 100;
         pct = Math.max(MIN_PERCENT, Math.min(100 - MIN_PERCENT, pct));
         if (Math.abs(pct - SNAP_PERCENT) <= SNAP_THRESHOLD) pct = SNAP_PERCENT;
+        firstPxRef.current = (pct / 100) * total;
         setFirstPercent(pct);
       };
 
