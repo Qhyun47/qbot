@@ -16,8 +16,24 @@
 
 ## 스테이징 규칙
 
-- 임시 파일, 로그 파일, `.env` 계열은 절대 포함하지 않음
-- `shrimp_data/` 폴더는 포함하지 않음
-- 변경된 소스 파일만 명시적으로 `git add` (와일드카드 지양)
+아래 **제외 목록에 해당하지 않는 모든 변경/신규 파일**을 커밋에 포함한다.
+파일의 관련성을 임의로 판단해 제외하는 행위는 금지한다.
+
+### 제외 목록 (이것만 제외, 나머지는 전부 포함)
+
+- `shrimp_data/` 폴더 전체
+- `*.log` 파일
+- `.env`, `.env.*`, `.env.local` 등 환경변수 파일
+- OS/에디터 임시 파일 (`.DS_Store`, `Thumbs.db` 등)
+
+### 스테이징 방법
+
+```bash
+git add -A
+git restore --staged shrimp_data/ 2>/dev/null || true
+git restore --staged "*.log" 2>/dev/null || true
+```
+
+위 명령 실행 후 `git status`로 staged 목록을 확인한다.
 
 $ARGUMENTS
