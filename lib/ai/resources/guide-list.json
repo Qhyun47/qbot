@@ -1,9 +1,9 @@
 [
   { "guideKey": "im-basic", "displayName": "IM 기본" },
-  { "guideKey": "chest-pain", "displayName": "Chest pain" },
-  { "guideKey": "dyspnea", "displayName": "Dyspnea" },
-  { "guideKey": "hemoptysis", "displayName": "Hemoptysis" },
-  { "guideKey": "abdominal-pain", "displayName": "Abdominal pain" },
-  { "guideKey": "gi-bleeding", "displayName": "GI bleeding" },
-  { "guideKey": "ckd-hd-pd", "displayName": "CKD, HD/PD" }
+  { "guideKey": "chest-pain", "displayName": "IM - Chest pain" },
+  { "guideKey": "dyspnea", "displayName": "IM - Dyspnea" },
+  { "guideKey": "hemoptysis", "displayName": "IM - Hemoptysis" },
+  { "guideKey": "abdominal-pain", "displayName": "IM/GS - Abd pain" },
+  { "guideKey": "gi-bleeding", "displayName": "IM - GI bleeding" },
+  { "guideKey": "ckd-hd-pd", "displayName": "IM - CKD, HD/PD" }
 ]
