@@ -1,0 +1,144 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SkinLesionCase",
+  "description": "피부 병변(Skin lesion) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history",
+    "family_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류. 아래 enum 값 중 가장 적합한 것 하나를 선택.",
+            "enum": [
+              "onset",
+              "location",
+              "character",
+              "trigger_insect",
+              "trigger_food",
+              "trigger_medication",
+              "trigger_cosmetic",
+              "trigger_contact",
+              "associated_symptom",
+              "severity",
+              "prior_episode",
+              "vital_sign",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "family_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. 카드-섹션 매핑 기준: onset/location/character/trigger_insect/trigger_food/trigger_medication/trigger_cosmetic/trigger_contact/associated_symptom/severity/prior_episode → [pi, template] | vital_sign → [pi] | past_history/medication_history/operation_history/family_history → [history] 전용 (HPI·상용구에 포함 금지)",
+            "items": {
+              "type": "string",
+              "enum": ["pi", "template", "history", "pe"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "증상 발생 시점 (예: '3일 전', '금일 오전'). 없으면 null."
+    },
+    "location": {
+      "type": ["string", "null"],
+      "description": "피부 병변 발생 부위 (예: 'both arms', 'trunk', 'whole body', 'face'). 없으면 null."
+    },
+    "character": {
+      "type": ["string", "null"],
+      "description": "병변 양상/성질 (예: 'erythematous patch', 'papule', 'vesicle', 'urticarial wheal', 'maculopapular rash'). 없으면 null."
+    },
+    "trigger_insect": {
+      "type": ["boolean", "null"],
+      "description": "벌레 물림/접촉 유발 여부. true/false/null."
+    },
+    "trigger_food": {
+      "type": ["string", "null"],
+      "description": "의심 음식 (예: '새우', '견과류', '해산물'). 없으면 null."
+    },
+    "trigger_medication": {
+      "type": ["string", "null"],
+      "description": "최근 변경 또는 추가된 약물 (예: 'NSAIDs', '항생제'). 없으면 null."
+    },
+    "trigger_cosmetic": {
+      "type": ["boolean", "null"],
+      "description": "샤워용품·화장품 등 외용품 변경 여부. true/false/null."
+    },
+    "trigger_contact": {
+      "type": ["boolean", "null"],
+      "description": "동거인 유사 증상 여부(접촉 전파 가능성). true/false/null."
+    },
+    "pruritus": {
+      "type": ["boolean", "null"],
+      "description": "가려움증 동반 여부. true/false/null."
+    },
+    "severity": {
+      "type": ["string", "null"],
+      "description": "증상 강도 표현 (예: 'NRS 5/10', 'mild', 'severe'). 없으면 null."
+    },
+    "associated_symptoms": {
+      "type": ["array", "null"],
+      "description": "동반 증상 목록 (예: fever, chill, dyspnea, angioedema, urinary symptom, headache, dizziness 등). 없으면 null.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "prior_episode": {
+      "type": ["string", "null"],
+      "description": "유사 피부 병변 과거 에피소드 (예: '6개월 전 동일 양상, 항히스타민제 복용 후 호전'). 없으면 null."
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록 (예: ['atopic dermatitis', '천식', '알레르기 비염']). History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "family_history": {
+      "type": ["array", "null"],
+      "description": "가족력 목록. null이면 History 출력 시 해당 항목 전체 생략.",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

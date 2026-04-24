@@ -373,13 +373,15 @@ export function NewCaseForm({
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {pendingTemplateKeys.map((key) => {
-                    const label =
-                      (
-                        templateListJson as {
-                          templateKey: string;
-                          displayName: string;
-                        }[]
-                      ).find((t) => t.templateKey === key)?.displayName ?? key;
+                    const entry = (
+                      templateListJson as {
+                        templateKey: string;
+                        displayName: string;
+                        category?: string;
+                      }[]
+                    ).find((t) => t.templateKey === key);
+                    const label = entry?.displayName ?? key;
+                    const catLabel = entry?.category?.replace(/^\d+\.\s*/, "");
                     return (
                       <Button
                         key={key}
@@ -387,8 +389,14 @@ export function NewCaseForm({
                         variant="outline"
                         size="sm"
                         onClick={() => handleTemplateKeyConfirm(key)}
+                        className="gap-1.5"
                       >
                         {label}
+                        {catLabel && (
+                          <span className="rounded bg-muted px-1 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                            {catLabel}
+                          </span>
+                        )}
                       </Button>
                     );
                   })}

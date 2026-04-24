@@ -1,7 +1,38 @@
 [
-  { "templateKey": "chest-pain", "displayName": "Chest pain" },
-  { "templateKey": "dyspnea", "displayName": "Dyspnea" },
-  { "templateKey": "hemoptysis", "displayName": "Hemoptysis" },
-  { "templateKey": "abdominal-pain", "displayName": "Abdominal pain" },
-  { "templateKey": "gi-bleeding", "displayName": "GI bleeding" }
+  {
+    "templateKey": "im-basic",
+    "displayName": "내과 기본",
+    "category": "0. IM"
+  },
+  {
+    "templateKey": "chest-pain",
+    "displayName": "Chest pain",
+    "category": "0. IM"
+  },
+  { "templateKey": "dyspnea", "displayName": "Dyspnea", "category": "0. IM" },
+  {
+    "templateKey": "abdominal-pain",
+    "displayName": "Abdominal pain",
+    "category": "0. IM"
+  },
+  {
+    "templateKey": "gi-bleeding",
+    "displayName": "GI bleeding",
+    "category": "0. IM"
+  },
+  {
+    "templateKey": "hemoptysis",
+    "displayName": "Hemoptysis",
+    "category": "0. IM"
+  },
+  {
+    "templateKey": "urticaria",
+    "displayName": "Urticaria",
+    "category": "0. IM"
+  },
+  {
+    "templateKey": "skin-lesion",
+    "displayName": "피부 병변",
+    "category": "0. IM"
+  }
 ]

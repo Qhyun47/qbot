@@ -1,6 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, XCircle, ChevronDown, ChevronUp } from "lucide-react";
 import type { TemplateItem } from "@/lib/admin/resource-reader";
 
 interface TemplateDetailProps {
@@ -9,20 +12,19 @@ interface TemplateDetailProps {
 
 function OutputPreview({ label, text }: { label: string; text: string }) {
   if (!text) return null;
-  const lines = text.split("\n");
-  const preview = lines.slice(0, 7).join("\n");
   return (
     <div className="space-y-1">
       <p className="text-xs font-medium">{label}</p>
       <pre className="overflow-x-auto rounded border bg-muted/50 p-2 text-xs leading-relaxed">
-        {preview}
-        {lines.length > 7 && "\n..."}
+        {text}
       </pre>
     </div>
   );
 }
 
 export function TemplateDetail({ item }: TemplateDetailProps) {
+  const [examplesOpen, setExamplesOpen] = useState(false);
+
   return (
     <div className="space-y-4">
       {/* 헤더 */}
@@ -36,6 +38,11 @@ export function TemplateDetail({ item }: TemplateDetailProps) {
             <CheckCircle2 className="size-4 text-emerald-500" />
           ) : (
             <XCircle className="size-4 text-destructive" />
+          )}
+          {item.category && (
+            <Badge variant="secondary" className="text-xs">
+              {item.category.replace(/^\d+\.\s*/, "")}
+            </Badge>
           )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -64,7 +71,7 @@ export function TemplateDetail({ item }: TemplateDetailProps) {
               </code>
             </CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-4 px-4 pb-4 sm:grid-cols-3">
+          <CardContent className="flex flex-col gap-4 px-4 pb-4">
             <OutputPreview
               label={`P.I 상용구 (fields)`}
               text={item.mainOutputExample}
@@ -90,6 +97,45 @@ export function TemplateDetail({ item }: TemplateDetailProps) {
           </span>
         </div>
       )}
+
+      <div className="border-t" />
+
+      {/* 차팅 예시 섹션 */}
+      <div className="space-y-2">
+        {item.examplesExists ? (
+          <>
+            <button
+              type="button"
+              onClick={() => setExamplesOpen((prev) => !prev)}
+              className="flex w-full items-center justify-between rounded-md border px-3 py-2 text-left text-sm font-medium transition-colors hover:bg-accent/50"
+            >
+              <span>
+                차팅 예시{" "}
+                <span className="ml-1 text-xs font-normal text-muted-foreground">
+                  ({item.exampleCount}개)
+                </span>
+              </span>
+              {examplesOpen ? (
+                <ChevronUp className="size-4 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="size-4 text-muted-foreground" />
+              )}
+            </button>
+            {examplesOpen && (
+              <pre className="overflow-x-auto whitespace-pre-wrap rounded border bg-muted/50 p-3 text-xs leading-relaxed">
+                {item.examplesContent}
+              </pre>
+            )}
+          </>
+        ) : (
+          <div className="flex items-center gap-2 rounded-md border border-dashed px-3 py-2">
+            <XCircle className="size-4 shrink-0 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">
+              차팅 예시가 없습니다.
+            </span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

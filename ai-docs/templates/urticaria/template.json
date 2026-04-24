@@ -1,0 +1,83 @@
+{
+  "templateKey": "urticaria",
+  "cc": "Urticaria",
+  "description": "두드러기/피부발진 환자 EMR 상용구 템플릿",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "fields": [
+    {
+      "key": "onset",
+      "label": "onset",
+      "type": "open",
+      "description": "증상 발생 시점 (예: '3일 전', '금일 오전'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "location",
+      "label": "location",
+      "type": "open",
+      "description": "두드러기/발진 발생 부위 (예: 'both arms', 'trunk', 'whole body'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "flushing",
+      "label": "flushing(안면홍조)",
+      "type": "open",
+      "description": "안면홍조 여부 및 양상. 있으면 표현 기재, 없으면 빈 문자열."
+    },
+    {
+      "key": "pruritus",
+      "label": "pruritus",
+      "type": "symptom_check",
+      "format": "pruritus({pruritus})",
+      "slots": [
+        {
+          "key": "pruritus",
+          "symptom": "Pruritus",
+          "description": "가려움증",
+          "default": "-"
+        }
+      ],
+      "description": "가려움증 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "asso_sx",
+      "label": "asso Sx",
+      "type": "open",
+      "description": "동반 증상 서술형 (예: angioedema, dyspnea, abdominal pain 등). 정보 없으면 빈 문자열."
+    }
+  ],
+  "output_example": "* Urticaria\nonset :\nlocation : \nflushing(안면홍조) :\npruritus(-)\nasso Sx :",
+  "pe": {
+    "fields": [
+      {
+        "key": "general",
+        "label": "General / Vital status",
+        "default": "Vital stable, Mental alert"
+      },
+      {
+        "key": "lip_laryngeal_edema",
+        "label": "입술부종 / 후두부종",
+        "default": ""
+      },
+      {
+        "key": "neck_stridor",
+        "label": "Neck stridor",
+        "default": "(-)"
+      },
+      {
+        "key": "lung_sound",
+        "label": "Lung sound",
+        "default": "Clear breathing sound, wheezing/rales (-/-)"
+      }
+    ],
+    "output_example": "Vital stable, Mental alert\n입술부종 / 후두부종 :\nNeck stridor (-)\nLung sound : Clear breathing sound, wheezing/rales (-/-)"
+  },
+  "history": {
+    "fields": [
+      { "key": "past", "label": "Past Hx", "default": "" },
+      { "key": "operation", "label": "OP Hx", "default": "" },
+      { "key": "medication", "label": "Med Hx", "default": "" },
+      { "key": "urticaria_hx", "label": "Urticaria Hx", "default": "" },
+      { "key": "allergy", "label": "Allergy Hx", "default": "" }
+    ],
+    "output_example": "Past Hx :\nOP Hx :\nMed Hx :\nUrticaria Hx :\nAllergy Hx:"
+  }
+}

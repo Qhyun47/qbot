@@ -2,17 +2,17 @@
   "templateKey": "chest-pain",
   "cc": "Chest pain",
   "description": "흉통 환자 EMR 상용구 템플릿",
-  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라. 단, '* Chest pain' 헤더는 입력된 C.C.를 그대로 사용하라 (예: C.C.가 'Chest discomfort'이면 '* Chest discomfort'로 출력).",
   "special_questions": [
     {
       "key": "ntg_response",
-      "label": "NTG response?",
+      "label": "NTG response :",
       "type": "open",
       "description": "NTG(니트로글리세린) 투여 후 증상 반응 여부 서술. 과거 이력과 금번 반응을 함께 서술 (예: '3일간 NTG 사용 시 5분 이내 호전, 금일 NTG 무반응'). 투여 이력 없으면 빈 문자열."
     },
     {
       "key": "ongoing",
-      "label": "ongoing?",
+      "label": "ongoing :",
       "type": "open",
       "description": "내원 시점에도 흉통이 지속 중인지 여부. 지속 중이면 '+', 아니면 '-'. 정보 없으면 빈 문자열."
     }
@@ -160,7 +160,7 @@
       "description": "식욕부진/구역/구토/설사/변비 체크. 언급 없으면 기본값(-) 유지."
     }
   ],
-  "output_example": "NTG response?\nongoing?\n\n* Chest pain\nOnset : \nDuration : \nLocation : \nCharacter : \nAsso. Sx. : \nRadiating pain :\nResting pain :\nExertional pain : \n\nAgg.relieving factor :\n\nF/C(-/-)  C/S/R(-/-/-)  A/N/V/D/C(-/-/-/-/-)",
+  "output_example": "NTG response : \nongoing : \n\n* Chest pain\nOnset : \nDuration : \nLocation : \nCharacter : \nAsso. Sx. : \nRadiating pain :\nResting pain :\nExertional pain : \n\nAgg.relieving factor :\n\nF/C(-/-)  C/S/R(-/-/-)  A/N/V/D/C(-/-/-/-/-)",
   "pe": {
     "fields": [
       {

@@ -5,7 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -16,7 +18,31 @@ import { TemplateDetail } from "@/components/admin/template-detail";
 import type {
   ResourceOverviewData,
   CcResourceItem,
+  TemplateItem,
 } from "@/lib/admin/resource-reader";
+import categoriesRaw from "@/lib/ai/resources/template-categories.json";
+
+const allCategories = categoriesRaw as string[];
+
+function getCategoryLabel(category: string): string {
+  return category.replace(/^\d+\.\s*/, "");
+}
+
+function groupTemplatesByCategory(
+  items: TemplateItem[]
+): { label: string; items: TemplateItem[] }[] {
+  const groups = allCategories
+    .map((cat) => ({
+      label: getCategoryLabel(cat),
+      items: items.filter((t) => t.category === cat),
+    }))
+    .filter((g) => g.items.length > 0);
+  const uncategorized = items.filter((t) => !t.category);
+  if (uncategorized.length > 0) {
+    groups.push({ label: "기타", items: uncategorized });
+  }
+  return groups;
+}
 
 type FilterType = "all" | "guide" | "template";
 
@@ -83,18 +109,20 @@ function ResourceSidebarItem({
   linkedCount,
   selected,
   onClick,
+  exampleCount,
 }: {
   displayName: string;
   linkedCount: number;
   selected: boolean;
   onClick: () => void;
+  exampleCount?: number;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        "w-full px-3 py-2.5 text-left transition-colors",
+        "w-full px-3 py-2 text-left transition-colors",
         selected
           ? "bg-accent text-accent-foreground"
           : "text-foreground hover:bg-accent/50"
@@ -108,6 +136,22 @@ function ResourceSidebarItem({
           </Badge>
         )}
       </div>
+      {exampleCount !== undefined && (
+        <div className="mt-1">
+          {exampleCount > 0 ? (
+            <Badge className="h-4 bg-violet-100 px-1.5 text-[10px] text-violet-800 hover:bg-violet-100 dark:bg-violet-900/40 dark:text-violet-300">
+              예시 {exampleCount}개
+            </Badge>
+          ) : (
+            <Badge
+              variant="outline"
+              className="h-4 px-1.5 text-[10px] text-muted-foreground"
+            >
+              예시 없음
+            </Badge>
+          )}
+        </div>
+      )}
     </button>
   );
 }
@@ -116,7 +160,9 @@ export function ResourceOverview({ data }: ResourceOverviewProps) {
   const { stats } = data;
   const [filter, setFilter] = useState<FilterType>("all");
 
-  const topLevelItems = data.items.filter((i) => !i.aliasOf);
+  const topLevelItems = data.items
+    .filter((i) => !i.aliasOf)
+    .sort((a, b) => a.cc.localeCompare(b.cc));
 
   // C.C 탭 선택 상태
   const [selectedCc, setSelectedCc] = useState(topLevelItems[0]?.cc ?? "");
@@ -141,7 +187,7 @@ export function ResourceOverview({ data }: ResourceOverviewProps) {
     setFilter(next);
   }
 
-  // 현재 필터에 따른 사이드바/상세 렌더링 정보
+  // 현재 필터에 따른 사이드바/상세 렌더링 정보 (가이드라인만 사용)
   const sidebarItems: {
     id: string;
     displayName: string;
@@ -153,13 +199,9 @@ export function ResourceOverview({ data }: ResourceOverviewProps) {
           displayName: g.displayName,
           linkedCount: g.linkedCcs.length,
         }))
-      : filter === "template"
-        ? data.templateItems.map((t) => ({
-            id: t.key,
-            displayName: t.displayName,
-            linkedCount: t.linkedCcs.length,
-          }))
-        : [];
+      : [];
+
+  const templateGroups = groupTemplatesByCategory(data.templateItems);
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -169,8 +211,16 @@ export function ResourceOverview({ data }: ResourceOverviewProps) {
           {(
             [
               { key: "all", label: "C.C", count: stats.totalCc },
-              { key: "guide", label: "가이드라인", count: stats.withGuide },
-              { key: "template", label: "상용구", count: stats.withTemplate },
+              {
+                key: "guide",
+                label: "가이드라인",
+                count: data.guideItems.length,
+              },
+              {
+                key: "template",
+                label: "상용구",
+                count: data.templateItems.length,
+              },
             ] as const
           ).map(({ key, label, count }) => (
             <button
@@ -240,10 +290,18 @@ export function ResourceOverview({ data }: ResourceOverviewProps) {
                 <SelectValue placeholder="상용구 선택..." />
               </SelectTrigger>
               <SelectContent>
-                {data.templateItems.map((t) => (
-                  <SelectItem key={t.key} value={t.key} className="text-sm">
-                    {t.displayName}
-                  </SelectItem>
+                {templateGroups.map((group) => (
+                  <SelectGroup key={group.label}>
+                    <SelectLabel className="text-xs">{group.label}</SelectLabel>
+                    {group.items.map((t) => (
+                      <SelectItem key={t.key} value={t.key} className="text-sm">
+                        {t.displayName}
+                        {t.exampleCount > 0
+                          ? ` (예시 ${t.exampleCount}개)`
+                          : " (예시 없음)"}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
                 ))}
               </SelectContent>
             </Select>
@@ -261,7 +319,7 @@ export function ResourceOverview({ data }: ResourceOverviewProps) {
                 onClick={() => setSelectedCc(item.cc)}
               />
             ))}
-          {filter !== "all" &&
+          {filter === "guide" &&
             (sidebarItems.length === 0 ? (
               <p className="px-3 py-4 text-xs text-muted-foreground">
                 등록된 항목이 없습니다.
@@ -272,17 +330,33 @@ export function ResourceOverview({ data }: ResourceOverviewProps) {
                   key={id}
                   displayName={displayName}
                   linkedCount={linkedCount}
-                  selected={
-                    filter === "guide"
-                      ? selectedGuide === id
-                      : selectedTemplate === id
-                  }
-                  onClick={() =>
-                    filter === "guide"
-                      ? setSelectedGuide(id)
-                      : setSelectedTemplate(id)
-                  }
+                  selected={selectedGuide === id}
+                  onClick={() => setSelectedGuide(id)}
                 />
+              ))
+            ))}
+          {filter === "template" &&
+            (templateGroups.length === 0 ? (
+              <p className="px-3 py-4 text-xs text-muted-foreground">
+                등록된 항목이 없습니다.
+              </p>
+            ) : (
+              templateGroups.map((group) => (
+                <div key={group.label}>
+                  <p className="sticky top-0 bg-background/95 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+                    {group.label}
+                  </p>
+                  {group.items.map((t) => (
+                    <ResourceSidebarItem
+                      key={t.key}
+                      displayName={t.displayName}
+                      linkedCount={t.linkedCcs.length}
+                      selected={selectedTemplate === t.key}
+                      onClick={() => setSelectedTemplate(t.key)}
+                      exampleCount={t.exampleCount}
+                    />
+                  ))}
+                </div>
               ))
             ))}
         </div>

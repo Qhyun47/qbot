@@ -5,12 +5,24 @@
 시작 전 반드시 아래 순서로 파일을 읽습니다:
 
 1. `lib/ai/resources/template-list.json` — 중복 및 기존 항목 확인
-2. `lib/ai/resources/cc-list.json` — 사용자가 언급한 C.C. 존재 여부 확인용
-3. `ai-docs/pending-matches.md` — 대기 커넥션 확인 (섹션 2: C.C.→상용구 대기)
-4. `ai-docs/templates/chest-pain/template.json` — 템플릿 구조 참조 (fields, pe, history 섹션 구조 포함)
-5. `ai-docs/templates/chest-pain/schema.json` — 스키마 구조 참조
+2. `lib/ai/resources/template-categories.json` — 대분류 목록 확인
+3. `lib/ai/resources/cc-list.json` — 사용자가 언급한 C.C. 존재 여부 확인용
+4. `ai-docs/pending-matches.md` — 대기 커넥션 확인 (섹션 2: C.C.→상용구 대기)
+5. `ai-docs/templates/chest-pain/template.json` — 템플릿 구조 참조 (fields, pe, history 섹션 구조 포함)
+6. `ai-docs/templates/chest-pain/schema.json` — 스키마 구조 참조
 
 이후 CLAUDE.md "상용구 추가 절차"를 단계별로 따릅니다.
+
+**대분류(카테고리) 확인:**
+
+파일 읽기 후, 반드시 사용자에게 명시적으로 질문합니다:
+"이 상용구는 어느 분류에 넣을까요? `template-categories.json`에 등록된 분류 목록을 보여주고, 번호로 선택하게 합니다. 선택된 값을 `template-list.json`의 해당 항목 `category` 필드에 저장합니다."
+
+**분류 내 순서 확인:**
+
+카테고리 선택을 받은 뒤, 해당 분류에 이미 존재하는 상용구 목록을 번호와 함께 보여주고, 반드시 사용자에게 추가로 질문합니다:
+"이 분류에 현재 등록된 상용구 순서입니다. 새 상용구를 어느 위치에 배치할까요? 마지막에 추가하려면 '마지막'이라고, 특정 순서에 넣으려면 몇 번째 뒤에 넣을지 알려주세요."
+사용자가 선택한 위치를 기준으로 `template-list.json`에서 해당 분류 항목들 사이의 올바른 위치에 새 항목을 삽입합니다.
 
 **C.C. 커넥션 확인:**
 

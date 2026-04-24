@@ -1,0 +1,240 @@
+{
+  "templateKey": "skin-lesion",
+  "cc": "Skin lesion",
+  "description": "피부 병변 환자 EMR 상용구 템플릿",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "fields": [
+    {
+      "key": "insect_bite",
+      "label": "벌레 물린 느낌",
+      "type": "symptom_check",
+      "format": "벌레 물린 느낌 ({value})",
+      "slots": [
+        {
+          "key": "value",
+          "symptom": "Insect bite",
+          "description": "벌레에 물린 느낌 또는 노출",
+          "default": "-"
+        }
+      ],
+      "description": "벌레 물림 관련 증상/노출 여부. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "food_exposure",
+      "label": "잘못 먹은 음식",
+      "type": "symptom_check",
+      "format": "잘못 먹은 음식 ({value})",
+      "slots": [
+        {
+          "key": "value",
+          "symptom": "Suspicious food intake",
+          "description": "의심 음식 섭취",
+          "default": "-"
+        }
+      ],
+      "description": "의심 음식 섭취 여부. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "medication_change",
+      "label": "약 바꾼것",
+      "type": "symptom_check",
+      "format": "약 바꾼것 ({value})",
+      "slots": [
+        {
+          "key": "value",
+          "symptom": "New medication",
+          "description": "최근 약물 변경",
+          "default": "-"
+        }
+      ],
+      "description": "최근 약물 변경 여부. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "cosmetic_change",
+      "label": "샤워용품, 화장품 바꾼적",
+      "type": "symptom_check",
+      "format": "샤워용품, 화장품 바꾼적 ({value})",
+      "slots": [
+        {
+          "key": "value",
+          "symptom": "New cosmetics or hygiene products",
+          "description": "샤워용품/화장품 등 외용품 변경",
+          "default": "-"
+        }
+      ],
+      "description": "샤워용품·화장품 등 변경 여부. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "contact_symptom",
+      "label": "같이 사는 사람 증상",
+      "type": "symptom_check",
+      "format": "같이 사는 사람 증상 ({value})",
+      "slots": [
+        {
+          "key": "value",
+          "symptom": "Same household symptom",
+          "description": "동거인 유사 증상",
+          "default": "-"
+        }
+      ],
+      "description": "동거인 유사 증상 여부. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "fever_chill",
+      "label": "F/C",
+      "type": "symptom_check",
+      "format": "F/C({fever}/{chill})",
+      "slots": [
+        {
+          "key": "fever",
+          "symptom": "Fever",
+          "description": "발열",
+          "default": "-"
+        },
+        {
+          "key": "chill",
+          "symptom": "Chill",
+          "description": "오한",
+          "default": "-"
+        }
+      ],
+      "description": "발열/오한 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "cough_sputum_rhinorrhea",
+      "label": "C/S/R",
+      "type": "symptom_check",
+      "format": "C/S/R({cough}/{sputum}/{rhinorrhea})",
+      "slots": [
+        {
+          "key": "cough",
+          "symptom": "Cough",
+          "description": "기침",
+          "default": "-"
+        },
+        {
+          "key": "sputum",
+          "symptom": "Sputum",
+          "description": "가래",
+          "default": "-"
+        },
+        {
+          "key": "rhinorrhea",
+          "symptom": "Rhinorrhea",
+          "description": "콧물",
+          "default": "-"
+        }
+      ],
+      "description": "기침/가래/콧물 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "anvdc",
+      "label": "A/N/V/D/C",
+      "type": "symptom_check",
+      "format": "A/N/V/D/C({anorexia}/{nausea}/{vomiting}/{diarrhea}/{constipation})",
+      "slots": [
+        {
+          "key": "anorexia",
+          "symptom": "Anorexia",
+          "description": "식욕부진",
+          "default": "-"
+        },
+        {
+          "key": "nausea",
+          "symptom": "Nausea",
+          "description": "구역",
+          "default": "-"
+        },
+        {
+          "key": "vomiting",
+          "symptom": "Vomiting",
+          "description": "구토",
+          "default": "-"
+        },
+        {
+          "key": "diarrhea",
+          "symptom": "Diarrhea",
+          "description": "설사",
+          "default": "-"
+        },
+        {
+          "key": "constipation",
+          "symptom": "Constipation",
+          "description": "변비",
+          "default": "-"
+        }
+      ],
+      "description": "식욕부진/구역/구토/설사/변비 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "urinary_symptom",
+      "label": "Urinary symptom",
+      "type": "symptom_check",
+      "format": "Urinary symptom({value})",
+      "slots": [
+        {
+          "key": "value",
+          "symptom": "Urinary symptom",
+          "description": "비뇨기 증상",
+          "default": "-"
+        }
+      ],
+      "description": "비뇨기 증상 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "headache_dizziness",
+      "label": "Headache / Dizziness",
+      "type": "symptom_check",
+      "format": "Headache({headache}) Dizziness({dizziness})",
+      "slots": [
+        {
+          "key": "headache",
+          "symptom": "Headache",
+          "description": "두통",
+          "default": "-"
+        },
+        {
+          "key": "dizziness",
+          "symptom": "Dizziness",
+          "description": "어지럼",
+          "default": "-"
+        }
+      ],
+      "description": "두통/어지럼 체크. 언급 없으면 기본값(-) 유지."
+    }
+  ],
+  "output_example": "벌레 물린 느낌 (-)\n잘못 먹은 음식 (-)\n\n약 바꾼것 (-)\n샤워용품, 화장품 바꾼적 (-)\n같이 사는 사람 증상 (-)\n\nF/C(-/-) C/S/R(-/-/-)\nA/N/V/D/C(-/-/-/-/-) \nUrinary symptom(-)\nHeadache(-) Dizziness(-)",
+  "pe": {
+    "fields": [
+      {
+        "key": "lung_sound",
+        "label": "Lung sound",
+        "default": "CBS, rale(-), wheezing(-)"
+      },
+      {
+        "key": "throat_inj",
+        "label": "Throat inj.",
+        "default": "(-)"
+      },
+      {
+        "key": "abd_td",
+        "label": "Abd Td/rTd",
+        "default": "(-/-)"
+      },
+      {
+        "key": "cvat",
+        "label": "CVAT",
+        "default": "(-)"
+      }
+    ],
+    "output_example": "Lung sound : CBS, rale(-), wheezing(-)\nThroat inj. (-)\nAbd Td/rTd (-/-)\nCVAT(-)"
+  },
+  "history": {
+    "fields": [
+      { "key": "past", "label": "P.Hx", "default": "" },
+      { "key": "medication", "label": "Med.Hx", "default": "" },
+      { "key": "allergy", "label": "Allergy.Hx", "default": "" }
+    ],
+    "output_example": "P.Hx: \nMed.Hx: \nAllergy.Hx:"
+  }
+}

@@ -1,8 +1,9 @@
 [
+  { "guideKey": "im-basic", "displayName": "IM 기본" },
   { "guideKey": "chest-pain", "displayName": "Chest pain" },
   { "guideKey": "dyspnea", "displayName": "Dyspnea" },
   { "guideKey": "hemoptysis", "displayName": "Hemoptysis" },
   { "guideKey": "abdominal-pain", "displayName": "Abdominal pain" },
   { "guideKey": "gi-bleeding", "displayName": "GI bleeding" },
-  { "guideKey": "im-basic", "displayName": "IM 기본" }
+  { "guideKey": "ckd-hd-pd", "displayName": "CKD, HD/PD" }
 ]

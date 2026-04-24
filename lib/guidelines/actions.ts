@@ -1,5 +1,7 @@
 "use server";
 
+import fs from "fs/promises";
+import path from "path";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
@@ -7,6 +9,7 @@ import { loadGuide } from "@/lib/ai/load-resources";
 import type { Guideline } from "@/lib/supabase/types";
 import ccListRaw from "@/lib/ai/resources/cc-list.json";
 import guideListRaw from "@/lib/ai/resources/guide-list.json";
+import templateListRaw from "@/lib/ai/resources/template-list.json";
 
 interface CcListEntry {
   cc: string;
@@ -19,6 +22,18 @@ interface GuideListEntry {
   guideKey: string;
   displayName: string;
 }
+
+interface TemplateListEntry {
+  templateKey: string;
+  displayName: string;
+}
+
+export type TemplateContent = {
+  mainExample: string;
+  historyExample: string;
+  peExample: string;
+  displayName: string;
+};
 
 export type GuidelineData = {
   content: string | null;
@@ -278,4 +293,29 @@ export async function getAllCustomGuidelines(): Promise<Guideline[]> {
 
   if (error) throw new Error(error.message);
   return data ?? [];
+}
+
+export async function loadTemplateContent(
+  templateKey: string
+): Promise<TemplateContent | null> {
+  const tplPath = path.join(
+    process.cwd(),
+    "ai-docs/templates",
+    templateKey,
+    "template.json"
+  );
+  try {
+    const raw = await fs.readFile(tplPath, "utf-8");
+    const json = JSON.parse(raw);
+    const list = templateListRaw as TemplateListEntry[];
+    const entry = list.find((t) => t.templateKey === templateKey);
+    return {
+      mainExample: (json.output_example as string) ?? "",
+      historyExample: (json.history?.output_example as string) ?? "",
+      peExample: (json.pe?.output_example as string) ?? "",
+      displayName: entry?.displayName ?? templateKey,
+    };
+  } catch {
+    return null;
+  }
 }

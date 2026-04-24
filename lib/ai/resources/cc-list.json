@@ -45,16 +45,93 @@
   {
     "cc": "Abnormal lab",
     "guideKeys": ["im-basic"],
-    "templateKeys": []
+    "templateKeys": ["im-basic"]
   },
   {
     "cc": "Fever",
     "guideKeys": ["im-basic"],
-    "templateKeys": []
+    "templateKeys": ["im-basic"]
   },
   {
     "cc": "General weakness",
     "guideKeys": ["im-basic"],
+    "templateKeys": ["im-basic"]
+  },
+  {
+    "cc": "For paracentesis",
+    "guideKeys": ["ckd-hd-pd"],
     "templateKeys": []
+  },
+  {
+    "cc": "Nausea",
+    "guideKeys": ["im-basic"],
+    "templateKeys": ["im-basic"]
+  },
+  {
+    "cc": "Vomiting",
+    "guideKeys": ["im-basic"],
+    "templateKeys": ["im-basic"]
+  },
+  {
+    "cc": "Diarrhea",
+    "guideKeys": ["im-basic"],
+    "templateKeys": ["im-basic"]
+  },
+  {
+    "cc": "Constipation",
+    "guideKeys": ["im-basic"],
+    "templateKeys": ["im-basic"]
+  },
+  {
+    "cc": "Epigastric pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Abdominal pain"
+  },
+  {
+    "cc": "Hypogastric pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Abdominal pain"
+  },
+  {
+    "cc": "LUQ pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Abdominal pain"
+  },
+  {
+    "cc": "RUQ pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Abdominal pain"
+  },
+  {
+    "cc": "LLQ pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Abdominal pain"
+  },
+  {
+    "cc": "RLQ pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Abdominal pain"
+  },
+  {
+    "cc": "Chest discomfort",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Chest pain"
+  },
+  {
+    "cc": "Urticaria",
+    "guideKeys": [],
+    "templateKeys": ["urticaria"]
+  },
+  {
+    "cc": "Skin rash",
+    "guideKeys": [],
+    "templateKeys": ["urticaria", "skin-lesion"]
   }
 ]

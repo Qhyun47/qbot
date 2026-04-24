@@ -1,0 +1,135 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "UrticariaCase",
+  "description": "두드러기(Urticaria) / 피부발진(Skin rash) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history",
+    "family_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류. 아래 enum 값 중 가장 적합한 것 하나를 선택.",
+            "enum": [
+              "onset",
+              "location",
+              "character",
+              "flushing",
+              "pruritus",
+              "triggering_factor",
+              "angioedema",
+              "associated_symptom",
+              "severity",
+              "prior_episode",
+              "vital_sign",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "family_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. 카드-섹션 매핑 기준: onset/location/character/flushing/pruritus/triggering_factor/angioedema → [pi, template] | severity/associated_symptom/prior_episode/vital_sign → [pi] | past_history/medication_history/operation_history/family_history → [history] 전용 (PI·상용구에 포함 금지)",
+            "items": {
+              "type": "string",
+              "enum": ["pi", "template", "history", "pe"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "증상 발생 시점 (예: '3일 전', '금일 오전'). 없으면 null."
+    },
+    "location": {
+      "type": ["string", "null"],
+      "description": "두드러기/발진 발생 부위 (예: 'both arms', 'trunk', 'whole body'). 없으면 null."
+    },
+    "character": {
+      "type": ["string", "null"],
+      "description": "발진 양상 (예: 'erythematous wheal', 'maculopapular rash'). 없으면 null."
+    },
+    "flushing": {
+      "type": ["boolean", "null"],
+      "description": "안면홍조 여부. true/false/null."
+    },
+    "pruritus": {
+      "type": ["boolean", "null"],
+      "description": "가려움증 여부. true/false/null."
+    },
+    "triggering_factor": {
+      "type": ["string", "null"],
+      "description": "유발 요인 (예: '음식물', '약물', '벌레 교상', '원인불명'). 없으면 null."
+    },
+    "angioedema": {
+      "type": ["boolean", "null"],
+      "description": "혈관부종(angioedema) 동반 여부. true/false/null."
+    },
+    "associated_symptoms": {
+      "type": ["array", "null"],
+      "description": "동반 증상 목록 (예: dyspnea, abdominal pain, vomiting, dizziness 등). 없으면 null.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "severity": {
+      "type": ["string", "null"],
+      "description": "증상 중증도 (예: 'mild', 'moderate', 'severe', 'anaphylaxis 의심'). 없으면 null."
+    },
+    "prior_episode": {
+      "type": ["string", "null"],
+      "description": "유사 증상 과거 에피소드. 없으면 null."
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록. 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록. 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "family_history": {
+      "type": ["array", "null"],
+      "description": "가족력 목록. null이면 History 출력 시 해당 항목 전체 생략.",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

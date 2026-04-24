@@ -48,7 +48,7 @@ export function CcAutocomplete({ value, onSelect }: CcAutocompleteProps) {
           const bStarts = b.cc.toLowerCase().startsWith(q);
           if (aStarts && !bStarts) return -1;
           if (!aStarts && bStarts) return 1;
-          return 0;
+          return a.cc.localeCompare(b.cc);
         })
         .slice(0, 8)
     : [];

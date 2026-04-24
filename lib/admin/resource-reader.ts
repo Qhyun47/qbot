@@ -39,6 +39,7 @@ export type GuideItem = {
 export type TemplateItem = {
   key: string;
   displayName: string;
+  category?: string;
   exists: boolean;
   linkedCcs: string[];
   peFieldCount: number;
@@ -46,6 +47,9 @@ export type TemplateItem = {
   peOutputExample: string;
   historyOutputExample: string;
   mainOutputExample: string;
+  examplesExists: boolean;
+  exampleCount: number;
+  examplesContent: string;
 };
 
 export type ResourceOverviewData = {
@@ -96,6 +100,7 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
   const templateList = JSON.parse(templateListRaw) as {
     templateKey: string;
     displayName: string;
+    category?: string;
   }[];
 
   const guideDisplayMap = Object.fromEntries(
@@ -103,6 +108,9 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
   );
   const templateDisplayMap = Object.fromEntries(
     templateList.map((t) => [t.templateKey, t.displayName])
+  );
+  const templateCategoryMap = Object.fromEntries(
+    templateList.map((t) => [t.templateKey, t.category])
   );
 
   const ccList = JSON.parse(ccListRaw) as {
@@ -194,8 +202,8 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
     }
   }
 
-  // 고유 guide key 목록 (중복 제거)
-  const allGuideKeys = [...new Set(ccList.flatMap((e) => e.guideKeys))];
+  // 고유 guide key 목록 — guide-list.json 순서 유지
+  const allGuideKeys = guideList.map((g) => g.guideKey);
   const guideItems = await Promise.all(
     allGuideKeys.map(async (key) => {
       const guidePath = path.join(ROOT, "ai-docs/guides", key, "guide.html");
@@ -214,8 +222,8 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
     })
   );
 
-  // 고유 template key 목록 (중복 제거)
-  const allTemplateKeys = [...new Set(ccList.flatMap((e) => e.templateKeys))];
+  // 고유 template key 목록 — template-list.json 순서 유지
+  const allTemplateKeys = templateList.map((t) => t.templateKey);
   const templateItems = await Promise.all(
     allTemplateKeys.map(async (key) => {
       const tplPath = path.join(
@@ -224,11 +232,27 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
         key,
         "template.json"
       );
-      const exists = await fileExists(tplPath);
+      const examplesPath = path.join(
+        ROOT,
+        "ai-docs/templates",
+        key,
+        "examples.md"
+      );
+      const [exists, examplesExists] = await Promise.all([
+        fileExists(tplPath),
+        fileExists(examplesPath),
+      ]);
+      let examplesContent = "";
+      let exampleCount = 0;
+      if (examplesExists) {
+        examplesContent = await fs.readFile(examplesPath, "utf-8");
+        exampleCount = (examplesContent.match(/^# Case /gm) ?? []).length;
+      }
       if (!exists) {
         return {
           key,
           displayName: templateDisplayMap[key] ?? key,
+          category: templateCategoryMap[key],
           exists: false,
           linkedCcs: templateToCcs[key] ?? [],
           peFieldCount: 0,
@@ -236,12 +260,16 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
           peOutputExample: "",
           historyOutputExample: "",
           mainOutputExample: "",
+          examplesExists,
+          exampleCount,
+          examplesContent,
         };
       }
       const json = JSON.parse(await fs.readFile(tplPath, "utf-8"));
       return {
         key,
         displayName: templateDisplayMap[key] ?? key,
+        category: templateCategoryMap[key],
         exists: true,
         linkedCcs: templateToCcs[key] ?? [],
         peFieldCount: (json.pe?.fields?.length as number) ?? 0,
@@ -249,6 +277,9 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
         peOutputExample: (json.pe?.output_example as string) ?? "",
         historyOutputExample: (json.history?.output_example as string) ?? "",
         mainOutputExample: (json.output_example as string) ?? "",
+        examplesExists,
+        exampleCount,
+        examplesContent,
       };
     })
   );
