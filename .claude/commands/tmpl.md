@@ -53,22 +53,27 @@
 > AI가 각 섹션이 실제로 어떻게 채워지는지 학습할 수 있도록, HPI / P.I. template / History / P/E가 모두 포함된 케이스 예시를 아래 양식으로 제공해 주세요. 케이스가 여러 개일수록 AI 품질이 향상됩니다.
 >
 > ```
-> # Case 1
-> ## HPI (줄글)
-> (AI가 생성한 또는 직접 작성한 HPI 줄글 예시)
+> ### 001.
 >
-> ## P.I template
-> (실제 출력 예시)
+> (HPI 줄글 예시)
 >
-> ## History
-> (실제 출력 예시)
 >
-> ## P/E
-> (실제 출력 예시)
+> (P.I template 실제 출력 예시)
 >
-> # Case 2
+>
+> (History 실제 출력 예시)
+>
+>
+> (P/E 실제 출력 예시)
+>
+>
+> ---
+>
+> ### 002.
 > ...
 > ```
+>
+> 코드블록 순서: 1번째 = HPI / 2번째 = P.I template / 3번째 = History / 4번째 = P/E
 
 예시를 받으면 `ai-docs/templates/{templateKey}/examples.md`에 append합니다. 파일이 없으면 새로 생성합니다.
 

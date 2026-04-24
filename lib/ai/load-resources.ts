@@ -60,16 +60,6 @@ export interface Examples {
 
 const MAX_EXAMPLES = 10;
 
-function matchSectionBucket(sectionName: string): keyof Examples | null {
-  const name = sectionName.trim();
-  if (name.startsWith("HPI")) return "hpi";
-  if (name.startsWith("P.I template") || name.startsWith("P.I. template"))
-    return "template";
-  if (name.startsWith("History")) return "history";
-  if (name.startsWith("P/E")) return "pe";
-  return null;
-}
-
 export function loadExamples(templateKey: string): Examples {
   const filePath = path.join(TEMPLATES_DIR, templateKey, "examples.md");
   const empty: Examples = { hpi: [], template: [], history: [], pe: [] };
@@ -82,49 +72,62 @@ export function loadExamples(templateKey: string): Examples {
   const lines = content.split(/\r?\n/);
 
   const result: Examples = { hpi: [], template: [], history: [], pe: [] };
+  const bucketOrder: (keyof Examples)[] = ["hpi", "template", "history", "pe"];
 
   let caseCount = 0;
   let insideCase = false;
-  let currentBucket: keyof Examples | null = null;
+  let insideBlock = false;
+  let blockIndex = 0;
   let buffer: string[] = [];
 
-  const flushSection = () => {
-    if (currentBucket) {
+  const flushBlock = () => {
+    if (insideBlock && blockIndex < bucketOrder.length) {
       const text = buffer.join("\n").trim();
       if (text) {
-        result[currentBucket].push(text);
+        result[bucketOrder[blockIndex]].push(text);
       }
     }
     buffer = [];
-    currentBucket = null;
   };
 
   for (const line of lines) {
-    if (/^# Case\s+\d+/.test(line)) {
-      flushSection();
+    if (/^###\s+\d+\./.test(line)) {
+      if (insideBlock) {
+        flushBlock();
+        insideBlock = false;
+      }
       caseCount++;
       if (caseCount > MAX_EXAMPLES) {
         insideCase = false;
         break;
       }
       insideCase = true;
+      blockIndex = 0;
       continue;
     }
 
     if (!insideCase) continue;
 
-    const sectionMatch = /^##\s+(.+)$/.exec(line);
-    if (sectionMatch) {
-      flushSection();
-      currentBucket = matchSectionBucket(sectionMatch[1]);
+    if (/^```/.test(line)) {
+      if (!insideBlock) {
+        insideBlock = true;
+        buffer = [];
+      } else {
+        flushBlock();
+        insideBlock = false;
+        blockIndex++;
+      }
       continue;
     }
 
-    if (currentBucket) {
+    if (insideBlock) {
       buffer.push(line);
     }
   }
-  flushSection();
+
+  if (insideBlock) {
+    flushBlock();
+  }
 
   return result;
 }
