@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { useDebounce } from "use-debounce";
@@ -47,6 +47,7 @@ export function StatusBoardCard({ case: c }: StatusBoardCardProps) {
   const [memo, setMemo] = useState(c.memo ?? "");
   const [debouncedMemo] = useDebounce(memo, 500);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const savedRef = useRef(c.memo ?? "");
 
   useEffect(() => {
@@ -67,11 +68,13 @@ export function StatusBoardCard({ case: c }: StatusBoardCardProps) {
       .catch(() => toast.error("메모 저장에 실패했습니다."));
   }
 
-  async function handleDeleteConfirm() {
-    await hideFromBoard(c.id);
-    toast.success(
-      "현황판에서 제거했습니다. 케이스 목록에서 다시 추가할 수 있습니다."
-    );
+  function handleDeleteConfirm() {
+    startTransition(async () => {
+      await hideFromBoard(c.id);
+      toast.success(
+        "현황판에서 제거했습니다. 케이스 목록에서 다시 추가할 수 있습니다."
+      );
+    });
   }
 
   return (
@@ -144,9 +147,10 @@ export function StatusBoardCard({ case: c }: StatusBoardCardProps) {
             <AlertDialogCancel>취소</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteConfirm}
+              disabled={isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              삭제
+              {isPending ? "삭제 중..." : "삭제"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

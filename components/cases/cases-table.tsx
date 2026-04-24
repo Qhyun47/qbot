@@ -1,7 +1,8 @@
 "use client";
 
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Loader2 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { toast } from "sonner";
 import { restoreToBoard } from "@/lib/cases/actions";
@@ -16,15 +17,21 @@ interface CasesTableProps {
 
 export function CasesTable({ cases }: CasesTableProps) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [pendingId, setPendingId] = useState<string | null>(null);
 
   function handleRowClick(id: string) {
     router.push(`/cases/${id}?from=cases`);
   }
 
-  async function handleRestore(e: React.MouseEvent, id: string) {
+  function handleRestore(e: React.MouseEvent, id: string) {
     e.stopPropagation();
-    await restoreToBoard(id);
-    toast.success("현황판에 재등록했습니다.");
+    setPendingId(id);
+    startTransition(async () => {
+      await restoreToBoard(id);
+      toast.success("현황판에 재등록했습니다.");
+      setPendingId(null);
+    });
   }
 
   if (cases.length === 0) {
@@ -87,9 +94,14 @@ export function CasesTable({ cases }: CasesTableProps) {
                   {isHidden && (
                     <button
                       onClick={(e) => handleRestore(e, c.id)}
-                      className="flex items-center gap-1 rounded text-xs text-muted-foreground hover:text-foreground active:text-foreground"
+                      disabled={isPending && pendingId === c.id}
+                      className="flex items-center gap-1 rounded text-xs text-muted-foreground hover:text-foreground active:text-foreground disabled:opacity-50"
                     >
-                      <PlusCircle className="size-3.5" />
+                      {isPending && pendingId === c.id ? (
+                        <Loader2 className="size-3.5 animate-spin" />
+                      ) : (
+                        <PlusCircle className="size-3.5" />
+                      )}
                       재등록
                     </button>
                   )}
@@ -156,9 +168,14 @@ export function CasesTable({ cases }: CasesTableProps) {
                             variant="ghost"
                             size="sm"
                             onClick={(e) => handleRestore(e, c.id)}
+                            disabled={isPending && pendingId === c.id}
                             className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
                           >
-                            <PlusCircle className="size-3.5" />
+                            {isPending && pendingId === c.id ? (
+                              <Loader2 className="size-3.5 animate-spin" />
+                            ) : (
+                              <PlusCircle className="size-3.5" />
+                            )}
                             현황판 재등록
                           </Button>
                         )}
