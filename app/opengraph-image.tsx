@@ -48,7 +48,7 @@ export default function OgImage() {
           fontSize: 34,
         }}
       >
-        응급실 인턴을 위한 AI 차팅 어시스턴트
+        문진은 폰에서, 확인은 컴퓨터로 - ER AI 어시스턴트
       </div>
     </div>,
     { ...size }
