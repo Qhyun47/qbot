@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { FileUp, Loader2, Save, Trash2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,7 @@ import {
   upsertGuideline,
   deleteGuideline,
   deleteGuidelinePdf,
+  getGuidelinePdfSignedUrl,
 } from "@/lib/guidelines/actions";
 import { processGuideHtml } from "@/lib/utils/html-utils";
 import type { Guideline } from "@/lib/supabase/types";
@@ -73,6 +74,7 @@ export function GuidelinesEditor({
   );
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfFileName, setPdfFileName] = useState("");
+  const [pdfDisplayUrl, setPdfDisplayUrl] = useState("");
 
   function handleGuideKeyChange(guideKey: string) {
     setSelectedGuideKey(guideKey);
@@ -82,6 +84,7 @@ export function GuidelinesEditor({
     setSavedPdfPath(existing?.pdf_path ?? "");
     setPdfFile(null);
     setPdfFileName("");
+    setPdfDisplayUrl("");
     setRawHtmlInput("");
     setEncodingHelpOpen(false);
   }
@@ -90,7 +93,7 @@ export function GuidelinesEditor({
     startTransition(async () => {
       try {
         let pdfPath: string | null | undefined = undefined;
-        let content = customContent;
+        const content = customContent;
 
         if (inputMode === "pdf") {
           if (pdfFile) {
@@ -110,7 +113,6 @@ export function GuidelinesEditor({
               toast.error(json.error ?? "PDF 업로드에 실패했습니다.");
               return;
             }
-            content = json.text as string;
             pdfPath = json.storagePath as string;
             setSavedPdfPath(pdfPath);
             setPdfFile(null);
@@ -159,6 +161,7 @@ export function GuidelinesEditor({
         setSavedPdfPath("");
         setPdfFile(null);
         setPdfFileName("");
+        setPdfDisplayUrl("");
         setInputMode("text");
         setRawHtmlInput("");
       } catch {
@@ -195,6 +198,16 @@ export function GuidelinesEditor({
     pdfInputRef.current?.click();
   }
 
+  useEffect(() => {
+    if (!savedPdfPath) {
+      setPdfDisplayUrl("");
+      return;
+    }
+    getGuidelinePdfSignedUrl(selectedGuideKey)
+      .then(setPdfDisplayUrl)
+      .catch(() => setPdfDisplayUrl(""));
+  }, [savedPdfPath, selectedGuideKey]);
+
   const [htmlDialogOpen, setHtmlDialogOpen] = useState(false);
   const [rawHtmlInput, setRawHtmlInput] = useState("");
   const [encodingHelpOpen, setEncodingHelpOpen] = useState(false);
@@ -210,7 +223,7 @@ export function GuidelinesEditor({
   const hasPdf = !!pdfFile || !!savedPdfPath;
   const hasHtml = inputMode === "html" && customContent.trim() !== "";
   const htmlPending = inputMode === "html" && rawHtmlInput.trim() !== "";
-  const displayPdfName =
+  const _displayPdfName =
     pdfFileName || (savedPdfPath ? savedPdfPath.split("/").pop() : "");
   const systemContent = systemGuides[selectedGuideKey] ?? "";
   const isSaveDisabled =
@@ -311,7 +324,7 @@ export function GuidelinesEditor({
         {/* 커스텀 콘텐츠 — mobile order 4 / desktop grid (2,2) */}
         <div className="order-4 flex flex-col gap-2 md:order-4">
           {inputMode === "pdf" ? (
-            <div className="flex h-72 items-center justify-center rounded-lg border bg-muted/50">
+            <div className="flex flex-col gap-2">
               <input
                 ref={pdfInputRef}
                 type="file"
@@ -319,11 +332,34 @@ export function GuidelinesEditor({
                 className="hidden"
                 onChange={handlePdfSelect}
               />
-              {hasPdf ? (
-                <div className="flex flex-col items-center gap-3 px-4 text-center">
-                  <p className="max-w-[240px] truncate text-sm font-medium">
-                    {displayPdfName}
+              {pdfDisplayUrl ? (
+                <iframe
+                  src={pdfDisplayUrl}
+                  className="h-72 w-full rounded-lg border"
+                  title="PDF 가이드라인"
+                />
+              ) : pdfFile ? (
+                <div className="flex h-72 items-center justify-center rounded-lg border bg-muted/50">
+                  <p className="max-w-[240px] truncate text-sm text-muted-foreground">
+                    {pdfFileName}
                   </p>
+                </div>
+              ) : (
+                <div className="flex h-72 items-center justify-center rounded-lg border bg-muted/50">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5"
+                    onClick={() => pdfInputRef.current?.click()}
+                  >
+                    <FileUp className="size-3.5" />
+                    PDF 추가
+                  </Button>
+                </div>
+              )}
+              {hasPdf && (
+                <div className="flex justify-end">
                   <Button
                     type="button"
                     variant="outline"
@@ -335,17 +371,6 @@ export function GuidelinesEditor({
                     변경
                   </Button>
                 </div>
-              ) : (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="gap-1.5"
-                  onClick={() => pdfInputRef.current?.click()}
-                >
-                  <FileUp className="size-3.5" />
-                  PDF 추가
-                </Button>
               )}
             </div>
           ) : inputMode === "html" ? (
@@ -469,10 +494,66 @@ export function GuidelinesEditor({
                 한글이 깨져 보이나요?
               </button>
               {encodingHelpOpen && (
-                <p className="mt-1 text-xs text-muted-foreground">
-                  파일을 메모장(또는 VS Code)으로 열고 UTF-8로 다시 저장한 후
-                  내용을 붙여넣어 주세요.
-                </p>
+                <div className="mt-2 rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">
+                  <p className="mb-2 font-semibold text-foreground">
+                    왜 깨지나요?
+                  </p>
+                  <p className="mb-3">
+                    HWP에서 내보낸 HTML 파일은 한글 인코딩(EUC-KR)으로 저장되는
+                    경우가 많습니다. 이 상태의 파일을 그대로 복사하면 글자가
+                    깨져 보입니다.
+                  </p>
+
+                  <p className="mb-1.5 font-semibold text-foreground">
+                    메모장으로 해결하기 (Windows)
+                  </p>
+                  <ol className="mb-3 list-inside list-decimal space-y-1">
+                    <li>
+                      HTML 파일을 <strong>우클릭</strong> → &ldquo;연결
+                      프로그램&rdquo; → <strong>메모장</strong> 선택
+                    </li>
+                    <li>
+                      상단 메뉴 <strong>파일</strong> →{" "}
+                      <strong>다른 이름으로 저장</strong> 클릭
+                    </li>
+                    <li>
+                      저장 창 하단 &ldquo;인코딩&rdquo; 항목을{" "}
+                      <strong>UTF-8</strong> 로 변경
+                    </li>
+                    <li>파일 이름 그대로 저장 (덮어쓰기)</li>
+                    <li>
+                      저장된 파일을 다시 메모장으로 열고{" "}
+                      <strong>Ctrl+A → Ctrl+C</strong> 로 전체 복사
+                    </li>
+                    <li>
+                      이 창에 <strong>Ctrl+V</strong> 로 붙여넣기
+                    </li>
+                  </ol>
+
+                  <p className="mb-1.5 font-semibold text-foreground">
+                    VS Code로 해결하기{" "}
+                    <span className="font-normal text-muted-foreground">
+                      (메모장에서 해결이 안 될 때)
+                    </span>
+                  </p>
+                  <ol className="list-inside list-decimal space-y-1">
+                    <li>VS Code에서 HTML 파일 열기</li>
+                    <li>오른쪽 하단 상태바의 인코딩 이름(예: EUC-KR) 클릭</li>
+                    <li>
+                      &ldquo;다른 인코딩으로 다시 열기&rdquo; →{" "}
+                      <strong>Korean (EUC-KR)</strong> 선택
+                    </li>
+                    <li>한글이 정상으로 보이면, 다시 하단 인코딩 이름 클릭</li>
+                    <li>
+                      &ldquo;인코딩을 지정하여 저장&rdquo; →{" "}
+                      <strong>UTF-8</strong> 선택
+                    </li>
+                    <li>
+                      <strong>Ctrl+A → Ctrl+C</strong> 로 복사 후 이 창에
+                      붙여넣기
+                    </li>
+                  </ol>
+                </div>
               )}
             </div>
           </div>
