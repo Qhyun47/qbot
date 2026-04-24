@@ -20,8 +20,14 @@ interface GuideListEntry {
   displayName: string;
 }
 
+export type GuidelineData = {
+  content: string | null;
+  sourceType: string;
+  pdfSignedUrl: string | null;
+};
+
 export type GuidelineResult =
-  | { mode: "auto"; guideKey: string; content: string }
+  | ({ mode: "auto"; guideKey: string } & GuidelineData)
   | {
       mode: "recommendations";
       suggestions: { guideKey: string; displayName: string }[];
@@ -148,7 +154,30 @@ export async function getCustomGuideline(
   return data ?? null;
 }
 
-export async function loadGuideByKey(guideKey: string): Promise<string | null> {
+export async function getGuidelinePdfSignedUrl(
+  guideKey: string
+): Promise<string> {
+  const { supabase, user } = await getAuthUser();
+
+  const { data: row } = await supabase
+    .from("interview_guidelines")
+    .select("pdf_path")
+    .eq("guide_key", guideKey)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (!row?.pdf_path) throw new Error("PDF 경로를 찾을 수 없습니다.");
+
+  const { data, error } = await supabase.storage
+    .from("guideline-pdfs")
+    .createSignedUrl(row.pdf_path, 3600);
+
+  if (error || !data?.signedUrl)
+    throw new Error("PDF URL 생성에 실패했습니다.");
+  return data.signedUrl;
+}
+
+export async function loadGuideByKey(guideKey: string): Promise<GuidelineData> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -157,19 +186,41 @@ export async function loadGuideByKey(guideKey: string): Promise<string | null> {
   if (user) {
     const { data } = await supabase
       .from("interview_guidelines")
-      .select("content")
+      .select("content, source_type, pdf_path")
       .eq("guide_key", guideKey)
       .eq("user_id", user.id)
       .maybeSingle();
 
-    if (data?.content) return data.content;
+    if (data) {
+      if (data.source_type === "pdf" && data.pdf_path) {
+        const { data: signed, error } = await supabase.storage
+          .from("guideline-pdfs")
+          .createSignedUrl(data.pdf_path, 3600);
+        return {
+          content: null,
+          sourceType: "pdf",
+          pdfSignedUrl: error ? null : (signed?.signedUrl ?? null),
+        };
+      }
+      if (data.content) {
+        return {
+          content: data.content,
+          sourceType: data.source_type ?? "text",
+          pdfSignedUrl: null,
+        };
+      }
+    }
   }
 
   try {
     const systemContent = loadGuide(guideKey);
-    return systemContent || null;
+    return {
+      content: systemContent || null,
+      sourceType: "html",
+      pdfSignedUrl: null,
+    };
   } catch {
-    return null;
+    return { content: null, sourceType: "text", pdfSignedUrl: null };
   }
 }
 
@@ -189,9 +240,9 @@ export async function loadGuideline(cc: string): Promise<GuidelineResult> {
   if (guideKeys.length === 0) return { mode: "none" };
 
   if (guideKeys.length === 1) {
-    const content = await loadGuideByKey(guideKeys[0]);
-    if (!content) return { mode: "none" };
-    return { mode: "auto", guideKey: guideKeys[0], content };
+    const data = await loadGuideByKey(guideKeys[0]);
+    if (!data.content && !data.pdfSignedUrl) return { mode: "none" };
+    return { mode: "auto", guideKey: guideKeys[0], ...data };
   }
 
   const suggestions = guideKeys.map((key) => {

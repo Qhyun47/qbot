@@ -97,7 +97,7 @@ export function ErrorLogTable({ logs }: ErrorLogTableProps) {
                 <p className="mb-1 text-xs font-medium text-muted-foreground">
                   에러 메시지
                 </p>
-                <p className="rounded-md bg-destructive/10 p-3 text-destructive">
+                <p className="whitespace-pre-wrap break-all rounded-md bg-destructive/10 p-3 text-destructive">
                   {selected.error_message}
                 </p>
               </div>
@@ -106,7 +106,7 @@ export function ErrorLogTable({ logs }: ErrorLogTableProps) {
                   <p className="mb-1 text-xs font-medium text-muted-foreground">
                     Stack Trace
                   </p>
-                  <pre className="max-h-60 overflow-auto rounded-md bg-muted p-3 text-xs leading-relaxed">
+                  <pre className="max-h-60 overflow-auto whitespace-pre-wrap break-all rounded-md bg-muted p-3 text-xs leading-relaxed">
                     {selected.stack_trace}
                   </pre>
                 </div>

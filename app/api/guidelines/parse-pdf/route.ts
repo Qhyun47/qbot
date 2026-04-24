@@ -12,19 +12,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("is_admin, ai_access_status")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile?.is_admin && profile?.ai_access_status !== "approved") {
-    return NextResponse.json(
-      { error: "AI 사용 권한이 없습니다." },
-      { status: 403 }
-    );
-  }
-
   const formData = await req.formData();
   const file = formData.get("file");
   const guideKey = formData.get("guideKey");
@@ -42,18 +29,6 @@ export async function POST(req: NextRequest) {
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
-
-  let extractedText: string;
-  try {
-    const pdfParse = (await import("pdf-parse")).default;
-    const result = await pdfParse(buffer);
-    extractedText = result.text;
-  } catch {
-    return NextResponse.json(
-      { error: "PDF 텍스트 추출에 실패했습니다. 다른 파일을 시도해 주세요." },
-      { status: 422 }
-    );
-  }
 
   // 기존 PDF Storage 파일 삭제
   if (typeof oldPdfPath === "string" && oldPdfPath) {
@@ -76,5 +51,5 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  return NextResponse.json({ text: extractedText, storagePath });
+  return NextResponse.json({ storagePath });
 }

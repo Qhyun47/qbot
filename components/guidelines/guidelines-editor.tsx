@@ -410,8 +410,8 @@ export function GuidelinesEditor({
               onChange={(e) => setCustomContent(e.target.value)}
               placeholder={
                 inputMode === "markdown"
-                  ? "Markdown 형식으로 커스텀 가이드라인을 작성하세요..."
-                  : "커스텀 가이드라인을 작성하세요..."
+                  ? "Markdown 형식으로 커스텀 가이드라인을 작성하세요."
+                  : "커스텀 가이드라인을 작성하세요.\n(hwp 파일은 HTML로 변환하여 첨부하면 서식과 표를 최대한 보존할 수 있습니다.)"
               }
               className="h-72 resize-none font-mono text-sm"
             />
