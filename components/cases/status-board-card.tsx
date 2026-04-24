@@ -22,6 +22,22 @@ import {
 } from "@/components/ui/alert-dialog";
 import type { Case, BedZone, CaseStatus } from "@/lib/supabase/types";
 
+function formatRegisteredAt(createdAt: string): string {
+  const date = new Date(createdAt);
+  const now = new Date();
+  const isToday =
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate();
+  const hhmm = date.toLocaleTimeString("ko-KR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  if (isToday) return hhmm;
+  return `${date.getMonth() + 1}/${date.getDate()} ${hhmm}`;
+}
+
 interface StatusBoardCardProps {
   case: Case;
 }
@@ -75,12 +91,17 @@ export function StatusBoardCard({ case: c }: StatusBoardCardProps) {
           <StatusBadge status={c.status as CaseStatus} />
         </div>
 
-        {/* C.C */}
-        <p className="text-sm font-medium leading-snug">
-          {c.cc ?? (
-            <span className="italic text-muted-foreground">C.C 미입력</span>
-          )}
-        </p>
+        {/* C.C + 등록 시간 */}
+        <div className="flex items-baseline justify-between gap-2">
+          <p className="text-sm font-medium leading-snug">
+            {c.cc ?? (
+              <span className="italic text-muted-foreground">C.C 미입력</span>
+            )}
+          </p>
+          <span className="shrink-0 text-xs text-muted-foreground/70">
+            {formatRegisteredAt(c.created_at)}
+          </span>
+        </div>
 
         {/* 메모 입력 */}
         <Textarea
