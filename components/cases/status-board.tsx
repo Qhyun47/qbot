@@ -44,7 +44,7 @@ export function StatusBoard({ cases }: StatusBoardProps) {
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             {ZONE_LABELS[zone]}
           </p>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
             {grouped[zone].map((c) => (
               <StatusBoardCard key={c.id} case={c} />
             ))}

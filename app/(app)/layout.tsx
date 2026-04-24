@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Logo } from "@/components/icons/logo";
 import { Toaster } from "sonner";
 import { LogoutButton } from "@/components/logout-button";
-import { NewCaseButton } from "@/components/cases/new-case-button";
+import { HeaderNewCaseButton } from "@/components/layout/header-new-case-button";
 import { MobileNav } from "@/components/mobile-nav";
 import { NavLinks } from "@/components/nav-links";
 import { FontSizeInit } from "@/components/font-size-init";
@@ -48,7 +48,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             </Suspense>
             <Link
               href="/dashboard"
-              className="ml-2 lg:ml-0"
+              className="ml-2 xl:ml-0"
               aria-label="규봇 홈으로 이동"
             >
               <Logo className="size-6" />
@@ -57,10 +57,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               <NavLinksWithAdmin />
             </Suspense>
             <div className="ml-auto flex items-center gap-2">
-              {/* 좁은 화면(1280px 미만): 환자 추가 버튼 */}
-              <div className="xl:hidden">
-                <NewCaseButton size="sm" />
-              </div>
+              {/* 모바일 환경에서만 표시되는 환자 추가 버튼 (viewMode 기반) */}
+              <HeaderNewCaseButton />
               {/* 넓은 화면(1280px 이상): 로그아웃 버튼 */}
               <div className="hidden xl:block">
                 <LogoutButton />

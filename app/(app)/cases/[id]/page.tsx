@@ -162,7 +162,7 @@ async function CaseContent({
       </header>
 
       {/* 본문: 차팅 결과 영역 */}
-      <div className="flex-1 overflow-y-auto p-4 lg:p-8">
+      <div className="flex-1 overflow-y-auto p-4 xl:p-8">
         <div className="flex flex-col gap-4">
           {status === "generating" && <GeneratingSkeleton />}
           {status === "failed" &&
