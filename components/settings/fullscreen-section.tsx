@@ -23,11 +23,13 @@ export function FullscreenSection({
   const [mounted, setMounted] = useState(false);
   const [standalone, setStandalone] = useState(false);
   const [isIos, setIsIos] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     setStandalone(isStandalone());
     setIsIos(isIosDevice());
+    setIsMobile(/android|iphone|ipad|ipod/i.test(navigator.userAgent));
   }, []);
 
   async function handleToggle(value: boolean) {
@@ -51,7 +53,7 @@ export function FullscreenSection({
   }
 
   // 마운트 전에는 토글 비활성화 상태로 렌더
-  const isDisabled = !mounted || !standalone;
+  const isDisabled = !mounted || !standalone || !isMobile;
 
   return (
     <div className="flex flex-col gap-4">
@@ -62,8 +64,18 @@ export function FullscreenSection({
         </p>
       </div>
 
-      {/* 미설치 안내 (standalone이 아닐 때) */}
-      {mounted && !standalone && (
+      {/* PC 환경 안내 */}
+      {mounted && !isMobile && (
+        <div className="flex items-start gap-2 rounded-md border border-zinc-200 bg-zinc-50 p-3 text-sm dark:border-zinc-700 dark:bg-zinc-900">
+          <Smartphone className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+          <p className="text-muted-foreground">
+            모바일 기기에서만 사용할 수 있는 기능입니다.
+          </p>
+        </div>
+      )}
+
+      {/* 미설치 안내 (모바일이지만 standalone이 아닐 때) */}
+      {mounted && isMobile && !standalone && (
         <div className="flex items-start gap-2 rounded-md border border-zinc-200 bg-zinc-50 p-3 text-sm dark:border-zinc-700 dark:bg-zinc-900">
           <Smartphone className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
           <p className="text-muted-foreground">

@@ -7,13 +7,17 @@ function isIosDevice(): boolean {
   return /iphone|ipad|ipod/i.test(navigator.userAgent);
 }
 
+function isMobileDevice(): boolean {
+  return /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+
 interface FullscreenManagerProps {
   fullscreenMode: boolean;
 }
 
 export function FullscreenManager({ fullscreenMode }: FullscreenManagerProps) {
   useEffect(() => {
-    if (!fullscreenMode || !isStandalone()) return;
+    if (!fullscreenMode || !isStandalone() || !isMobileDevice()) return;
 
     // iOS: apple-mobile-web-app-status-bar-style 메타태그 동적 전환
     if (isIosDevice()) {
@@ -45,26 +49,19 @@ export function FullscreenManager({ fullscreenMode }: FullscreenManagerProps) {
       }
     }
 
-    // 뒤로가기 등으로 fullscreen이 종료되면 즉시 재진입 시도
-    function handleFullscreenChange() {
-      if (!document.fullscreenElement) {
-        tryEnterFullscreen();
-      }
-    }
-
-    // fullscreenchange 내 재진입이 브라우저에서 막힐 경우 다음 제스처에서 재진입
+    // 뒤로가기 버튼이 전체화면을 해제하면 popstate가 함께 발생함.
+    // fullscreenchange에서 즉시 재진입하면 뒤로가기 네비게이션을 막으므로,
+    // 다음 사용자 제스처(터치/클릭)에서만 재진입한다.
     function handleInteraction() {
       if (!document.fullscreenElement) {
         tryEnterFullscreen();
       }
     }
 
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
     document.addEventListener("click", handleInteraction);
     document.addEventListener("touchstart", handleInteraction);
 
     return () => {
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
       document.removeEventListener("click", handleInteraction);
       document.removeEventListener("touchstart", handleInteraction);
       if (document.fullscreenElement) {
