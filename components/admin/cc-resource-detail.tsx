@@ -9,7 +9,32 @@ interface CcResourceDetailProps {
   parentItem?: CcResourceItem;
 }
 
-function FileExistsBadge({ exists, path }: { exists: boolean; path: string }) {
+function RankBadge({ rank }: { rank: number }) {
+  if (rank === 0) {
+    return (
+      <span className="inline-flex items-center rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
+        0순위
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+      {rank}순위
+    </span>
+  );
+}
+
+function FileExistsBadge({
+  exists,
+  path,
+  rank,
+  showRank,
+}: {
+  exists: boolean;
+  path: string;
+  rank?: number;
+  showRank?: boolean;
+}) {
   return (
     <div className="flex items-center gap-2">
       {exists ? (
@@ -18,6 +43,7 @@ function FileExistsBadge({ exists, path }: { exists: boolean; path: string }) {
         <XCircle className="size-4 shrink-0 text-destructive" />
       )}
       <code className="rounded bg-muted px-1.5 py-0.5 text-xs">{path}</code>
+      {showRank && rank !== undefined && <RankBadge rank={rank} />}
       {!exists && <span className="text-xs text-destructive">파일 없음</span>}
     </div>
   );
@@ -93,6 +119,8 @@ export function CcResourceDetail({ item, parentItem }: CcResourceDetailProps) {
                   key={g.key}
                   exists={g.exists}
                   path={`ai-docs/guides/${g.key}/guide.html`}
+                  rank={g.rank}
+                  showRank={parentItem.guides.length >= 2}
                 />
               ))}
             </div>
@@ -112,6 +140,8 @@ export function CcResourceDetail({ item, parentItem }: CcResourceDetailProps) {
                 key={g.key}
                 exists={g.exists}
                 path={`ai-docs/guides/${g.key}/guide.html`}
+                rank={g.rank}
+                showRank={item.guides.length >= 2}
               />
             ))}
           </div>
@@ -155,6 +185,8 @@ export function CcResourceDetail({ item, parentItem }: CcResourceDetailProps) {
                       <FileExistsBadge
                         exists={t.exists}
                         path={`ai-docs/templates/${t.key}/template.json`}
+                        rank={t.rank}
+                        showRank={templates.length >= 2}
                       />
                     </CardTitle>
                   </CardHeader>

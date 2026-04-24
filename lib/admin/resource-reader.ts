@@ -7,11 +7,13 @@ const ROOT = process.cwd();
 
 export type GuideStatus = {
   key: string;
+  rank: number;
   exists: boolean;
 };
 
 export type TemplateStatus = {
   key: string;
+  rank: number;
   exists: boolean;
   peFieldCount: number;
   historyFieldCount: number;
@@ -131,6 +133,7 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
       const guides = await Promise.all(
         entry.guideKeys.map(async (e) => ({
           key: e.key,
+          rank: e.rank,
           exists: await fileExists(
             path.join(ROOT, "ai-docs/guides", e.key, "guide.html")
           ),
@@ -150,6 +153,7 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
           if (!exists) {
             return {
               key,
+              rank: e.rank,
               exists: false,
               peFieldCount: 0,
               historyFieldCount: 0,
@@ -161,6 +165,7 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
           const json = JSON.parse(await fs.readFile(tplPath, "utf-8"));
           return {
             key,
+            rank: e.rank,
             exists: true,
             peFieldCount: (json.pe?.fields?.length as number) ?? 0,
             historyFieldCount: (json.history?.fields?.length as number) ?? 0,

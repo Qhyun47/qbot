@@ -36,6 +36,11 @@
     "category": "0. IM"
   },
   {
+    "templateKey": "nu-code-red",
+    "displayName": "CODE RED",
+    "category": "1. NU"
+  },
+  {
     "templateKey": "pd-fever",
     "displayName": "PD fever",
     "category": "3. PD"

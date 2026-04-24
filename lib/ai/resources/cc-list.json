@@ -181,5 +181,80 @@
     "cc": "Labor pain",
     "guideKeys": [{ "key": "og", "rank": 0 }],
     "templateKeys": [{ "key": "og-basic", "rank": 0 }]
+  },
+  {
+    "cc": "Lt. side weakness",
+    "guideKeys": [{ "key": "nu-code-red", "rank": 0 }],
+    "templateKeys": [{ "key": "nu-code-red", "rank": 0 }]
+  },
+  {
+    "cc": "Rt. side weakness",
+    "guideKeys": [{ "key": "nu-code-red", "rank": 0 }],
+    "templateKeys": [{ "key": "nu-code-red", "rank": 0 }]
+  },
+  {
+    "cc": "Dysarthria",
+    "guideKeys": [{ "key": "nu-code-red", "rank": 0 }],
+    "templateKeys": [{ "key": "nu-code-red", "rank": 0 }]
+  },
+  {
+    "cc": "Gait disturbance",
+    "guideKeys": [{ "key": "nu-code-red", "rank": 0 }],
+    "templateKeys": [{ "key": "nu-code-red", "rank": 0 }]
+  },
+  {
+    "cc": "Ataxia",
+    "guideKeys": [{ "key": "nu-code-red", "rank": 0 }],
+    "templateKeys": [{ "key": "nu-code-red", "rank": 0 }]
+  },
+  {
+    "cc": "Headache",
+    "guideKeys": [{ "key": "nu-code-red", "rank": 1 }],
+    "templateKeys": [{ "key": "nu-code-red", "rank": 1 }]
+  },
+  {
+    "cc": "Diplopia",
+    "guideKeys": [{ "key": "nu-code-red", "rank": 1 }],
+    "templateKeys": [{ "key": "nu-code-red", "rank": 1 }]
+  },
+  {
+    "cc": "Visual disturbance",
+    "guideKeys": [{ "key": "nu-code-red", "rank": 1 }],
+    "templateKeys": [{ "key": "nu-code-red", "rank": 1 }]
+  },
+  {
+    "cc": "Lt. visual disturbance",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual disturbance"
+  },
+  {
+    "cc": "Rt. visual disturbance",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual disturbance"
+  },
+  {
+    "cc": "Visual disturbance(OS)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual disturbance"
+  },
+  {
+    "cc": "Visual disturbance(OD)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual disturbance"
+  },
+  {
+    "cc": "Visual disturbance(OU)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual disturbance"
+  },
+  {
+    "cc": "Mental change",
+    "guideKeys": [{ "key": "nu-code-red", "rank": 0 }],
+    "templateKeys": [{ "key": "nu-code-red", "rank": 0 }]
   }
 ]

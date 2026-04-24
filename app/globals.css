@@ -338,6 +338,12 @@ html[data-view="desktop"] .lg\:inline-flex {
   color: hsl(var(--foreground)) !important;
 }
 
+/* 회색 #595959 → 밝은 회색 */
+.dark .guideline-html [style*="color: #595959"],
+.dark .guideline-html [style*="color:#595959"] {
+  color: #a0a0a0 !important;
+}
+
 .guideline-html p,
 .guideline-html div {
   margin-top: 0;

@@ -1,0 +1,183 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CodeRedCase",
+  "description": "뇌졸중 의심(CODE RED) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history",
+    "family_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류. 아래 enum 값 중 가장 적합한 것 하나를 선택.",
+            "enum": [
+              "onset",
+              "lnt",
+              "fft",
+              "initial_bp",
+              "side_weakness",
+              "dysarthria",
+              "loc",
+              "headache",
+              "dizziness",
+              "nausea_vomiting",
+              "ataxia",
+              "nystagmus",
+              "diplopia",
+              "facial_palsy",
+              "sensory_change",
+              "gait",
+              "vital_sign",
+              "associated_symptom",
+              "severity",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "family_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. 카드-섹션 매핑 기준: onset/lnt/fft/initial_bp/side_weakness/dysarthria/loc/headache/dizziness/nausea_vomiting/ataxia/nystagmus/diplopia/facial_palsy/sensory_change/gait → [pi, template] | associated_symptom/severity/vital_sign → [pi] | past_history/medication_history/operation_history/family_history → [history] 전용 (HPI·상용구에 포함 금지)",
+            "items": {
+              "type": "string",
+              "enum": ["pi", "template", "history", "pe"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "증상 발생 시점 (예: '금일 오전 9시', '3시간 전'). 없으면 null."
+    },
+    "lnt": {
+      "type": ["string", "null"],
+      "description": "Last Normal Time — 마지막으로 정상 상태가 확인된 시각. 없으면 null."
+    },
+    "fft": {
+      "type": ["string", "null"],
+      "description": "First Found Time — 증상이 처음 발견된 시각. 없으면 null."
+    },
+    "initial_bp": {
+      "type": ["string", "null"],
+      "description": "내원 시 초기 혈압 (예: '180/100 mmHg'). 없으면 null."
+    },
+    "rt_side_weakness": {
+      "type": ["boolean", "null"],
+      "description": "우측 편마비 여부. true/false/null."
+    },
+    "lt_side_weakness": {
+      "type": ["boolean", "null"],
+      "description": "좌측 편마비 여부. true/false/null."
+    },
+    "dysarthria": {
+      "type": ["boolean", "null"],
+      "description": "구음장애 여부. true/false/null."
+    },
+    "loc": {
+      "type": ["boolean", "null"],
+      "description": "의식 저하(Loss of Consciousness) 여부. true/false/null."
+    },
+    "headache": {
+      "type": ["boolean", "null"],
+      "description": "두통 여부. true/false/null."
+    },
+    "dizziness": {
+      "type": ["boolean", "null"],
+      "description": "어지럼증 여부. true/false/null."
+    },
+    "nausea": {
+      "type": ["boolean", "null"],
+      "description": "구역 여부. true/false/null."
+    },
+    "vomiting": {
+      "type": ["boolean", "null"],
+      "description": "구토 여부. true/false/null."
+    },
+    "ataxia": {
+      "type": ["boolean", "null"],
+      "description": "운동실조 여부. true/false/null."
+    },
+    "nystagmus": {
+      "type": ["boolean", "null"],
+      "description": "안진 여부. true/false/null."
+    },
+    "diplopia": {
+      "type": ["boolean", "null"],
+      "description": "복시 여부. true/false/null."
+    },
+    "facial_palsy": {
+      "type": ["boolean", "null"],
+      "description": "안면 마비 여부. true/false/null."
+    },
+    "sensory_change": {
+      "type": ["string", "null"],
+      "description": "감각 이상 서술 (예: 'Lt. hemisensory loss'). 없으면 null."
+    },
+    "gait_disturbance": {
+      "type": ["boolean", "null"],
+      "description": "보행 장애 여부. true/false/null."
+    },
+    "severity": {
+      "type": ["string", "null"],
+      "description": "증상 중증도 표현 (예: 'NIHSS 6점'). 없으면 null."
+    },
+    "associated_symptoms": {
+      "type": ["array", "null"],
+      "description": "기타 동반 증상 목록. 없으면 null.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록 (예: ['고혈압', '당뇨', '심방세동']). History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "family_history": {
+      "type": ["array", "null"],
+      "description": "가족력 목록. null이면 History 출력 시 해당 항목 전체 생략.",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

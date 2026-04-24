@@ -9,6 +9,7 @@ import type { TemplateItem } from "@/lib/admin/resource-reader";
 
 type ParsedExample = {
   number: string;
+  cc?: string;
   hpi: string;
   piTemplate: string;
   history: string;
@@ -22,12 +23,21 @@ function parseExamples(content: string): ParsedExample[] {
 
   for (let i = 1; i < parts.length; i += 2) {
     const number = parts[i].padStart(3, "0");
-    const body = parts[i + 1] ?? "";
+    const rawBody = parts[i + 1] ?? "";
+
+    // 헤더 첫 줄에서 C.C. 추출 ("### 001. Dysarthria" → "Dysarthria")
+    const firstLineEnd = rawBody.indexOf("\n");
+    const firstLine =
+      firstLineEnd >= 0 ? rawBody.slice(0, firstLineEnd) : rawBody;
+    const cc = firstLine.trim() || undefined;
+    const body = firstLineEnd >= 0 ? rawBody.slice(firstLineEnd + 1) : "";
+
     const codeBlocks = [...body.matchAll(/```[^\n]*\n([\s\S]*?)```/g)].map(
       (m) => m[1].trim()
     );
     examples.push({
       number,
+      cc,
       hpi: codeBlocks[0] ?? "",
       piTemplate: codeBlocks[1] ?? "",
       history: codeBlocks[2] ?? "",
@@ -76,6 +86,16 @@ function ExamplesViewer({ content }: { content: string }) {
             )}
           >
             {ex.number}
+            {ex.cc && (
+              <span
+                className={cn(
+                  "ml-1",
+                  selected === idx ? "opacity-70" : "opacity-50"
+                )}
+              >
+                · {ex.cc}
+              </span>
+            )}
           </button>
         ))}
       </div>
