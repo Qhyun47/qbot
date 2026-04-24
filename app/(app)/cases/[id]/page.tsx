@@ -18,13 +18,8 @@ import {
   updatePiEdited,
   updatePeEdited,
   updateHistoryEdited,
+  updateTemplateEdited,
 } from "@/lib/cases/actions";
-
-function buildCombinedPi(pi: string, template: string): string {
-  if (!template) return pi;
-  if (!pi) return template;
-  return `${pi}\n\n${template}`;
-}
 import { getLayoutSettings } from "@/lib/settings/actions";
 import { Separator } from "@/components/ui/separator";
 import type { CaseStatus, BedZone } from "@/lib/supabase/types";
@@ -185,16 +180,17 @@ async function CaseContent({
                 </div>
               )}
               <ResultSection
-                title="P.I"
-                value={
-                  result.pi_edited ??
-                  buildCombinedPi(
-                    result.pi_draft ?? "",
-                    result.template_draft ?? ""
-                  )
-                }
+                title="HPI"
+                value={result.pi_edited ?? result.pi_draft ?? ""}
                 onSave={updatePiEdited.bind(null, result.id)}
               />
+              {(result.template_draft || result.template_edited) && (
+                <ResultSection
+                  title="P.I template"
+                  value={result.template_edited ?? result.template_draft ?? ""}
+                  onSave={updateTemplateEdited.bind(null, result.id)}
+                />
+              )}
               <ResultSection
                 title="History"
                 value={result.history_edited ?? result.history_draft ?? ""}

@@ -21,7 +21,7 @@
       "key": "amount",
       "label": "amount",
       "type": "open",
-      "description": "출혈량 (예: '소량', '반 컵 이상', 'large amount'). 정보 없으면 빈 문자열."
+      "description": "출혈량. 단일 출혈 유형은 간결하게 기재 (예: '소량', '반 컵 이상'). 다중 출혈 유형(hematemesis + melena 등)은 유형별로 줄을 나눠 기재 (예: 'Melena - 3차례, 합쳐서 2-300cc 이상, loose form\nHematemesis - 2일전 2차례, 금일 1차례'). 횟수 필드는 전체 총 횟수 기재. 정보 없으면 빈 문자열."
     },
     {
       "key": "count",
