@@ -7,5 +7,7 @@
   { "guideKey": "gi-bleeding", "displayName": "IM - GI bleeding" },
   { "guideKey": "ckd-hd-pd", "displayName": "IM - CKD, HD/PD" },
   { "guideKey": "og", "displayName": "OG" },
-  { "guideKey": "pd-fever-vomiting", "displayName": "PD - Fever ≒ Vomiting" }
+  { "guideKey": "pd-fever-vomiting", "displayName": "PD - Fever ≒ Vomiting" },
+  { "guideKey": "pd-seizure", "displayName": "PD - Seizure" },
+  { "guideKey": "ns-head-trauma", "displayName": "NS - 소아 head trauma" }
 ]

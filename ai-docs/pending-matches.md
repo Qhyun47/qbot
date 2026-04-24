@@ -47,10 +47,11 @@ _(현재 없음)_
 가이드라인 등록 시 연결하려 했으나 해당 C.C.가 아직 존재하지 않는 항목입니다.
 C.C.가 등록될 때 이 섹션을 확인합니다.
 
-| guideKey | displayName | 대기 중인 C.C. | 등록일 |
-| -------- | ----------- | -------------- | ------ |
-
-_(현재 없음)_
+| guideKey   | displayName  | 대기 중인 C.C.       | rank | 등록일     |
+| ---------- | ------------ | -------------------- | ---- | ---------- |
+| pd-seizure | PD - Seizure | Involuntary movement | 1    | 2026-04-24 |
+| pd-seizure | PD - Seizure | Convulsive movement  | 1    | 2026-04-24 |
+| pd-seizure | PD - Seizure | Seizure              | 1    | 2026-04-24 |
 
 ---
 
