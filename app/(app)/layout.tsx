@@ -43,7 +43,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <Suspense fallback={null}>
         <ConditionalHeader>
           <header className="sticky top-0 z-50 flex h-14 items-center border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-            <Suspense fallback={<div className="size-8 lg:hidden" />}>
+            <Suspense fallback={<div className="size-8 xl:hidden" />}>
               <MobileNavWithAdmin />
             </Suspense>
             <Link
@@ -53,16 +53,16 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             >
               <Logo className="size-6" />
             </Link>
-            <Suspense fallback={<div className="ml-8 hidden lg:flex" />}>
+            <Suspense fallback={<div className="ml-8 hidden xl:flex" />}>
               <NavLinksWithAdmin />
             </Suspense>
             <div className="ml-auto flex items-center gap-2">
-              {/* 모바일: 환자 추가 버튼 */}
-              <div className="lg:hidden">
+              {/* 좁은 화면(1280px 미만): 환자 추가 버튼 */}
+              <div className="xl:hidden">
                 <NewCaseButton size="sm" />
               </div>
-              {/* 데스크탑: 로그아웃 버튼 */}
-              <div className="hidden lg:block">
+              {/* 넓은 화면(1280px 이상): 로그아웃 버튼 */}
+              <div className="hidden xl:block">
                 <LogoutButton />
               </div>
             </div>

@@ -1,14 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { Smartphone } from "lucide-react";
+import { Smartphone, ChevronDown, Shield } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { NAV_LINKS } from "@/lib/nav-config";
 import { useViewMode } from "@/lib/hooks/use-view-mode";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+const ADMIN_LINKS = [
+  { href: "/admin/users", label: "사용자 관리" },
+  { href: "/admin/resources", label: "AI 리소스" },
+  { href: "/admin/error-logs", label: "에러 로그" },
+] as const;
 
 interface NavLinksProps {
-  /** 관리자 여부 — true이면 관리자 메뉴를 추가로 표시합니다. */
+  /** 관리자 여부 — true이면 관리자 드롭다운 메뉴를 표시합니다. */
   isAdmin?: boolean;
 }
 
@@ -16,20 +28,13 @@ export function NavLinks({ isAdmin }: NavLinksProps) {
   const pathname = usePathname();
   const { viewMode, setViewMode } = useViewMode();
 
-  // 관리자 전용 링크 (일반 링크 뒤에 표시)
-  const adminLinks = isAdmin
-    ? [
-        { href: "/admin/users", label: "사용자 관리" },
-        { href: "/admin/resources", label: "AI 리소스" },
-        { href: "/admin/error-logs", label: "에러 로그" },
-      ]
-    : [];
-
-  const allLinks = [...NAV_LINKS, ...adminLinks];
+  const isAdminActive = ADMIN_LINKS.some(
+    ({ href }) => pathname === href || pathname.startsWith(href)
+  );
 
   return (
-    <nav className="ml-8 hidden items-center gap-1 lg:flex">
-      {allLinks.map(({ href, label }) => {
+    <nav className="ml-8 hidden items-center gap-1 xl:flex">
+      {NAV_LINKS.map(({ href, label }) => {
         const isActive =
           pathname === href ||
           (href !== "/dashboard" && pathname.startsWith(href));
@@ -49,7 +54,32 @@ export function NavLinks({ isAdmin }: NavLinksProps) {
         );
       })}
 
-      {/* 모바일/PC 버전 전환 버튼 (항상 표시) */}
+      {/* 관리자 드롭다운 */}
+      {isAdmin && (
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className={cn(
+              "flex items-center gap-1 px-3 py-1.5 text-sm outline-none transition-colors",
+              isAdminActive
+                ? "font-semibold text-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Shield className="size-3.5" />
+            관리자 페이지
+            <ChevronDown className="size-3.5" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            {ADMIN_LINKS.map(({ href, label }) => (
+              <DropdownMenuItem key={href} asChild>
+                <Link href={href}>{label}</Link>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+
+      {/* 모바일/PC 버전 전환 버튼 */}
       <button
         onClick={() =>
           viewMode === "mobile" ? setViewMode("auto") : setViewMode("mobile")
