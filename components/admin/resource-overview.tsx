@@ -161,7 +161,7 @@ export function ResourceOverview({ data }: ResourceOverviewProps) {
   const [filter, setFilter] = useState<FilterType>("all");
 
   const topLevelItems = data.items
-    .filter((i) => !i.aliasOf)
+    .filter((i) => !i.aliasOf && !i.patternOf)
     .sort((a, b) => a.cc.localeCompare(b.cc));
 
   // C.C 탭 선택 상태

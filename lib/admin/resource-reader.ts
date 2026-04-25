@@ -25,11 +25,13 @@ export type TemplateStatus = {
 export type CcResourceItem = {
   cc: string;
   aliasOf?: string;
+  patternOf?: string;
   guideKeys: string[];
   templateKeys: string[];
   guides: GuideStatus[];
   templates: TemplateStatus[];
   aliasedBy: string[];
+  patternExamples: string[];
 };
 
 export type GuideItem = {
@@ -65,6 +67,7 @@ export type ResourceOverviewData = {
     withGuide: number;
     withTemplate: number;
     aliasCount: number;
+    patternCount: number;
   };
 };
 
@@ -119,10 +122,17 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
   const ccList = JSON.parse(ccListRaw) as CcListEntry[];
 
   const reverseAliasMap: Record<string, string[]> = {};
+  const reversePatternMap: Record<string, string[]> = {};
   for (const entry of ccList) {
     if (entry.aliasOf) {
       reverseAliasMap[entry.aliasOf] = [
         ...(reverseAliasMap[entry.aliasOf] ?? []),
+        entry.cc,
+      ];
+    }
+    if (entry.patternOf) {
+      reversePatternMap[entry.patternOf] = [
+        ...(reversePatternMap[entry.patternOf] ?? []),
         entry.cc,
       ];
     }
@@ -180,11 +190,13 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
       return {
         cc: entry.cc,
         aliasOf: entry.aliasOf,
+        patternOf: entry.patternOf,
         guideKeys: entry.guideKeys.map((e) => e.key),
         templateKeys: entry.templateKeys.map((e) => e.key),
         guides,
         templates,
         aliasedBy: reverseAliasMap[entry.cc] ?? [],
+        patternExamples: reversePatternMap[entry.cc] ?? [],
       };
     })
   );
@@ -286,13 +298,14 @@ export async function buildResourceOverview(): Promise<ResourceOverviewData> {
     })
   );
 
-  const topLevel = items.filter((i) => !i.aliasOf);
+  const topLevel = items.filter((i) => !i.aliasOf && !i.patternOf);
   const stats = {
     totalCc: topLevel.length,
     withGuide: topLevel.filter((i) => i.guides.some((g) => g.exists)).length,
     withTemplate: topLevel.filter((i) => i.templates.some((t) => t.exists))
       .length,
     aliasCount: items.filter((i) => i.aliasOf).length,
+    patternCount: items.filter((i) => i.patternOf).length,
   };
 
   return { items, guideItems, templateItems, pendingMatches, stats };

@@ -724,6 +724,446 @@
     "aliasOf": "Facial laceration"
   },
   {
+    "cc": "** pain",
+    "guideKeys": [{ "key": "trauma-traffic-accident", "rank": 0 }],
+    "templateKeys": [
+      { "key": "trauma", "rank": 0 },
+      { "key": "ta", "rank": 1 }
+    ]
+  },
+  {
+    "cc": "Neck pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Chest wall pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Clavicle pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. clavicle pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. clavicle pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Both clavicle pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Scapular pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. scapular pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. scapular pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Both scapular pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Sacral pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Coccyx pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Pelvic pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. pelvic pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. pelvic pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Both pelvic pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Hip pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. hip pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. hip pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Both hip pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Buttock pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. buttock pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. buttock pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Both buttock pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Shoulder pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. shoulder pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. shoulder pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Both shoulder pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Humerus pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. humerus pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. humerus pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Both humerus pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Elbow pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. elbow pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. elbow pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Both elbow pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Forearm pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. forearm pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. forearm pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Both forearm pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Hand pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. hand pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. hand pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Both hand pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Thumb pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. thumb pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. thumb pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Both thumb pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Femur pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. femur pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. femur pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Both femur pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Thigh pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. thigh pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. thigh pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Both thigh pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Knee pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. knee pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. knee pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Both knee pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lower leg pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. lower leg pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. lower leg pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Both lower leg pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Ankle pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. ankle pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. ankle pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Both ankle pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Foot pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. foot pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. foot pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Both foot pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
     "cc": "Back pain",
     "guideKeys": [
       { "key": "os-ns-back-pain", "rank": 0 },
@@ -733,6 +1173,266 @@
       { "key": "back-pain", "rank": 0 },
       { "key": "trauma", "rank": 1 },
       { "key": "ta", "rank": 2 }
+    ]
+  },
+  {
+    "cc": "** laceration",
+    "guideKeys": [{ "key": "trauma-traffic-accident", "rank": 0 }],
+    "templateKeys": [
+      { "key": "trauma", "rank": 0 },
+      { "key": "ta", "rank": 1 }
+    ]
+  },
+  {
+    "cc": "Shoulder laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. shoulder laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. shoulder laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Humerus laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. humerus laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. humerus laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Elbow laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. elbow laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. elbow laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Forearm laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. forearm laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. forearm laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Hand laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. hand laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. hand laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Thumb laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. thumb laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. thumb laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Femur laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. femur laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. femur laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Thigh laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. thigh laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. thigh laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Knee laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. knee laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. knee laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lower leg laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. lower leg laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. lower leg laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Ankle laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. ankle laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. ankle laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Foot laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. foot laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. foot laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Tooth avulsion",
+    "guideKeys": [
+      { "key": "dt", "rank": 0 },
+      { "key": "ps", "rank": 1 },
+      { "key": "trauma-traffic-accident", "rank": 2 }
+    ],
+    "templateKeys": [
+      { "key": "ps", "rank": 1 },
+      { "key": "trauma", "rank": 2 }
+    ]
+  },
+  {
+    "cc": "TMJ dislocation",
+    "guideKeys": [
+      { "key": "dt", "rank": 0 },
+      { "key": "ps", "rank": 1 },
+      { "key": "trauma-traffic-accident", "rank": 2 }
+    ],
+    "templateKeys": [
+      { "key": "ps", "rank": 1 },
+      { "key": "trauma", "rank": 2 }
+    ]
+  },
+  {
+    "cc": "Tooth broken",
+    "guideKeys": [
+      { "key": "dt", "rank": 0 },
+      { "key": "ps", "rank": 1 },
+      { "key": "trauma-traffic-accident", "rank": 2 }
+    ],
+    "templateKeys": [
+      { "key": "ps", "rank": 1 },
+      { "key": "trauma", "rank": 2 }
     ]
   }
 ]

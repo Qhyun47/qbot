@@ -65,6 +65,7 @@ function OutputPreview({ label, text }: { label: string; text: string }) {
 
 export function CcResourceDetail({ item, parentItem }: CcResourceDetailProps) {
   const isAlias = !!item.aliasOf;
+  const isPatternExample = !!item.patternOf;
 
   return (
     <div className="space-y-5">
@@ -75,6 +76,11 @@ export function CcResourceDetail({ item, parentItem }: CcResourceDetailProps) {
           {isAlias && (
             <Badge variant="outline" className="text-xs">
               별칭
+            </Badge>
+          )}
+          {isPatternExample && (
+            <Badge variant="outline" className="text-xs">
+              패턴 예시
             </Badge>
           )}
         </div>
@@ -89,7 +95,17 @@ export function CcResourceDetail({ item, parentItem }: CcResourceDetailProps) {
           </div>
         )}
 
-        {!isAlias && item.aliasedBy.length > 0 && (
+        {isPatternExample && (
+          <div className="flex items-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800 dark:border-blue-800 dark:bg-blue-950/30 dark:text-blue-300">
+            <ArrowRight className="size-4 shrink-0" />
+            <span>
+              <strong>{item.patternOf}</strong> 패턴의 예시입니다. 가이드라인과
+              상용구는 <strong>{item.patternOf}</strong>의 것을 사용합니다.
+            </span>
+          </div>
+        )}
+
+        {!isAlias && !isPatternExample && item.aliasedBy.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-xs text-muted-foreground">
               이 C.C.의 별칭:
@@ -101,6 +117,19 @@ export function CcResourceDetail({ item, parentItem }: CcResourceDetailProps) {
             ))}
           </div>
         )}
+
+        {!isAlias && !isPatternExample && item.patternExamples.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-xs text-muted-foreground">
+              이 패턴의 예시:
+            </span>
+            {item.patternExamples.map((example) => (
+              <Badge key={example} variant="secondary" className="text-xs">
+                {example}
+              </Badge>
+            ))}
+          </div>
+        )}
       </div>
 
       <Separator />
@@ -108,11 +137,11 @@ export function CcResourceDetail({ item, parentItem }: CcResourceDetailProps) {
       {/* 가이드라인 섹션 */}
       <section className="space-y-3">
         <h3 className="text-sm font-semibold">가이드라인</h3>
-        {isAlias ? (
+        {isAlias || isPatternExample ? (
           parentItem && parentItem.guideKeys.length > 0 ? (
             <div className="space-y-2">
               <p className="text-xs text-muted-foreground">
-                {item.aliasOf}의 가이드라인 사용
+                {item.aliasOf ?? item.patternOf}의 가이드라인 사용
               </p>
               {parentItem.guides.map((g) => (
                 <FileExistsBadge
@@ -126,7 +155,7 @@ export function CcResourceDetail({ item, parentItem }: CcResourceDetailProps) {
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">
-              {item.aliasOf}에 연결된 가이드라인이 없습니다.
+              {item.aliasOf ?? item.patternOf}에 연결된 가이드라인이 없습니다.
             </p>
           )
         ) : item.guideKeys.length === 0 ? (
@@ -154,28 +183,32 @@ export function CcResourceDetail({ item, parentItem }: CcResourceDetailProps) {
       <section className="space-y-3">
         <h3 className="text-sm font-semibold">상용구</h3>
         {(() => {
-          const templates = isAlias
-            ? (parentItem?.templates ?? [])
-            : item.templates;
-          const keys = isAlias
-            ? (parentItem?.templateKeys ?? [])
-            : item.templateKeys;
+          const templates =
+            isAlias || isPatternExample
+              ? (parentItem?.templates ?? [])
+              : item.templates;
+          const keys =
+            isAlias || isPatternExample
+              ? (parentItem?.templateKeys ?? [])
+              : item.templateKeys;
 
           if (keys.length === 0) {
             return (
               <p className="text-sm text-muted-foreground">
                 {isAlias
                   ? `${item.aliasOf}에 연결된 상용구가 없습니다.`
-                  : "연결된 상용구가 없습니다."}
+                  : isPatternExample
+                    ? `${item.patternOf}에 연결된 상용구가 없습니다.`
+                    : "연결된 상용구가 없습니다."}
               </p>
             );
           }
 
           return (
             <div className="space-y-4">
-              {isAlias && (
+              {(isAlias || isPatternExample) && (
                 <p className="text-xs text-muted-foreground">
-                  {item.aliasOf}의 상용구 사용
+                  {item.aliasOf ?? item.patternOf}의 상용구 사용
                 </p>
               )}
               {templates.map((t) => (
