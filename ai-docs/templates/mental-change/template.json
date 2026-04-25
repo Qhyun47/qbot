@@ -1,0 +1,183 @@
+{
+  "templateKey": "mental-change",
+  "cc": "Mental change",
+  "description": "의식 변화(Mental change) 환자 EMR 상용구 템플릿",
+  "hpi_hints": "LNT(Last Normal Time)/FFT(First Found Time) 확인. 초기 BST, BT 포함. Code red 감별(lateralizing sign, pupil 이상) 여부 포함.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "fields": [
+    {
+      "key": "onset",
+      "label": "onset",
+      "type": "open",
+      "description": "증상 발생 시점 (예: '3시간 전', '금일 오전'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "lnt_fft",
+      "label": "LNT / FFT",
+      "type": "open",
+      "description": "LNT(Last Normal Time): 마지막으로 정상이었던 시각. FFT(First Found Time): 증상을 처음 발견한 시각. 'LNT : {시각} / FFT : {시각}' 형식으로 출력. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "initial_bst",
+      "label": "initial BST",
+      "type": "open",
+      "description": "초기 혈당 수치 (예: '120 mg/dL'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "initial_bt",
+      "label": "initial BT",
+      "type": "open",
+      "description": "초기 체온 수치 (예: '36.8℃'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "fever_chill",
+      "label": "F/C",
+      "type": "symptom_check",
+      "format": "F/C({fever}/{chill})",
+      "slots": [
+        {
+          "key": "fever",
+          "symptom": "Fever",
+          "description": "발열",
+          "default": "-"
+        },
+        {
+          "key": "chill",
+          "symptom": "Chill",
+          "description": "오한",
+          "default": "-"
+        }
+      ],
+      "description": "발열/오한 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "cough_sputum_rhinorrhea",
+      "label": "C/S/R",
+      "type": "symptom_check",
+      "format": "C/S/R({cough}/{sputum}/{rhinorrhea})",
+      "slots": [
+        {
+          "key": "cough",
+          "symptom": "Cough",
+          "description": "기침",
+          "default": "-"
+        },
+        {
+          "key": "sputum",
+          "symptom": "Sputum",
+          "description": "가래",
+          "default": "-"
+        },
+        {
+          "key": "rhinorrhea",
+          "symptom": "Rhinorrhea",
+          "description": "콧물",
+          "default": "-"
+        }
+      ],
+      "description": "기침/가래/콧물 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "anvdc",
+      "label": "A/N/V/D/C",
+      "type": "symptom_check",
+      "format": "A/N/V/D/C({anorexia}/{nausea}/{vomiting}/{diarrhea}/{constipation})",
+      "slots": [
+        {
+          "key": "anorexia",
+          "symptom": "Anorexia",
+          "description": "식욕부진",
+          "default": "-"
+        },
+        {
+          "key": "nausea",
+          "symptom": "Nausea",
+          "description": "구역",
+          "default": "-"
+        },
+        {
+          "key": "vomiting",
+          "symptom": "Vomiting",
+          "description": "구토",
+          "default": "-"
+        },
+        {
+          "key": "diarrhea",
+          "symptom": "Diarrhea",
+          "description": "설사",
+          "default": "-"
+        },
+        {
+          "key": "constipation",
+          "symptom": "Constipation",
+          "description": "변비",
+          "default": "-"
+        }
+      ],
+      "description": "식욕부진/구역/구토/설사/변비 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "dizziness",
+      "label": "Dizziness",
+      "type": "open",
+      "description": "어지러움 동반 여부. 있으면 '+', 없으면 '-'. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "sweating",
+      "label": "Sweating",
+      "type": "open",
+      "description": "발한 동반 여부. 있으면 '+', 없으면 '-'. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "npo_solid",
+      "label": "NPO Solid",
+      "type": "open",
+      "description": "마지막 고형식 섭취 시각 또는 기간 (예: '6시간 전', '오전 9시'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "npo_liquid",
+      "label": "NPO Liquid",
+      "type": "open",
+      "description": "마지막 수분 섭취 시각 또는 기간 (예: '2시간 전'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "weight_change",
+      "label": "Weight change",
+      "type": "open",
+      "description": "최근 체중 변화 여부 및 정도. 없으면 '(-)'. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "gross_hematuria",
+      "label": "Gross hematuria",
+      "type": "open",
+      "description": "육안적 혈뇨 여부. 없으면 '(-)'. 정보 없으면 빈 문자열."
+    }
+  ],
+  "output_example": "onset :\nLNT : / FFT :\ninitial BST :\ninitial BT :\n\n#** code red  감별 : lateralizing sign / pupil \n\nF/C(-/-)  C/S/R(-/-/-)\nA/N/V/D/C(-/-/-/-/-)  Dizziness ( ) Sweating( )\n\nNPO: Solid - \n    Liquid - \nWeight change(-)\nGross hematuria(-)",
+  "pe": {
+    "fields": [
+      { "key": "mental_status", "label": "mental status", "default": "" },
+      { "key": "pupil", "label": "pupil", "default": "(3+/3+)" },
+      { "key": "eom", "label": "EOM", "default": "" },
+      { "key": "facial", "label": "facial motor sensory", "default": "intact" },
+      { "key": "limb_motor", "label": "Limb motor power", "default": "5 5" },
+      { "key": "limb_sensory", "label": "Limb sensory", "default": "intact" },
+      { "key": "abd_tenderness", "label": "Abd Td/rTd", "default": "(-/-)" },
+      { "key": "pitting_edema", "label": "pitting edema", "default": "" }
+    ],
+    "output_example": "* Neurologic Ex.\n mental status :   / GCS\n pupil (3+/3+)\n EOM\n facial motor sensory intact\n Limb motor power 5 5\n Limb sensory intact\n\nAbd Td/rTd (-/-)\npitting edema"
+  },
+  "history": {
+    "fields": [
+      {
+        "key": "past",
+        "label": "P.Hx.",
+        "default": "DM/HTN/Lung/Liver (-/-/-/-)"
+      },
+      { "key": "medication", "label": "Med. Hx.", "default": "" },
+      { "key": "operation", "label": "OP Hx.", "default": "" },
+      { "key": "allergy", "label": "Allergy Hx", "default": "" }
+    ],
+    "output_example": "- P.Hx.: DM/HTN/Lung/Liver (-/-/-/-)\n- Med. Hx.: $DM PO med or Insulin, Antiplatelet\n- OP Hx.:\n- Allergy Hx:"
+  }
+}

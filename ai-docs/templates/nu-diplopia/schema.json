@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DiplopsiaCase",
+  "description": "복시(Diplopia) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history",
+    "family_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류.",
+            "enum": [
+              "onset",
+              "monocular_binocular",
+              "diplopia_direction",
+              "gaze_finding",
+              "eom",
+              "associated_symptom",
+              "trauma_history",
+              "specific_ocular_history",
+              "vital_sign",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "family_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. onset/monocular_binocular/diplopia_direction/gaze_finding → [pi, template] | eom/associated_symptom → [pi, template] | trauma_history/specific_ocular_history → [template, history] | vital_sign → [pe] | past_history/medication_history/operation_history/family_history → [history] 전용",
+            "items": {
+              "type": "string",
+              "enum": ["pi", "template", "history", "pe"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "monocular_binocular": {
+      "type": ["string", "null"],
+      "description": "단안성(monocular) 또는 양안성(binocular) 복시 여부. 한쪽 눈 가려도 복시 지속 시 단안. 없으면 null."
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "복시 발생 시점 (예: '3일 전', '금일 오전'). 없으면 null."
+    },
+    "onset_character": {
+      "type": ["string", "null"],
+      "description": "발생 및 경과 양상 — 'sudden'(갑자기), 'gradual'(서서히 악화), 'progressive'(진행), 'fluctuating'(변동), 'improving'(호전). 없으면 null."
+    },
+    "diplopia_direction": {
+      "type": ["string", "null"],
+      "description": "복시 방향 — 두 상의 정렬 방향 (예: 'horizontal', 'vertical', 'oblique'). 없으면 null."
+    },
+    "image_count_description": {
+      "type": ["string", "null"],
+      "description": "보이는 상의 개수/형태 (예: '2개', '여러 개', '한 개인데 퍼져 보임'). 없으면 null."
+    },
+    "max_separation_gaze": {
+      "type": ["string", "null"],
+      "description": "두 상 사이의 간격이 가장 커지는 주시 방향 (예: 'right lateral gaze', 'upgaze', 'left lateral + upgaze'). 없으면 null."
+    },
+    "lateral_gaze_deviation": {
+      "type": ["string", "null"],
+      "description": "좌우 측방 주시 중 편위가 증가하는 방향 (예: 'right', 'left'). 없으면 null."
+    },
+    "head_tilt_deviation": {
+      "type": ["string", "null"],
+      "description": "고개 기울임 시 편위가 증가하는 방향 (예: 'right tilt', 'left tilt'). 없으면 null."
+    },
+    "trauma_history": {
+      "type": ["boolean", "null"],
+      "description": "외상(TRAUMA) 병력 여부. true/false/null."
+    },
+    "associated_symptoms": {
+      "type": ["array", "null"],
+      "description": "동반 증상 목록 (예: 'blurred vision', 'vertigo', 'oscillopsia', 'ptosis', 'headache'). 없으면 null.",
+      "items": { "type": "string" }
+    },
+    "specific_ocular_history": {
+      "type": ["array", "null"],
+      "description": "안과/복시 관련 특이 병력 (예: '사시', '안구차폐', '시력저하', '갑상선 질환', '당뇨'). 없으면 null.",
+      "items": { "type": "string" }
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록. History 출력 시 항상 포함; 없으면 null → (-)로 출력.",
+      "items": { "type": "string" }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록. History 출력 시 항상 포함; 없으면 null → (-)로 출력.",
+      "items": { "type": "string" }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. History 출력 시 항상 포함; 없으면 null → (-)로 출력.",
+      "items": { "type": "string" }
+    },
+    "family_history": {
+      "type": ["array", "null"],
+      "description": "가족력 목록. null이면 History 출력 시 해당 항목 생략.",
+      "items": { "type": "string" }
+    }
+  }
+}

@@ -51,6 +51,31 @@
     "category": "1. NU"
   },
   {
+    "templateKey": "headache",
+    "displayName": "Headache",
+    "category": "1. NU"
+  },
+  {
+    "templateKey": "facial-palsy",
+    "displayName": "Facial palsy",
+    "category": "1. NU"
+  },
+  {
+    "templateKey": "nu-diplopia",
+    "displayName": "Diplopia",
+    "category": "1. NU"
+  },
+  {
+    "templateKey": "memory-loss",
+    "displayName": "Memory loss",
+    "category": "1. NU"
+  },
+  {
+    "templateKey": "mental-change",
+    "displayName": "Mental change",
+    "category": "1. NU"
+  },
+  {
     "templateKey": "pd-fever",
     "displayName": "PD fever",
     "category": "3. PD"

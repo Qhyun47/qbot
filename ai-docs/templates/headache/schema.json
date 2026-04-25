@@ -1,0 +1,153 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HeadacheCase",
+  "description": "두통(Headache) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history",
+    "family_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류. 아래 enum 값 중 가장 적합한 것 하나를 선택.",
+            "enum": [
+              "onset",
+              "location",
+              "duration",
+              "character",
+              "intensity",
+              "previous_episode",
+              "aggravating_factor",
+              "relieving_factor",
+              "associated_symptom",
+              "valsalva_maneuver",
+              "vital_sign",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "family_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. 카드-섹션 매핑 기준: onset/location/duration/character/intensity/previous_episode/aggravating_factor/relieving_factor/valsalva_maneuver → [pi, template] | associated_symptom/vital_sign → [pi] | past_history/medication_history/operation_history/family_history → [history] 전용 (pi·template에 포함 금지)",
+            "items": {
+              "type": "string",
+              "enum": ["pi", "template", "history", "pe"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "두통 발생 상황 및 시점 (예: '갑자기', '어제 아침', '운동 중', '3일 전부터'). 없으면 null."
+    },
+    "location": {
+      "type": ["string", "null"],
+      "description": "두통 위치 (예: '전두부', '후두부', '측두부 편측', '전체'). 없으면 null."
+    },
+    "duration": {
+      "type": ["string", "null"],
+      "description": "두통 지속 시간 및 형태 (예: '수분', '수 시간', '간헐적', '지속적'). 없으면 null."
+    },
+    "character": {
+      "type": ["array", "null"],
+      "description": "두통 양상 목록. 해당하는 항목만 포함. 가능한 값: 'throbbing'(박동성), 'stabbing'(자통), 'pressure'(압박감/죄이는), 'heaviness'(무거움/혼탁감).",
+      "items": {
+        "type": "string",
+        "enum": ["throbbing", "stabbing", "pressure", "heaviness"]
+      }
+    },
+    "intensity_peak": {
+      "type": ["string", "null"],
+      "description": "최고 통증 강도 NRS 수치 (예: '8'). 없으면 null."
+    },
+    "intensity_current": {
+      "type": ["string", "null"],
+      "description": "현재 통증 강도 NRS 수치 (예: '5'). 없으면 null."
+    },
+    "previous_headache": {
+      "type": ["boolean", "null"],
+      "description": "이전 두통 경험 여부. true/false/null."
+    },
+    "previous_analgesic": {
+      "type": ["boolean", "null"],
+      "description": "이전 두통약 복용력 여부. true/false/null."
+    },
+    "aggravating_factors": {
+      "type": ["array", "null"],
+      "description": "악화 요인 목록 (예: ['빛', '소리', '냄새', '피로', '수면부족', '스트레스', '공복', '과식', '성관계']). 없으면 null.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "relieving_factors": {
+      "type": ["array", "null"],
+      "description": "완화 요인 목록 (예: ['안정', '진통제', '수면']). 없으면 null.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "valsalva_maneuver": {
+      "type": ["boolean", "null"],
+      "description": "발살바 유사 상황(고음 지르기, 배변, 운동) 동반 여부. true/false/null."
+    },
+    "associated_symptoms": {
+      "type": ["array", "null"],
+      "description": "동반 증상 목록. 가능한 값: nausea, vomiting, photophobia, phonophobia, dizziness, sleep_disturbance, ocular_discomfort, posterior_neck_discomfort, aura 등. 없으면 null.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록 (예: ['고혈압', '당뇨', '뇌졸중']). History 출력 시 항상 포함; 내용 없으면 null → 빈 값으로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록. History 출력 시 항상 포함; 내용 없으면 null → 빈 값으로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. History 출력 시 항상 포함; 내용 없으면 null → 빈 값으로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "family_history": {
+      "type": ["array", "null"],
+      "description": "가족력 목록. null이면 History 출력 시 해당 항목 전체 생략.",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

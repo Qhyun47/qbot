@@ -1,0 +1,103 @@
+{
+  "templateKey": "nu-diplopia",
+  "cc": "Diplopia",
+  "description": "복시 환자 EMR 상용구 템플릿",
+  "instructions": "이 템플릿의 각 항목을 structured JSON 입력에서 채워라. '$' 마커가 있는 줄: $text를 삭제하고 $text가 설명하는 내용에 맞게 해당 줄을 자유 형식으로 서술하여 대체하라 (정보 없으면 $ 기호만 제거하고 원문 그대로 출력). '#' 마커 줄: 절대 수정 금지, # 기호만 제거하여 그대로 출력. type이 'open'인 field: 관련 정보 있으면 채우고 없으면 빈 문자열. type이 'symptom_check'인 field: 명시적 양성 언급이 있을 때만 '+', 없으면 반드시 '-'. format 문자열의 변수를 교체해 출력. 출력 형식은 output_example을 따르라.",
+  "fields": [
+    {
+      "key": "eom",
+      "label": "EOM",
+      "type": "open",
+      "description": "안구 운동(EOM) 소견. 제한이 있는 방향/정도 서술 (예: 'right lateral gaze limitation', 'upgaze limitation'). 없으면 빈 문자열."
+    },
+    {
+      "key": "assoc_sx",
+      "label": "동반증상",
+      "type": "symptom_check",
+      "format": "blurred vision({blurred_vision}), vertigo({vertigo}), oscillopsia(진동시각)({oscillopsia}), ptosis",
+      "slots": [
+        {
+          "key": "blurred_vision",
+          "symptom": "Blurred vision",
+          "description": "시야 흐림",
+          "default": "-"
+        },
+        {
+          "key": "vertigo",
+          "symptom": "Vertigo",
+          "description": "현기증",
+          "default": "-"
+        },
+        {
+          "key": "oscillopsia",
+          "symptom": "Oscillopsia",
+          "description": "진동시각 (사물이 진동하는 것처럼 보임)",
+          "default": "-"
+        }
+      ],
+      "description": "동반 증상 체크. blurred vision/vertigo/oscillopsia: 언급 없으면 기본값(-) 유지. ptosis: format에 고정 포함(항상 출력)."
+    },
+    {
+      "key": "specific_history",
+      "label": "병력(특히 TRAUMA, DM)",
+      "type": "open",
+      "description": "복시 관련 특이 병력 서술. 안과: 사시, 안구차폐, 시력저하, 안구손상, 두위이상 / 전신: 당뇨, 고혈압, 고지혈증, 유전성 근육질환, 갑상선 질환 중 해당 항목. 없으면 빈 문자열."
+    }
+  ],
+  "output_example": "#* NU, EY 동시 notify!\n#* Code Red time 확인\n#* Lab 처방할 시, TFT & HbA1c 함께 처방해주세요\n\n1. 단안성/양안성 + onset \n   - $한쪽 눈 가리고도 복시 호소할 시 단안 복시\n   - $갑자기 발생하여 서서히 호전 / 진행하거나 양상이 변함\n   - $Onset 상황에 대해서 자세히 서술합니다\n\n2. 복시 방향 \n   - 상의 정렬과 두 상의 거리가 최대가 되는 방향 : $수평/수직/사선\n   - 몇 개로 보이는지 : $여러 개로 보이는지, 한 개인데 퍼져보이는지\n\n3. 주시 방향에 따른 두 상 사이의 간격이 가장 커지는 주시 방향\n   - $좌우 측방 주시시 어느 쪽 주시 시 편위가 증가하는지\n   - $편위가 증가된 측방 주시의 상,하 주시 중 어느 쪽의 편위가 큰지\n   - $고개를 좌우로 기울였을 때 어느 쪽의 안구 편위가 큰지\n\n4. EOM :\n\n5. 동반증상 : blurred vision(), vertigo(), oscillopsia(진동시각)(), ptosis\n\n6. 병력(특히 TRAUMA, DM) : 사시, 안구차폐, 시력저하, 안구손상, 두위이상\n                        당뇨, 고혈압, 고지혈증, 유전성 근육질환, 갑상선 질환",
+  "pe": {
+    "fields": [
+      {
+        "key": "general",
+        "label": "General / Vital status",
+        "default": "Vital stable, Mental alert"
+      },
+      {
+        "key": "pupil",
+        "label": "Pupil",
+        "default": "3+/3+"
+      },
+      {
+        "key": "eom_pe",
+        "label": "EOM",
+        "default": "intact"
+      },
+      {
+        "key": "nystagmus",
+        "label": "Nystagmus",
+        "default": ""
+      },
+      {
+        "key": "diplopia_test",
+        "label": "Diplopia",
+        "default": "(-/-)"
+      },
+      {
+        "key": "facial",
+        "label": "Facial Motor sensory",
+        "default": "intact"
+      },
+      {
+        "key": "motor_power",
+        "label": "Motor power",
+        "default": "5 5\n            5 5"
+      },
+      {
+        "key": "sensory",
+        "label": "Sensory",
+        "default": "intact"
+      }
+    ],
+    "output_example": "Vital stable, Mental alert, Pupil 3+/3+\nEOM intact, nystagmus, diplopia(-/-)\nFacial Motor sensory intact\nMotor power 5 5\n            5 5\nSensory intact"
+  },
+  "history": {
+    "fields": [
+      { "key": "past", "label": "Past Hx", "default": "" },
+      { "key": "medication", "label": "Med Hx", "default": "" },
+      { "key": "operation", "label": "Op. Hx.", "default": "" },
+      { "key": "alcohol", "label": "Alcohol", "default": "" },
+      { "key": "smoking", "label": "Smoking", "default": "" }
+    ],
+    "output_example": "Past Hx:\nMed Hx: \nOp. Hx. : \nAlcohol :     , Smoking : "
+  }
+}

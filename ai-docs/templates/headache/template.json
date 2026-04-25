@@ -1,0 +1,170 @@
+{
+  "templateKey": "headache",
+  "cc": "Headache",
+  "description": "두통 환자 EMR 상용구 템플릿",
+  "hpi_hints": "두통 발생 상황(onset)과 양상(character)을 반드시 포함. HA alarm sign 해당 여부 및 Valsalva 유사 상황(고음 지르기, 배변, 운동) 확인 필요.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 빈 문자열(\"\")을 유지하라. character_check field: 해당하는 항목만 괄호 안에 '+'를 표시하고 나머지는 빈 괄호로 유지하라. 고정 텍스트(exclusion lines, 번호 섹션, HA alarm sign)는 output_example을 따라 절대 수정하지 말고 그대로 출력하라. 단, '*Headache' 헤더는 입력된 C.C.를 그대로 사용하라.",
+  "fields": [
+    {
+      "key": "onset",
+      "label": "Onset(상황)",
+      "type": "open",
+      "description": "두통 발생 상황 및 시점. 발살바 유사 상황(고음 지르기, 배변, 운동) 여부 포함. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "location",
+      "label": "Location",
+      "type": "open",
+      "description": "두통 위치 (예: '전두부', '후두부', '측두부', '편측', '전체'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "duration",
+      "label": "Duration",
+      "type": "open",
+      "description": "두통 지속 시간 및 형태 (예: '수분', '수 시간', '간헐적', '지속적'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "character",
+      "label": "Character",
+      "type": "character_check",
+      "description": "두통 양상. 해당하는 항목 괄호 안에 '+'를 표시. 해당 없으면 빈 괄호 유지.",
+      "options": [
+        {
+          "key": "throbbing",
+          "label": "박동성으로 욱씬거린다",
+          "description": "박동성 두통(throbbing)"
+        },
+        {
+          "key": "stabbing",
+          "label": "바늘 등 날카로운 것으로 콕콕 찌른다",
+          "description": "자통(stabbing) 양상"
+        },
+        {
+          "key": "pressure",
+          "label": "머리전체를 죄이는 듯 하다",
+          "description": "압박감(pressure/tension) 양상"
+        },
+        {
+          "key": "heaviness",
+          "label": "머리가 무겁고 맑지 않다",
+          "description": "무거움/혼탁감"
+        }
+      ]
+    },
+    {
+      "key": "intensity",
+      "label": "Intensity (Peak time/현재)",
+      "type": "open",
+      "description": "통증 강도. NRS 수치로 표현 (예: 'NRS 8/7' — Peak/현재 순서). 정보 없으면 'NRS'만 출력."
+    },
+    {
+      "key": "previous_hx",
+      "label": "Previous headache Hx.",
+      "type": "open",
+      "description": "이전 두통 경험 및 두통약 복용력. 경험 있으면 '이전 두통 경험(+)', 없으면 '이전 두통 경험(-)', 정보 없으면 '이전 두통 경험()'. 복용력도 동일. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "agg_reliev",
+      "label": "Agg/Reliev Fx.",
+      "type": "open",
+      "description": "악화/완화 요인. 언급된 항목 괄호 안에 '+' 표기, 언급 없으면 빈 괄호 유지. 목록: 하루중 언제, 강한 빛/소리/냄새, 피로, 수면부족, 스트레스, 공복, 과식, 성관계. 정보 없으면 기본 목록(모두 빈 괄호)을 그대로 출력."
+    },
+    {
+      "key": "ass_sx",
+      "label": "Ass Sx.",
+      "type": "symptom_check",
+      "format": "nausea({nausea}) vomiting({vomiting}) photo/phonophbia({photophonophobia}) dizziness({dizziness}) sleep disturbance({sleep_disturbance})\n              ocular discomfort({ocular_discomfort}) posterior neck discomfort({posterior_neck_discomfort}) aura({aura})",
+      "slots": [
+        {
+          "key": "nausea",
+          "symptom": "Nausea",
+          "description": "구역",
+          "default": ""
+        },
+        {
+          "key": "vomiting",
+          "symptom": "Vomiting",
+          "description": "구토",
+          "default": ""
+        },
+        {
+          "key": "photophonophobia",
+          "symptom": "Photo/phonophobia",
+          "description": "광과민/소리과민",
+          "default": ""
+        },
+        {
+          "key": "dizziness",
+          "symptom": "Dizziness",
+          "description": "어지럼증",
+          "default": ""
+        },
+        {
+          "key": "sleep_disturbance",
+          "symptom": "Sleep disturbance",
+          "description": "수면 장애",
+          "default": ""
+        },
+        {
+          "key": "ocular_discomfort",
+          "symptom": "Ocular discomfort",
+          "description": "안구 불편감",
+          "default": ""
+        },
+        {
+          "key": "posterior_neck_discomfort",
+          "symptom": "Posterior neck discomfort",
+          "description": "후경부 불편감",
+          "default": ""
+        },
+        {
+          "key": "aura",
+          "symptom": "Aura",
+          "description": "전조 증상",
+          "default": ""
+        }
+      ],
+      "description": "동반 증상 체크. 명시적 언급 있으면 '+', 없으면 빈 괄호 유지."
+    }
+  ],
+  "output_example": "*Headache\nOnset(상황) : \nLocation : \nDuration : \nCharacter : \n       박동성으로 욱씬거린다()\n       바늘 등 날카로운 것으로 콕콕 찌른다()\n       머리전체를 죄이는 듯 하다()\n       머리가 무겁고 맑지 않다()\nIntensity (Peak time/현재): NRS\nPrevious headache Hx. : 이전 두통 경험() 두통약 복용력()\n\nAgg/Reliev Fx. : 하루중 언제, 강한 빛/소리/냄새(), 피로(), 수면부족(), 스트레스(), 공복(), 과식(), 성관계()\nAss Sx. : nausea() vomiting() photo/phonophbia() dizziness() sleep disturbance() \n              ocular discomfort() posterior neck discomfort() aura()\n\n Trauma(-), Brain tumor(-), Brain hemorrhage(-) \n Hypertension induced headache(-)\n 대상포진(-)\n\n1.  denogan effect(+), brain CT n-s 일 시\n     →  가까운 시일 내에 NU Opd f/u\n\n2.  high fever(-), recent infection Hx.(-), Brudzinski sign(-), Kernig sign(-) \n      → 타과적 fever focus 없을 시, R/O meningitis 가능성 고려하여 NU 교수님 notify\n\n    * 심한 두통 기준 : NRS 7점 (출산의 고통과 동일함)\n\nHA alarm sign:  이전에 경험하지 못한 갑작스러운 심한 두통( )\n                      진통제에 반응없고, 점점 악화되고 지속적인 두통( )\n                      수면을 방해하고 잠에서 깰 정도의 심한 두통( )\n                      신경학적 증상이 동반된 심한 두통( )\n\n+) 두통 발생한 Onset(상황) 에 대해서 확인해주세요. \n    : 발살바수기유사상황(Ex. 고음 지르다, 배변, 운동) 여부 확인",
+  "pe": {
+    "fields": [
+      {
+        "key": "general",
+        "label": "General / Pupil",
+        "default": "Mental alert, Pupil 3+/3+"
+      },
+      {
+        "key": "eom",
+        "label": "EOM / nystagmus / diplopia",
+        "default": "EOM intact, nystagmus, diplopia(-/-)"
+      },
+      {
+        "key": "facial",
+        "label": "Facial",
+        "default": "Facial Motor sensory intact"
+      },
+      {
+        "key": "motor",
+        "label": "Motor power",
+        "default": "Motor power 5 5\n            5 5"
+      },
+      { "key": "sensory", "label": "Sensory", "default": "Sensory intact" },
+      {
+        "key": "neck",
+        "label": "Neck",
+        "default": "Neck stiffness(-), Neck tenderness(-)"
+      }
+    ],
+    "output_example": "Mental alert, Pupil 3+/3+\nEOM intact, nystagmus, diplopia(-/-)\nFacial Motor sensory intact\nMotor power 5 5\n            5 5\nSensory intact\n\nNeck stiffness(-), Neck tenderness(-)"
+  },
+  "history": {
+    "fields": [
+      { "key": "past", "label": "PHx.", "default": "" },
+      { "key": "medication", "label": "Med. Hx.", "default": "" },
+      { "key": "operation", "label": "Op Hx.", "default": "" }
+    ],
+    "output_example": "PHx.\nMed. Hx.\nOp Hx."
+  }
+}

@@ -217,7 +217,10 @@
       { "key": "nu-headache", "rank": 0 },
       { "key": "nu-code-red", "rank": 1 }
     ],
-    "templateKeys": [{ "key": "nu-code-red", "rank": 1 }]
+    "templateKeys": [
+      { "key": "headache", "rank": 0 },
+      { "key": "nu-code-red", "rank": 1 }
+    ]
   },
   {
     "cc": "Diplopia",
@@ -225,7 +228,10 @@
       { "key": "nu-code-red", "rank": 1 },
       { "key": "nu-ey-diplopia", "rank": 2 }
     ],
-    "templateKeys": [{ "key": "nu-code-red", "rank": 1 }]
+    "templateKeys": [
+      { "key": "nu-code-red", "rank": 1 },
+      { "key": "nu-diplopia", "rank": 2 }
+    ]
   },
   {
     "cc": "Visual disturbance",
@@ -263,6 +269,76 @@
     "aliasOf": "Visual disturbance"
   },
   {
+    "cc": "Facial palsy",
+    "guideKeys": [
+      { "key": "nu-code-red", "rank": 0 },
+      { "key": "nu-facial-palsy", "rank": 1 }
+    ],
+    "templateKeys": [
+      { "key": "nu-code-red", "rank": 0 },
+      { "key": "facial-palsy", "rank": 1 }
+    ]
+  },
+  {
+    "cc": "Lt. facial palsy",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial palsy"
+  },
+  {
+    "cc": "Rt. facial palsy",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial palsy"
+  },
+  {
+    "cc": "LOC",
+    "guideKeys": [
+      { "key": "nu-loc", "rank": 0 },
+      { "key": "im-dka-hhs-mental-change", "rank": 1 }
+    ],
+    "templateKeys": [{ "key": "loc-ro-seizure", "rank": 0 }]
+  },
+  {
+    "cc": "Faintness",
+    "guideKeys": [{ "key": "nu-loc", "rank": 0 }],
+    "templateKeys": [{ "key": "loc-ro-seizure", "rank": 0 }]
+  },
+  {
+    "cc": "Convulsive movement",
+    "guideKeys": [
+      { "key": "nu-loc", "rank": 0 },
+      { "key": "pd-seizure", "rank": 1 }
+    ],
+    "templateKeys": [
+      { "key": "loc-ro-seizure", "rank": 0 },
+      { "key": "pd-seizure", "rank": 1 }
+    ]
+  },
+  {
+    "cc": "Involuntary movement",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Convulsive movement"
+  },
+  {
+    "cc": "Seizure",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Convulsive movement"
+  },
+  {
+    "cc": "Memory loss",
+    "guideKeys": [
+      { "key": "nu-memory-loss", "rank": 0 },
+      { "key": "nu-code-red", "rank": 1 }
+    ],
+    "templateKeys": [
+      { "key": "memory-loss", "rank": 0 },
+      { "key": "nu-code-red", "rank": 1 }
+    ]
+  },
+  {
     "cc": "Mental change",
     "guideKeys": [
       { "key": "nu-code-red", "rank": 0 },
@@ -272,6 +348,7 @@
     ],
     "templateKeys": [
       { "key": "nu-code-red", "rank": 0 },
+      { "key": "mental-change", "rank": 1 },
       { "key": "loc-ro-seizure", "rank": 2 }
     ]
   }

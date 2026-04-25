@@ -1,0 +1,196 @@
+{
+  "templateKey": "facial-palsy",
+  "cc": "Facial palsy",
+  "description": "안면마비 환자 EMR 상용구 템플릿",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 빈 문자열(\"\")로 남겨라. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "fields": [
+    {
+      "key": "facial_type",
+      "label": "facial type",
+      "type": "open",
+      "description": "안면마비 타입(upper/lower/both) 서술 (예: 'upper/lower facial palsy(+)', 'lower facial palsy(+)'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "sensory_finding",
+      "label": "sensory",
+      "type": "open",
+      "description": "안면 감각 소견 (예: 'sensory : Lt. 30%, Rt. 100%'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "limb_finding",
+      "label": "limb motor/sensory",
+      "type": "open",
+      "description": "사지 운동/감각 소견 (예: 'both limb motor/sensory intact'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "ear_detail",
+      "label": "이개 추가 소견",
+      "type": "open",
+      "description": "이개 통증에 대한 추가 서술. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "underlying_diseases",
+      "label": "underlying disease",
+      "type": "symptom_check",
+      "format": "underlying disease : DM({dm}), 대상포진({hz})",
+      "slots": [
+        {
+          "key": "dm",
+          "symptom": "DM",
+          "description": "당뇨병",
+          "default": "-"
+        },
+        {
+          "key": "hz",
+          "symptom": "대상포진(Herpes zoster)",
+          "description": "대상포진 과거력",
+          "default": "-"
+        }
+      ],
+      "description": "기저질환 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "weight_npo",
+      "label": "weight, NPO time",
+      "type": "open",
+      "description": "체중 및 금식 시작 시점. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "recent_uri",
+      "label": "recent URI Sx.",
+      "type": "symptom_check",
+      "format": "recent URI Sx.({uri})",
+      "slots": [
+        {
+          "key": "uri",
+          "symptom": "URI",
+          "description": "최근 상기도 감염 증상",
+          "default": "-"
+        }
+      ],
+      "description": "최근 상기도 감염 증상 여부. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "vesicle",
+      "label": "vesicle",
+      "type": "symptom_check",
+      "format": "vesicle({vesicle})",
+      "slots": [
+        {
+          "key": "vesicle",
+          "symptom": "vesicle",
+          "description": "수포 여부",
+          "default": "-"
+        }
+      ],
+      "description": "수포 여부. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "taste_dry",
+      "label": "taste change / dry mouth / dry eye",
+      "type": "symptom_check",
+      "format": "taste change({taste}), dry mouth({dry_mouth}), dry eye({dry_eye})",
+      "slots": [
+        {
+          "key": "taste",
+          "symptom": "taste change",
+          "description": "미각 변화",
+          "default": "-"
+        },
+        {
+          "key": "dry_mouth",
+          "symptom": "dry mouth",
+          "description": "구강 건조",
+          "default": "-"
+        },
+        {
+          "key": "dry_eye",
+          "symptom": "dry eye",
+          "description": "안구 건조",
+          "default": "-"
+        }
+      ],
+      "description": "미각 변화/구강 건조/안구 건조 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "ear_symptoms",
+      "label": "ear symptoms",
+      "type": "symptom_check",
+      "format": "auricle pain({auricle}), retromastoid pain({retromastoid}), tenderenss({tenderness}), tinnitus({tinnitus}), hearing loss({hearing_loss})",
+      "slots": [
+        {
+          "key": "auricle",
+          "symptom": "auricle pain",
+          "description": "이개 통증",
+          "default": "-"
+        },
+        {
+          "key": "retromastoid",
+          "symptom": "retromastoid pain",
+          "description": "유양돌기 후방 통증",
+          "default": "-"
+        },
+        {
+          "key": "tenderness",
+          "symptom": "tenderness",
+          "description": "압통",
+          "default": "-"
+        },
+        {
+          "key": "tinnitus",
+          "symptom": "tinnitus",
+          "description": "이명",
+          "default": "-"
+        },
+        {
+          "key": "hearing_loss",
+          "symptom": "hearing loss",
+          "description": "청력 저하",
+          "default": "-"
+        }
+      ],
+      "description": "이개 통증/유양돌기 통증/압통/이명/청력 저하 체크. 언급 없으면 기본값(-) 유지."
+    }
+  ],
+  "output_example": "* Facial (Upper/Lower) (motor/sensory) check!\n   - lower만 이상 있을 시, CODE RED time 확인하기\n   - \n   - \n   - both limb motor/sensory 확인\n\n* 외이도의 통증과 수포 확인, 있을 시 Ramsay-Hunt Syndrome → OL notify\n\n* History taking \n   - underlying disease : DM(-), 대상포진(-)\n   - weight, NPO time\n   - recent URI Sx.(-)\n   - vesicle(-) \n   - taste change(-), dry mouth(-), dry eye(-)\n   - auricle pain(-), retromastoid pain(-), tenderenss(-), tinnitus(-), hearing loss(-)",
+  "pe": {
+    "fields": [
+      {
+        "key": "general",
+        "label": "General / Vital status",
+        "default": "Vital stable, Mental alert, Pupil 3+/3+"
+      },
+      {
+        "key": "eom",
+        "label": "EOM / Nystagmus / Diplopia",
+        "default": "EOM intact, nystagmus, diplopia(-/-)"
+      },
+      {
+        "key": "facial_motor_sensory",
+        "label": "Facial Motor / Sensory",
+        "default": "Facial Motor sensory intact"
+      },
+      {
+        "key": "motor_power",
+        "label": "Motor power",
+        "default": "Motor power 5 5\n            5 5"
+      },
+      {
+        "key": "sensory",
+        "label": "Sensory",
+        "default": "Sensory intact"
+      }
+    ],
+    "output_example": "Vital stable, Mental alert, Pupil 3+/3+\nEOM intact, nystagmus, diplopia(-/-)\nFacial Motor sensory intact\nMotor power 5 5\n            5 5\nSensory intact"
+  },
+  "history": {
+    "fields": [
+      { "key": "past", "label": "Past Hx", "default": "" },
+      { "key": "medication", "label": "Med Hx", "default": "" },
+      { "key": "operation", "label": "Op. Hx.", "default": "" },
+      { "key": "alcohol", "label": "Alcohol", "default": "" },
+      { "key": "smoking", "label": "Smoking", "default": "" }
+    ],
+    "output_example": "Past Hx:\nMed Hx: \nOp. Hx. : \nAlcohol :     , Smoking : "
+  }
+}

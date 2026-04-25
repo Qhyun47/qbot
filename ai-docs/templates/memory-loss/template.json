@@ -1,0 +1,152 @@
+{
+  "templateKey": "memory-loss",
+  "cc": "Memory loss",
+  "description": "Memory loss (TGA 의심) 환자 EMR 상용구 템플릿",
+  "hpi_hints": "기억이 없는 시간대, 유발 원인, TGA 의심 여부를 중심으로 서술.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "fields": [
+    {
+      "key": "patient_account",
+      "label": "환자 진술",
+      "type": "open",
+      "description": "환자가 기억하는 내용 요약. 기상 후부터 응급실 내원까지 어떤 일이 있었는지 환자가 진술한 내용. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "guardian_account",
+      "label": "보호자 진술",
+      "type": "open",
+      "description": "보호자가 관찰한 내용 요약. 환자 진술과 비교 가능한 경우 포함. 보호자 부재 또는 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "cause",
+      "label": "유발 원인",
+      "type": "open",
+      "description": "기억상실 유발 원인. 신체 활동(격한 운동, 역기, 수영, 목욕), 감정적/심리적 스트레스, 통증, 의료 시술, 성교, 발살바법 등 해당하는 항목 서술. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "new_memory_loss",
+      "label": "새로운 기억을 저장할 수 있는 능력 상실",
+      "type": "symptom_check",
+      "format": "새로운 기억을 저장할 수 있는 능력 상실({value})",
+      "slots": [
+        {
+          "key": "value",
+          "symptom": "새로운 기억 저장 능력 상실",
+          "description": "새로운 정보를 기억에 저장하지 못함 (anterograde amnesia)",
+          "default": "-"
+        }
+      ]
+    },
+    {
+      "key": "retrograde_amnesia",
+      "label": "회상 능력 상실",
+      "type": "symptom_check",
+      "format": "기억상실이 발생한 이후에 나타난 사건들을 회상할 능력도 갑자기 일시적으로 상실({value})",
+      "slots": [
+        {
+          "key": "value",
+          "symptom": "회상 능력 상실",
+          "description": "기억상실 발생 이후 사건들을 회상하지 못함 (retrograde amnesia)",
+          "default": "-"
+        }
+      ]
+    },
+    {
+      "key": "anxiety",
+      "label": "경계심과 불안감",
+      "type": "symptom_check",
+      "format": "경계심과 불안감({value})",
+      "slots": [
+        {
+          "key": "value",
+          "symptom": "경계심과 불안감",
+          "description": "경계심 및 불안감 호소",
+          "default": "-"
+        }
+      ]
+    },
+    {
+      "key": "repetitive_speech",
+      "label": "동일한 질문 또는 어구 반복",
+      "type": "symptom_check",
+      "format": "종종 동일한 질문 또는 어구를 반복해서 말함({value})",
+      "slots": [
+        {
+          "key": "value",
+          "symptom": "반복적 질문/어구",
+          "description": "동일한 질문이나 어구를 반복해서 말함",
+          "default": "-"
+        }
+      ]
+    },
+    {
+      "key": "disorientation",
+      "label": "시간과 장소에 대한 개념 혼동",
+      "type": "symptom_check",
+      "format": "시간과 장소에 대한 개념을 혼동({value})",
+      "slots": [
+        {
+          "key": "value",
+          "symptom": "시간/장소 지남력 장애",
+          "description": "시간과 장소에 대한 개념 혼동",
+          "default": "-"
+        }
+      ]
+    },
+    {
+      "key": "person_orientation",
+      "label": "사람에 대한 지남력 보존",
+      "type": "symptom_check",
+      "format": "사람에 대한 지남력 보존({value})",
+      "slots": [
+        {
+          "key": "value",
+          "symptom": "사람 지남력 보존",
+          "description": "사람에 대한 지남력 보존 여부",
+          "default": "-"
+        }
+      ]
+    }
+  ],
+  "output_example": "   # * * DDx. 먼저 감별해주세요\n# - 외상 여부 / 발작, 편두통 / 심리적 요인 / 과도한 알코올 섭취 / 특정 진정제(바르비투르염, 벤조디아제핀, 미다졸람, 트리아졸람) 복용 여부 / 불법 약물 사용 여부\n\n#   * TGA 의심될 시 Brain Routine CT 시행합니다\n\n#   * MMSE 시행 (교육년수/반응 포함)\n\n   * 기억이 없는 시간대 파악하기 \n     - 환자에게 : $기상 후부터 응급실 내원까지 어떤 일이 있었는지 물어보기 \n     - $보호자가 옆에 있을 시 다시 한번 history taking 하여 비교하기\n\n   * cause\n     - $신체 활동(격한 운동, 역기, 수영, 목욕) / 감정적 또는 심리적 스트레스 / \n       통증 / 의료 시술 / 성교 / 발살바법\n\n   * Symptom\n     - 새로운 기억을 저장할 수 있는 능력 상실(-)\n     - 기억상실이 발생한 이후에 나타난 사건들을 회상할 능력도 갑자기 일시적으로 상실(-) \n     - 경계심과 불안감(-)\n     - 종종 동일한 질문 또는 어구를 반복해서 말함(-)\n     - 시간과 장소에 대한 개념을 혼동(-)\n     - 사람에 대한 지남력 보존(-)",
+  "pe": {
+    "fields": [
+      {
+        "key": "general",
+        "label": "General / Vital status",
+        "default": "Vital stable, Mental alert, Pupil 3+/3+"
+      },
+      {
+        "key": "eom",
+        "label": "EOM / Nystagmus / Diplopia",
+        "default": "EOM intact, nystagmus, diplopia(-/-)"
+      },
+      {
+        "key": "facial",
+        "label": "Facial Motor Sensory",
+        "default": "Facial Motor sensory intact"
+      },
+      {
+        "key": "motor",
+        "label": "Motor power",
+        "default": "Motor power 5 5\n            5 5"
+      },
+      {
+        "key": "sensory",
+        "label": "Sensory",
+        "default": "Sensory intact"
+      }
+    ],
+    "output_example": "Vital stable, Mental alert, Pupil 3+/3+\nEOM intact, nystagmus, diplopia(-/-)\nFacial Motor sensory intact\nMotor power 5 5\n            5 5\nSensory intact"
+  },
+  "history": {
+    "fields": [
+      { "key": "past", "label": "Past Hx", "default": "" },
+      { "key": "medication", "label": "Med Hx", "default": "" },
+      { "key": "operation", "label": "Op. Hx.", "default": "" },
+      { "key": "alcohol", "label": "Alcohol", "default": "" },
+      { "key": "smoking", "label": "Smoking", "default": "" }
+    ],
+    "output_example": "Past Hx:\nMed Hx: \nOp. Hx. : \nAlcohol :     , Smoking :"
+  }
+}

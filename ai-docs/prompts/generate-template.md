@@ -12,6 +12,13 @@
   - 이 규칙은 필드 label 뒤에 값을 붙여 출력하는 모든 boolean 필드에 적용됩니다
 - 단, boolean 값이 있어도 필드 description에 서술형 텍스트를 요구하는 경우, templateInputs에서 관련 카드의 normalized_text를 우선 사용합니다
 
+### character_check 필드
+
+- options 목록에 있는 양상이 해당될 경우: 해당 항목 줄 끝 괄호 안에 '+' 표시
+- 해당하지 않는 항목은 빈 괄호 () 유지
+- options 목록에 없는 양상이 입력된 경우: 해당 표현을 Character 레이블 줄에 직접 서술
+- 양쪽이 혼합된 경우: Character 줄에 서술형 추가 + 해당 옵션에 '+' 표시 모두 반영
+
 ### symptom_check 필드
 
 - format 문자열의 {key} 변수를 채워 출력합니다 (예: F/C({fever}/{chill}) → F/C(-/-))
@@ -29,6 +36,10 @@
 
 - template의 output_example 형식을 정확히 따릅니다
 - 줄 순서, 공백, 구두점, 콜론 위치를 그대로 유지합니다
+- `output_example`에서 `#`은 **인라인 고정 마커**입니다. `#` 이전 텍스트는 그대로 유지하고, `#` 기호를 제거한 후 `#` 이후 텍스트(줄 끝까지)를 절대 수정하지 말고 그대로 출력합니다
+  - 예: `"before #fixed part"` → `"before fixed part"` (`fixed part`는 수정 불가)
+- `output_example`에서 `$`은 **인라인 AI 생성 마커**입니다. `$` 이전 텍스트는 그대로 유지하고, `$` 기호를 제거한 후 `$` 이후 텍스트(줄 끝까지, 이하 `$text`)를 입력 정보에 맞게 자유 형식으로 서술하여 대체합니다. 정보가 없으면 `$` 기호만 제거하고 `$text` 원문을 그대로 출력합니다. `$` 기호는 출력에 포함하지 않습니다
+  - 예: `"before $description"` → `"before [AI 생성 내용]"` 또는 정보 없으면 `"before description"`
 - 입력 정보 중 어떤 필드에도 해당하지 않는 내용은 상용구 출력 맨 아래에 추가합니다
   예: `vaginal discharge(+)`, `facial swelling(+)` 등 표준 의학 표기 형식으로 작성
 - 출력은 완성된 상용구 텍스트만 반환하고, 다른 설명이나 주석을 붙이지 않습니다

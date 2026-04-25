@@ -334,6 +334,10 @@ export async function getAllCustomGuidelines(): Promise<Guideline[]> {
   return data ?? [];
 }
 
+function stripAnnotationMarkers(text: string): string {
+  return text.replace(/#/g, "").replace(/\$/g, "");
+}
+
 export async function loadTemplateContent(
   templateKey: string
 ): Promise<TemplateContent | null> {
@@ -349,9 +353,15 @@ export async function loadTemplateContent(
     const list = templateListRaw as TemplateListEntry[];
     const entry = list.find((t) => t.templateKey === templateKey);
     return {
-      mainExample: (json.output_example as string) ?? "",
-      historyExample: (json.history?.output_example as string) ?? "",
-      peExample: (json.pe?.output_example as string) ?? "",
+      mainExample: stripAnnotationMarkers(
+        (json.output_example as string) ?? ""
+      ),
+      historyExample: stripAnnotationMarkers(
+        (json.history?.output_example as string) ?? ""
+      ),
+      peExample: stripAnnotationMarkers(
+        (json.pe?.output_example as string) ?? ""
+      ),
       displayName: entry?.displayName ?? templateKey,
     };
   } catch {

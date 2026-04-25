@@ -1,0 +1,127 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MemoryLossCase",
+  "description": "Memory loss (TGA 의심) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류. 아래 enum 값 중 가장 적합한 것 하나를 선택.",
+            "enum": [
+              "onset",
+              "duration",
+              "trigger_cause",
+              "patient_account",
+              "guardian_account",
+              "new_memory_loss",
+              "retrograde_amnesia",
+              "anxiety",
+              "repetitive_speech",
+              "disorientation",
+              "person_orientation",
+              "prior_episode",
+              "vital_sign",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. 카드-섹션 매핑 기준: onset/duration/trigger_cause/patient_account/guardian_account → [pi, template] | new_memory_loss/retrograde_amnesia/anxiety/repetitive_speech/disorientation/person_orientation/prior_episode/vital_sign → [pi] | past_history/medication_history/operation_history → [history] 전용 (HPI·상용구에 포함 금지)",
+            "items": {
+              "type": "string",
+              "enum": ["pi", "template", "history", "pe"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "기억상실 발생 시점 (예: '오전 10시경', '2시간 전'). 없으면 null."
+    },
+    "duration": {
+      "type": ["string", "null"],
+      "description": "기억상실 지속 시간 (예: '약 2시간', '30분'). 없으면 null."
+    },
+    "trigger_cause": {
+      "type": ["string", "null"],
+      "description": "기억상실 유발 원인 (예: '격한 운동', '감정적 스트레스', '성교', '의료 시술'). 없으면 null."
+    },
+    "patient_account": {
+      "type": ["string", "null"],
+      "description": "환자가 기억하는 내용. 기상 후부터 기억이 없는 시점까지 환자 진술 요약. 없으면 null."
+    },
+    "guardian_account": {
+      "type": ["string", "null"],
+      "description": "보호자가 관찰한 내용 요약. 보호자 부재 시 null."
+    },
+    "new_memory_loss": {
+      "type": ["boolean", "null"],
+      "description": "새로운 기억 저장 능력 상실 (anterograde amnesia) 여부. true/false/null."
+    },
+    "retrograde_amnesia": {
+      "type": ["boolean", "null"],
+      "description": "기억상실 발생 이후 사건 회상 능력 상실 여부. true/false/null."
+    },
+    "anxiety": {
+      "type": ["boolean", "null"],
+      "description": "경계심과 불안감 호소 여부. true/false/null."
+    },
+    "repetitive_speech": {
+      "type": ["boolean", "null"],
+      "description": "동일한 질문/어구 반복 여부. true/false/null."
+    },
+    "disorientation": {
+      "type": ["boolean", "null"],
+      "description": "시간과 장소 지남력 장애 여부. true/false/null."
+    },
+    "person_orientation_intact": {
+      "type": ["boolean", "null"],
+      "description": "사람에 대한 지남력 보존 여부. true/false/null."
+    },
+    "prior_episode": {
+      "type": ["string", "null"],
+      "description": "유사 기억상실 과거 에피소드 서술. 없으면 null."
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록 (예: ['고혈압', '당뇨']). History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": { "type": "string" }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": { "type": "string" }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": { "type": "string" }
+    }
+  }
+}
