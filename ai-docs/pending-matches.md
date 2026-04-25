@@ -23,15 +23,11 @@
 C.C. 등록 시 연결하려 했으나 해당 guideKey가 아직 존재하지 않는 항목입니다.
 가이드라인이 등록될 때 이 섹션을 확인합니다.
 
-| C.C.               | 대기 중인 guideKey       | displayName                  | rank | 등록일     |
-| ------------------ | ------------------------ | ---------------------------- | ---- | ---------- |
-| Urticaria          | dm-urticaria             | DM - Urticaria               |      | 2026-04-24 |
-| Skin rash          | dm-urticaria             | DM - Urticaria               |      | 2026-04-24 |
-| Diplopia           | nu-ey-diplopia           | NU or EY - Diplopia          | 2    | 2026-04-25 |
-| Visual disturbance | ey                       | EY                           | 0    | 2026-04-25 |
-| Mental change      | im-dka-hhs-mental-change | IM - DKA/HHS + Mental change | 1    | 2026-04-25 |
-| Mental change      | nu-loc                   | NU - LOC                     | 2    | 2026-04-25 |
-| Mental change      | drug-intoxication        | Drug Intoxication            | 3    | 2026-04-25 |
+| C.C.               | 대기 중인 guideKey | displayName    | rank | 등록일     |
+| ------------------ | ------------------ | -------------- | ---- | ---------- |
+| Urticaria          | dm-urticaria       | DM - Urticaria |      | 2026-04-24 |
+| Skin rash          | dm-urticaria       | DM - Urticaria |      | 2026-04-24 |
+| Visual disturbance | ey                 | EY             | 0    | 2026-04-25 |
 
 ---
 
@@ -55,11 +51,13 @@ C.C. 등록 시 연결하려 했으나 해당 templateKey가 아직 존재하지
 가이드라인 등록 시 연결하려 했으나 해당 C.C.가 아직 존재하지 않는 항목입니다.
 C.C.가 등록될 때 이 섹션을 확인합니다.
 
-| guideKey   | displayName  | 대기 중인 C.C.       | rank | 등록일     |
-| ---------- | ------------ | -------------------- | ---- | ---------- |
-| pd-seizure | PD - Seizure | Involuntary movement | 1    | 2026-04-24 |
-| pd-seizure | PD - Seizure | Convulsive movement  | 1    | 2026-04-24 |
-| pd-seizure | PD - Seizure | Seizure              | 1    | 2026-04-24 |
+| guideKey        | displayName       | 대기 중인 C.C.       | rank | 등록일     |
+| --------------- | ----------------- | -------------------- | ---- | ---------- |
+| pd-seizure      | PD - Seizure      | Involuntary movement | 1    | 2026-04-24 |
+| pd-seizure      | PD - Seizure      | Convulsive movement  | 1    | 2026-04-24 |
+| pd-seizure      | PD - Seizure      | Seizure              | 1    | 2026-04-24 |
+| nu-facial-palsy | NU - Facial palsy | Facial palsy         | 0    | 2026-04-25 |
+| nu-memory-loss  | NU - Memory loss  | Memory loss          | 0    | 2026-04-25 |
 
 ---
 

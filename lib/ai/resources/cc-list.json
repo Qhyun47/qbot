@@ -76,14 +76,18 @@
   },
   {
     "cc": "Nausea",
-    "guideKeys": [{ "key": "im-basic", "rank": 0 }],
+    "guideKeys": [
+      { "key": "im-basic", "rank": 0 },
+      { "key": "drug-intoxication", "rank": 1 }
+    ],
     "templateKeys": [{ "key": "im-basic", "rank": 0 }]
   },
   {
     "cc": "Vomiting",
     "guideKeys": [
       { "key": "im-basic", "rank": 0 },
-      { "key": "pd-fever-vomiting", "rank": 1 }
+      { "key": "drug-intoxication", "rank": 1 },
+      { "key": "pd-fever-vomiting", "rank": 2 }
     ],
     "templateKeys": [{ "key": "im-basic", "rank": 0 }]
   },
@@ -209,12 +213,18 @@
   },
   {
     "cc": "Headache",
-    "guideKeys": [{ "key": "nu-code-red", "rank": 1 }],
+    "guideKeys": [
+      { "key": "nu-headache", "rank": 0 },
+      { "key": "nu-code-red", "rank": 1 }
+    ],
     "templateKeys": [{ "key": "nu-code-red", "rank": 1 }]
   },
   {
     "cc": "Diplopia",
-    "guideKeys": [{ "key": "nu-code-red", "rank": 1 }],
+    "guideKeys": [
+      { "key": "nu-code-red", "rank": 1 },
+      { "key": "nu-ey-diplopia", "rank": 2 }
+    ],
     "templateKeys": [{ "key": "nu-code-red", "rank": 1 }]
   },
   {
@@ -254,7 +264,12 @@
   },
   {
     "cc": "Mental change",
-    "guideKeys": [{ "key": "nu-code-red", "rank": 0 }],
+    "guideKeys": [
+      { "key": "nu-code-red", "rank": 0 },
+      { "key": "im-dka-hhs-mental-change", "rank": 1 },
+      { "key": "nu-loc", "rank": 2 },
+      { "key": "drug-intoxication", "rank": 3 }
+    ],
     "templateKeys": [{ "key": "nu-code-red", "rank": 0 }]
   }
 ]

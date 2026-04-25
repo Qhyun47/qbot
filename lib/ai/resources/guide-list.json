@@ -10,5 +10,15 @@
   { "guideKey": "pd-fever-vomiting", "displayName": "PD - Fever ≒ Vomiting" },
   { "guideKey": "pd-seizure", "displayName": "PD - Seizure" },
   { "guideKey": "ns-head-trauma", "displayName": "NS - 소아 head trauma" },
-  { "guideKey": "nu-code-red", "displayName": "NU - CODE RED" }
+  { "guideKey": "nu-code-red", "displayName": "NU - CODE RED" },
+  {
+    "guideKey": "im-dka-hhs-mental-change",
+    "displayName": "IM - DKA/HHS + Mental change"
+  },
+  { "guideKey": "nu-loc", "displayName": "NU - LOC" },
+  { "guideKey": "drug-intoxication", "displayName": "Drug Intoxication" },
+  { "guideKey": "nu-ey-diplopia", "displayName": "NU or EY - Diplopia" },
+  { "guideKey": "nu-facial-palsy", "displayName": "NU - Facial palsy" },
+  { "guideKey": "nu-memory-loss", "displayName": "NU - Memory loss" },
+  { "guideKey": "nu-headache", "displayName": "NU - Headache" }
 ]
