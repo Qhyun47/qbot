@@ -467,7 +467,8 @@
     ],
     "templateKeys": [
       { "key": "trauma", "rank": 1 },
-      { "key": "pc-hx", "rank": 2 }
+      { "key": "ta", "rank": 2 },
+      { "key": "pc-hx", "rank": 3 }
     ]
   },
   {
@@ -487,5 +488,251 @@
     "guideKeys": [],
     "templateKeys": [],
     "aliasOf": "Wrist pain"
+  },
+  {
+    "cc": "Orbital pain",
+    "guideKeys": [
+      { "key": "ps", "rank": 2 },
+      { "key": "trauma-traffic-accident", "rank": 3 }
+    ],
+    "templateKeys": [
+      { "key": "ps", "rank": 2 },
+      { "key": "trauma", "rank": 3 },
+      { "key": "ta", "rank": 4 }
+    ]
+  },
+  {
+    "cc": "Lt. orbital pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Orbital pain"
+  },
+  {
+    "cc": "Rt. orbital pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Orbital pain"
+  },
+  {
+    "cc": "Both orbital pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Orbital pain"
+  },
+  {
+    "cc": "Facial pain",
+    "guideKeys": [
+      { "key": "ps", "rank": 1 },
+      { "key": "trauma-traffic-accident", "rank": 2 }
+    ],
+    "templateKeys": [
+      { "key": "ps", "rank": 1 },
+      { "key": "trauma", "rank": 2 },
+      { "key": "ta", "rank": 3 }
+    ]
+  },
+  {
+    "cc": "Lt. facial pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial pain"
+  },
+  {
+    "cc": "Rt. facial pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial pain"
+  },
+  {
+    "cc": "Zygoma pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial pain"
+  },
+  {
+    "cc": "Lt. zygoma pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial pain"
+  },
+  {
+    "cc": "Rt. zygoma pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial pain"
+  },
+  {
+    "cc": "Both zygoma pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial pain"
+  },
+  {
+    "cc": "Nasal pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial pain"
+  },
+  {
+    "cc": "Maxillary pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial pain"
+  },
+  {
+    "cc": "Lt. maxillary pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial pain"
+  },
+  {
+    "cc": "Rt. maxillary pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial pain"
+  },
+  {
+    "cc": "Both maxillary pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial pain"
+  },
+  {
+    "cc": "Mandible pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial pain"
+  },
+  {
+    "cc": "Lt. mandible pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial pain"
+  },
+  {
+    "cc": "Rt. mandible pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial pain"
+  },
+  {
+    "cc": "Both mandible pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial pain"
+  },
+  {
+    "cc": "Facial laceration",
+    "guideKeys": [
+      { "key": "ps", "rank": 1 },
+      { "key": "trauma-traffic-accident", "rank": 2 }
+    ],
+    "templateKeys": [
+      { "key": "ps", "rank": 1 },
+      { "key": "trauma", "rank": 2 },
+      { "key": "ta", "rank": 3 }
+    ]
+  },
+  {
+    "cc": "Lt. facial laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Rt. facial laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Zygoma laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Lt. zygoma laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Rt. zygoma laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Both zygoma laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Nasal laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Maxillary laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Lt. maxillary laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Rt. maxillary laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Both maxillary laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Mandible laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Lt. mandible laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Rt. mandible laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Both mandible laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Back pain",
+    "guideKeys": [
+      { "key": "os-ns-back-pain", "rank": 0 },
+      { "key": "trauma-traffic-accident", "rank": 1 }
+    ],
+    "templateKeys": [
+      { "key": "back-pain", "rank": 0 },
+      { "key": "trauma", "rank": 1 },
+      { "key": "ta", "rank": 2 }
+    ]
   }
 ]
