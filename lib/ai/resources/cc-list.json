@@ -328,6 +328,11 @@
     "aliasOf": "Convulsive movement"
   },
   {
+    "cc": "Dizziness",
+    "guideKeys": [{ "key": "nu-dizziness", "rank": 0 }],
+    "templateKeys": [{ "key": "dizziness", "rank": 0 }]
+  },
+  {
     "cc": "Memory loss",
     "guideKeys": [
       { "key": "nu-memory-loss", "rank": 0 },
