@@ -86,6 +86,11 @@
     "category": "7. PC"
   },
   {
+    "templateKey": "trauma",
+    "displayName": "Trauma",
+    "category": "2. Trauma"
+  },
+  {
     "templateKey": "pd-fever",
     "displayName": "PD fever",
     "category": "3. PD"

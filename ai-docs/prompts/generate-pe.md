@@ -18,6 +18,8 @@
 - Nystagmus detail 하위 항목에 방향 또는 부가 소견이 있을 경우 해당 줄 끝에 `-> {내용}` 형식으로 추가합니다
   (예: `- Head rolling : Geotropic type(-) / Apogeotropic type(+) -> Lt.`, `- Dix-Hallpike : (-) -> 어지럼증 호소, 양쪽 비슷한 것 같다`)
 - 양식에 없는 비정상 소견은 가장 적절한 위치 아래에 별도 줄로 추가합니다
+- `LOM, tenderness (X/Y)` 형식의 항목에서: LOM이 있으면 `+ d/t pain`, tenderness 있으면 `+` 로 표기합니다
+  특정 side만 해당하는 경우 `,Rt` / `,Lt` 를 값 뒤에 붙입니다 (예: `(+ d/t pain,Rt/+,Rt)`)
 - 양식에 해당 항목이 없으면 출력 맨 아래에 추가합니다
 - 정상 범위 내의 소견(예: clear breathing sound)은 해당 항목 기본값을 그대로 유지합니다
 

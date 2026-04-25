@@ -23,13 +23,11 @@
 C.C. 등록 시 연결하려 했으나 해당 guideKey가 아직 존재하지 않는 항목입니다.
 가이드라인이 등록될 때 이 섹션을 확인합니다.
 
-| C.C.               | 대기 중인 guideKey      | displayName               | rank | 등록일     |
-| ------------------ | ----------------------- | ------------------------- | ---- | ---------- |
-| Urticaria          | dm-urticaria            | DM - Urticaria            |      | 2026-04-24 |
-| Skin rash          | dm-urticaria            | DM - Urticaria            |      | 2026-04-24 |
-| Visual disturbance | ey                      | EY                        | 0    | 2026-04-25 |
-| Wrist laceration   | trauma-traffic-accident | Trauma / Traffic accident | 2    | 2026-04-25 |
-| Wrist pain         | trauma-traffic-accident | Trauma / Traffic accident | 1    | 2026-04-25 |
+| C.C.               | 대기 중인 guideKey | displayName    | rank | 등록일     |
+| ------------------ | ------------------ | -------------- | ---- | ---------- |
+| Urticaria          | dm-urticaria       | DM - Urticaria |      | 2026-04-24 |
+| Skin rash          | dm-urticaria       | DM - Urticaria |      | 2026-04-24 |
+| Visual disturbance | ey                 | EY             | 0    | 2026-04-25 |
 
 ---
 
@@ -43,8 +41,6 @@ C.C. 등록 시 연결하려 했으나 해당 templateKey가 아직 존재하지
 | Visual disturbance | ey                    | EY          | 0    | 2026-04-25 |
 | Mental change      | di                    | DI          | 3    | 2026-04-25 |
 | Drug overdose      | di                    | DI          | 0    | 2026-04-25 |
-| Wrist laceration   | trauma                | Trauma      | 2    | 2026-04-25 |
-| Wrist pain         | trauma                | Trauma      | 1    | 2026-04-25 |
 
 ---
 

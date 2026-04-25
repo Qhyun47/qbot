@@ -22,5 +22,9 @@
   { "guideKey": "nu-memory-loss", "displayName": "NU - Memory loss" },
   { "guideKey": "nu-headache", "displayName": "NU - Headache" },
   { "guideKey": "nu-dizziness", "displayName": "NU - Dizziness" },
-  { "guideKey": "pc", "displayName": "PC" }
+  { "guideKey": "pc", "displayName": "PC" },
+  {
+    "guideKey": "trauma-traffic-accident",
+    "displayName": "Trauma / Traffic accident"
+  }
 ]

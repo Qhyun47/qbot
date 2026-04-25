@@ -1,0 +1,252 @@
+{
+  "templateKey": "trauma",
+  "cc": "Trauma",
+  "description": "외상 환자 EMR 상용구 템플릿",
+  "hpi_hints": "손상 기전, 손상 부위, 발생 시점을 반드시 포함. 동반 증상(LOC, 두통, 어지럼증)이 확인된 경우 포함.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. output_example의 $ 마커: '$text' 형태로 표시된 곳은 해당 설명에 맞게 자유 형식으로 채워라. 정보가 없으면 $ 기호만 제거하고 원문 텍스트를 그대로 출력. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "fields": [
+    {
+      "key": "os_common",
+      "label": "OS 공통",
+      "type": "open",
+      "description": "직업, LOM/ROM 여부, 해당 부위 Sensory/Motor 이상 여부, NPO 확인 내용. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "os_hand",
+      "label": "수부",
+      "type": "open",
+      "description": "주 손잡이(dominant hand), 손을 많이 사용하는 직업/활동 여부. 수부 외상이 아닌 경우 빈 문자열."
+    },
+    {
+      "key": "os_leg",
+      "label": "하지",
+      "type": "open",
+      "description": "평소 ambulation 상태 (Self ambulation / Cane / Walker / 휠체어 / Bed-Ridden), claudication 여부. 하지 외상이 아닌 경우 빈 문자열."
+    },
+    {
+      "key": "os_osteo",
+      "label": "골다공증",
+      "type": "open",
+      "description": "골다공증 관련 주사 치료 여부, 평소 침이나 통증 주사 치료 여부. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "initial_vs",
+      "label": "Initial V/S",
+      "type": "open",
+      "description": "내원 시 초기 활력징후. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "loc_nv",
+      "label": "LOC / N/V",
+      "type": "symptom_check",
+      "format": "LOC({loc}) N/V({nausea}/{vomiting})",
+      "slots": [
+        {
+          "key": "loc",
+          "symptom": "LOC",
+          "description": "의식 소실",
+          "default": "-"
+        },
+        {
+          "key": "nausea",
+          "symptom": "Nausea",
+          "description": "구역",
+          "default": "-"
+        },
+        {
+          "key": "vomiting",
+          "symptom": "Vomiting",
+          "description": "구토",
+          "default": "-"
+        }
+      ],
+      "description": "의식소실/구역/구토 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "headache_dizziness",
+      "label": "Headache / Dizziness",
+      "type": "symptom_check",
+      "format": "Headache({headache}) Dizziness({dizziness})",
+      "slots": [
+        {
+          "key": "headache",
+          "symptom": "Headache",
+          "description": "두통",
+          "default": "-"
+        },
+        {
+          "key": "dizziness",
+          "symptom": "Dizziness",
+          "description": "어지럼증",
+          "default": "-"
+        }
+      ],
+      "description": "두통/어지럼증 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "laceration",
+      "label": "Laceration",
+      "type": "open",
+      "description": "열상 여부 및 위치/크기. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "npo_solid",
+      "label": "NPO Solid",
+      "type": "open",
+      "description": "마지막 고형식 섭취 시간. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "npo_liquid",
+      "label": "NPO Liquid",
+      "type": "open",
+      "description": "마지막 액체 섭취 시간. 정보 없으면 빈 문자열."
+    }
+  ],
+  "output_example": "* OS Trauma 의심 시\n- 공통 : $직업, LOM/ROM, 해당 부위 Sensory / Motor, NPO\n- 수부 : $주 손잡이, 손 많이 사용하는 환자?\n- 하지 : $평소 Ambulation (Self ambulation, Cane, Walker, 휠체어, Bed-Ridden), Claudication\n- 골다공증 : $(주사 치료 여부) / 평소 침이나 통증 주사 맞으러 다녔는지\n\nInitial V/S : \n\nLOC(-) N/V(-/-)\nHeadache(-) Dizziness(-)\n\n\nLaceration : \n\nNPO : Solid - \n     Liquid - ",
+  "pe": {
+    "fields": [
+      {
+        "key": "general",
+        "label": "General",
+        "default": "Vital stable, Mental alert, Pupil 3+/3+"
+      },
+      {
+        "key": "eom",
+        "label": "EOM",
+        "default": "EOM intact, nystagmus, diplopia(-/-)"
+      },
+      {
+        "key": "facial",
+        "label": "Facial",
+        "default": "Facial Motor sensory intact"
+      },
+      {
+        "key": "motor_power",
+        "label": "Motor power",
+        "default": "Motor power 5 5\n            5 5"
+      },
+      { "key": "sensory", "label": "Sensory", "default": "Sensory intact" },
+      {
+        "key": "scalp",
+        "label": "Scalp",
+        "default": "Scalp swelling, redness (-/-)"
+      },
+      {
+        "key": "periorbital",
+        "label": "Periorbital",
+        "default": "Periorbital tenderness, swelling(-/-)"
+      },
+      {
+        "key": "nose",
+        "label": "Nose",
+        "default": "Nose tenderness,swelling(-/-) , epistaxis(-)"
+      },
+      {
+        "key": "zygoma",
+        "label": "Zygoma",
+        "default": "Zygoma tenderness, swelling(-/-)"
+      },
+      {
+        "key": "maxilla",
+        "label": "Maxilla",
+        "default": "Maxilla tenderness, swelling(-/-)"
+      },
+      {
+        "key": "mandible",
+        "label": "Mandible",
+        "default": "Mandible tenderness, TMJL, Malocclusion(-/-/-)"
+      },
+      {
+        "key": "neck",
+        "label": "Neck",
+        "default": "Neck LOM, tenderness (-/-)"
+      },
+      {
+        "key": "shoulder",
+        "label": "Shoulder",
+        "default": "Shoulder LOM, tenderness (-/-)"
+      },
+      {
+        "key": "clavicle",
+        "label": "Clavicle",
+        "default": "Clavicle LOM, tenderness (-/-)"
+      },
+      {
+        "key": "scapula",
+        "label": "Scapula",
+        "default": "Scapula LOM, tenderness (-/-)"
+      },
+      {
+        "key": "elbow",
+        "label": "Elbow",
+        "default": "Elbow LOM, tenderness  (-/-)"
+      },
+      {
+        "key": "wrist",
+        "label": "Wrist",
+        "default": "Wrist LOM, tenderness  (-/-)"
+      },
+      {
+        "key": "hand",
+        "label": "Hand",
+        "default": "Hand LOM, tenderness  (-/-)"
+      },
+      {
+        "key": "hip",
+        "label": "Hip joint",
+        "default": "Hip joint LOM, tenderness  (-/-)"
+      },
+      {
+        "key": "knee",
+        "label": "Knee",
+        "default": "Knee LOM, tenderness  (-/-)"
+      },
+      {
+        "key": "ankle",
+        "label": "Ankle",
+        "default": "Ankle LOM, tenderness  (-/-)"
+      },
+      {
+        "key": "foot",
+        "label": "Foot",
+        "default": "Foot LOM, tenderness  (-/-)"
+      },
+      {
+        "key": "rib_sternum",
+        "label": "Rib/sternum",
+        "default": "Rib,sternum tenderness(-)"
+      },
+      {
+        "key": "abd",
+        "label": "Abdomen",
+        "default": "Abd.T, rT(-/-), abd.distension/rigidity(-/-)"
+      },
+      {
+        "key": "spine",
+        "label": "Spine",
+        "default": "Spine LOM, tenderness (-/-)"
+      },
+      {
+        "key": "back_muscle",
+        "label": "Back muscle",
+        "default": "Back muscle tenderness (-)"
+      },
+      {
+        "key": "tingling",
+        "label": "Tingling sensation",
+        "default": "Tingling sensation (-)"
+      }
+    ],
+    "output_example": "Vital stable, Mental alert, Pupil 3+/3+\nEOM intact, nystagmus, diplopia(-/-)\nFacial Motor sensory intact\nMotor power 5 5\n            5 5\nSensory intact\n\n\nScalp swelling, redness (-/-)\n\nPeriorbital tenderness, swelling(-/-)\nNose tenderness,swelling(-/-) , epistaxis(-)\nZygoma tenderness, swelling(-/-) \nMaxilla tenderness, swelling(-/-)\nMandible tenderness, TMJL, Malocclusion(-/-/-)\n\nNeck LOM, tenderness (-/-)\nShoulder LOM, tenderness (-/-)\nClavicle LOM, tenderness (-/-)\nScapula LOM, tenderness (-/-)\nElbow LOM, tenderness  (-/-)\nWrist LOM, tenderness  (-/-)\nHand LOM, tenderness  (-/-)\nHip joint LOM, tenderness  (-/-)\nKnee LOM, tenderness  (-/-)\nAnkle LOM, tenderness  (-/-)\nFoot LOM, tenderness  (-/-)\n\nRib,sternum tenderness(-)\nAbd.T, rT(-/-), abd.distension/rigidity(-/-)\n\nSpine LOM, tenderness (-/-)\nBack muscle tenderness (-)\nTingling sensation (-)"
+  },
+  "history": {
+    "fields": [
+      { "key": "past", "label": "P.Hx", "default": "" },
+      { "key": "medication", "label": "Med.Hx", "default": "" },
+      { "key": "operation", "label": "Op.Hx", "default": "" },
+      { "key": "alcohol", "label": "Alcohol", "default": "" },
+      { "key": "smoking", "label": "Smoking", "default": "" }
+    ],
+    "output_example": "P.Hx : \nMed.Hx : \nOp.Hx : \nAlcohol :     , Smoking : "
+  }
+}
