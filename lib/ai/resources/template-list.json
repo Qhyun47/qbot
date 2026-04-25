@@ -46,6 +46,11 @@
     "category": "1. NU"
   },
   {
+    "templateKey": "dizziness",
+    "displayName": "Dizziness",
+    "category": "1. NU"
+  },
+  {
     "templateKey": "pd-fever",
     "displayName": "PD fever",
     "category": "3. PD"

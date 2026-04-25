@@ -13,6 +13,8 @@
 - 해당 항목의 기본값(default)을 입력값으로 교체합니다
   예: `nystagmus(-)`로 되어 있는데 'nystagmus+'가 입력된 경우 → `nystagmus(+)`
   예: `Limb motor power 5-5-5-5`인데 'Lt arm motor 3'이 입력된 경우 → `5-3-5-5`
+- Nystagmus detail 하위 항목에 방향 또는 부가 소견이 있을 경우 해당 줄 끝에 `-> {내용}` 형식으로 추가합니다
+  (예: `- Head rolling : Geotropic type(-) / Apogeotropic type(+) -> Lt.`, `- Dix-Hallpike : (-) -> 어지럼증 호소, 양쪽 비슷한 것 같다`)
 - 양식에 없는 비정상 소견은 가장 적절한 위치 아래에 별도 줄로 추가합니다
 - 양식에 해당 항목이 없으면 출력 맨 아래에 추가합니다
 - 정상 범위 내의 소견(예: clear breathing sound)은 해당 항목 기본값을 그대로 유지합니다

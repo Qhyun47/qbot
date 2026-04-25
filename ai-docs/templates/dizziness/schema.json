@@ -1,0 +1,231 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DizzinessCase",
+  "description": "어지럼증(Dizziness) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history",
+    "family_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류. 아래 enum 값 중 가장 적합한 것 하나를 선택.",
+            "enum": [
+              "dizziness_type",
+              "situation",
+              "onset",
+              "intensity",
+              "frequency_duration",
+              "associated_symptom_neuro",
+              "associated_symptom_ear",
+              "associated_symptom_visual",
+              "associated_symptom_cv",
+              "associated_symptom_syncope",
+              "aggravating_relieving_factor",
+              "previous_dizziness_hx",
+              "recent_condition",
+              "vital_sign",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "family_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. 카드-섹션 매핑 기준: dizziness_type/situation/onset/intensity/frequency_duration/associated_symptom_*/aggravating_relieving_factor → [pi, template] | previous_dizziness_hx/recent_condition → [pi, template] | vital_sign → [pi] | past_history/medication_history/operation_history/family_history → [history] 전용 (HPI·상용구에 포함 금지)",
+            "items": {
+              "type": "string",
+              "enum": ["pi", "template", "history", "pe"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "dizziness_type": {
+      "type": ["string", "null"],
+      "description": "어지럼증 유형. 'whirling'(회전성) 또는 'non-whirling'(비회전성). 없으면 null."
+    },
+    "situation": {
+      "type": ["string", "null"],
+      "description": "어지럼증 발생 상황 (예: '앉다가 일어설 때', '보행 중 갑자기'). 없으면 null."
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "발병 시기 (예: '3일 전', '금일 오전'). 없으면 null."
+    },
+    "onset_character": {
+      "type": ["string", "null"],
+      "description": "발생 양상 — 'acute'(갑자기), 'gradual'(서서히), 'intermittent'(간헐적). 없으면 null."
+    },
+    "intensity": {
+      "type": ["string", "null"],
+      "description": "증상 강도 표현 (예: '눈을 못 뜰 정도', '의식소실 동반', '못 걸을 정도'). 없으면 null."
+    },
+    "frequency": {
+      "type": ["string", "null"],
+      "description": "어지럼증 빈도 (예: '하루 2~3회', '지속적'). 없으면 null."
+    },
+    "duration": {
+      "type": ["string", "null"],
+      "description": "어지럼증 지속 시간 (예: '수초', '수분', '수시간', '지속'). 없으면 null."
+    },
+    "nystagmus": {
+      "type": ["boolean", "null"],
+      "description": "안진 여부. true/false/null."
+    },
+    "gait_disturbance": {
+      "type": ["boolean", "null"],
+      "description": "보행 장애 여부. true/false/null."
+    },
+    "tinnitus": {
+      "type": ["boolean", "null"],
+      "description": "이명 여부. true/false/null."
+    },
+    "hearing_loss": {
+      "type": ["boolean", "null"],
+      "description": "청력 저하 여부. true/false/null."
+    },
+    "ear_fullness": {
+      "type": ["boolean", "null"],
+      "description": "이충만감 여부. true/false/null."
+    },
+    "otalgia": {
+      "type": ["boolean", "null"],
+      "description": "이통 여부. true/false/null."
+    },
+    "ear_bleeding": {
+      "type": ["boolean", "null"],
+      "description": "이출혈 여부. true/false/null."
+    },
+    "ear_discharge": {
+      "type": ["boolean", "null"],
+      "description": "이루 여부. true/false/null."
+    },
+    "headache": {
+      "type": ["boolean", "null"],
+      "description": "두통 여부. true/false/null."
+    },
+    "nausea": {
+      "type": ["boolean", "null"],
+      "description": "구역 여부. true/false/null."
+    },
+    "vomiting": {
+      "type": ["boolean", "null"],
+      "description": "구토 여부. true/false/null."
+    },
+    "aura": {
+      "type": ["boolean", "null"],
+      "description": "전조 증상 여부. true/false/null."
+    },
+    "visual_disturbance": {
+      "type": ["boolean", "null"],
+      "description": "시각 장애 여부. true/false/null."
+    },
+    "photopsia": {
+      "type": ["boolean", "null"],
+      "description": "빛 번쩍임/환시 여부. true/false/null."
+    },
+    "white_out": {
+      "type": ["boolean", "null"],
+      "description": "시야 하얘짐(white out) 여부. true/false/null."
+    },
+    "black_out": {
+      "type": ["boolean", "null"],
+      "description": "시야 깜깜해짐(black out) 여부. true/false/null."
+    },
+    "blurred_vision": {
+      "type": ["boolean", "null"],
+      "description": "시야 흐림 여부. true/false/null."
+    },
+    "palpitation": {
+      "type": ["boolean", "null"],
+      "description": "심계항진 여부. true/false/null."
+    },
+    "chest_pain_sx": {
+      "type": ["boolean", "null"],
+      "description": "흉통 동반 여부. true/false/null."
+    },
+    "sweating": {
+      "type": ["boolean", "null"],
+      "description": "발한 여부. true/false/null."
+    },
+    "presyncope": {
+      "type": ["boolean", "null"],
+      "description": "전실신감(쓰러질 것 같은 느낌) 여부. true/false/null."
+    },
+    "prolonged_standing_aggravation": {
+      "type": ["boolean", "null"],
+      "description": "오래 서 있을 때 악화 여부. true/false/null."
+    },
+    "bowel_bladder_change": {
+      "type": ["boolean", "null"],
+      "description": "대소변 변화 여부. true/false/null."
+    },
+    "neurologic_symptoms": {
+      "type": ["boolean", "null"],
+      "description": "신경학적 증상(사지 위약감, 감각 이상, 복시, 구음 장애, 보행 실조) 여부. true/false/null."
+    },
+    "aggravating_factor": {
+      "type": ["string", "null"],
+      "description": "악화 요인 (예: '고개를 옆으로 돌릴 때', '기립 시', '보행 시'). 없으면 null."
+    },
+    "relieving_factor": {
+      "type": ["string", "null"],
+      "description": "완화 요인 (예: '안정 시', '눕는 자세'). 없으면 null."
+    },
+    "previous_dizziness_hx": {
+      "type": ["string", "null"],
+      "description": "이전 어지럼증 경험 또는 평소 기립성 어지럼증 경험 서술. 없으면 null."
+    },
+    "medication_change": {
+      "type": ["boolean", "null"],
+      "description": "최근 약물 복용/변경 여부(고혈압약, 전립선비대증약 등). true/false/null."
+    },
+    "recent_condition": {
+      "type": ["string", "null"],
+      "description": "최근 식사, 수면, 스트레스, 컨디션 변화 서술. 없으면 null."
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": { "type": "string" }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": { "type": "string" }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": { "type": "string" }
+    },
+    "family_history": {
+      "type": ["array", "null"],
+      "description": "가족력 목록. null이면 History 출력 시 해당 항목 전체 생략.",
+      "items": { "type": "string" }
+    }
+  }
+}

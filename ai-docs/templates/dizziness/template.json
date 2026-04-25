@@ -1,0 +1,333 @@
+{
+  "templateKey": "dizziness",
+  "cc": "Dizziness",
+  "description": "어지럼증 환자 EMR 상용구 템플릿",
+  "hpi_hints": "어지럼증 유형(whirling vs non-whirling), 발생 시기 및 양상, 동반 신경학적 증상 포함 여부를 중점으로 서술.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "fields": [
+    {
+      "key": "type",
+      "label": "Type",
+      "type": "open",
+      "description": "어지럼증 유형. whirling(회전성, 물체가 빙빙 도는 느낌)이면 'whirling', non-whirling(비회전성, 멀미하는 듯한 느낌)이면 'non-whirling'. 둘 다 언급된 경우 'whirling + non-whirling'. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "situation",
+      "label": "상황",
+      "type": "open",
+      "description": "어지럼증 발생 상황 상세 서술 (예: '앉아 있다 갑자기 일어났을 때', '아무런 유발 요인 없이'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "onset_time",
+      "label": "Onset time",
+      "type": "open",
+      "description": "발병 시기(예: '3일 전', '금일 오전')와 발생 양상(갑자기/서서히/간헐적). 해당되는 항목의 괄호 안에 체크 또는 구체적 내용 기재. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "intensity",
+      "label": "Intensity",
+      "type": "open",
+      "description": "어지럼증 강도. 해당하는 항목 기재: 눈을 못 뜰 정도 / 의식소실 동반 / 못 걸을 정도. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "frequency_duration",
+      "label": "Frequency/Duration",
+      "type": "open",
+      "description": "어지럼증 빈도 및 지속 시간 (예: '하루 2~3회, 1회 수분간 지속', '내원 시까지 지속'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "asso_neuro",
+      "label": "Asso.sx. (신경계)",
+      "type": "symptom_check",
+      "format": "Nystagmus({nystagmus}) / Gait disturbance({gait_disturbance})",
+      "slots": [
+        {
+          "key": "nystagmus",
+          "symptom": "Nystagmus",
+          "description": "안진",
+          "default": "-"
+        },
+        {
+          "key": "gait_disturbance",
+          "symptom": "Gait disturbance",
+          "description": "보행 장애",
+          "default": "-"
+        }
+      ],
+      "description": "안진/보행장애 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "asso_ear1",
+      "label": "Asso.sx. (이과 1)",
+      "type": "symptom_check",
+      "format": "Tinnitus ({tinnitus}) Hearing loss({hearing_loss}) Ear fullness ({ear_fullness})",
+      "slots": [
+        {
+          "key": "tinnitus",
+          "symptom": "Tinnitus",
+          "description": "이명",
+          "default": "-"
+        },
+        {
+          "key": "hearing_loss",
+          "symptom": "Hearing loss",
+          "description": "청력 저하",
+          "default": "-"
+        },
+        {
+          "key": "ear_fullness",
+          "symptom": "Ear fullness",
+          "description": "이충만감",
+          "default": "-"
+        }
+      ],
+      "description": "이명/청력저하/이충만감 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "asso_ear2",
+      "label": "Asso.sx. (이과 2)",
+      "type": "symptom_check",
+      "format": "Otalgia ({otalgia}) Ear bleeding/Ear discharge ({ear_bleeding}/{ear_discharge})",
+      "slots": [
+        {
+          "key": "otalgia",
+          "symptom": "Otalgia",
+          "description": "이통",
+          "default": "-"
+        },
+        {
+          "key": "ear_bleeding",
+          "symptom": "Ear bleeding",
+          "description": "이출혈",
+          "default": "-"
+        },
+        {
+          "key": "ear_discharge",
+          "symptom": "Ear discharge",
+          "description": "이루",
+          "default": "-"
+        }
+      ],
+      "description": "이통/이출혈/이루 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "asso_ha_gi",
+      "label": "Asso.sx. (두통/소화기)",
+      "type": "symptom_check",
+      "format": "HA ({ha}) / nausea({nausea}) vomiting({vomiting}) / Aura({aura})",
+      "slots": [
+        {
+          "key": "ha",
+          "symptom": "Headache",
+          "description": "두통",
+          "default": "-"
+        },
+        {
+          "key": "nausea",
+          "symptom": "Nausea",
+          "description": "구역",
+          "default": "-"
+        },
+        {
+          "key": "vomiting",
+          "symptom": "Vomiting",
+          "description": "구토",
+          "default": "-"
+        },
+        {
+          "key": "aura",
+          "symptom": "Aura",
+          "description": "전조 증상",
+          "default": "-"
+        }
+      ],
+      "description": "두통/구역/구토/전조 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "asso_visual1",
+      "label": "Asso.sx. (시각 1)",
+      "type": "symptom_check",
+      "format": "Visual disturbance({visual_disturbance}) / 눈 앞에서 불빛이 반짝이는 환시({photopsia})",
+      "slots": [
+        {
+          "key": "visual_disturbance",
+          "symptom": "Visual disturbance",
+          "description": "시야 장애",
+          "default": "-"
+        },
+        {
+          "key": "photopsia",
+          "symptom": "Photopsia",
+          "description": "빛번쩍임/환시",
+          "default": "-"
+        }
+      ],
+      "description": "시각 장애/환시 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "asso_visual2",
+      "label": "Asso.sx. (시각 2)",
+      "type": "symptom_check",
+      "format": "White out/Black out({white_out}/{black_out}) / blurred vision({blurred_vision})",
+      "slots": [
+        {
+          "key": "white_out",
+          "symptom": "White out",
+          "description": "시야 하얘짐",
+          "default": "-"
+        },
+        {
+          "key": "black_out",
+          "symptom": "Black out",
+          "description": "시야 깜깜해짐",
+          "default": "-"
+        },
+        {
+          "key": "blurred_vision",
+          "symptom": "Blurred vision",
+          "description": "시야 흐림",
+          "default": "-"
+        }
+      ],
+      "description": "시야 whiteout/blackout/흐림 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "asso_cv",
+      "label": "Asso.sx. (심혈관)",
+      "type": "symptom_check",
+      "format": "palpitation/chest pain({palpitation}/{chest_pain}) sweating({sweating})",
+      "slots": [
+        {
+          "key": "palpitation",
+          "symptom": "Palpitation",
+          "description": "심계항진",
+          "default": "-"
+        },
+        {
+          "key": "chest_pain",
+          "symptom": "Chest pain",
+          "description": "흉통",
+          "default": "-"
+        },
+        {
+          "key": "sweating",
+          "symptom": "Sweating",
+          "description": "발한",
+          "default": "-"
+        }
+      ],
+      "description": "심계항진/흉통/발한 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "asso_syncope",
+      "label": "Asso.sx. (실신 관련)",
+      "type": "symptom_check",
+      "format": "쓰러질 것 같은 느낌({presyncope}) 특히 오랜 시간 서 있는 중({prolonged_standing}), 대소변({bowel_bladder})",
+      "slots": [
+        {
+          "key": "presyncope",
+          "symptom": "Presyncope",
+          "description": "전실신감(쓰러질 것 같은 느낌)",
+          "default": "-"
+        },
+        {
+          "key": "prolonged_standing",
+          "symptom": "Prolonged standing aggravation",
+          "description": "오래 서 있을 때 악화",
+          "default": "-"
+        },
+        {
+          "key": "bowel_bladder",
+          "symptom": "Bowel/bladder change",
+          "description": "대소변 변화",
+          "default": "-"
+        }
+      ],
+      "description": "전실신감/기립성 악화/대소변 변화 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "neuro_sx",
+      "label": "neurologic Sx",
+      "type": "symptom_check",
+      "format": "* neurologic Sx ({neuro_sx}) : limb weakness, sensory change, diplopia, dysarthria, ataxia",
+      "slots": [
+        {
+          "key": "neuro_sx",
+          "symptom": "Neurologic symptoms",
+          "description": "신경학적 증상(사지 위약감, 감각 이상, 복시, 구음 장애, 보행 실조 중 하나라도 있으면 +)",
+          "default": "-"
+        }
+      ],
+      "description": "신경학적 증상 여부 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "agg_relieving",
+      "label": "Agg/relieving fx.",
+      "type": "open",
+      "description": "악화/완화 요인. 자세 변화 관련(누울 때/고개 옆으로 돌릴 때/누웠다 앉을 때/기립 시), 그 외(피로/스트레스/걸을 때/안정 시/오래 서있을 때/불면/쉬면 완화/감기 및 컨디션 저하/식사량 저하) 중 해당 항목 기재. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "previous_hx",
+      "label": "Previous dizziness Hx.",
+      "type": "open",
+      "description": "이전 어지럼증 경험, 평소 기립성 어지럼증 경험, 최근 약물 복용/변경(고혈압약, 전립선비대증약 등) 여부. 해당 항목 기재. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "recent_condition",
+      "label": "최근 컨디션",
+      "type": "open",
+      "description": "최근 식사, 수면, 스트레스, 컨디션 변화 서술. 정보 없으면 빈 문자열."
+    }
+  ],
+  "output_example": "▶ Dizziness \nType: \n상황(자세히):\nOnset time: \nIntensity : \nFrequency/Duration:\nAsso.sx. : Nystagmus(-) / Gait disturbance(-)\n           Tinnitus (-) Hearing loss(-) Ear fullness (-)\n           Otalgia (-) Ear bleeding/Ear discharge (-/-)\n           HA (-) / nausea(-) vomiting(-) / Aura(-)  \n           Visual disturbance(-) / 눈 앞에서 불빛이 반짝이는 환시(-) \n           White out/Black out(-/-) / blurred vision(-)\n           palpitation/chest pain(-/-) sweating(-)           \n           쓰러질 것 같은 느낌(-) 특히 오랜 시간 서 있는 중(-), 대소변(-)\n           * neurologic Sx (-) : limb weakness, sensory change, diplopia, dysarthria, ataxia\n\nAgg/relieving fx.: 자세변화 : 누울때( ) 고개옆으로 돌릴 때( ) 누웠다 앉을 때( ) 기립시( )\n               - 그 외, 피로( ) 스트레스( ) 걸을때( ) 안정시( ) 오래 서있을 때( ) 불면( )\n               쉬면 완화( ) 감기증상/컨디션저하( ) 식사량저하( ) \n\nPrevious dizziness Hx. : 이전 어지럼증 경험( ) 평소 기립성 어지럼증 경험( )\n                         약 복용/변경( ) – 고혈압약, 전립선비대증약등\n\n*** 최근 식사, 수면, 스트레스, 컨디션 변화 : ",
+  "pe": {
+    "fields": [
+      {
+        "key": "general",
+        "label": "General / Vital status",
+        "default": "Vital stable, Mental alert, Pupil 3+/3+"
+      },
+      {
+        "key": "eom",
+        "label": "EOM / Nystagmus / Diplopia",
+        "default": "EOM intact, nystagmus, diplopia(-/-)"
+      },
+      {
+        "key": "facial",
+        "label": "Facial",
+        "default": "Facial Motor sensory intact"
+      },
+      {
+        "key": "motor",
+        "label": "Motor power",
+        "default": "Motor power 5 5\n            5 5"
+      },
+      {
+        "key": "sensory",
+        "label": "Sensory",
+        "default": "Sensory intact"
+      },
+      {
+        "key": "nystagmus_detail",
+        "label": "Nystagmus detail",
+        "default": "* Nystagmus \n     - Spontaneous : (-) \n     - Gaze evoked : (-)\n     - head shaking 시 nystagmus aggravation(-)\n     - Head rolling : Geotropic type(-) / Apogeotropic type(-)\n     - Dix-Hallpike : (-) \n     - Head thrust : Catch-up saccade (-)"
+      }
+    ],
+    "output_example": "Vital stable, Mental alert, Pupil 3+/3+\nEOM intact, nystagmus, diplopia(-/-)\nFacial Motor sensory intact\nMotor power 5 5\n            5 5\nSensory intact\n\n* Nystagmus \n     - Spontaneous : (-) \n     - Gaze evoked : (-)\n     - head shaking 시 nystagmus aggravation(-)\n     - Head rolling : Geotropic type(-) / Apogeotropic type(-)\n     - Dix-Hallpike : (-) \n     - Head thrust : Catch-up saccade (-)"
+  },
+  "history": {
+    "fields": [
+      { "key": "past", "label": "Past Hx", "default": "" },
+      {
+        "key": "medication",
+        "label": "Med Hx",
+        "default": "",
+        "hint": "HTN 과거력 있으면 최근 약 바꾼 것 있는지"
+      },
+      { "key": "operation", "label": "Op. Hx.", "default": "" },
+      { "key": "alcohol", "label": "Alcohol", "default": "" },
+      { "key": "smoking", "label": "Smoking", "default": "" }
+    ],
+    "output_example": "Past Hx:\nMed Hx: (HTN 과거력 있으면 최근 약 바꾼 것 있는지)\nOp. Hx. : \nAlcohol :     , Smoking : "
+  }
+}
