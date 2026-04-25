@@ -1,0 +1,95 @@
+{
+  "templateKey": "dm-foot",
+  "cc": "DM foot",
+  "description": "당뇨발 환자 EMR 상용구 템플릿",
+  "hpi_hints": "당뇨 과거력, 상처 유무, 외상력, 당조절 상태를 반드시 포함.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. $로 시작하는 줄은 해당 설명에 맞게 AI가 자유 형식으로 채우며, 정보가 없으면 $를 제거하고 원문 텍스트를 그대로 출력한다. 출력 형식은 output_example을 따르라.",
+  "fields": [
+    {
+      "key": "onset",
+      "label": "Onset",
+      "type": "open",
+      "description": "증상 발생 시점 (예: '3일 전', '1주 전'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "location",
+      "label": "Location",
+      "type": "open",
+      "description": "발 병변 위치 (예: 'right foot', 'left great toe'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "wound",
+      "label": "Wound 유무",
+      "type": "open",
+      "description": "상처 유무 및 양상 (예: '있음', '없음', 'ulcer'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "traumatic_hx",
+      "label": "Traumatic hx.",
+      "type": "open",
+      "description": "외상력 유무 (예: '있음 - 못 밟음', '없음'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "dm_medication",
+      "label": "DM 약물/당조절",
+      "type": "open",
+      "description": "복용 중인 당뇨 약물 종류, 복용 시작 시점, 당조절 상태, 약 복용 순응도 서술. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "antibiotic",
+      "label": "항생제",
+      "type": "open",
+      "description": "항생제 사용 여부 및 종류 서술. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "culture",
+      "label": "균검사",
+      "type": "open",
+      "description": "균검사 시행 여부 및 종류 서술. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "wound_check",
+      "label": "Wound check",
+      "type": "symptom_check",
+      "format": "Open({open})  Bone touch({bone_touch})  고름({pus})  냄새({odor})",
+      "slots": [
+        {
+          "key": "open",
+          "symptom": "Open wound",
+          "description": "개방성 창상",
+          "default": "-"
+        },
+        {
+          "key": "bone_touch",
+          "symptom": "Bone touch",
+          "description": "뼈 노출",
+          "default": "-"
+        },
+        {
+          "key": "pus",
+          "symptom": "고름",
+          "description": "농 분비물",
+          "default": "-"
+        },
+        {
+          "key": "odor",
+          "symptom": "냄새",
+          "description": "악취",
+          "default": "-"
+        }
+      ],
+      "description": "창상 소견 체크. 언급 없으면 기본값(-) 유지."
+    }
+  ],
+  "output_example": "* DM foot\nOnset :\nLocation :\nWound 유무 :\nTraumatic hx. :\n\nSensory, Motor, Circulation\n\n$먹고 있는 약/언제부터, 당조절 되는지/당뇨약 잘 먹는지\n\n$항생제 사용 여부/종류\n$균검사 여부/종류\n\nOpen (-)  Bone touch (-)  고름 (-)  냄새 (-)",
+  "history": {
+    "fields": [
+      { "key": "past", "label": "P.Hx", "default": "" },
+      { "key": "medication", "label": "Med.Hx", "default": "" },
+      { "key": "operation", "label": "Op.Hx", "default": "" },
+      { "key": "alcohol", "label": "Alcohol", "default": "" },
+      { "key": "smoking", "label": "Smoking", "default": "" }
+    ],
+    "output_example": "P.Hx : \nMed.Hx : \nOp.Hx : \nAlcohol :     , Smoking : "
+  }
+}

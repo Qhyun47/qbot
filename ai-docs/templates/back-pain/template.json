@@ -1,0 +1,87 @@
+{
+  "templateKey": "back-pain",
+  "cc": "Back pain",
+  "description": "요통 환자 EMR 상용구 템플릿",
+  "hpi_hints": "척추 압통 및 배부근 압통 여부, 사지 운동/감각 이상, 저림 증상 여부를 포함.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "fields": [
+    {
+      "key": "character",
+      "label": "Character",
+      "type": "open",
+      "description": "통증 양상 (예: 'dull aching', 'sharp', 'radiating to leg'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "spine_tenderness",
+      "label": "Spine tenderness",
+      "type": "open",
+      "description": "척추 압통 부위 및 여부 (예: 'L4-5 level (+)', '(-)'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "back_m_tenderness",
+      "label": "Back m. tenderness",
+      "type": "open",
+      "description": "배부근 압통 여부 및 부위 (예: 'bilateral (+)', '(-)'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "arm_leg_motor_sensory",
+      "label": "arm, leg motor , sensory",
+      "type": "open",
+      "description": "사지 운동 및 감각 기능 상태. 이상 없으면 'intact'. 이상이 있으면 구체적으로 기술.",
+      "default": "intact"
+    },
+    {
+      "key": "tingling_sensation",
+      "label": "tingling sensation",
+      "type": "open",
+      "description": "저림 증상 여부 및 부위 (예: 'Lt. leg (+)', '(-)'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "anal_tone",
+      "label": "Anal tone",
+      "type": "open",
+      "description": "항문 괄약근 긴장도 (예: 'intact', 'decreased'). 정보 없으면 빈 문자열."
+    }
+  ],
+  "output_example": "Character : \nSpine tenderness : \nBack m. tenderness : \narm, leg motor , sensory intact\ntingling sensation : \n\nAnal tone\n\n#* MRI 촬영 여부",
+  "pe": {
+    "fields": [
+      {
+        "key": "general",
+        "label": "General",
+        "default": "Vital stable, Mental alert, Pupil 3+/3+"
+      },
+      {
+        "key": "eom",
+        "label": "EOM",
+        "default": "EOM intact, nystagmus, diplopia(-/-)"
+      },
+      {
+        "key": "facial",
+        "label": "Facial",
+        "default": "Facial Motor sensory intact"
+      },
+      {
+        "key": "limb_motor",
+        "label": "Limb Motor power",
+        "default": "5 5\n                 5 5"
+      },
+      {
+        "key": "limb_sensory",
+        "label": "Limb Sensory",
+        "default": "intact"
+      }
+    ],
+    "output_example": "Vital stable, Mental alert, Pupil 3+/3+\nEOM intact, nystagmus, diplopia(-/-)\nFacial Motor sensory intact\nLimb Motor power 5 5\n                 5 5\nLimb Sensory intact"
+  },
+  "history": {
+    "fields": [
+      { "key": "past", "label": "Past Hx", "default": "" },
+      { "key": "medication", "label": "Med Hx", "default": "" },
+      { "key": "operation", "label": "Op. Hx.", "default": "" },
+      { "key": "alcohol", "label": "Alcohol", "default": "" },
+      { "key": "smoking", "label": "Smoking", "default": "" }
+    ],
+    "output_example": "Past Hx: #(골다공증 확인)\nMed Hx:\nOp. Hx. : \nAlcohol :     , Smoking :"
+  }
+}

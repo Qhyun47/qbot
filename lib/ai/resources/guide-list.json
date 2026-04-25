@@ -26,5 +26,7 @@
   {
     "guideKey": "trauma-traffic-accident",
     "displayName": "Trauma / Traffic accident"
-  }
+  },
+  { "guideKey": "ps", "displayName": "PS" },
+  { "guideKey": "os-ns-back-pain", "displayName": "OS/NS - Back pain" }
 ]

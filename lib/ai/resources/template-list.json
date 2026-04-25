@@ -91,6 +91,26 @@
     "category": "2. Trauma"
   },
   {
+    "templateKey": "ps",
+    "displayName": "PS",
+    "category": "2. Trauma"
+  },
+  {
+    "templateKey": "ta",
+    "displayName": "TA",
+    "category": "2. Trauma"
+  },
+  {
+    "templateKey": "back-pain",
+    "displayName": "Back pain",
+    "category": "2. Trauma"
+  },
+  {
+    "templateKey": "dm-foot",
+    "displayName": "DM foot",
+    "category": "2. Trauma"
+  },
+  {
     "templateKey": "pd-fever",
     "displayName": "PD fever",
     "category": "3. PD"

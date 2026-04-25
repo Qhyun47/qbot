@@ -1,0 +1,144 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TrafficAccidentCase",
+  "description": "교통사고(TA) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history",
+    "family_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류. 아래 enum 값 중 가장 적합한 것 하나를 선택.",
+            "enum": [
+              "accident_mechanism",
+              "accident_time",
+              "vehicle_type",
+              "seatbelt",
+              "speed",
+              "helmet",
+              "loc",
+              "initial_vs",
+              "associated_symptom",
+              "laceration",
+              "npo",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "family_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. 카드-섹션 매핑 기준: accident_mechanism/accident_time/vehicle_type/seatbelt/speed/helmet/loc/initial_vs → [pi, template] | associated_symptom/laceration/npo → [pi, template] | past_history/medication_history/operation_history/family_history → [history] 전용",
+            "items": {
+              "type": "string",
+              "enum": ["pi", "template", "history", "pe"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "accident_type": {
+      "type": ["string", "null"],
+      "description": "사고 유형. 'in_car'(차량 탑승자), 'out_car'(보행자/자전거), 'motorcycle'(오토바이) 중 하나. 없으면 null.",
+      "enum": ["in_car", "out_car", "motorcycle", null]
+    },
+    "accident_time": {
+      "type": ["string", "null"],
+      "description": "사고 발생 시각 (예: '오전 10시경', '금일 14:30'). 없으면 null."
+    },
+    "vehicle_type": {
+      "type": ["string", "null"],
+      "description": "관련 차량 종류 (예: '승용차', '트럭', '오토바이', '자전거'). 없으면 null."
+    },
+    "seatbelt": {
+      "type": ["boolean", "null"],
+      "description": "안전벨트 착용 여부. true/false/null."
+    },
+    "speed_kmh": {
+      "type": ["number", "null"],
+      "description": "추정 속력(km/h). 없으면 null."
+    },
+    "helmet": {
+      "type": ["boolean", "null"],
+      "description": "오토바이 헬멧 착용 여부. true/false/null (오토바이 사고가 아니면 null)."
+    },
+    "loc": {
+      "type": ["boolean", "null"],
+      "description": "사고 후 의식 소실(LOC) 여부. true/false/null."
+    },
+    "initial_vs": {
+      "type": ["string", "null"],
+      "description": "초기 활력징후 서술 (예: 'BP 130/80, HR 90, RR 18, SpO2 98%'). 없으면 null."
+    },
+    "associated_symptoms": {
+      "type": ["array", "null"],
+      "description": "동반 증상 목록 (예: headache, dizziness, nausea, vomiting, neck pain 등). 없으면 null.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "laceration": {
+      "type": ["string", "null"],
+      "description": "열상 부위 및 크기 서술 (예: 'scalp 3cm', 'Lt. forearm 2cm'). 없으면 null."
+    },
+    "npo_solid": {
+      "type": ["string", "null"],
+      "description": "마지막 고형식 섭취 시각/시간 (예: '금일 오전 7시', '8시간 전'). 없으면 null."
+    },
+    "npo_liquid": {
+      "type": ["string", "null"],
+      "description": "마지막 음료 섭취 시각/시간 (예: '금일 오전 9시', '6시간 전'). 없으면 null."
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록 (예: ['고혈압', '당뇨']). History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "family_history": {
+      "type": ["array", "null"],
+      "description": "가족력 목록. null이면 History 출력 시 해당 항목 전체 생략.",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
