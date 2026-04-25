@@ -21,5 +21,6 @@
   { "guideKey": "nu-facial-palsy", "displayName": "NU - Facial palsy" },
   { "guideKey": "nu-memory-loss", "displayName": "NU - Memory loss" },
   { "guideKey": "nu-headache", "displayName": "NU - Headache" },
-  { "guideKey": "nu-dizziness", "displayName": "NU - Dizziness" }
+  { "guideKey": "nu-dizziness", "displayName": "NU - Dizziness" },
+  { "guideKey": "pc", "displayName": "PC" }
 ]

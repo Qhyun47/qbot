@@ -1,0 +1,201 @@
+{
+  "templateKey": "pc-hanging",
+  "cc": "Hanging",
+  "description": "Hanging 환자 EMR 상용구 템플릿",
+  "hpi_hints": "Hanging 시간, 발견 시간, 자세(complete/incomplete), 끈 위치 및 종류를 반드시 포함. 사고 내용 및 과정, 자살 의도 포함.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. 출력 형식은 output_example을 따르라.",
+  "fields": [
+    {
+      "key": "hanging_time",
+      "label": "시간(Hanging 시간 / 발견시간)",
+      "type": "open",
+      "description": "Hanging 발생 시간 및 발견 시간 (예: '23:00경 / 23:30 발견'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "posture",
+      "label": "자세(complete/incomplete)",
+      "type": "open",
+      "description": "발이 공중에 완전히 떴으면 'complete', 바닥에 닿아 있으면 'incomplete'. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "rope_position",
+      "label": "끈 위치",
+      "type": "open",
+      "description": "끈이 목 양쪽 또는 한쪽을 조였는지, 목의 흔적 여부. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "rope_type",
+      "label": "끈 종류",
+      "type": "open",
+      "description": "사용된 끈/도구 종류 (예: 벨트, 전선, 넥타이 등). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "patient_interview",
+      "label": "환자 면담을 원하는지",
+      "type": "open",
+      "description": "환자가 면담을 원하는지 여부. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "accident_content",
+      "label": "사고내용",
+      "type": "open",
+      "description": "사고 내용 서술. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "accident_process",
+      "label": "사고과정",
+      "type": "open",
+      "description": "사고 과정 서술. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "duration",
+      "label": "Duration",
+      "type": "open",
+      "description": "Hanging 지속 시간 (추정). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "hallucination",
+      "label": "Auditory hallucination/Visual hallucination",
+      "type": "symptom_check",
+      "format": "Auditory hallucination/Visual hallucination({auditory}/{visual})",
+      "slots": [
+        {
+          "key": "auditory",
+          "symptom": "Auditory hallucination",
+          "description": "환청",
+          "default": "-"
+        },
+        {
+          "key": "visual",
+          "symptom": "Visual hallucination",
+          "description": "환시",
+          "default": "-"
+        }
+      ],
+      "description": "환청/환시 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "suicide_thinking",
+      "label": "Suicide thinking/attempt",
+      "type": "open",
+      "description": "자살 사고 및 시도 이력. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "recent_stress",
+      "label": "Recent stress",
+      "type": "open",
+      "description": "최근 스트레스 내용. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "personality",
+      "label": "성격",
+      "type": "open",
+      "description": "성격 특성. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "occupation",
+      "label": "직업",
+      "type": "open",
+      "description": "직업. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "marital_status",
+      "label": "결혼",
+      "type": "open",
+      "description": "결혼 여부/상태. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "education",
+      "label": "학력",
+      "type": "open",
+      "description": "학력. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "economic_status",
+      "label": "경제상황",
+      "type": "open",
+      "description": "경제 상황. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "family_relation",
+      "label": "가족관계(현재)",
+      "type": "open",
+      "description": "현재 가족 관계. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "religion",
+      "label": "종교",
+      "type": "open",
+      "description": "종교. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "alcohol_cage",
+      "label": "Alcohol (CAGE)",
+      "type": "cage",
+      "slots": [
+        { "key": "C", "question": "술 끊으려고 해봤나", "default": "-" },
+        {
+          "key": "A",
+          "question": "술마시고 남들에게 비판받은 적 있나",
+          "default": "-"
+        },
+        {
+          "key": "G",
+          "question": "술마시고 죄책감 느낀 적 있나",
+          "default": "-"
+        },
+        {
+          "key": "E",
+          "question": "술마시고 일어나서 다시 술 마시나",
+          "default": "-"
+        }
+      ],
+      "description": "CAGE 알코올 선별 검사. 양성이면 '+', 음성이면 '-' 유지."
+    }
+  ],
+  "output_example": "1. 시간(Hanging 시간 / 발견시간) : \n2. 자세(complete/incomplete) : $발이 공중에 떴는가 / 안 떴는가\n3. 끈 위치(목 양쪽 or 한쪽 조였는지, 목에 흔적 있으면 사진 등록) : \n4. 끈 종류 : \n\n* 환자 면담을 원하는지 : \n\n사고내용:\n사고과정:\nDuration:\n\nAuditory hallucination/Visual hallucination(-/-)\nSuicide thinking/attempt:\nRecent stress:\n\n성격:\n직업:\n결혼:\n학력:\n경제상황:\n가족관계(현재):\n종교:\n\nAlcohol (CAGE)\nC 술 끊으려고 해봤나                (-)\nA 술마시고 남들에게 비판받은 적 있나 (-)\nG 술마시고 죄책감 느낀 적 있나       (-)\nE 술마시고 일어나서 다시 술 마시나   (-)",
+  "pe": {
+    "fields": [
+      {
+        "key": "general",
+        "label": "General / Vital status",
+        "default": "Vital stable, Mental alert"
+      },
+      {
+        "key": "lung",
+        "label": "Lung sound / Throat",
+        "default": "clear  / Throat inj. (-)"
+      },
+      {
+        "key": "bowel",
+        "label": "Bowel sound",
+        "default": "N-S"
+      },
+      {
+        "key": "abdomen",
+        "label": "Abdomen",
+        "default": "soft & flat / Tr(-) rTr(-) /CVA Tr(-)"
+      },
+      {
+        "key": "pitting_edema",
+        "label": "Pitting edema",
+        "default": "(-)"
+      },
+      {
+        "key": "palpable_ln",
+        "label": "Palpable LN",
+        "default": "(-)"
+      }
+    ],
+    "output_example": "Vital stable, Mental alert\nLung sound : clear  / Throat inj. (-)\nBowel sound : N-S\nAbd. soft & flat / Tr(-) rTr(-) /CVA Tr(-)\nPitting edema (-)\nPalpable LN (-)"
+  },
+  "history": {
+    "fields": [
+      { "key": "pc", "label": "PC Hx", "default": "" },
+      { "key": "past", "label": "Past Hx", "default": "" },
+      { "key": "medication", "label": "Med Hx", "default": "" },
+      { "key": "operation", "label": "Op Hx", "default": "" }
+    ],
+    "output_example": "PC Hx:\nPast Hx: \nMed Hx:\nOp Hx:"
+  }
+}

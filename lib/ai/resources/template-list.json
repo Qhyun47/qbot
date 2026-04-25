@@ -76,6 +76,16 @@
     "category": "1. NU"
   },
   {
+    "templateKey": "pc-hx",
+    "displayName": "PC Hx",
+    "category": "7. PC"
+  },
+  {
+    "templateKey": "pc-hanging",
+    "displayName": "PC Hanging",
+    "category": "7. PC"
+  },
+  {
     "templateKey": "pd-fever",
     "displayName": "PD fever",
     "category": "3. PD"

@@ -356,5 +356,136 @@
       { "key": "mental-change", "rank": 1 },
       { "key": "loc-ro-seizure", "rank": 2 }
     ]
+  },
+  {
+    "cc": "Altered mental status",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Mental change"
+  },
+  {
+    "cc": "Anxiety",
+    "guideKeys": [{ "key": "pc", "rank": 0 }],
+    "templateKeys": [{ "key": "pc-hx", "rank": 0 }]
+  },
+  {
+    "cc": "Panic attack",
+    "guideKeys": [{ "key": "pc", "rank": 0 }],
+    "templateKeys": [{ "key": "pc-hx", "rank": 0 }]
+  },
+  {
+    "cc": "Depression",
+    "guideKeys": [{ "key": "pc", "rank": 0 }],
+    "templateKeys": [{ "key": "pc-hx", "rank": 0 }]
+  },
+  {
+    "cc": "Insomnia",
+    "guideKeys": [{ "key": "pc", "rank": 0 }],
+    "templateKeys": [{ "key": "pc-hx", "rank": 0 }]
+  },
+  {
+    "cc": "Suicide attempt",
+    "guideKeys": [{ "key": "pc", "rank": 0 }],
+    "templateKeys": [{ "key": "pc-hx", "rank": 0 }]
+  },
+  {
+    "cc": "Suicidal thinking",
+    "guideKeys": [{ "key": "pc", "rank": 0 }],
+    "templateKeys": [{ "key": "pc-hx", "rank": 0 }]
+  },
+  {
+    "cc": "Hanging",
+    "guideKeys": [{ "key": "pc", "rank": 0 }],
+    "templateKeys": [
+      { "key": "pc-hanging", "rank": 0 },
+      { "key": "pc-hx", "rank": 1 }
+    ]
+  },
+  {
+    "cc": "Abnormal behavior",
+    "guideKeys": [{ "key": "pc", "rank": 0 }],
+    "templateKeys": [{ "key": "pc-hx", "rank": 0 }]
+  },
+  {
+    "cc": "Confusion",
+    "guideKeys": [{ "key": "pc", "rank": 0 }],
+    "templateKeys": [{ "key": "pc-hx", "rank": 0 }]
+  },
+  {
+    "cc": "Disorientation",
+    "guideKeys": [{ "key": "pc", "rank": 0 }],
+    "templateKeys": [{ "key": "pc-hx", "rank": 0 }]
+  },
+  {
+    "cc": "Agressive behavior",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Abnormal behavior"
+  },
+  {
+    "cc": "Psychosis",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Abnormal behavior"
+  },
+  {
+    "cc": "Drug overdose",
+    "guideKeys": [
+      { "key": "drug-intoxication", "rank": 0 },
+      { "key": "pc", "rank": 1 }
+    ],
+    "templateKeys": [{ "key": "pc-hx", "rank": 1 }]
+  },
+  {
+    "cc": "Wrist laceration",
+    "guideKeys": [
+      { "key": "pc", "rank": 1 },
+      { "key": "trauma-traffic-accident", "rank": 2 }
+    ],
+    "templateKeys": [
+      { "key": "pc-hx", "rank": 1 },
+      { "key": "trauma", "rank": 2 }
+    ]
+  },
+  {
+    "cc": "Lt. wrist laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Wrist laceration"
+  },
+  {
+    "cc": "Rt. wrist laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Wrist laceration"
+  },
+  {
+    "cc": "Wrist pain",
+    "guideKeys": [
+      { "key": "trauma-traffic-accident", "rank": 1 },
+      { "key": "pc", "rank": 2 }
+    ],
+    "templateKeys": [
+      { "key": "trauma", "rank": 1 },
+      { "key": "pc-hx", "rank": 2 }
+    ]
+  },
+  {
+    "cc": "Lt. wrist pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Wrist pain"
+  },
+  {
+    "cc": "Rt. wrist pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Wrist pain"
+  },
+  {
+    "cc": "Both wrist pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Wrist pain"
   }
 ]

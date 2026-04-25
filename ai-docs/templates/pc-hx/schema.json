@@ -1,0 +1,163 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PcHxCase",
+  "description": "정신건강의학과(PC) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history",
+    "family_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류.",
+            "enum": [
+              "interview_consent",
+              "thought_content",
+              "thought_process",
+              "duration",
+              "hallucination",
+              "suicide",
+              "recent_stress",
+              "social_background",
+              "alcohol",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "family_history",
+              "vital_sign",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 카드-섹션 매핑 기준: interview_consent/thought_content/thought_process/duration/hallucination/suicide/recent_stress/social_background/alcohol → [pi, template] | past_history/medication_history/operation_history/family_history → [history] 전용",
+            "items": {
+              "type": "string",
+              "enum": ["pi", "template", "history", "pe"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "interview_consent": {
+      "type": ["boolean", "null"],
+      "description": "환자가 면담을 원하는지 여부. true/false/null."
+    },
+    "thought_content": {
+      "type": ["string", "null"],
+      "description": "사고내용 (망상, 강박사고, 피해망상 등). 없으면 null."
+    },
+    "thought_process": {
+      "type": ["string", "null"],
+      "description": "사고과정 (사고비약, 사고지연, 연상이완 등). 없으면 null."
+    },
+    "duration": {
+      "type": ["string", "null"],
+      "description": "증상 지속 기간 (예: '2주', '3개월'). 없으면 null."
+    },
+    "auditory_hallucination": {
+      "type": ["boolean", "null"],
+      "description": "환청 여부. true/false/null."
+    },
+    "visual_hallucination": {
+      "type": ["boolean", "null"],
+      "description": "환시 여부. true/false/null."
+    },
+    "suicide_thinking": {
+      "type": ["boolean", "null"],
+      "description": "자살사고 여부. true/false/null."
+    },
+    "suicide_attempt": {
+      "type": ["boolean", "null"],
+      "description": "자살시도 여부. true/false/null."
+    },
+    "recent_stress": {
+      "type": ["string", "null"],
+      "description": "최근 스트레스 요인. 없으면 null."
+    },
+    "personality": {
+      "type": ["string", "null"],
+      "description": "평소 성격 특성. 없으면 null."
+    },
+    "occupation": {
+      "type": ["string", "null"],
+      "description": "직업. 없으면 null."
+    },
+    "marital_status": {
+      "type": ["string", "null"],
+      "description": "결혼 상태. 없으면 null."
+    },
+    "education": {
+      "type": ["string", "null"],
+      "description": "최종 학력. 없으면 null."
+    },
+    "economic_status": {
+      "type": ["string", "null"],
+      "description": "경제적 상황. 없으면 null."
+    },
+    "family_relationship": {
+      "type": ["string", "null"],
+      "description": "현재 가족관계. 없으면 null."
+    },
+    "religion": {
+      "type": ["string", "null"],
+      "description": "종교. 없으면 null."
+    },
+    "cage_c": {
+      "type": ["boolean", "null"],
+      "description": "CAGE-C: 술을 끊으려 해본 적. true/false/null."
+    },
+    "cage_a": {
+      "type": ["boolean", "null"],
+      "description": "CAGE-A: 음주 후 타인에게 비판받은 적. true/false/null."
+    },
+    "cage_g": {
+      "type": ["boolean", "null"],
+      "description": "CAGE-G: 음주 후 죄책감. true/false/null."
+    },
+    "cage_e": {
+      "type": ["boolean", "null"],
+      "description": "CAGE-E: 아침에 일어나서 다시 음주(Eye-opener). true/false/null."
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": { "type": "string" }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": { "type": "string" }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": { "type": "string" }
+    },
+    "family_history": {
+      "type": ["array", "null"],
+      "description": "가족력 목록. null이면 History 출력 시 해당 항목 전체 생략.",
+      "items": { "type": "string" }
+    }
+  }
+}
