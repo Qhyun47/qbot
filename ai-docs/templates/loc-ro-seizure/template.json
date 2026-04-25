@@ -1,0 +1,538 @@
+{
+  "templateKey": "loc-ro-seizure",
+  "cc": "LOC (R/O Seizure)",
+  "description": "의식소실(LOC) R/O Seizure 환자 EMR 상용구 템플릿",
+  "hpi_hints": "의식소실의 전후 상황을 시간순으로 서술. seizure 시사 소견(post-ictal confusion, tongue bite, urination, eyeball deviation)과 syncope 시사 소견(전구 증상, 체위 변화, 자율신경계 증상)을 구분하여 기술.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+'로 교체하고, 언급 없으면 반드시 해당 slot의 default 값을 유지하라. '( )' 스타일 항목(default 공백): 언급 시 '(+)', 없으면 '( )' 그대로 유지. '(-)' 스타일 항목(default '-'): 언급 시 '(+)', 없으면 '(-)' 유지. post ictal confusion 항목: 언급 시 '(+) / duration [시간]', 없으면 '(-) / duration'. output_example의 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "fields": [
+    {
+      "key": "first_syncope",
+      "label": "1st syncope",
+      "type": "open",
+      "description": "초발 실신 여부. 처음이면 '(+)', 이전 에피소드가 있으면 '(-)', 정보 없으면 '(-)'."
+    },
+    {
+      "key": "duration",
+      "label": "Duration",
+      "type": "open",
+      "description": "의식소실 지속 시간 (예: '약 1분', '수초간'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "loc_detail",
+      "label": "LOC 상황",
+      "type": "open",
+      "description": "의식소실 상황. time/place(언제 어디서), character(자세·팔다리 양상), 타병원 내원 및 처치 여부를 각 bullet에 서술. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "pre_posture",
+      "label": "실신 직전 자세",
+      "type": "symptom_check",
+      "format": "  -자세 : 누워있다가({lying}) 앉아있다가({sitting}) 오래서있다가({standing}) 일어선지 3분이내(orthostatic) ({orthostatic})",
+      "slots": [
+        {
+          "key": "lying",
+          "symptom": "누워있다가",
+          "description": "누워 있던 중 실신",
+          "default": " "
+        },
+        {
+          "key": "sitting",
+          "symptom": "앉아있다가",
+          "description": "앉아 있던 중 실신",
+          "default": " "
+        },
+        {
+          "key": "standing",
+          "symptom": "오래서있다가",
+          "description": "오래 서 있던 중 실신",
+          "default": " "
+        },
+        {
+          "key": "orthostatic",
+          "symptom": "기립저혈압(orthostatic)",
+          "description": "기립 후 3분 이내 실신",
+          "default": " "
+        }
+      ],
+      "description": "실신 직전 자세. 언급된 항목은 '+'로, 언급 없으면 ' '(공백) 유지."
+    },
+    {
+      "key": "pre_emotion",
+      "label": "실신 직전 감정",
+      "type": "symptom_check",
+      "format": "  -감정 : 공포({fear}) 통증({pain}) 흥분({excitement}) 슬픔({sadness}) 기쁨({joy})",
+      "slots": [
+        {
+          "key": "fear",
+          "symptom": "공포",
+          "description": "공포 유발",
+          "default": " "
+        },
+        {
+          "key": "pain",
+          "symptom": "통증",
+          "description": "통증 유발",
+          "default": " "
+        },
+        {
+          "key": "excitement",
+          "symptom": "흥분",
+          "description": "흥분 상태",
+          "default": " "
+        },
+        {
+          "key": "sadness",
+          "symptom": "슬픔",
+          "description": "슬픔/감정적 스트레스",
+          "default": " "
+        },
+        {
+          "key": "joy",
+          "symptom": "기쁨",
+          "description": "강한 기쁨/감동",
+          "default": " "
+        }
+      ],
+      "description": "실신 직전 감정 유발 요인. 언급된 항목은 '+'로, 없으면 ' '(공백) 유지."
+    },
+    {
+      "key": "pre_situation",
+      "label": "실신 직전 상황",
+      "type": "symptom_check",
+      "format": "  -상황 : 기침({cough}) 대소변({toilet}) 운동후({post_exercise}) 삼킴({swallow}) 식후({post_meal})",
+      "slots": [
+        {
+          "key": "cough",
+          "symptom": "기침",
+          "description": "기침 시 실신(기침 실신)",
+          "default": " "
+        },
+        {
+          "key": "toilet",
+          "symptom": "대소변",
+          "description": "대소변 시 실신(배뇨/배변 실신)",
+          "default": " "
+        },
+        {
+          "key": "post_exercise",
+          "symptom": "운동후",
+          "description": "운동 후 실신",
+          "default": " "
+        },
+        {
+          "key": "swallow",
+          "symptom": "삼킴",
+          "description": "삼킴 시 실신(연하 실신)",
+          "default": " "
+        },
+        {
+          "key": "post_meal",
+          "symptom": "식후",
+          "description": "식후 실신(식후 저혈압)",
+          "default": " "
+        }
+      ],
+      "description": "실신 직전 상황적 유발 요인. 언급된 항목은 '+'로, 없으면 ' '(공백) 유지."
+    },
+    {
+      "key": "cp_palp_doe_sob",
+      "label": "Chest pain / Palpitation / DOE / SOB",
+      "type": "symptom_check",
+      "format": "     Chest pain / Palpitation/ DOE/ SOB ({cp}/{palp}/{doe}/{sob})",
+      "slots": [
+        {
+          "key": "cp",
+          "symptom": "Chest pain",
+          "description": "흉통",
+          "default": "-"
+        },
+        {
+          "key": "palp",
+          "symptom": "Palpitation",
+          "description": "심계항진",
+          "default": "-"
+        },
+        {
+          "key": "doe",
+          "symptom": "DOE",
+          "description": "운동 시 호흡곤란",
+          "default": "-"
+        },
+        {
+          "key": "sob",
+          "symptom": "SOB",
+          "description": "안정 시 호흡곤란",
+          "default": "-"
+        }
+      ],
+      "description": "흉통/심계항진/DOE/SOB 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "abd_back",
+      "label": "ABD pain / Back pain",
+      "type": "symptom_check",
+      "format": "     ABD pain ({abd}) / Back pain ({back})",
+      "slots": [
+        {
+          "key": "abd",
+          "symptom": "ABD pain",
+          "description": "복통",
+          "default": "-"
+        },
+        {
+          "key": "back",
+          "symptom": "Back pain",
+          "description": "허리/등 통증",
+          "default": "-"
+        }
+      ],
+      "description": "복통/허리통증 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "pre_seizure_aura",
+      "label": "의식 소실 전 - 뇌전증 조짐(aura)",
+      "type": "symptom_check",
+      "format": "     - 뱃속에서 무언가 치밀어 오르는 느낌({epigastric_rise})\n     - 이상한 맛 또는 냄새({taste_smell}) \n     - 이미 본 느낌(d´ej`avu) ({deja_vu})\n     - 눈 앞에서 불빛이 반짝이는 환시(visual hallucination) ({visual_hallucination})",
+      "slots": [
+        {
+          "key": "epigastric_rise",
+          "symptom": "치밀어오르는느낌",
+          "description": "상복부에서 치밀어 오르는 느낌(측두엽 뇌전증 aura)",
+          "default": "-"
+        },
+        {
+          "key": "taste_smell",
+          "symptom": "이상한맛또는냄새",
+          "description": "이상한 맛/냄새 aura",
+          "default": "-"
+        },
+        {
+          "key": "deja_vu",
+          "symptom": "deja vu",
+          "description": "기시감(측두엽 뇌전증 aura)",
+          "default": "-"
+        },
+        {
+          "key": "visual_hallucination",
+          "symptom": "visual hallucination",
+          "description": "환시(후두엽 뇌전증 aura)",
+          "default": "-"
+        }
+      ],
+      "description": "뇌전증 조짐 증상. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "pre_cardiac",
+      "label": "의식 소실 전 - 심박동/흉통",
+      "type": "symptom_check",
+      "format": "     - 심박동({palpitation}) 가슴 통증({chest_pain})",
+      "slots": [
+        {
+          "key": "palpitation",
+          "symptom": "심박동이상",
+          "description": "의식소실 전 심박동 이상",
+          "default": "-"
+        },
+        {
+          "key": "chest_pain",
+          "symptom": "가슴통증",
+          "description": "의식소실 전 흉통",
+          "default": "-"
+        }
+      ],
+      "description": "의식소실 전 심박동/흉통. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "pre_neuro_autonomic",
+      "label": "의식 소실 전 - 신경/자율신경 증상",
+      "type": "symptom_check",
+      "format": "     - 머리가 어찔어찔(lightheadedness) ({lightheadedness}) / 어지럼증({dizziness})\n     - 식은땀({diaphoresis}) / 메스꺼움({nausea})",
+      "slots": [
+        {
+          "key": "lightheadedness",
+          "symptom": "lightheadedness",
+          "description": "어지럼/lightheadedness",
+          "default": "-"
+        },
+        {
+          "key": "dizziness",
+          "symptom": "어지럼증",
+          "description": "현훈/어지럼증",
+          "default": "-"
+        },
+        {
+          "key": "diaphoresis",
+          "symptom": "식은땀",
+          "description": "식은땀(vagal prodrome)",
+          "default": "-"
+        },
+        {
+          "key": "nausea",
+          "symptom": "메스꺼움",
+          "description": "구역(vagal prodrome)",
+          "default": "-"
+        }
+      ],
+      "description": "의식소실 전 신경/자율신경계 증상. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "pre_sensory_other",
+      "label": "의식 소실 전 - 감각/기타",
+      "type": "symptom_check",
+      "format": "     - hearing loss({hearing_loss}) / blurred vision({blurred_vision}) / black out ({black_out}) \n     - 쓰러질 것 같은 느낌({presyncope}) \n     - 특히 오랜 시간 서 있는 중({prolonged_standing}), 대소변({pre_toilet})\n     - hyperventilation({hyperventilation})",
+      "slots": [
+        {
+          "key": "hearing_loss",
+          "symptom": "hearing loss",
+          "description": "청력 소실",
+          "default": "-"
+        },
+        {
+          "key": "blurred_vision",
+          "symptom": "blurred vision",
+          "description": "시야 흐림",
+          "default": "-"
+        },
+        {
+          "key": "black_out",
+          "symptom": "black out",
+          "description": "시야 암전(black out)",
+          "default": "-"
+        },
+        {
+          "key": "presyncope",
+          "symptom": "쓰러질것같은느낌",
+          "description": "실신 전구 느낌",
+          "default": "-"
+        },
+        {
+          "key": "prolonged_standing",
+          "symptom": "오랜시간서있는중",
+          "description": "장시간 기립 중",
+          "default": "-"
+        },
+        {
+          "key": "pre_toilet",
+          "symptom": "대소변전실신",
+          "description": "대소변 직전/중 실신",
+          "default": "-"
+        },
+        {
+          "key": "hyperventilation",
+          "symptom": "hyperventilation",
+          "description": "과호흡",
+          "default": "-"
+        }
+      ],
+      "description": "의식소실 전 감각/기타 증상. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "during_seizure",
+      "label": "의식 소실 중 - seizure 관련",
+      "type": "symptom_check",
+      "format": "     - seizure/convulsive movement({seizure_conv}) flaccid(잠자듯이 축늘어짐) ({flaccid})",
+      "slots": [
+        {
+          "key": "seizure_conv",
+          "symptom": "seizure/convulsive movement",
+          "description": "경련/발작 양상",
+          "default": " "
+        },
+        {
+          "key": "flaccid",
+          "symptom": "flaccid",
+          "description": "축 늘어짐(flaccid collapse)",
+          "default": " "
+        }
+      ],
+      "description": "의식소실 중 seizure 관련 소견. 언급 시 '+'로, 없으면 ' '(공백) 유지."
+    },
+    {
+      "key": "during_other",
+      "label": "의식 소실 중 - 기타 소견",
+      "type": "symptom_check",
+      "format": "       drooling({drooling}) eyeball deviation({eyeball_dev}) tongue bite({tongue_bite}) pale appearance({pale})\n       trauma({trauma}) urination/defecation({urine_defec}) headache({headache}) nausea/vomiting({nv})\n       abnormal behavior({abnormal_behavior})",
+      "slots": [
+        {
+          "key": "drooling",
+          "symptom": "drooling",
+          "description": "침 흘림",
+          "default": " "
+        },
+        {
+          "key": "eyeball_dev",
+          "symptom": "eyeball deviation",
+          "description": "안구 편위(뇌전증 시사)",
+          "default": " "
+        },
+        {
+          "key": "tongue_bite",
+          "symptom": "tongue bite",
+          "description": "혀 깨물림(뇌전증 시사)",
+          "default": " "
+        },
+        {
+          "key": "pale",
+          "symptom": "pale appearance",
+          "description": "창백(syncope 시사)",
+          "default": " "
+        },
+        {
+          "key": "trauma",
+          "symptom": "trauma",
+          "description": "외상",
+          "default": " "
+        },
+        {
+          "key": "urine_defec",
+          "symptom": "urination/defecation",
+          "description": "대소변 실금(뇌전증 시사)",
+          "default": " "
+        },
+        {
+          "key": "headache",
+          "symptom": "headache during",
+          "description": "의식소실 중 두통",
+          "default": " "
+        },
+        {
+          "key": "nv",
+          "symptom": "nausea/vomiting during",
+          "description": "의식소실 중 구역/구토",
+          "default": " "
+        },
+        {
+          "key": "abnormal_behavior",
+          "symptom": "abnormal behavior",
+          "description": "이상 행동(자동증 등)",
+          "default": " "
+        }
+      ],
+      "description": "의식소실 중 기타 소견. 언급 시 '+'로, 없으면 ' '(공백) 유지."
+    },
+    {
+      "key": "post_ictal_confusion",
+      "label": "post ictal confusion",
+      "type": "open",
+      "description": "의식 회복 직후 post-ictal confusion 여부. 있으면 '(+) / duration [시간]', 없으면 '(-) / duration'."
+    },
+    {
+      "key": "post_resyncope",
+      "label": "재실신",
+      "type": "open",
+      "description": "의식 회복 직후 바로 재실신 여부. 있으면 '(+)', 없으면 '(-)'."
+    },
+    {
+      "key": "post_trauma",
+      "label": "외상 여부",
+      "type": "open",
+      "description": "의식소실 후 외상 여부. 있으면 '(+)', 없으면 '(-)'."
+    },
+    {
+      "key": "post_headache_myalgia",
+      "label": "심한 두통/ 근육통",
+      "type": "open",
+      "description": "의식 회복 직후 심한 두통 또는 근육통 여부 및 내용. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "nvd_gi",
+      "label": "N/V/D / GI bleeding",
+      "type": "symptom_check",
+      "format": "N/V/D({nausea}/{vomiting}/{diarrhea})       GI bleeding({gi_bleeding})",
+      "slots": [
+        {
+          "key": "nausea",
+          "symptom": "Nausea",
+          "description": "구역",
+          "default": "-"
+        },
+        {
+          "key": "vomiting",
+          "symptom": "Vomiting",
+          "description": "구토",
+          "default": "-"
+        },
+        {
+          "key": "diarrhea",
+          "symptom": "Diarrhea",
+          "description": "설사",
+          "default": "-"
+        },
+        {
+          "key": "gi_bleeding",
+          "symptom": "GI bleeding",
+          "description": "위장관 출혈",
+          "default": "-"
+        }
+      ],
+      "description": "구역/구토/설사/GI출혈 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "dizziness_headache_fnd",
+      "label": "Dizziness / Headache / Focal neurologic deficit",
+      "type": "symptom_check",
+      "format": "Dizziness ({dizziness})     Headache ({headache})   \nFocal neurologic deficit({fnd})",
+      "slots": [
+        {
+          "key": "dizziness",
+          "symptom": "Dizziness",
+          "description": "어지럼증",
+          "default": "-"
+        },
+        {
+          "key": "headache",
+          "symptom": "Headache",
+          "description": "두통",
+          "default": "-"
+        },
+        {
+          "key": "fnd",
+          "symptom": "Focal neurologic deficit",
+          "description": "국소 신경학적 결손",
+          "default": "-"
+        }
+      ],
+      "description": "어지럼/두통/FND 체크. 언급 없으면 기본값(-) 유지."
+    }
+  ],
+  "output_example": "- 1st syncope (-)\n\n (1) Duration : \n\n (2) LOC 상황에 대하여 자세히 \n   * time/place\n   * Character : 자세, 팔/다리 \n   * 타 병원 내원 및 처치 여부\n\n (3) 실신 직전 상황 :  \n  -자세 : 누워있다가( ) 앉아있다가( ) 오래서있다가( ) 일어선지 3분이내(orthostatic) ( )        \n  -감정 : 공포( ) 통증( ) 흥분( ) 슬픔( ) 기쁨( )\n  -상황 : 기침( ) 대소변( ) 운동후( ) 삼킴( ) 식후( )\n\n (4) Symptom\n     Chest pain / Palpitation/ DOE/ SOB (-/-/-/-) \n     ABD pain (-) / Back pain (-) \n\n   * 의식 소실 전 증상\n     - 뱃속에서 무언가 치밀어 오르는 느낌(-)\n     - 이상한 맛 또는 냄새(-) \n     - 이미 본 느낌(d´ej`avu) (-)\n     - 눈 앞에서 불빛이 반짝이는 환시(visual hallucination) (-) \n     - 심박동(-) 가슴 통증(-)  \n     - 머리가 어찔어찔(lightheadedness) (-) / 어지럼증(-)\n     - 식은땀(-) / 메스꺼움(-) \n     - hearing loss(-) / blurred vision(-) / black out (-) \n     - 쓰러질 것 같은 느낌(-) \n     - 특히 오랜 시간 서 있는 중(-), 대소변(-)\n     - hyperventilation(-) \n\n   * 의식 소실 중 증상\n     - seizure/convulsive movement( ) flaccid(잠자듯이 축늘어짐) ( ) \n       drooling( ) eyeball deviation( ) tongue bite( ) pale appearance( )\n       trauma( ) urination/defecation( ) headache( ) nausea/vomiting( )\n       abnormal behavior( ) \n\n   * 의식 회복 직후 증상\n     - post ictal confusion (-) / duration \n     - 의식 회복 직후 바로 또 다시 의식을 상실하면서 쓰러짐 (-)  \n     - 외상 여부(-)\n     - 심한 두통/ 근육통\n\n\nN/V/D(-/-/-)       GI bleeding(-)\nDizziness (-)     Headache (-)   \nFocal neurologic deficit(-)",
+  "pe": {
+    "fields": [
+      {
+        "key": "general",
+        "label": "General / Vital status",
+        "default": "Vital stable, Mental alert, Pupil 3+/3+"
+      },
+      {
+        "key": "eom_nystagmus_diplopia",
+        "label": "EOM / nystagmus / diplopia",
+        "default": "EOM intact, nystagmus, diplopia(-/-)"
+      },
+      { "key": "facial", "label": "Facial Motor sensory", "default": "intact" },
+      {
+        "key": "limb_motor",
+        "label": "Limb Motor power",
+        "default": "5 5\n                 5 5"
+      },
+      { "key": "limb_sensory", "label": "Limb Sensory", "default": "intact" }
+    ],
+    "output_example": "Vital stable, Mental alert, Pupil 3+/3+\nEOM intact, nystagmus, diplopia(-/-)\nFacial Motor sensory intact\nLimb Motor power 5 5\n                 5 5\nLimb Sensory intact"
+  },
+  "history": {
+    "fields": [
+      { "key": "past", "label": "Past Hx.", "default": "" },
+      {
+        "key": "medication",
+        "label": "Med Hx.",
+        "default": "(약 / 약 변동사항 (특히 HTN, BPH))"
+      },
+      { "key": "operation", "label": "Op Hx.", "default": "" },
+      {
+        "key": "alcohol",
+        "label": "Alcohol",
+        "default": "(평소 주량 / 마지막 음주 시간/양)"
+      }
+    ],
+    "output_example": "Past Hx. : \nMed Hx. : (약 / 약 변동사항 (특히 HTN, BPH))\nOp Hx. :\nAlcohol : (평소 주량 / 마지막 음주 시간/양)"
+  }
+}

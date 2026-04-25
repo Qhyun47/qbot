@@ -1,0 +1,155 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LocRoSeizureCase",
+  "description": "의식소실(LOC) R/O Seizure 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history",
+    "family_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류. 아래 enum 값 중 가장 적합한 것 하나를 선택.",
+            "enum": [
+              "onset",
+              "first_episode",
+              "duration",
+              "loc_situation",
+              "posture_trigger",
+              "emotional_trigger",
+              "situational_trigger",
+              "pre_syncope_symptom",
+              "during_loc_finding",
+              "post_loc_finding",
+              "associated_symptom",
+              "vital_sign",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "family_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. 카드-섹션 매핑 기준: onset/first_episode/duration/loc_situation → [pi, template] | posture_trigger/emotional_trigger/situational_trigger → [template] | pre_syncope_symptom/during_loc_finding/post_loc_finding → [pi, template] | associated_symptom/vital_sign → [pi] | past_history/medication_history/operation_history/family_history → [history] 전용",
+            "items": {
+              "type": "string",
+              "enum": ["pi", "template", "history", "pe"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "의식소실 발생 시점 (예: '금일 오후 3시경', '어제 저녁'). 없으면 null."
+    },
+    "first_episode": {
+      "type": ["boolean", "null"],
+      "description": "초발 에피소드 여부. true=처음, false=재발, null=정보 없음."
+    },
+    "duration_of_loc": {
+      "type": ["string", "null"],
+      "description": "의식소실 지속 시간 (예: '약 1분', '수초간', '수분'). 없으면 null."
+    },
+    "loc_situation": {
+      "type": ["string", "null"],
+      "description": "의식소실 발생 상황. time/place, 발생 시 자세·팔다리 양상, 타병원 내원 및 처치 여부 포함 서술. 없으면 null."
+    },
+    "posture_trigger": {
+      "type": ["string", "null"],
+      "description": "실신 직전 자세. 누워있다가/앉아있다가/오래서있다가/기립저혈압(orthostatic) 중 해당 항목. 없으면 null."
+    },
+    "emotional_trigger": {
+      "type": ["string", "null"],
+      "description": "실신 직전 감정 유발 요인. 공포/통증/흥분/슬픔/기쁨 중 해당 항목. 없으면 null."
+    },
+    "situational_trigger": {
+      "type": ["string", "null"],
+      "description": "실신 직전 상황적 유발 요인. 기침/대소변/운동후/삼킴/식후 중 해당 항목. 없으면 null."
+    },
+    "pre_syncope_symptoms": {
+      "type": ["array", "null"],
+      "description": "의식소실 전 증상 목록 (예: lightheadedness, dizziness, diaphoresis, nausea, palpitation, chest_pain, epigastric_rise, deja_vu, visual_hallucination, blurred_vision, black_out, presyncope, hyperventilation 등). 없으면 null.",
+      "items": { "type": "string" }
+    },
+    "during_loc_findings": {
+      "type": ["array", "null"],
+      "description": "의식소실 중 소견 목록 (예: seizure, convulsive_movement, flaccid, drooling, eyeball_deviation, tongue_bite, pale_appearance, trauma, urination, defecation, headache, nausea_vomiting, abnormal_behavior 등). 없으면 null.",
+      "items": { "type": "string" }
+    },
+    "post_loc_findings": {
+      "type": ["object", "null"],
+      "description": "의식 회복 직후 소견. 없으면 null.",
+      "properties": {
+        "post_ictal_confusion": {
+          "type": ["boolean", "null"],
+          "description": "post-ictal confusion 여부"
+        },
+        "post_ictal_duration": {
+          "type": ["string", "null"],
+          "description": "post-ictal confusion 지속 시간"
+        },
+        "re_syncope": {
+          "type": ["boolean", "null"],
+          "description": "회복 직후 재실신 여부"
+        },
+        "trauma": {
+          "type": ["boolean", "null"],
+          "description": "의식소실 후 외상 여부"
+        },
+        "headache": {
+          "type": ["boolean", "null"],
+          "description": "심한 두통 여부"
+        },
+        "myalgia": { "type": ["boolean", "null"], "description": "근육통 여부" }
+      }
+    },
+    "associated_symptoms": {
+      "type": ["array", "null"],
+      "description": "동반 증상 목록 (예: chest_pain, palpitation, DOE, SOB, ABD_pain, back_pain, nausea, vomiting, diarrhea, GI_bleeding, dizziness, headache, focal_neurologic_deficit 등). 없으면 null.",
+      "items": { "type": "string" }
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록 (예: ['고혈압', '당뇨', '뇌전증', '심방세동']). History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": { "type": "string" }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록. 특히 HTN 약, BPH 약, 약 변동사항 확인. History 출력 시 항상 포함; 없으면 null.",
+      "items": { "type": "string" }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. History 출력 시 항상 포함; 없으면 null.",
+      "items": { "type": "string" }
+    },
+    "family_history": {
+      "type": ["array", "null"],
+      "description": "가족력 목록. null이면 History 출력 시 해당 항목 전체 생략.",
+      "items": { "type": "string" }
+    }
+  }
+}

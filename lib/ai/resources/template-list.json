@@ -41,6 +41,11 @@
     "category": "1. NU"
   },
   {
+    "templateKey": "loc-ro-seizure",
+    "displayName": "LOC (R/O Seizure)",
+    "category": "1. NU"
+  },
+  {
     "templateKey": "pd-fever",
     "displayName": "PD fever",
     "category": "3. PD"

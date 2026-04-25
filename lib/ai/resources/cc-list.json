@@ -270,6 +270,9 @@
       { "key": "nu-loc", "rank": 2 },
       { "key": "drug-intoxication", "rank": 3 }
     ],
-    "templateKeys": [{ "key": "nu-code-red", "rank": 0 }]
+    "templateKeys": [
+      { "key": "nu-code-red", "rank": 0 },
+      { "key": "loc-ro-seizure", "rank": 2 }
+    ]
   }
 ]
