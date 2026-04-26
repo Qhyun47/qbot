@@ -783,23 +783,35 @@ export function GuidelinesEditor({
             </p>
           ) : (
             <ul className="space-y-1">
-              {customGuidelines.map((g) => (
-                <li
-                  key={g.guide_key}
-                  className="flex items-center gap-2 text-sm"
-                >
-                  <span className="font-medium">
-                    {extractGuidelineTitle(
-                      g.content,
-                      g.source_type,
-                      g.pdf_path
-                    )}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {format(new Date(g.created_at), "yyyy.MM.dd HH:mm")}
-                  </span>
-                </li>
-              ))}
+              {[...customGuidelines]
+                .sort((a, b) => {
+                  const ai = guideList.findIndex(
+                    (g) => g.guideKey === a.guide_key
+                  );
+                  const bi = guideList.findIndex(
+                    (g) => g.guideKey === b.guide_key
+                  );
+                  return (
+                    (ai === -1 ? Infinity : ai) - (bi === -1 ? Infinity : bi)
+                  );
+                })
+                .map((g) => (
+                  <li
+                    key={g.guide_key}
+                    className="flex items-center gap-2 text-sm"
+                  >
+                    <span className="font-medium">
+                      {extractGuidelineTitle(
+                        g.content,
+                        g.source_type,
+                        g.pdf_path
+                      )}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {format(new Date(g.created_at), "yyyy.MM.dd HH:mm")}
+                    </span>
+                  </li>
+                ))}
             </ul>
           )}
         </div>
