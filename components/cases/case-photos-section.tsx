@@ -6,6 +6,7 @@ import {
   ChevronRight,
   Download,
   DownloadCloud,
+  Loader2,
   RotateCcw,
   RotateCw,
   X,
@@ -91,10 +92,12 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
       .finally(() => setLoading(false));
   }, [caseId]);
 
+  const normalizedRotation = ((rotation % 360) + 360) % 360;
+
   const handleLightboxDownload = async () => {
     if (!viewingPhoto?.url) return;
-    if (rotation !== 0 && imgRef.current) {
-      const blob = await createRotatedBlob(imgRef.current, rotation);
+    if (normalizedRotation !== 0 && imgRef.current) {
+      const blob = await createRotatedBlob(imgRef.current, normalizedRotation);
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = blobUrl;
@@ -108,9 +111,9 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
     }
   };
 
-  const saveRotatedPhoto = async (photo: CasePhotoWithUrl, deg: number) => {
+  const saveRotatedPhoto = async (photo: CasePhotoWithUrl) => {
     if (!imgRef.current) return;
-    const blob = await createRotatedBlob(imgRef.current, deg);
+    const blob = await createRotatedBlob(imgRef.current, normalizedRotation);
     const formData = new FormData();
     formData.append(
       "file",
@@ -157,7 +160,7 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
     return () => window.removeEventListener("keydown", onKey);
   }, [viewingIndex, showPrev, showNext]);
 
-  if (loading || photos.length === 0) return null;
+  if (!loading && photos.length === 0) return null;
 
   const viewingPhoto = viewingIndex !== null ? photos[viewingIndex] : null;
 
@@ -168,7 +171,7 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
           <h2 className="text-sm font-semibold text-muted-foreground">
             첨부 사진
           </h2>
-          {photos.length >= 2 && (
+          {!loading && photos.length >= 2 && (
             <Button
               variant="ghost"
               size="sm"
@@ -180,47 +183,54 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
             </Button>
           )}
         </div>
-        <div className="flex flex-wrap gap-2">
-          {photos.map((photo, idx) => (
-            <div key={photo.id} className="relative size-24 shrink-0">
-              {photo.url ? (
+        {loading ? (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="size-4 animate-spin" />
+            불러오는 중...
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {photos.map((photo, idx) => (
+              <div key={photo.id} className="relative size-24 shrink-0">
+                {photo.url ? (
+                  <button
+                    type="button"
+                    className="h-full w-full"
+                    onClick={() => setViewingIndex(idx)}
+                    aria-label="사진 확대"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={photo.url}
+                      alt={photo.file_name}
+                      className="h-full w-full rounded-md object-cover"
+                    />
+                  </button>
+                ) : (
+                  <div className="h-full w-full rounded-md bg-muted" />
+                )}
                 <button
                   type="button"
-                  className="h-full w-full"
-                  onClick={() => setViewingIndex(idx)}
-                  aria-label="사진 확대"
+                  onClick={() => setDeleteTarget(photo)}
+                  className="absolute right-1 top-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+                  aria-label="삭제"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={photo.url}
-                    alt={photo.file_name}
-                    className="h-full w-full rounded-md object-cover"
-                  />
+                  <X className="size-3" />
                 </button>
-              ) : (
-                <div className="h-full w-full rounded-md bg-muted" />
-              )}
-              <button
-                type="button"
-                onClick={() => setDeleteTarget(photo)}
-                className="absolute right-1 top-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
-                aria-label="삭제"
-              >
-                <X className="size-3" />
-              </button>
-              {photo.url && (
-                <button
-                  type="button"
-                  onClick={() => triggerDownload(photo)}
-                  className="absolute bottom-1 right-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
-                  aria-label="다운로드"
-                >
-                  <Download className="size-3" />
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
+                {photo.url && (
+                  <button
+                    type="button"
+                    onClick={() => triggerDownload(photo)}
+                    className="absolute bottom-1 right-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+                    aria-label="다운로드"
+                  >
+                    <Download className="size-3" />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 사진 뷰어 */}
@@ -228,10 +238,10 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
         open={viewingIndex !== null}
         onOpenChange={async (open) => {
           if (open || isSaving) return;
-          if (rotation !== 0 && viewingPhoto) {
+          if (normalizedRotation !== 0 && viewingPhoto) {
             setIsSaving(true);
             try {
-              await saveRotatedPhoto(viewingPhoto, rotation);
+              await saveRotatedPhoto(viewingPhoto);
               const res = await fetch(`/api/cases/${caseId}/photos`);
               if (res.ok) setPhotos(await res.json());
             } finally {
@@ -249,16 +259,36 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
                 <span className="text-sm text-muted-foreground">
                   {(viewingIndex ?? 0) + 1} / {photos.length}
                 </span>
-                <button
-                  type="button"
-                  onClick={handleLightboxDownload}
-                  disabled={isSaving}
-                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
-                  aria-label="다운로드"
-                >
-                  <Download className="size-4" />
-                  다운로드
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setRotation((r) => r - 90)}
+                    disabled={isSaving}
+                    className="text-muted-foreground hover:text-foreground disabled:opacity-50"
+                    aria-label="반시계 방향 회전"
+                  >
+                    <RotateCcw className="size-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRotation((r) => r + 90)}
+                    disabled={isSaving}
+                    className="text-muted-foreground hover:text-foreground disabled:opacity-50"
+                    aria-label="시계 방향 회전"
+                  >
+                    <RotateCw className="size-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleLightboxDownload}
+                    disabled={isSaving}
+                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
+                    aria-label="다운로드"
+                  >
+                    <Download className="size-4" />
+                    다운로드
+                  </button>
+                </div>
               </div>
               <div className="relative flex flex-1 items-center justify-center overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -292,31 +322,10 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
                   </>
                 )}
               </div>
-              {isSaving ? (
+              {isSaving && (
                 <p className="text-center text-sm text-muted-foreground">
                   저장 중...
                 </p>
-              ) : (
-                <div className="flex items-center justify-center gap-6">
-                  <button
-                    type="button"
-                    onClick={() => setRotation((r) => (r - 90 + 360) % 360)}
-                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-                    aria-label="반시계 방향 회전"
-                  >
-                    <RotateCcw className="size-4" />
-                    반시계
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setRotation((r) => (r + 90) % 360)}
-                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-                    aria-label="시계 방향 회전"
-                  >
-                    <RotateCw className="size-4" />
-                    시계 방향
-                  </button>
-                </div>
               )}
             </>
           )}
