@@ -204,10 +204,10 @@ async function CaseContent({
                 value={result.pe_edited ?? result.pe_draft ?? ""}
                 onSave={updatePeEdited.bind(null, result.id)}
               />
-              <CasePhotosSection caseId={caseData.id} />
             </>
           )}
           {status === "draft" && <DraftState />}
+          <CasePhotosSection caseId={caseData.id} />
         </div>
 
         <Separator className="my-2" />

@@ -32,7 +32,7 @@ export function PhotoBottomSheet({ caseId }: PhotoBottomSheetProps) {
   const [open, setOpen] = useState(false);
   const [photos, setPhotos] = useState<CasePhotoWithUrl[]>([]);
   const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [uploadingCount, setUploadingCount] = useState(0);
   const [deleteTarget, setDeleteTarget] = useState<CasePhotoWithUrl | null>(
     null
   );
@@ -60,7 +60,7 @@ export function PhotoBottomSheet({ caseId }: PhotoBottomSheetProps) {
 
   const handleFileSelect = async (file: File) => {
     if (!caseId) return;
-    setUploading(true);
+    setUploadingCount((c) => c + 1);
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -75,7 +75,7 @@ export function PhotoBottomSheet({ caseId }: PhotoBottomSheetProps) {
         alert(err.error ?? "업로드에 실패했습니다.");
       }
     } finally {
-      setUploading(false);
+      setUploadingCount((c) => c - 1);
     }
   };
 
@@ -153,7 +153,7 @@ export function PhotoBottomSheet({ caseId }: PhotoBottomSheetProps) {
                 type="button"
                 variant="outline"
                 className="flex-1"
-                disabled={!caseId || uploading}
+                disabled={!caseId}
                 onClick={() => cameraInputRef.current?.click()}
               >
                 <Camera className="mr-2 size-4" />
@@ -163,17 +163,19 @@ export function PhotoBottomSheet({ caseId }: PhotoBottomSheetProps) {
                 type="button"
                 variant="outline"
                 className="flex-1"
-                disabled={!caseId || uploading}
+                disabled={!caseId}
                 onClick={() => albumInputRef.current?.click()}
               >
                 <ImagePlus className="mr-2 size-4" />
-                앨범
+                갤러리
               </Button>
             </div>
 
-            {uploading && (
+            {uploadingCount > 0 && (
               <p className="text-center text-xs text-muted-foreground">
-                업로드 중...
+                {uploadingCount > 1
+                  ? `${uploadingCount}개 업로드 중...`
+                  : "업로드 중..."}
               </p>
             )}
           </div>
