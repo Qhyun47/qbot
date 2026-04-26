@@ -70,3 +70,18 @@ for (const { w, h, file } of DIMENSIONS) {
 }
 
 console.log("\n스플래시 이미지 생성 완료!");
+
+// apple-touch-icon 및 PWA 아이콘도 동일 SVG로 재생성 (어두운 배경 유지)
+await sharp(iconSrc)
+  .resize(180, 180)
+  .png()
+  .toFile(path.join(ROOT, "public/icons/apple-touch-icon.png"));
+await sharp(iconSrc)
+  .resize(192, 192)
+  .png()
+  .toFile(path.join(ROOT, "public/icons/icon-192.png"));
+await sharp(iconSrc)
+  .resize(512, 512)
+  .png()
+  .toFile(path.join(ROOT, "public/icons/icon-512.png"));
+console.log("✓ apple-touch-icon.png, icon-192.png, icon-512.png 재생성 완료");
