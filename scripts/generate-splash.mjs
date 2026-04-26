@@ -1,4 +1,5 @@
 import sharp from "sharp";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import path from "path";
 
@@ -20,6 +21,13 @@ const DIMENSIONS = [
 
 const iconSrc = path.join(ROOT, "public/icons/icon.svg");
 
+// 배경 rect를 제거한 투명 배경 SVG 생성
+// → PNG로 렌더링 시 배경이 완전히 투명해져 어떤 배경색과도 경계선 없이 어우러짐
+const svgRaw = fs.readFileSync(iconSrc, "utf8");
+const transparentSvg = svgRaw.replace(/<rect[^>]*fill="#18181b"[^>]*\/>/, "");
+const transparentSvgBuf = Buffer.from(transparentSvg);
+
+// ── 커스텀 스플래시 PNG (iOS apple-touch-startup-image) ──────────────────────
 for (const { w, h, file } of DIMENSIONS) {
   const iconSize = Math.floor(w * 0.32);
   const iconTop = Math.floor(h * 0.35);
@@ -53,11 +61,13 @@ for (const { w, h, file } of DIMENSIONS) {
     >ER AI 어시스턴트</text>
   </svg>`;
 
-  const iconBuf = await sharp(iconSrc)
+  // 투명 배경 아이콘을 어두운 배경 위에 합성
+  const iconBuf = await sharp(transparentSvgBuf)
     .resize(iconSize, iconSize, {
       fit: "contain",
       background: { r: 0, g: 0, b: 0, alpha: 0 },
     })
+    .png()
     .toBuffer();
 
   const outPath = path.join(ROOT, "public/splash", file);
@@ -71,17 +81,23 @@ for (const { w, h, file } of DIMENSIONS) {
 
 console.log("\n스플래시 이미지 생성 완료!");
 
-// apple-touch-icon 및 PWA 아이콘도 동일 SVG로 재생성 (어두운 배경 유지)
+// ── PWA 아이콘 재생성 ────────────────────────────────────────────────────────
+
+// icon-192 / icon-512: 투명 배경 → Android/Chrome이 manifest.background_color 위에 올려서
+// 사각형 경계 없이 아이콘만 보임
+await sharp(transparentSvgBuf)
+  .resize(192, 192)
+  .png()
+  .toFile(path.join(ROOT, "public/icons/icon-192.png"));
+await sharp(transparentSvgBuf)
+  .resize(512, 512)
+  .png()
+  .toFile(path.join(ROOT, "public/icons/icon-512.png"));
+console.log("✓ icon-192.png, icon-512.png (투명 배경) 재생성 완료");
+
+// apple-touch-icon: 어두운 배경 유지 (iOS가 기본 흰 배경을 깔지 않도록)
 await sharp(iconSrc)
   .resize(180, 180)
   .png()
   .toFile(path.join(ROOT, "public/icons/apple-touch-icon.png"));
-await sharp(iconSrc)
-  .resize(192, 192)
-  .png()
-  .toFile(path.join(ROOT, "public/icons/icon-192.png"));
-await sharp(iconSrc)
-  .resize(512, 512)
-  .png()
-  .toFile(path.join(ROOT, "public/icons/icon-512.png"));
-console.log("✓ apple-touch-icon.png, icon-192.png, icon-512.png 재생성 완료");
+console.log("✓ apple-touch-icon.png (어두운 배경) 재생성 완료");
