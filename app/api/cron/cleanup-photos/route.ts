@@ -1,0 +1,51 @@
+import { NextRequest, NextResponse } from "next/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
+export async function GET(req: NextRequest) {
+  const secret = process.env.CRON_SECRET;
+  const authHeader = req.headers.get("authorization");
+
+  if (!secret || authHeader !== `Bearer ${secret}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const supabase = createAdminClient();
+
+  // 12시간 이전 케이스에 첨부된 사진 조회
+  const { data: photos, error: fetchError } = await supabase
+    .from("case_photos")
+    .select("id, storage_path, cases!inner(created_at)")
+    .lt(
+      "cases.created_at",
+      new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
+    );
+
+  if (fetchError) {
+    return NextResponse.json({ error: fetchError.message }, { status: 500 });
+  }
+
+  if (!photos || photos.length === 0) {
+    return NextResponse.json({ deleted: 0 });
+  }
+
+  const storagePaths = photos.map((p) => p.storage_path);
+  const photoIds = photos.map((p) => p.id);
+
+  // Storage 파일 삭제 (실패해도 DB 삭제 계속 진행)
+  await supabase.storage.from("case-photos").remove(storagePaths);
+
+  // DB 행 삭제
+  const { error: deleteError } = await supabase
+    .from("case_photos")
+    .delete()
+    .in("id", photoIds);
+
+  if (deleteError) {
+    return NextResponse.json({ error: deleteError.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ deleted: photos.length });
+}

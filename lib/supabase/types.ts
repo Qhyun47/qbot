@@ -14,6 +14,54 @@ export type Database = {
   };
   public: {
     Tables: {
+      case_photos: {
+        Row: {
+          id: string;
+          case_id: string;
+          user_id: string;
+          storage_path: string;
+          file_name: string;
+          file_size: number;
+          mime_type: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          case_id: string;
+          user_id: string;
+          storage_path: string;
+          file_name: string;
+          file_size: number;
+          mime_type: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          case_id?: string;
+          user_id?: string;
+          storage_path?: string;
+          file_name?: string;
+          file_size?: number;
+          mime_type?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "case_photos_case_id_fkey";
+            columns: ["case_id"];
+            isOneToOne: false;
+            referencedRelation: "cases";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "case_photos_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       case_inputs: {
         Row: {
           case_id: string;
@@ -568,6 +616,11 @@ export type GuidelineInsert =
   Database["public"]["Tables"]["interview_guidelines"]["Insert"];
 export type GuidelineUpdate =
   Database["public"]["Tables"]["interview_guidelines"]["Update"];
+
+// 편의 타입 — case_photos
+export type CasePhoto = Database["public"]["Tables"]["case_photos"]["Row"];
+export type CasePhotoInsert =
+  Database["public"]["Tables"]["case_photos"]["Insert"];
 
 // 편의 타입 — error_logs
 export type ErrorLog = Database["public"]["Tables"]["error_logs"]["Row"];

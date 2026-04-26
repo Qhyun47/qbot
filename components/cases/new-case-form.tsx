@@ -458,7 +458,7 @@ export function NewCaseForm({
           />
         </div>
       </div>
-      <CardInputBar onSubmit={handleCardSubmit} />
+      <CardInputBar onSubmit={handleCardSubmit} caseId={caseId ?? undefined} />
     </div>
   );
 

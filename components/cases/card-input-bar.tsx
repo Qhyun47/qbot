@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { parseTimeTag } from "@/lib/time/parse-time-tag";
 import { cn } from "@/lib/utils";
+import { PhotoBottomSheet } from "@/components/cases/photo-bottom-sheet";
 
 interface CardInputBarProps {
   onSubmit: (
@@ -13,9 +14,10 @@ interface CardInputBarProps {
     timeTag: string | null,
     timeOffsetMinutes: number | null
   ) => void;
+  caseId?: string;
 }
 
-export function CardInputBar({ onSubmit }: CardInputBarProps) {
+export function CardInputBar({ onSubmit, caseId }: CardInputBarProps) {
   const [text, setText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const parsed = parseTimeTag(text);
@@ -57,6 +59,9 @@ export function CardInputBar({ onSubmit }: CardInputBarProps) {
         </div>
       )}
       <div className="flex items-end gap-2 p-3">
+        <div className="flex is-desktop:hidden">
+          <PhotoBottomSheet caseId={caseId ?? null} />
+        </div>
         <Textarea
           ref={textareaRef}
           value={text}

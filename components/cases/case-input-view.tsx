@@ -381,7 +381,7 @@ export function CaseInputView({
           onEdit={handleCardEdit}
         />
       </div>
-      <CardInputBar onSubmit={handleCardSubmit} />
+      <CardInputBar onSubmit={handleCardSubmit} caseId={caseId} />
     </div>
   );
 

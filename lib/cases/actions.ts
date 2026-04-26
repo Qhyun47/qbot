@@ -223,6 +223,18 @@ export async function updateCaseMemo(
 export async function hideFromBoard(caseId: string): Promise<void> {
   const { supabase, user } = await getAuthUser();
 
+  // cases 행은 DB에 보존되므로 ON DELETE CASCADE 미작동 → 사진 명시적 삭제
+  const { data: photos } = await supabase
+    .from("case_photos")
+    .select("storage_path")
+    .eq("case_id", caseId);
+  if (photos && photos.length > 0) {
+    await supabase.storage
+      .from("case-photos")
+      .remove(photos.map((p) => p.storage_path));
+  }
+  await supabase.from("case_photos").delete().eq("case_id", caseId);
+
   const { error } = await supabase
     .from("cases")
     .update({ board_hidden_at: new Date().toISOString() })
@@ -301,6 +313,17 @@ export async function moveCaseInputSection(
 
 export async function deleteCase(caseId: string): Promise<void> {
   const { supabase, user } = await getAuthUser();
+
+  // Storage 파일 정리 (cases 삭제 시 ON DELETE CASCADE가 DB rows는 처리하지만 Storage는 미처리)
+  const { data: photos } = await supabase
+    .from("case_photos")
+    .select("storage_path")
+    .eq("case_id", caseId);
+  if (photos && photos.length > 0) {
+    await supabase.storage
+      .from("case-photos")
+      .remove(photos.map((p) => p.storage_path));
+  }
 
   const { error } = await supabase
     .from("cases")

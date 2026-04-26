@@ -23,6 +23,7 @@ import {
 import { getLayoutSettings } from "@/lib/settings/actions";
 import { Separator } from "@/components/ui/separator";
 import { AiWarningBanner } from "@/components/cases/ai-warning-banner";
+import { CasePhotosSection } from "@/components/cases/case-photos-section";
 import type { CaseStatus, BedZone } from "@/lib/supabase/types";
 
 function GeneratingSkeleton() {
@@ -203,6 +204,7 @@ async function CaseContent({
                 value={result.pe_edited ?? result.pe_draft ?? ""}
                 onSave={updatePeEdited.bind(null, result.id)}
               />
+              <CasePhotosSection caseId={caseData.id} />
             </>
           )}
           {status === "draft" && <DraftState />}
