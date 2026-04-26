@@ -34,7 +34,8 @@ interface CasePhotosSectionProps {
 async function triggerDownload(photo: CasePhotoWithUrl) {
   if (!photo.url) return;
   const res = await fetch(photo.url);
-  const blob = await res.blob();
+  const raw = await res.blob();
+  const blob = new Blob([raw], { type: "application/octet-stream" });
   const blobUrl = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = blobUrl;
@@ -101,10 +102,8 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
     setIsDownloading(true);
     try {
       if (normalizedRotation !== 0 && imgRef.current) {
-        const blob = await createRotatedBlob(
-          imgRef.current,
-          normalizedRotation
-        );
+        const raw = await createRotatedBlob(imgRef.current, normalizedRotation);
+        const blob = new Blob([raw], { type: "application/octet-stream" });
         const blobUrl = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = blobUrl;
