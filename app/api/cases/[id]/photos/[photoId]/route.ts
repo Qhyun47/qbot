@@ -47,7 +47,7 @@ export async function PATCH(
     );
   }
 
-  const { error: dbError } = await supabase
+  const { data: updated, error: dbError } = await supabase
     .from("case_photos")
     .update({
       storage_path: newStoragePath,
@@ -55,9 +55,10 @@ export async function PATCH(
       file_size: file.size,
       mime_type: file.type,
     })
-    .eq("id", photoId);
+    .eq("id", photoId)
+    .select("id");
 
-  if (dbError) {
+  if (dbError || !updated || updated.length === 0) {
     await supabase.storage.from("case-photos").remove([newStoragePath]);
     return NextResponse.json(
       { error: "DB 업데이트에 실패했습니다." },
