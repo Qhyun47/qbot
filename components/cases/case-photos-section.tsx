@@ -1,11 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
   Download,
   DownloadCloud,
+  RotateCcw,
+  RotateCw,
   X,
 } from "lucide-react";
 import {
@@ -42,6 +44,30 @@ async function triggerDownload(photo: CasePhotoWithUrl) {
   URL.revokeObjectURL(blobUrl);
 }
 
+function createRotatedBlob(
+  imgEl: HTMLImageElement,
+  deg: number
+): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d")!;
+    const swapped = deg % 180 !== 0;
+    canvas.width = swapped ? imgEl.naturalHeight : imgEl.naturalWidth;
+    canvas.height = swapped ? imgEl.naturalWidth : imgEl.naturalHeight;
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate((deg * Math.PI) / 180);
+    ctx.drawImage(imgEl, -imgEl.naturalWidth / 2, -imgEl.naturalHeight / 2);
+    canvas.toBlob(
+      (blob) => {
+        if (blob) resolve(blob);
+        else reject(new Error("Canvas toBlob 실패"));
+      },
+      "image/jpeg",
+      0.92
+    );
+  });
+}
+
 export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
   const [photos, setPhotos] = useState<CasePhotoWithUrl[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,6 +75,13 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
     null
   );
   const [viewingIndex, setViewingIndex] = useState<number | null>(null);
+  const [rotation, setRotation] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    setRotation(0);
+  }, [viewingIndex]);
 
   useEffect(() => {
     fetch(`/api/cases/${caseId}/photos`)
@@ -57,6 +90,37 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
       .catch(() => setPhotos([]))
       .finally(() => setLoading(false));
   }, [caseId]);
+
+  const handleLightboxDownload = async () => {
+    if (!viewingPhoto?.url) return;
+    if (rotation !== 0 && imgRef.current) {
+      const blob = await createRotatedBlob(imgRef.current, rotation);
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = viewingPhoto.file_name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } else {
+      await triggerDownload(viewingPhoto);
+    }
+  };
+
+  const saveRotatedPhoto = async (photo: CasePhotoWithUrl, deg: number) => {
+    if (!imgRef.current) return;
+    const blob = await createRotatedBlob(imgRef.current, deg);
+    const formData = new FormData();
+    formData.append(
+      "file",
+      new File([blob], photo.file_name, { type: "image/jpeg" })
+    );
+    await fetch(`/api/cases/${caseId}/photos/${photo.id}`, {
+      method: "PATCH",
+      body: formData,
+    });
+  };
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -162,21 +226,34 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
       {/* 사진 뷰어 */}
       <Dialog
         open={viewingIndex !== null}
-        onOpenChange={(open) => {
-          if (!open) setViewingIndex(null);
+        onOpenChange={async (open) => {
+          if (open || isSaving) return;
+          if (rotation !== 0 && viewingPhoto) {
+            setIsSaving(true);
+            try {
+              await saveRotatedPhoto(viewingPhoto, rotation);
+              const res = await fetch(`/api/cases/${caseId}/photos`);
+              if (res.ok) setPhotos(await res.json());
+            } finally {
+              setIsSaving(false);
+            }
+          }
+          setViewingIndex(null);
+          setRotation(0);
         }}
       >
         <DialogContent className="flex max-h-[90vh] max-w-[90vw] flex-col gap-3 p-4">
           {viewingPhoto && (
             <>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between pr-8">
                 <span className="text-sm text-muted-foreground">
                   {(viewingIndex ?? 0) + 1} / {photos.length}
                 </span>
                 <button
                   type="button"
-                  onClick={() => triggerDownload(viewingPhoto)}
-                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+                  onClick={handleLightboxDownload}
+                  disabled={isSaving}
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
                   aria-label="다운로드"
                 >
                   <Download className="size-4" />
@@ -186,9 +263,11 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
               <div className="relative flex flex-1 items-center justify-center overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
+                  ref={imgRef}
                   src={viewingPhoto.url ?? ""}
                   alt={viewingPhoto.file_name}
-                  className="max-h-[75vh] max-w-full rounded-md object-contain"
+                  className="max-h-[75vh] max-w-full rounded-md object-contain transition-transform duration-200"
+                  style={{ transform: `rotate(${rotation}deg)` }}
                 />
                 {photos.length > 1 && (
                   <>
@@ -213,6 +292,32 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
                   </>
                 )}
               </div>
+              {isSaving ? (
+                <p className="text-center text-sm text-muted-foreground">
+                  저장 중...
+                </p>
+              ) : (
+                <div className="flex items-center justify-center gap-6">
+                  <button
+                    type="button"
+                    onClick={() => setRotation((r) => (r - 90 + 360) % 360)}
+                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+                    aria-label="반시계 방향 회전"
+                  >
+                    <RotateCcw className="size-4" />
+                    반시계
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRotation((r) => (r + 90) % 360)}
+                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+                    aria-label="시계 방향 회전"
+                  >
+                    <RotateCw className="size-4" />
+                    시계 방향
+                  </button>
+                </div>
+              )}
             </>
           )}
         </DialogContent>
