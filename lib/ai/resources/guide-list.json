@@ -30,5 +30,12 @@
   { "guideKey": "ps", "displayName": "PS" },
   { "guideKey": "os-ns-back-pain", "displayName": "OS/NS - Back pain" },
   { "guideKey": "ey", "displayName": "EY" },
-  { "guideKey": "dt", "displayName": "DT" }
+  { "guideKey": "dt", "displayName": "DT" },
+  { "guideKey": "ol-ear-pain", "displayName": "OL - Ear pain" },
+  { "guideKey": "ol-epistaxis", "displayName": "OL - Epistaxis" },
+  {
+    "guideKey": "ol-foreign-body-neck",
+    "displayName": "OL - Foreign body in neck"
+  },
+  { "guideKey": "ol-sore-throat", "displayName": "IM/OL - Sore throat" }
 ]

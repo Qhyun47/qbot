@@ -1,0 +1,106 @@
+{
+  "templateKey": "sore-throat",
+  "cc": "Sore throat",
+  "description": "인후통 환자 EMR 상용구 템플릿",
+  "hpi_hints": "인후통 발생 시점, odynophagia/dysphagia/trismus 여부, 발열 동반 여부, URI 선행 병력, LMC 방문 및 검사 결과를 포함. 연관 감염(peritonsillar abscess, epiglottitis 등) 의심 소견이 있으면 반드시 기술.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 단, description에 '정보 없으면 (-)'라고 명시된 field는 정보 없을 때 '(-)'로 출력하라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "fields": [
+    {
+      "key": "odynophagia",
+      "label": "Odynophagia 연하통",
+      "type": "open",
+      "description": "연하통 여부 및 양상. 양성이면 '(+)' 또는 '(+, 양상 서술)', 정보 없으면 '(-)'."
+    },
+    {
+      "key": "dysphagia",
+      "label": "Dysphagia 연하곤란",
+      "type": "symptom_check",
+      "format": "Dysphagia 연하곤란: ({dysphagia})",
+      "slots": [
+        {
+          "key": "dysphagia",
+          "symptom": "Dysphagia",
+          "description": "연하곤란",
+          "default": "-"
+        }
+      ],
+      "description": "연하곤란 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "trismus",
+      "label": "Trismus 개구장애",
+      "type": "symptom_check",
+      "format": "Trismus 개구장애: ({trismus})",
+      "slots": [
+        {
+          "key": "trismus",
+          "symptom": "Trismus",
+          "description": "개구장애",
+          "default": "-"
+        }
+      ],
+      "description": "개구장애 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "dyspnea",
+      "label": "Dyspnea",
+      "type": "symptom_check",
+      "format": "Dyspnea: ({dyspnea})",
+      "slots": [
+        {
+          "key": "dyspnea",
+          "symptom": "Dyspnea",
+          "description": "호흡곤란",
+          "default": "-"
+        }
+      ],
+      "description": "호흡곤란 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "fever_chilling",
+      "label": "Fever/Chilling",
+      "type": "symptom_check",
+      "format": "Fever/Chilling({fever}/{chilling})",
+      "slots": [
+        {
+          "key": "fever",
+          "symptom": "Fever",
+          "description": "발열",
+          "default": "-"
+        },
+        {
+          "key": "chilling",
+          "symptom": "Chilling",
+          "description": "오한",
+          "default": "-"
+        }
+      ],
+      "description": "발열/오한 체크. 현재 내원 시점의 발열/오한 여부만 반영. 언급 없으면 기본값(-) 유지."
+    }
+  ],
+  "output_example": "Odynophagia 연하통: (-)\nDysphagia 연하곤란: (-)\nTrismus 개구장애: (-)\n\nDyspnea: (-)\nFever/Chilling(-/-)",
+  "pe": {
+    "fields": [
+      {
+        "key": "tonsil_swelling",
+        "label": "Tonsil swelling",
+        "default": ""
+      },
+      {
+        "key": "throat_injection",
+        "label": "Throat injection",
+        "default": ""
+      }
+    ],
+    "output_example": "Tonsil swelling : \nThroat injection :"
+  },
+  "history": {
+    "fields": [
+      { "key": "trauma_hx", "label": "Trauma Hx", "default": "" },
+      { "key": "uri_hx", "label": "URI Hx", "default": "" },
+      { "key": "past", "label": "Past Hx", "default": "" },
+      { "key": "medication", "label": "Med Hx", "default": "" }
+    ],
+    "output_example": "Trauma Hx: \nURI Hx: \nPast Hx: \nMed Hx:"
+  }
+}

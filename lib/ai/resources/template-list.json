@@ -41,6 +41,26 @@
     "category": "5. EY/OL"
   },
   {
+    "templateKey": "ear-pain",
+    "displayName": "Ear pain",
+    "category": "5. EY/OL"
+  },
+  {
+    "templateKey": "epistaxis",
+    "displayName": "Epistaxis",
+    "category": "5. EY/OL"
+  },
+  {
+    "templateKey": "fb-in-neck",
+    "displayName": "F.B in neck",
+    "category": "5. EY/OL"
+  },
+  {
+    "templateKey": "sore-throat",
+    "displayName": "Sore throat",
+    "category": "5. EY/OL"
+  },
+  {
     "templateKey": "nu-code-red",
     "displayName": "CODE RED",
     "category": "1. NU"

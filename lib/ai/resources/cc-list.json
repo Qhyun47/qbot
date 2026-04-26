@@ -1806,5 +1806,85 @@
     "guideKeys": [],
     "templateKeys": [],
     "aliasOf": "Visual field defect"
+  },
+  {
+    "cc": "Ear pain",
+    "guideKeys": [{ "key": "ol-ear-pain", "rank": 0 }],
+    "templateKeys": [{ "key": "ear-pain", "rank": 0 }]
+  },
+  {
+    "cc": "Lt. ear pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Ear pain"
+  },
+  {
+    "cc": "Rt. ear pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Ear pain"
+  },
+  {
+    "cc": "Both ear pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Ear pain"
+  },
+  {
+    "cc": "Lt. otalgia",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Ear pain"
+  },
+  {
+    "cc": "Rt. otalgia",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Ear pain"
+  },
+  {
+    "cc": "Both otalgia",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Ear pain"
+  },
+  {
+    "cc": "Epistaxis",
+    "guideKeys": [{ "key": "ol-epistaxis", "rank": 0 }],
+    "templateKeys": [{ "key": "epistaxis", "rank": 0 }]
+  },
+  {
+    "cc": "Lt. epistaxis",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Epistaxis"
+  },
+  {
+    "cc": "Rt. epistaxis",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Epistaxis"
+  },
+  {
+    "cc": "Both epistaxis",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Epistaxis"
+  },
+  {
+    "cc": "Foreign body in neck",
+    "guideKeys": [{ "key": "ol-foreign-body-neck", "rank": 0 }],
+    "templateKeys": [{ "key": "fb-in-neck", "rank": 0 }]
+  },
+  {
+    "cc": "F.B in neck",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Foreign body in neck"
+  },
+  {
+    "cc": "Sore throat",
+    "guideKeys": [{ "key": "ol-sore-throat", "rank": 0 }],
+    "templateKeys": [{ "key": "sore-throat", "rank": 0 }]
   }
 ]

@@ -1,0 +1,151 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EarPainCase",
+  "description": "귀 통증(Ear pain) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류. 아래 enum 값 중 가장 적합한 것 하나를 선택.",
+            "enum": [
+              "onset",
+              "duration",
+              "trauma_history",
+              "hearing_loss",
+              "tinnitus",
+              "otalgia",
+              "ear_fullness",
+              "ear_bleeding",
+              "ear_discharge",
+              "dizziness",
+              "outer_ear_trauma",
+              "associated_symptom",
+              "severity",
+              "prior_episode",
+              "vital_sign",
+              "uri_history",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. 카드-섹션 매핑 기준: onset/duration/trauma_history/hearing_loss/tinnitus/otalgia/ear_fullness/ear_bleeding/ear_discharge/dizziness/outer_ear_trauma → [pi, template] | severity/associated_symptom/prior_episode/vital_sign → [pi] | uri_history/past_history/medication_history/operation_history → [history] 전용 (HPI·상용구에 포함 금지)",
+            "items": {
+              "type": "string",
+              "enum": ["pi", "template", "history", "pe"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "증상 발생 시점 (예: '3일 전', '금일 오후'). 없으면 null."
+    },
+    "duration": {
+      "type": ["string", "null"],
+      "description": "증상 지속 시간 (예: '2시간', '간헐적', '지속적'). 없으면 null."
+    },
+    "trauma_history": {
+      "type": ["string", "null"],
+      "description": "귀 외상력 서술 (예: '면봉으로 쑤심', '귀 때림'). 없으면 null."
+    },
+    "hearing_loss": {
+      "type": ["boolean", "null"],
+      "description": "난청 여부. true/false/null."
+    },
+    "tinnitus": {
+      "type": ["boolean", "null"],
+      "description": "이명 여부. true/false/null."
+    },
+    "otalgia": {
+      "type": ["boolean", "null"],
+      "description": "이통 여부. true/false/null."
+    },
+    "ear_fullness": {
+      "type": ["boolean", "null"],
+      "description": "이충만감 여부. true/false/null."
+    },
+    "ear_bleeding": {
+      "type": ["boolean", "null"],
+      "description": "이출혈 여부. true/false/null."
+    },
+    "ear_discharge": {
+      "type": ["boolean", "null"],
+      "description": "이루 여부. true/false/null."
+    },
+    "dizziness": {
+      "type": ["boolean", "null"],
+      "description": "어지럼증 여부. true/false/null."
+    },
+    "outer_ear_trauma": {
+      "type": ["boolean", "null"],
+      "description": "외이 외상 여부. true/false/null."
+    },
+    "associated_symptoms": {
+      "type": ["array", "null"],
+      "description": "동반 증상 목록. 없으면 null.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "severity": {
+      "type": ["string", "null"],
+      "description": "통증 강도 표현 (예: 'NRS 7/10', 'severe', 'mild'). 없으면 null."
+    },
+    "prior_episode": {
+      "type": ["string", "null"],
+      "description": "유사 증상 과거 에피소드. 없으면 null."
+    },
+    "uri_history": {
+      "type": ["string", "null"],
+      "description": "최근 상기도 감염(URI) 이력. 없으면 null."
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록. 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록. 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. 내용 없으면 null → (-)로 출력.",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

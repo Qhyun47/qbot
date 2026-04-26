@@ -1,0 +1,133 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SoreThroatCase",
+  "description": "인후통(Sore throat) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": ["inputs", "past_history", "medication_history"],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류. 아래 enum 값 중 가장 적합한 것 하나를 선택.",
+            "enum": [
+              "onset",
+              "odynophagia",
+              "dysphagia",
+              "trismus",
+              "dyspnea",
+              "fever",
+              "chilling",
+              "uri_history",
+              "trauma_history",
+              "lmc_finding",
+              "severity",
+              "associated_symptom",
+              "prior_episode",
+              "vital_sign",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "family_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. onset/odynophagia/dysphagia/trismus/dyspnea/fever/chilling/uri_history/trauma_history/lmc_finding → [pi, template] | severity/associated_symptom/prior_episode/vital_sign → [pi] | past_history/medication_history/operation_history/family_history → [history] 전용",
+            "items": {
+              "type": "string",
+              "enum": ["pi", "template", "history", "pe"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "인후통 발생 시점 (예: '3일 전', '금일 오전'). 없으면 null."
+    },
+    "onset_character": {
+      "type": ["string", "null"],
+      "description": "발생 양상 — 'acute'(갑작스러운) 또는 'gradual'(서서히 악화). 없으면 null."
+    },
+    "odynophagia": {
+      "type": ["string", "null"],
+      "description": "연하통 여부 및 양상 (예: '찢어지듯이 아프다', '하품 시 악화'). 있으면 양상 서술, 단순 양성이면 'positive', 없으면 null."
+    },
+    "dysphagia": {
+      "type": ["boolean", "null"],
+      "description": "연하곤란 여부. true/false/null."
+    },
+    "trismus": {
+      "type": ["boolean", "null"],
+      "description": "개구장애 여부. true/false/null."
+    },
+    "dyspnea": {
+      "type": ["boolean", "null"],
+      "description": "호흡곤란 여부. true/false/null."
+    },
+    "fever": {
+      "type": ["boolean", "null"],
+      "description": "내원 시점 발열 여부. true/false/null."
+    },
+    "chilling": {
+      "type": ["boolean", "null"],
+      "description": "내원 시점 오한 여부. true/false/null."
+    },
+    "uri_history": {
+      "type": ["string", "null"],
+      "description": "URI 선행 병력 (예: '3일 전부터 cough, sputum'). 없으면 null."
+    },
+    "trauma_history": {
+      "type": ["string", "null"],
+      "description": "인후부 외상력. 없으면 null."
+    },
+    "lmc_finding": {
+      "type": ["string", "null"],
+      "description": "의원급 방문 소견 (예: '하인두농양 의심', 'epiglottic abscess r/o'). 없으면 null."
+    },
+    "severity": {
+      "type": ["string", "null"],
+      "description": "증상 강도 표현 (예: 'NRS 7/10', 'severe'). 없으면 null."
+    },
+    "associated_symptoms": {
+      "type": ["array", "null"],
+      "description": "동반 증상 목록 (예: headache, cough, sputum, rhinorrhea 등). 없으면 null.",
+      "items": { "type": "string" }
+    },
+    "prior_episode": {
+      "type": ["string", "null"],
+      "description": "유사 증상 과거 에피소드. 없으면 null."
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록. 내용 없으면 null → (-)로 출력.",
+      "items": { "type": "string" }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록. 내용 없으면 null → (-)로 출력.",
+      "items": { "type": "string" }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. 내용 없으면 null → (-)로 출력.",
+      "items": { "type": "string" }
+    }
+  }
+}

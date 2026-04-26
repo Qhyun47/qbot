@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EpistaxisCase",
+  "description": "코피(Epistaxis) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류.",
+            "enum": [
+              "onset",
+              "duration",
+              "amount",
+              "side",
+              "bleeding_direction",
+              "nose_trauma_hx",
+              "uri_sx",
+              "prior_episode",
+              "initial_bp",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "bleeding_tendency",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. onset/duration/amount/side/bleeding_direction/nose_trauma_hx/uri_sx → [pi, template] | prior_episode → [pi] | initial_bp/past_history/medication_history/operation_history/bleeding_tendency → [history]",
+            "items": {
+              "type": "string",
+              "enum": ["pi", "template", "history"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "출혈 발생 시점 (예: '09.30', '금일 17:00'). 없으면 null."
+    },
+    "duration": {
+      "type": ["string", "null"],
+      "description": "출혈 지속 시간 (예: '20분', '2시간', '지속'). 없으면 null."
+    },
+    "amount": {
+      "type": ["string", "null"],
+      "description": "출혈량 (예: '종이컵 반컵', '소주잔 3잔'). 없으면 null."
+    },
+    "side": {
+      "type": ["string", "null"],
+      "description": "출혈 시작 측. 'Rt', 'Lt', 'Both' 중 하나. 없으면 null."
+    },
+    "bleeding_direction": {
+      "type": ["string", "null"],
+      "description": "출혈 방향. 'anterior'(앞으로 나옴), 'posterior'(목 뒤로 넘어감), 'both'(앞으로 나오다가 뒤로 넘어감). 없으면 null."
+    },
+    "nose_trauma_hx": {
+      "type": ["boolean", "null"],
+      "description": "코 외상력 여부. true/false/null."
+    },
+    "uri_sx": {
+      "type": ["boolean", "null"],
+      "description": "최근 상기도 감염 증상 여부. true/false/null."
+    },
+    "uri_sx_detail": {
+      "type": ["string", "null"],
+      "description": "URI 증상 상세 내용 (예: 'sore throat', '콧물/코막힘/재채기'). 없으면 null."
+    },
+    "prior_episode": {
+      "type": ["string", "null"],
+      "description": "과거 코피 발생 이력 및 치료 경과. 없으면 null."
+    },
+    "initial_bp": {
+      "type": ["string", "null"],
+      "description": "내원 당시 혈압 (예: '160/100'). 없으면 null."
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록 (예: ['HTN', 'DM']). 없으면 null.",
+      "items": { "type": "string" }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록. 없으면 null.",
+      "items": { "type": "string" }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. 없으면 null.",
+      "items": { "type": "string" }
+    },
+    "bleeding_tendency": {
+      "type": ["string", "null"],
+      "description": "출혈 경향 관련 약물 또는 상태 (예: '75mg PlatLess', 'Astrix'). 없으면 null."
+    }
+  }
+}

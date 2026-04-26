@@ -1,0 +1,240 @@
+{
+  "templateKey": "ear-pain",
+  "cc": "Ear pain",
+  "description": "귀 통증 환자 EMR 상용구 템플릿",
+  "hpi_hints": "외상력(trauma history) 및 이출혈, 이루, 난청, 이명 여부를 반드시 포함.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "fields": [
+    {
+      "key": "trauma_hx",
+      "label": "Trauma Hx",
+      "type": "open",
+      "description": "귀에 대한 외상력 서술 (예: '면봉으로 쑤심', '귀 때림'). 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "hearing_loss_tinnitus",
+      "label": "Hearing loss/Tinnitus",
+      "type": "symptom_check",
+      "format": "Hearing loss/Tinnitus({hearing_loss}/{tinnitus})",
+      "slots": [
+        {
+          "key": "hearing_loss",
+          "symptom": "Hearing loss",
+          "description": "난청",
+          "default": "-"
+        },
+        {
+          "key": "tinnitus",
+          "symptom": "Tinnitus",
+          "description": "이명",
+          "default": "-"
+        }
+      ],
+      "description": "난청/이명 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "otalgia",
+      "label": "Otalgia",
+      "type": "symptom_check",
+      "format": "Otalgia({otalgia})",
+      "slots": [
+        {
+          "key": "otalgia",
+          "symptom": "Otalgia",
+          "description": "이통",
+          "default": "-"
+        }
+      ],
+      "description": "이통 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "ear_fullness_bleeding_discharge",
+      "label": "Ear fullness/Ear bleeding/Ear discharge",
+      "type": "symptom_check",
+      "format": "Ear fullness/Ear bleeding/Ear discharge({ear_fullness}/{ear_bleeding}/{ear_discharge})",
+      "slots": [
+        {
+          "key": "ear_fullness",
+          "symptom": "Ear fullness",
+          "description": "이충만감",
+          "default": "-"
+        },
+        {
+          "key": "ear_bleeding",
+          "symptom": "Ear bleeding",
+          "description": "이출혈",
+          "default": "-"
+        },
+        {
+          "key": "ear_discharge",
+          "symptom": "Ear discharge",
+          "description": "이루",
+          "default": "-"
+        }
+      ],
+      "description": "이충만감/이출혈/이루 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "asso_sx",
+      "label": "Asso. Sx.",
+      "type": "open",
+      "description": "동반 증상 서술형. symptom_check로 분리된 항목 외 추가 동반 증상. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "dizziness",
+      "label": "Dizzness",
+      "type": "symptom_check",
+      "format": "Dizzness({dizziness})",
+      "slots": [
+        {
+          "key": "dizziness",
+          "symptom": "Dizziness",
+          "description": "어지럼증",
+          "default": "-"
+        }
+      ],
+      "description": "어지럼증 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "outer_ear_tr",
+      "label": "Outer ear Tr",
+      "type": "symptom_check",
+      "format": "Outer ear Tr({outer_ear_tr})",
+      "slots": [
+        {
+          "key": "outer_ear_tr",
+          "symptom": "Outer ear trauma",
+          "description": "외이 외상",
+          "default": "-"
+        }
+      ],
+      "description": "외이 외상 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "redness_swelling",
+      "label": "Redness/Swelling",
+      "type": "symptom_check",
+      "format": "Redness({redness})/Swelling({swelling})",
+      "slots": [
+        {
+          "key": "redness",
+          "symptom": "Redness",
+          "description": "발적",
+          "default": "-"
+        },
+        {
+          "key": "swelling",
+          "symptom": "Swelling",
+          "description": "부종",
+          "default": "-"
+        }
+      ],
+      "description": "발적/부종 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "fever_chill",
+      "label": "F/C",
+      "type": "symptom_check",
+      "format": "F/C({fever}/{chill})",
+      "slots": [
+        {
+          "key": "fever",
+          "symptom": "Fever",
+          "description": "발열",
+          "default": "-"
+        },
+        {
+          "key": "chill",
+          "symptom": "Chill",
+          "description": "오한",
+          "default": "-"
+        }
+      ],
+      "description": "발열/오한 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "cough_sputum_rhinorrhea",
+      "label": "C/S/R",
+      "type": "symptom_check",
+      "format": "C/S/R({cough}/{sputum}/{rhinorrhea})",
+      "slots": [
+        {
+          "key": "cough",
+          "symptom": "Cough",
+          "description": "기침",
+          "default": "-"
+        },
+        {
+          "key": "sputum",
+          "symptom": "Sputum",
+          "description": "가래",
+          "default": "-"
+        },
+        {
+          "key": "rhinorrhea",
+          "symptom": "Rhinorrhea",
+          "description": "콧물",
+          "default": "-"
+        }
+      ],
+      "description": "기침/가래/콧물 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "anvdc",
+      "label": "A/N/V/D/C",
+      "type": "symptom_check",
+      "format": "A/N/V/D/C({anorexia}/{nausea}/{vomiting}/{diarrhea}/{constipation})",
+      "slots": [
+        {
+          "key": "anorexia",
+          "symptom": "Anorexia",
+          "description": "식욕부진",
+          "default": "-"
+        },
+        {
+          "key": "nausea",
+          "symptom": "Nausea",
+          "description": "구역",
+          "default": "-"
+        },
+        {
+          "key": "vomiting",
+          "symptom": "Vomiting",
+          "description": "구토",
+          "default": "-"
+        },
+        {
+          "key": "diarrhea",
+          "symptom": "Diarrhea",
+          "description": "설사",
+          "default": "-"
+        },
+        {
+          "key": "constipation",
+          "symptom": "Constipation",
+          "description": "변비",
+          "default": "-"
+        }
+      ],
+      "description": "식욕부진/구역/구토/설사/변비 체크. 언급 없으면 기본값(-) 유지."
+    }
+  ],
+  "output_example": "Trauma Hx:\nHearing loss/Tinnitus(-/-) Otalgia(-)\nEar fullness/Ear bleeding/Ear discharge(-/-/-)\n\nAsso. Sx: \n\nDizzness(-) Outer ear Tr(-)/ Redness(-)/Swelling(-)\nF/C(-/-)  C/S/R(-/-/-)  A/N/V/D/C(-/-/-/-/-)",
+  "pe": {
+    "fields": [
+      { "key": "outer_ear_tr", "label": "Outer ear Tr", "default": "(-)" },
+      { "key": "redness", "label": "Redness", "default": "(-)" },
+      { "key": "swelling", "label": "Swelling", "default": "(-)" }
+    ],
+    "output_example": "Outer ear Tr(-)\nRedness(-)\nSwelling(-)"
+  },
+  "history": {
+    "fields": [
+      { "key": "uri_hx", "label": "URI Hx", "default": "" },
+      { "key": "past", "label": "Past Hx", "default": "" },
+      { "key": "medication", "label": "Med Hx", "default": "" },
+      { "key": "operation", "label": "Op Hx", "default": "" }
+    ],
+    "output_example": "URI Hx: \nPast Hx: \nMed Hx: \nOp Hx: "
+  }
+}
