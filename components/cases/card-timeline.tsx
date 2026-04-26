@@ -79,7 +79,7 @@ export function CardTimeline({
         </p>
         {!readOnly && (
           <p className="text-xs text-muted-foreground">
-            아래 입력창에 문진 키워드를 입력하세요.
+            아래 입력창에 문진 정보를 입력하세요.
           </p>
         )}
       </div>

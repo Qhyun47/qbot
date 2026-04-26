@@ -16,11 +16,10 @@
 - 정보가 없는 항목은 양식 그대로 유지합니다 (빈 줄, 기본값 모두 포함)
 - Alcohol / Smoking: 언급된 경우에만 채웁니다. 양(예: soju 1bottle/day), 기간, 금주 여부 등 구체적 내용 기재
 - Family history: 언급된 경우에만 기본값을 교체합니다. 언급 없으면 반드시 기본값 그대로 유지
-- 'HTN, DM → med 복용'과 같이 과거력과 복약 여부를 함께 기재한 경우: Past Hx에는 진단명(HTN, DM)을, Med Hx에는 해당 복약(HTN med, DM med)을 기입합니다. 정확한 약제명이 없으면 '{진단명} med' 형식을 사용합니다.
+- Past Hx의 진단명과 동일한 표기로 Med Hx를 기입합니다 (예: Past Hx: HTN → Med Hx: HTN med). 정확한 약제명 없이 복약 여부만 확인된 경우 반드시 '{Past Hx 병명 그대로} med' 형식을 사용합니다. "HTN medication", "고혈압 약", "Hypertension med"(Past Hx가 HTN인 경우) 형태는 금지입니다.
 - 입력 정보 중 historyTemplate에 해당 항목이 없는 내용(예: Family history 항목이 없는 템플릿에서 가족력이 입력된 경우)은 출력 맨 아래에 추가합니다
   예: `Family Hx: Breast ca.(모)`
-- 한국어로 입력된 병력은 번역하지 않고 원문 그대로 사용합니다
-- 진단명, 약제명은 영어 의학 표기를 우선합니다
+- 병력 배열(past_history, medication_history)에 이미 정규화된 표기가 담겨 있습니다. 해당 표기를 그대로 사용하세요 — 약어를 풀네임으로 바꾸거나 반대로 줄이지 마세요
 
 ## 절대 금지 사항
 

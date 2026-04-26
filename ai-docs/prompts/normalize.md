@@ -68,6 +68,24 @@ From cards categorized as past_history / medication_history / operation_history 
 - "Op -" or similar negatives → empty array [] or null depending on context.
 - Multiple items in one card → split into separate strings.
 
+## History Name Formatting Rules
+
+When extracting past_history and medication_history items, apply the following naming rules:
+
+**Condition name format:**
+
+- If the user wrote an abbreviation (e.g., HTN, DM, AF) → keep exactly as written: "HTN"
+- If the user wrote a full English name (e.g., Hypertension, Atrial Fibrillation) → keep exactly as written: "Hypertension"
+- If the user wrote in Korean (e.g., 고혈압, 당뇨) → convert to the commonly used English form (typically the abbreviation if one exists): "HTN", "DM"
+- Never expand abbreviations or contract full names — preserve the user's chosen notation (or convert Korean → English as above)
+
+**Medication history format (for condition-linked medications):**
+
+- When a card indicates the patient is on medication for a specific condition, record it as: `{same condition name as in past_history} med`
+- The condition name in medication_history must match the form used in past_history exactly
+- Do NOT use: "HTN medication", "고혈압 약", "Hypertension med" (if past_history entry is "HTN")
+- Do NOT use: full name expansion or Korean when the past_history entry is an abbreviation
+
 ## Input Format
 
 You will receive a JSON object:

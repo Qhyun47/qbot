@@ -159,15 +159,13 @@ async function CaseContent({
         </div>
         <StatusBadge status={status} />
         <RegenerateButton caseId={caseData.id} />
-        {status === "completed" && result && (
-          <MedicationTriggerButton
-            caseId={caseData.id}
-            currentHistory={result.history_edited ?? result.history_draft ?? ""}
-            defaultPastHx={extractPastHx(
-              result.history_edited ?? result.history_draft ?? ""
-            )}
-          />
-        )}
+        <MedicationTriggerButton
+          caseId={caseData.id}
+          currentHistory={result?.history_edited ?? result?.history_draft ?? ""}
+          defaultPastHx={extractPastHx(
+            result?.history_edited ?? result?.history_draft ?? ""
+          )}
+        />
       </header>
 
       {/* 본문: 차팅 결과 영역 */}
@@ -234,7 +232,7 @@ async function CaseContent({
 
         <div className="flex flex-col gap-2 pb-4 pt-4">
           <h2 className="text-sm font-semibold text-muted-foreground">
-            문진 키워드
+            문진 정보
           </h2>
           <CardInputSection
             caseId={caseData.id}
