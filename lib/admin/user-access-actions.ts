@@ -62,7 +62,7 @@ export async function approveServiceAccess(
 
   const supabase = await createClient();
   const { error } = await supabase
-    .from("profiles")
+    .from("service_access_requests")
     .update({ service_access_status: "approved" })
     .eq("id", userId);
 
@@ -80,7 +80,7 @@ export async function approveServiceAccessAiExcluded(
 
   const supabase = await createClient();
   const { error } = await supabase
-    .from("profiles")
+    .from("service_access_requests")
     .update({ service_access_status: "ai_excluded" })
     .eq("id", userId);
 
@@ -98,7 +98,7 @@ export async function denyServiceAccess(
 
   const supabase = await createClient();
   const { error } = await supabase
-    .from("profiles")
+    .from("service_access_requests")
     .update({ service_access_status: "denied" })
     .eq("id", userId);
 
@@ -116,7 +116,7 @@ export async function holdServiceAccess(
 
   const supabase = await createClient();
   const { error } = await supabase
-    .from("profiles")
+    .from("service_access_requests")
     .update({ service_access_status: "held" })
     .eq("id", userId);
 
@@ -135,7 +135,7 @@ export async function updateServiceAccessStatus(
 
   const supabase = await createClient();
   const { error } = await supabase
-    .from("profiles")
+    .from("service_access_requests")
     .update({ service_access_status: status })
     .eq("id", userId);
 

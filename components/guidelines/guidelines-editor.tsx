@@ -245,7 +245,10 @@ export function GuidelinesEditor({
           <SelectTrigger id="guide-select" className="w-full max-w-sm">
             <SelectValue placeholder="가이드라인을 선택하세요" />
           </SelectTrigger>
-          <SelectContent position="popper">
+          <SelectContent
+            position="popper"
+            className="max-h-[min(360px,var(--radix-select-content-available-height))] overflow-y-auto"
+          >
             {guideList.map((item) => (
               <SelectItem key={item.guideKey} value={item.guideKey}>
                 {item.displayName}
