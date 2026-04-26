@@ -129,5 +129,10 @@
     "templateKey": "og-basic",
     "displayName": "OG 기본",
     "category": "4. OG"
+  },
+  {
+    "templateKey": "di",
+    "displayName": "DI",
+    "category": "8. DI"
   }
 ]

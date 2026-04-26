@@ -29,5 +29,6 @@
   },
   { "guideKey": "ps", "displayName": "PS" },
   { "guideKey": "os-ns-back-pain", "displayName": "OS/NS - Back pain" },
-  { "guideKey": "ey", "displayName": "EY" }
+  { "guideKey": "ey", "displayName": "EY" },
+  { "guideKey": "dt", "displayName": "DT" }
 ]

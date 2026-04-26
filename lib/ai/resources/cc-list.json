@@ -80,7 +80,10 @@
       { "key": "im-basic", "rank": 0 },
       { "key": "drug-intoxication", "rank": 1 }
     ],
-    "templateKeys": [{ "key": "im-basic", "rank": 0 }]
+    "templateKeys": [
+      { "key": "im-basic", "rank": 0 },
+      { "key": "di", "rank": 1 }
+    ]
   },
   {
     "cc": "Vomiting",
@@ -89,7 +92,10 @@
       { "key": "drug-intoxication", "rank": 1 },
       { "key": "pd-fever-vomiting", "rank": 2 }
     ],
-    "templateKeys": [{ "key": "im-basic", "rank": 0 }]
+    "templateKeys": [
+      { "key": "im-basic", "rank": 0 },
+      { "key": "di", "rank": 1 }
+    ]
   },
   {
     "cc": "Diarrhea",
@@ -366,7 +372,8 @@
     "templateKeys": [
       { "key": "nu-code-red", "rank": 0 },
       { "key": "mental-change", "rank": 1 },
-      { "key": "loc-ro-seizure", "rank": 2 }
+      { "key": "loc-ro-seizure", "rank": 2 },
+      { "key": "di", "rank": 3 }
     ]
   },
   {
@@ -378,7 +385,10 @@
   {
     "cc": "Anxiety",
     "guideKeys": [{ "key": "pc", "rank": 0 }],
-    "templateKeys": [{ "key": "pc-hx", "rank": 0 }]
+    "templateKeys": [
+      { "key": "pc-hx", "rank": 0 },
+      { "key": "di", "rank": 1 }
+    ]
   },
   {
     "cc": "Panic attack",
@@ -446,7 +456,10 @@
       { "key": "drug-intoxication", "rank": 0 },
       { "key": "pc", "rank": 1 }
     ],
-    "templateKeys": [{ "key": "pc-hx", "rank": 1 }]
+    "templateKeys": [
+      { "key": "di", "rank": 0 },
+      { "key": "pc-hx", "rank": 1 }
+    ]
   },
   {
     "cc": "Wrist laceration",
