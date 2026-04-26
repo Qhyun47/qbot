@@ -1,0 +1,191 @@
+{
+  "templateKey": "ur",
+  "cc": "UR",
+  "description": "비뇨기과(UR) 환자 EMR 상용구 템플릿",
+  "hpi_hints": "혈뇨의 경우 색깔, 양상(지속적/간헐적), 양, 배뇨 중 위치(처음/중간/끝) 포함. 고환 통증의 경우 발생 시각과 상황 포함. 최근 URI 이력 반드시 확인.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "fields": [
+    {
+      "key": "fever_chill",
+      "label": "F/C",
+      "type": "symptom_check",
+      "format": "F/C({fever}/{chill})",
+      "slots": [
+        {
+          "key": "fever",
+          "symptom": "Fever",
+          "description": "발열",
+          "default": "-"
+        },
+        {
+          "key": "chill",
+          "symptom": "Chill",
+          "description": "오한",
+          "default": "-"
+        }
+      ],
+      "description": "발열/오한 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "csr_uri",
+      "label": "C/S/R + 최근URI",
+      "type": "symptom_check",
+      "format": "C/S/R({cough}/{sputum}/{rhinorrhea}) 최근URI ({recent_uri})",
+      "slots": [
+        {
+          "key": "cough",
+          "symptom": "Cough",
+          "description": "기침",
+          "default": "-"
+        },
+        {
+          "key": "sputum",
+          "symptom": "Sputum",
+          "description": "가래",
+          "default": "-"
+        },
+        {
+          "key": "rhinorrhea",
+          "symptom": "Rhinorrhea",
+          "description": "콧물",
+          "default": "-"
+        },
+        {
+          "key": "recent_uri",
+          "symptom": "Recent URI",
+          "description": "최근 상기도감염 이력. 명시적 언급 있을 때만 '+'.",
+          "default": "-"
+        }
+      ],
+      "description": "기침/가래/콧물/최근URI 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "anvdc",
+      "label": "A/N/V/D/C",
+      "type": "symptom_check",
+      "format": "A/N/V/D/C({anorexia}/{nausea}/{vomiting}/{diarrhea}/{constipation})",
+      "slots": [
+        {
+          "key": "anorexia",
+          "symptom": "Anorexia",
+          "description": "식욕부진",
+          "default": "-"
+        },
+        {
+          "key": "nausea",
+          "symptom": "Nausea",
+          "description": "구역",
+          "default": "-"
+        },
+        {
+          "key": "vomiting",
+          "symptom": "Vomiting",
+          "description": "구토",
+          "default": "-"
+        },
+        {
+          "key": "diarrhea",
+          "symptom": "Diarrhea",
+          "description": "설사",
+          "default": "-"
+        },
+        {
+          "key": "constipation",
+          "symptom": "Constipation",
+          "description": "변비",
+          "default": "-"
+        }
+      ],
+      "description": "식욕부진/구역/구토/설사/변비 체크. 언급 없으면 기본값(-) 유지."
+    },
+    {
+      "key": "urinary_symptom",
+      "label": "Urinary symptom",
+      "type": "symptom_check",
+      "format": "Urinary symptom: F/U/N/D({frequency}/{urgency}/{nocturia}/{dysuria}) , Gross hematuria({gross_hematuria})",
+      "slots": [
+        {
+          "key": "frequency",
+          "symptom": "Frequency",
+          "description": "빈뇨",
+          "default": "-"
+        },
+        {
+          "key": "urgency",
+          "symptom": "Urgency",
+          "description": "절박뇨",
+          "default": "-"
+        },
+        {
+          "key": "nocturia",
+          "symptom": "Nocturia",
+          "description": "야간뇨",
+          "default": "-"
+        },
+        {
+          "key": "dysuria",
+          "symptom": "Dysuria",
+          "description": "배뇨통",
+          "default": "-"
+        },
+        {
+          "key": "gross_hematuria",
+          "symptom": "Gross hematuria",
+          "description": "육안적 혈뇨. 양성이면 색깔·양상·양 등 세부사항 포함 가능 (예: '+, pinkish, 소주잔 1-2잔 분량').",
+          "default": "-"
+        }
+      ],
+      "description": "비뇨기 증상 체크. F=빈뇨, U=절박뇨, N=야간뇨, D=배뇨통. Gross hematuria는 양성 시 세부 서술 포함."
+    },
+    {
+      "key": "voiding_difficulty",
+      "label": "Voiding difficulty",
+      "type": "open",
+      "description": "배뇨곤란 여부 및 세부 사항. 음성이면 '(-)', 양성이면 발생 시각(몇시부터), 마지막 소변 시각, Foley 삽입 후 initial urine 양을 포함하여 서술."
+    },
+    {
+      "key": "npo",
+      "label": "NPO",
+      "type": "open",
+      "description": "금식 시작 시각. 'NPO: Solid - [시각]\\n    Liquid - [시각]' 형식으로 기재. 정보 없으면 시각란 공란."
+    }
+  ],
+  "output_example": "F/C(-/-)  C/S/R(-/-/-) 최근URI (-)  \nA/N/V/D/C(-/-/-/-/-) \nUrinary symptom: F/U/N/D(-/-/-/-) , Gross hematuria(-)\nVoiding difficulty(-): $몇시부터, 마지막 소변 언제, Foley 꽂은 후 꼭 initial urine 양 차팅하기.\n\nNPO: Solid - \n    Liquid - ",
+  "pe": {
+    "fields": [
+      { "key": "abd_td", "label": "Abd Td/rTd", "default": "(-/-)" },
+      {
+        "key": "abd_distension",
+        "label": "Abdominal distension",
+        "default": "(-)"
+      },
+      { "key": "cvat", "label": "CVAT", "default": "(-)" },
+      { "key": "scrotal_pain", "label": "Scrotal pain", "default": "" },
+      {
+        "key": "scrotal_srt",
+        "label": "Scrotal swelling/redness/Td",
+        "default": "(-/-/-)"
+      },
+      {
+        "key": "cremasteric_reflex",
+        "label": "Cremasteric reflex",
+        "default": "(+)"
+      },
+      { "key": "prehn_sign", "label": "Prehn's sign", "default": "(-)" },
+      {
+        "key": "transillumination",
+        "label": "Transillumination test",
+        "default": "(-)"
+      }
+    ],
+    "output_example": "Abd Td/rTd(-/-)\nAbdominal distension (-)\nCVAT(-)\n\nScrotal pain: $몇시부터, 어떤 상황에서\nScrotal swelling/redness/Td(-/-/-)\nCremasteric reflex(+) #-> 정상이면 (+)\nPrehn's sign (-) #-> 음낭 거상시 통증완화되면 (+)\nTransillumination test (-) #-> 빛이 음낭을 통과하면 (+)"
+  },
+  "history": {
+    "fields": [
+      { "key": "past", "label": "P.Hx.", "default": "" },
+      { "key": "medication", "label": "Med. Hx.", "default": "" },
+      { "key": "operation", "label": "OP Hx.", "default": "" }
+    ],
+    "output_example": "- P.Hx.:\n- Med. Hx.:\n- OP Hx.:"
+  }
+}

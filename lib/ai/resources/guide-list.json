@@ -37,5 +37,9 @@
     "guideKey": "ol-foreign-body-neck",
     "displayName": "OL - Foreign body in neck"
   },
-  { "guideKey": "ol-sore-throat", "displayName": "IM/OL - Sore throat" }
+  { "guideKey": "ol-sore-throat", "displayName": "IM/OL - Sore throat" },
+  { "guideKey": "dm-urticaria", "displayName": "DM - Urticaria" },
+  { "guideKey": "dm-skin-lesion", "displayName": "DM - 피부병변" },
+  { "guideKey": "peg", "displayName": "PEG" },
+  { "guideKey": "ur", "displayName": "UR" }
 ]

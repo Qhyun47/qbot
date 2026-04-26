@@ -23,10 +23,8 @@
 C.C. 등록 시 연결하려 했으나 해당 guideKey가 아직 존재하지 않는 항목입니다.
 가이드라인이 등록될 때 이 섹션을 확인합니다.
 
-| C.C.      | 대기 중인 guideKey | displayName    | rank | 등록일     |
-| --------- | ------------------ | -------------- | ---- | ---------- |
-| Urticaria | dm-urticaria       | DM - Urticaria |      | 2026-04-24 |
-| Skin rash | dm-urticaria       | DM - Urticaria |      | 2026-04-24 |
+| C.C. | 대기 중인 guideKey | displayName | rank | 등록일 |
+| ---- | ------------------ | ----------- | ---- | ------ |
 
 ---
 

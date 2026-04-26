@@ -151,12 +151,21 @@
   },
   {
     "cc": "Urticaria",
-    "guideKeys": [],
-    "templateKeys": [{ "key": "urticaria", "rank": 0 }]
+    "guideKeys": [
+      { "key": "dm-urticaria", "rank": 0 },
+      { "key": "dm-skin-lesion", "rank": 1 }
+    ],
+    "templateKeys": [
+      { "key": "urticaria", "rank": 0 },
+      { "key": "skin-lesion", "rank": 1 }
+    ]
   },
   {
     "cc": "Skin rash",
-    "guideKeys": [],
+    "guideKeys": [
+      { "key": "dm-skin-lesion", "rank": 1 },
+      { "key": "dm-urticaria", "rank": 2 }
+    ],
     "templateKeys": [
       { "key": "skin-lesion", "rank": 1 },
       { "key": "urticaria", "rank": 2 }
@@ -1886,5 +1895,110 @@
     "cc": "Sore throat",
     "guideKeys": [{ "key": "ol-sore-throat", "rank": 0 }],
     "templateKeys": [{ "key": "sore-throat", "rank": 0 }]
+  },
+  {
+    "cc": "Hematuria",
+    "guideKeys": [{ "key": "ur", "rank": 0 }],
+    "templateKeys": [{ "key": "ur", "rank": 0 }]
+  },
+  {
+    "cc": "Voiding difficulty",
+    "guideKeys": [{ "key": "ur", "rank": 0 }],
+    "templateKeys": [{ "key": "ur", "rank": 0 }]
+  },
+  {
+    "cc": "Testicular pain",
+    "guideKeys": [{ "key": "ur", "rank": 0 }],
+    "templateKeys": [{ "key": "ur", "rank": 0 }]
+  },
+  {
+    "cc": "Lt. testicular pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Testicular pain"
+  },
+  {
+    "cc": "Rt. testicular pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Testicular pain"
+  },
+  {
+    "cc": "Both testicular pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Testicular pain"
+  },
+  {
+    "cc": "Scrotal pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Testicular pain"
+  },
+  {
+    "cc": "Lt. scrotal pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Testicular pain"
+  },
+  {
+    "cc": "Rt. scrotal pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Testicular pain"
+  },
+  {
+    "cc": "Penis pain",
+    "guideKeys": [{ "key": "ur", "rank": 0 }],
+    "templateKeys": [{ "key": "ur", "rank": 0 }]
+  },
+  {
+    "cc": "Flank pain",
+    "guideKeys": [
+      { "key": "ur", "rank": 0 },
+      { "key": "abdominal-pain", "rank": 1 }
+    ],
+    "templateKeys": [
+      { "key": "ur", "rank": 0 },
+      { "key": "abdominal-pain", "rank": 1 }
+    ]
+  },
+  {
+    "cc": "Lt. flank pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Flank pain"
+  },
+  {
+    "cc": "Rt. flank pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Flank pain"
+  },
+  {
+    "cc": "Both flank pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Flank pain"
+  },
+  {
+    "cc": "Priapism",
+    "guideKeys": [{ "key": "ur", "rank": 0 }],
+    "templateKeys": [{ "key": "ur", "rank": 0 }]
+  },
+  {
+    "cc": "Paraphimosis",
+    "guideKeys": [{ "key": "ur", "rank": 0 }],
+    "templateKeys": [{ "key": "ur", "rank": 0 }]
+  },
+  {
+    "cc": "Cardiac arrest",
+    "guideKeys": [],
+    "templateKeys": [{ "key": "cardiac-arrest", "rank": 0 }]
+  },
+  {
+    "cc": "Risk for self directed violence",
+    "guideKeys": [{ "key": "pc", "rank": 0 }],
+    "templateKeys": [{ "key": "pc-hx", "rank": 0 }]
   }
 ]

@@ -36,6 +36,11 @@
     "category": "0. IM"
   },
   {
+    "templateKey": "ur",
+    "displayName": "UR",
+    "category": "6. UR"
+  },
+  {
     "templateKey": "ey",
     "displayName": "EY",
     "category": "5. EY/OL"
@@ -154,5 +159,10 @@
     "templateKey": "di",
     "displayName": "DI",
     "category": "8. DI"
+  },
+  {
+    "templateKey": "cardiac-arrest",
+    "displayName": "Cardiac arrest",
+    "category": "13. Cardiac arrest"
   }
 ]

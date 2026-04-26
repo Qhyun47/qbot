@@ -1,0 +1,101 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CardiacArrestCase",
+  "description": "심정지(Cardiac arrest) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류.",
+            "enum": [
+              "report_reason_time",
+              "bystander_cpr",
+              "ems_arrival_time",
+              "initial_ecg_rhythm",
+              "defibrillation_count",
+              "cpr_count_duration",
+              "epi_count",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. report_reason_time/bystander_cpr/ems_arrival_time/initial_ecg_rhythm/defibrillation_count/cpr_count_duration/epi_count → [pi, template] | past_history/medication_history/operation_history → [history] 전용",
+            "items": {
+              "type": "string",
+              "enum": ["pi", "template", "history"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "report_reason_time": {
+      "type": ["string", "null"],
+      "description": "신고 이유와 신고 시각. 없으면 null."
+    },
+    "bystander_cpr": {
+      "type": ["string", "null"],
+      "description": "목격자 CPR 시행 여부. 없으면 null."
+    },
+    "ems_arrival_time": {
+      "type": ["string", "null"],
+      "description": "119 구급대 현장 도착 시각. 없으면 null."
+    },
+    "initial_ecg_rhythm": {
+      "type": ["string", "null"],
+      "description": "최초 확인된 심전도 리듬 (예: VF, PEA, Asystole). 없으면 null."
+    },
+    "defibrillation_count": {
+      "type": ["string", "null"],
+      "description": "shockable rhythm 시 제세동 횟수. 없으면 null."
+    },
+    "cpr_count_duration": {
+      "type": ["string", "null"],
+      "description": "CPR 시행 횟수 및 총 소요 시간. 없으면 null."
+    },
+    "epi_count": {
+      "type": ["string", "null"],
+      "description": "에피네프린 투여 횟수. 없으면 null."
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록. 없으면 null.",
+      "items": { "type": "string" }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록. 없으면 null.",
+      "items": { "type": "string" }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. 없으면 null.",
+      "items": { "type": "string" }
+    }
+  }
+}
