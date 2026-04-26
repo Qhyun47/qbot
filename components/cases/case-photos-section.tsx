@@ -77,11 +77,13 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
   );
   const [viewingIndex, setViewingIndex] = useState<number | null>(null);
   const [rotation, setRotation] = useState(0);
-  const [isSaving, setIsSaving] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [savingPhotoId, setSavingPhotoId] = useState<string | null>(null);
   const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     setRotation(0);
+    setIsDownloading(false);
   }, [viewingIndex]);
 
   useEffect(() => {
@@ -95,25 +97,31 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
   const normalizedRotation = ((rotation % 360) + 360) % 360;
 
   const handleLightboxDownload = async () => {
-    if (!viewingPhoto?.url) return;
-    if (normalizedRotation !== 0 && imgRef.current) {
-      const blob = await createRotatedBlob(imgRef.current, normalizedRotation);
-      const blobUrl = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = blobUrl;
-      a.download = viewingPhoto.file_name;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(blobUrl);
-    } else {
-      await triggerDownload(viewingPhoto);
+    if (!viewingPhoto?.url || isDownloading) return;
+    setIsDownloading(true);
+    try {
+      if (normalizedRotation !== 0 && imgRef.current) {
+        const blob = await createRotatedBlob(
+          imgRef.current,
+          normalizedRotation
+        );
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = viewingPhoto.file_name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+      } else {
+        await triggerDownload(viewingPhoto);
+      }
+    } finally {
+      setIsDownloading(false);
     }
   };
 
-  const saveRotatedPhoto = async (photo: CasePhotoWithUrl) => {
-    if (!imgRef.current) return;
-    const blob = await createRotatedBlob(imgRef.current, normalizedRotation);
+  const uploadRotatedBlob = async (photo: CasePhotoWithUrl, blob: Blob) => {
     const formData = new FormData();
     formData.append(
       "file",
@@ -177,8 +185,13 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
               size="sm"
               className="gap-1.5 text-xs text-muted-foreground"
               onClick={handleDownloadAll}
+              disabled={savingPhotoId !== null}
             >
-              <DownloadCloud className="size-3.5" />
+              {savingPhotoId !== null ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <DownloadCloud className="size-3.5" />
+              )}
               모두 다운로드
             </Button>
           )}
@@ -209,6 +222,11 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
                 ) : (
                   <div className="h-full w-full rounded-md bg-muted" />
                 )}
+                {savingPhotoId === photo.id && (
+                  <div className="absolute inset-0 flex items-center justify-center rounded-md bg-black/40">
+                    <Loader2 className="size-6 animate-spin text-white" />
+                  </div>
+                )}
                 <button
                   type="button"
                   onClick={() => setDeleteTarget(photo)}
@@ -221,10 +239,15 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
                   <button
                     type="button"
                     onClick={() => triggerDownload(photo)}
-                    className="absolute bottom-1 right-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+                    disabled={savingPhotoId === photo.id}
+                    className="absolute bottom-1 right-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
                     aria-label="다운로드"
                   >
-                    <Download className="size-3" />
+                    {savingPhotoId === photo.id ? (
+                      <Loader2 className="size-3 animate-spin" />
+                    ) : (
+                      <Download className="size-3" />
+                    )}
                   </button>
                 )}
               </div>
@@ -237,19 +260,34 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
       <Dialog
         open={viewingIndex !== null}
         onOpenChange={async (open) => {
-          if (open || isSaving) return;
-          if (normalizedRotation !== 0 && viewingPhoto) {
-            setIsSaving(true);
-            try {
-              await saveRotatedPhoto(viewingPhoto);
-              const res = await fetch(`/api/cases/${caseId}/photos`);
-              if (res.ok) setPhotos(await res.json());
-            } finally {
-              setIsSaving(false);
-            }
-          }
+          if (open) return;
+          const photoToSave = viewingPhoto;
+          const rotationToSave = normalizedRotation;
+          const imgEl = imgRef.current;
+
+          // 팝업 즉시 닫기
           setViewingIndex(null);
           setRotation(0);
+
+          // 회전이 있으면 백그라운드 저장
+          if (rotationToSave !== 0 && photoToSave && imgEl) {
+            let blob: Blob | null = null;
+            try {
+              blob = await createRotatedBlob(imgEl, rotationToSave);
+            } catch {
+              // Canvas 오류 시 저장 생략하고 그냥 닫힘
+            }
+            if (blob) {
+              setSavingPhotoId(photoToSave.id);
+              try {
+                await uploadRotatedBlob(photoToSave, blob);
+                const res = await fetch(`/api/cases/${caseId}/photos`);
+                if (res.ok) setPhotos(await res.json());
+              } finally {
+                setSavingPhotoId(null);
+              }
+            }
+          }
         }}
       >
         <DialogContent className="flex max-h-[90vh] max-w-[90vw] flex-col gap-3 p-4">
@@ -259,36 +297,20 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
                 <span className="text-sm text-muted-foreground">
                   {(viewingIndex ?? 0) + 1} / {photos.length}
                 </span>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setRotation((r) => r - 90)}
-                    disabled={isSaving}
-                    className="text-muted-foreground hover:text-foreground disabled:opacity-50"
-                    aria-label="반시계 방향 회전"
-                  >
-                    <RotateCcw className="size-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setRotation((r) => r + 90)}
-                    disabled={isSaving}
-                    className="text-muted-foreground hover:text-foreground disabled:opacity-50"
-                    aria-label="시계 방향 회전"
-                  >
-                    <RotateCw className="size-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleLightboxDownload}
-                    disabled={isSaving}
-                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
-                    aria-label="다운로드"
-                  >
+                <button
+                  type="button"
+                  onClick={handleLightboxDownload}
+                  disabled={isDownloading}
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
+                  aria-label="다운로드"
+                >
+                  {isDownloading ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
                     <Download className="size-4" />
-                    다운로드
-                  </button>
-                </div>
+                  )}
+                  다운로드
+                </button>
               </div>
               <div className="relative flex flex-1 items-center justify-center overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -296,6 +318,7 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
                   ref={imgRef}
                   src={viewingPhoto.url ?? ""}
                   alt={viewingPhoto.file_name}
+                  crossOrigin="anonymous"
                   className="max-h-[75vh] max-w-full rounded-md object-contain transition-transform duration-200"
                   style={{ transform: `rotate(${rotation}deg)` }}
                 />
@@ -322,11 +345,24 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
                   </>
                 )}
               </div>
-              {isSaving && (
-                <p className="text-center text-sm text-muted-foreground">
-                  저장 중...
-                </p>
-              )}
+              <div className="flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setRotation((r) => r - 90)}
+                  className="flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+                  aria-label="반시계 방향 회전"
+                >
+                  <RotateCcw className="size-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRotation((r) => r + 90)}
+                  className="flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+                  aria-label="시계 방향 회전"
+                >
+                  <RotateCw className="size-4" />
+                </button>
+              </div>
             </>
           )}
         </DialogContent>
