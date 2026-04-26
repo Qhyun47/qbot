@@ -17,7 +17,7 @@ export async function getServiceAccessStatus(): Promise<ServiceAccessStatus> {
       .single();
 
     if (profile?.is_admin) return "approved";
-    return profile?.service_access_status ?? "pending";
+    return (profile?.service_access_status ?? "pending") as ServiceAccessStatus;
   } catch {
     return "pending";
   }

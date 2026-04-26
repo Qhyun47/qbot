@@ -24,6 +24,9 @@ import { getLayoutSettings } from "@/lib/settings/actions";
 import { Separator } from "@/components/ui/separator";
 import { AiWarningBanner } from "@/components/cases/ai-warning-banner";
 import { CasePhotosSection } from "@/components/cases/case-photos-section";
+import { MedicationTriggerButton } from "@/components/medication/medication-trigger-button";
+import { MedicationAnalysisSection } from "@/components/medication/medication-analysis-section";
+import { extractPastHx } from "@/lib/medication/text-utils";
 import type { CaseStatus, BedZone } from "@/lib/supabase/types";
 
 function GeneratingSkeleton() {
@@ -156,6 +159,15 @@ async function CaseContent({
         </div>
         <StatusBadge status={status} />
         <RegenerateButton caseId={caseData.id} />
+        {status === "completed" && result && (
+          <MedicationTriggerButton
+            caseId={caseData.id}
+            currentHistory={result.history_edited ?? result.history_draft ?? ""}
+            defaultPastHx={extractPastHx(
+              result.history_edited ?? result.history_draft ?? ""
+            )}
+          />
+        )}
       </header>
 
       {/* 본문: 차팅 결과 영역 */}
@@ -207,6 +219,14 @@ async function CaseContent({
             </>
           )}
           {status === "draft" && <DraftState />}
+          {status === "completed" && result && (
+            <MedicationAnalysisSection
+              antithromboticCheck={result.antithrombotic_check ?? null}
+              antithromboticAt={result.antithrombotic_at ?? null}
+              underlyingDisease={result.underlying_disease ?? null}
+              underlyingDiseaseAt={result.underlying_disease_at ?? null}
+            />
+          )}
           <CasePhotosSection caseId={caseData.id} />
         </div>
 

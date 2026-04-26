@@ -20,7 +20,7 @@ function Switch({
         // 공통
         "group/switch shadow-xs peer inline-flex shrink-0 items-center rounded-full outline-none transition-all",
         "focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50",
-        "data-[size=default]:h-[1.15rem] data-[size=sm]:h-3.5 data-[size=default]:w-8 data-[size=sm]:w-6",
+        "data-[size=default]:h-5 data-[size=sm]:h-3.5 data-[size=default]:w-9 data-[size=sm]:w-6",
         // ON 상태: 라이트=진한 회색 배경, 다크=밝은 회색 배경
         "data-[state=checked]:border-0 data-[state=checked]:bg-zinc-800",
         "dark:data-[state=checked]:bg-zinc-200",
@@ -36,7 +36,7 @@ function Switch({
         className={cn(
           "pointer-events-none block rounded-full ring-0 transition-transform",
           "data-[state=checked]:translate-x-[calc(100%-2px)] data-[state=unchecked]:translate-x-0",
-          "group-data-[size=default]/switch:size-4 group-data-[size=sm]/switch:size-3",
+          "group-data-[size=default]/switch:size-[1.125rem] group-data-[size=sm]/switch:size-3",
           // ON 상태 thumb: 라이트=흰색, 다크=진한 회색
           "data-[state=checked]:bg-white",
           "dark:data-[state=checked]:bg-zinc-900",

@@ -14,36 +14,120 @@ export type Database = {
   };
   public: {
     Tables: {
-      case_photos: {
+      ai_usage_logs: {
         Row: {
-          id: string;
           case_id: string;
-          user_id: string;
-          storage_path: string;
-          file_name: string;
-          file_size: number;
-          mime_type: string;
           created_at: string;
+          id: string;
+          user_id: string;
         };
         Insert: {
-          id?: string;
           case_id: string;
-          user_id: string;
-          storage_path: string;
-          file_name: string;
-          file_size: number;
-          mime_type: string;
           created_at?: string;
+          id?: string;
+          user_id: string;
         };
         Update: {
-          id?: string;
           case_id?: string;
+          created_at?: string;
+          id?: string;
           user_id?: string;
-          storage_path?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ai_usage_logs_case_id_fkey";
+            columns: ["case_id"];
+            isOneToOne: false;
+            referencedRelation: "cases";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ai_usage_logs_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ai_usage_logs_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "service_access_requests";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      case_inputs: {
+        Row: {
+          case_id: string;
+          created_at: string;
+          display_order: number;
+          id: string;
+          raw_text: string;
+          section_override: string | null;
+          time_offset_minutes: number | null;
+          time_tag: string | null;
+        };
+        Insert: {
+          case_id: string;
+          created_at?: string;
+          display_order: number;
+          id?: string;
+          raw_text: string;
+          section_override?: string | null;
+          time_offset_minutes?: number | null;
+          time_tag?: string | null;
+        };
+        Update: {
+          case_id?: string;
+          created_at?: string;
+          display_order?: number;
+          id?: string;
+          raw_text?: string;
+          section_override?: string | null;
+          time_offset_minutes?: number | null;
+          time_tag?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "case_inputs_case_id_fkey";
+            columns: ["case_id"];
+            isOneToOne: false;
+            referencedRelation: "cases";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      case_photos: {
+        Row: {
+          case_id: string;
+          created_at: string;
+          file_name: string;
+          file_size: number;
+          id: string;
+          mime_type: string;
+          storage_path: string;
+          user_id: string;
+        };
+        Insert: {
+          case_id: string;
+          created_at?: string;
+          file_name: string;
+          file_size: number;
+          id?: string;
+          mime_type: string;
+          storage_path: string;
+          user_id: string;
+        };
+        Update: {
+          case_id?: string;
+          created_at?: string;
           file_name?: string;
           file_size?: number;
+          id?: string;
           mime_type?: string;
-          created_at?: string;
+          storage_path?: string;
+          user_id?: string;
         };
         Relationships: [
           {
@@ -60,51 +144,19 @@ export type Database = {
             referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
-        ];
-      };
-      case_inputs: {
-        Row: {
-          case_id: string;
-          created_at: string;
-          display_order: number;
-          id: string;
-          raw_text: string;
-          section_override: "timed" | "untimed" | null;
-          time_offset_minutes: number | null;
-          time_tag: string | null;
-        };
-        Insert: {
-          case_id: string;
-          created_at?: string;
-          display_order: number;
-          id?: string;
-          raw_text: string;
-          section_override?: "timed" | "untimed" | null;
-          time_offset_minutes?: number | null;
-          time_tag?: string | null;
-        };
-        Update: {
-          case_id?: string;
-          created_at?: string;
-          display_order?: number;
-          id?: string;
-          raw_text?: string;
-          section_override?: "timed" | "untimed" | null;
-          time_offset_minutes?: number | null;
-          time_tag?: string | null;
-        };
-        Relationships: [
           {
-            foreignKeyName: "case_inputs_case_id_fkey";
-            columns: ["case_id"];
+            foreignKeyName: "case_photos_user_id_fkey";
+            columns: ["user_id"];
             isOneToOne: false;
-            referencedRelation: "cases";
+            referencedRelation: "service_access_requests";
             referencedColumns: ["id"];
           },
         ];
       };
       case_results: {
         Row: {
+          antithrombotic_at: string | null;
+          antithrombotic_check: string | null;
           case_id: string;
           error_message: string | null;
           generated_at: string;
@@ -120,8 +172,12 @@ export type Database = {
           template_draft: string;
           template_edited: string | null;
           template_key_used: string;
+          underlying_disease: string | null;
+          underlying_disease_at: string | null;
         };
         Insert: {
+          antithrombotic_at?: string | null;
+          antithrombotic_check?: string | null;
           case_id: string;
           error_message?: string | null;
           generated_at?: string;
@@ -137,8 +193,12 @@ export type Database = {
           template_draft: string;
           template_edited?: string | null;
           template_key_used: string;
+          underlying_disease?: string | null;
+          underlying_disease_at?: string | null;
         };
         Update: {
+          antithrombotic_at?: string | null;
+          antithrombotic_check?: string | null;
           case_id?: string;
           error_message?: string | null;
           generated_at?: string;
@@ -154,6 +214,8 @@ export type Database = {
           template_draft?: string;
           template_edited?: string | null;
           template_key_used?: string;
+          underlying_disease?: string | null;
+          underlying_disease_at?: string | null;
         };
         Relationships: [
           {
@@ -232,13 +294,65 @@ export type Database = {
             referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
+          {
+            foreignKeyName: "cases_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "service_access_requests";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      error_logs: {
+        Row: {
+          created_at: string;
+          error_message: string;
+          id: string;
+          page_url: string;
+          stack_trace: string | null;
+          user_agent: string | null;
+          user_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          error_message: string;
+          id?: string;
+          page_url: string;
+          stack_trace?: string | null;
+          user_agent?: string | null;
+          user_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          error_message?: string;
+          id?: string;
+          page_url?: string;
+          stack_trace?: string | null;
+          user_agent?: string | null;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "error_logs_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "error_logs_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "service_access_requests";
+            referencedColumns: ["id"];
+          },
         ];
       };
       interview_guidelines: {
         Row: {
-          guide_key: string;
           content: string;
           created_at: string;
+          guide_key: string;
           id: string;
           pdf_path: string | null;
           source_type: string;
@@ -246,9 +360,9 @@ export type Database = {
           user_id: string | null;
         };
         Insert: {
-          guide_key: string;
           content: string;
           created_at?: string;
+          guide_key: string;
           id?: string;
           pdf_path?: string | null;
           source_type?: string;
@@ -256,9 +370,9 @@ export type Database = {
           user_id?: string | null;
         };
         Update: {
-          guide_key?: string;
           content?: string;
           created_at?: string;
+          guide_key?: string;
           id?: string;
           pdf_path?: string | null;
           source_type?: string;
@@ -273,30 +387,32 @@ export type Database = {
             referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
+          {
+            foreignKeyName: "interview_guidelines_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "service_access_requests";
+            referencedColumns: ["id"];
+          },
         ];
       };
       profiles: {
         Row: {
           avatar_url: string | null;
+          case_input_font_size: number;
           created_at: string;
           fold_auto_switch: boolean;
           fold_case_input_font_size: number;
-          fold_fallback_layout: "single" | "split_vertical";
+          fold_fallback_layout: string;
           fold_guideline_font_size: number;
           full_name: string | null;
-          fullscreen_mode: boolean;
+          fullscreen_mode: boolean | null;
           guideline_font_size: number;
           id: string;
           input_layout: Database["public"]["Enums"]["input_layout"];
           is_admin: boolean;
-          case_input_font_size: number;
           mobile_font_size: number;
-          service_access_status:
-            | "pending"
-            | "approved"
-            | "ai_excluded"
-            | "denied"
-            | "held";
+          service_access_status: string;
           split_ratio: number;
           updated_at: string;
         };
@@ -306,21 +422,16 @@ export type Database = {
           created_at?: string;
           fold_auto_switch?: boolean;
           fold_case_input_font_size?: number;
-          fold_fallback_layout?: "single" | "split_vertical";
+          fold_fallback_layout?: string;
           fold_guideline_font_size?: number;
           full_name?: string | null;
-          fullscreen_mode?: boolean;
+          fullscreen_mode?: boolean | null;
           guideline_font_size?: number;
           id: string;
           input_layout?: Database["public"]["Enums"]["input_layout"];
           is_admin?: boolean;
           mobile_font_size?: number;
-          service_access_status?:
-            | "pending"
-            | "approved"
-            | "ai_excluded"
-            | "denied"
-            | "held";
+          service_access_status?: string;
           split_ratio?: number;
           updated_at?: string;
         };
@@ -330,115 +441,31 @@ export type Database = {
           created_at?: string;
           fold_auto_switch?: boolean;
           fold_case_input_font_size?: number;
-          fold_fallback_layout?: "single" | "split_vertical";
+          fold_fallback_layout?: string;
           fold_guideline_font_size?: number;
           full_name?: string | null;
-          fullscreen_mode?: boolean;
+          fullscreen_mode?: boolean | null;
           guideline_font_size?: number;
           id?: string;
           input_layout?: Database["public"]["Enums"]["input_layout"];
           is_admin?: boolean;
           mobile_font_size?: number;
-          service_access_status?:
-            | "pending"
-            | "approved"
-            | "ai_excluded"
-            | "denied"
-            | "held";
+          service_access_status?: string;
           split_ratio?: number;
           updated_at?: string;
         };
         Relationships: [];
       };
-      ai_usage_logs: {
-        Row: {
-          id: string;
-          user_id: string;
-          case_id: string;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          case_id: string;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          case_id?: string;
-          created_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "ai_usage_logs_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "ai_usage_logs_case_id_fkey";
-            columns: ["case_id"];
-            isOneToOne: false;
-            referencedRelation: "cases";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      error_logs: {
-        Row: {
-          id: string;
-          user_id: string | null;
-          page_url: string;
-          error_message: string;
-          stack_trace: string | null;
-          user_agent: string | null;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          user_id?: string | null;
-          page_url: string;
-          error_message: string;
-          stack_trace?: string | null;
-          user_agent?: string | null;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          user_id?: string | null;
-          page_url?: string;
-          error_message?: string | null;
-          stack_trace?: string | null;
-          user_agent?: string | null;
-          created_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "error_logs_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
     };
     Views: {
       service_access_requests: {
         Row: {
-          id: string;
-          full_name: string | null;
-          service_access_status:
-            | "pending"
-            | "approved"
-            | "ai_excluded"
-            | "denied"
-            | "held";
-          is_admin: boolean;
-          created_at: string;
+          created_at: string | null;
           email: string | null;
+          full_name: string | null;
+          id: string | null;
+          is_admin: boolean | null;
+          service_access_status: string | null;
         };
         Relationships: [];
       };

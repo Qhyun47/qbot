@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { NewCaseButton } from "@/components/cases/new-case-button";
+import { MedicationTriggerButton } from "@/components/medication/medication-trigger-button";
 import { StatusBoard } from "@/components/cases/status-board";
 import { HideAllFromBoardButton } from "@/components/cases/hide-all-from-board-button";
 import { listCasesByBed } from "@/lib/cases/queries";
@@ -49,7 +50,10 @@ export default function DashboardPage() {
             현재 응급실 환자를 베드 순으로 확인합니다.
           </p>
         </div>
-        <NewCaseButton className="gap-1.5" />
+        <div className="flex items-center gap-2">
+          <MedicationTriggerButton />
+          <NewCaseButton className="gap-1.5" />
+        </div>
       </div>
 
       {/* 현황판 섹션 */}
@@ -59,6 +63,7 @@ export default function DashboardPage() {
             현황판
           </h2>
           <div className="flex items-center gap-2">
+            <MedicationTriggerButton />
             <NewCaseButton className="xl:hidden" size="sm" />
             <HideAllFromBoardButton />
             <Link

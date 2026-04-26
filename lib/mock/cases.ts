@@ -225,6 +225,10 @@ export const MOCK_CASE_RESULTS: CaseResult[] = [
       "Family Hx. : 부친 AMI",
     history_edited: null,
     generated_at: "2026-04-19T06:15:00.000Z",
+    antithrombotic_check: null,
+    antithrombotic_at: null,
+    underlying_disease: null,
+    underlying_disease_at: null,
   },
   {
     id: "r1b2c3d4-e5f6-4a7b-8c9d-000000000004",
@@ -242,6 +246,10 @@ export const MOCK_CASE_RESULTS: CaseResult[] = [
     history_draft: "Past Hx. : (-)\nMed Hx. : (-)\nOp Hx. : (-)",
     history_edited: null,
     generated_at: "2026-04-19T04:10:00.000Z",
+    antithrombotic_check: null,
+    antithrombotic_at: null,
+    underlying_disease: null,
+    underlying_disease_at: null,
   },
 ];
 
