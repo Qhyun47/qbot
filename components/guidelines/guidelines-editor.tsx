@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import { format } from "date-fns";
 import { toast } from "sonner";
 import { FileUp, Loader2, Save, Trash2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,43 @@ interface GuidelinesEditorProps {
   guideList: GuideListItem[];
   initialGuidelines: Guideline[];
   systemGuides: Record<string, string>;
+}
+
+function extractGuidelineTitle(
+  content: string,
+  sourceType: string,
+  pdfPath: string | null
+): string {
+  switch (sourceType) {
+    case "text":
+      return content.split("\n").find((l) => l.trim()) ?? "";
+    case "markdown":
+      return (
+        content
+          .split("\n")
+          .find((l) => l.trim())
+          ?.replace(/^#+\s*/, "")
+          .replace(/[*_`~>]/g, "")
+          .trim() ?? ""
+      );
+    case "html":
+      return (
+        content
+          .replace(/<[^>]+>/g, " ")
+          .split("\n")
+          .map((l) => l.trim())
+          .find((l) => l.length > 0) ?? ""
+      );
+    case "pdf":
+      return (
+        pdfPath
+          ?.split("/")
+          .pop()
+          ?.replace(/\.pdf$/i, "") ?? "PDF"
+      );
+    default:
+      return content.slice(0, 50);
+  }
 }
 
 export function GuidelinesEditor({
@@ -512,6 +550,10 @@ export function GuidelinesEditor({
                       <strong>인터넷 문서 (*.htm)</strong> 으로 변경 후 저장
                     </li>
                     <li>
+                      (문자 코드 선택 → <strong>유니코드(UTF-8)</strong> 지정 후
+                      확인)
+                    </li>
+                    <li>
                       저장된 <code>.htm</code> 파일을 <strong>메모장</strong>
                       으로 열기
                     </li>
@@ -619,18 +661,16 @@ export function GuidelinesEditor({
                   key={g.guide_key}
                   className="flex items-center gap-2 text-sm"
                 >
-                  <span className="font-medium">{g.guide_key}</span>
-                  <span className="text-muted-foreground">—</span>
-                  {g.source_type === "pdf" ? (
-                    <span className="text-muted-foreground">
-                      PDF ({g.pdf_path?.split("/").pop() ?? "파일"})
-                    </span>
-                  ) : (
-                    <span className="truncate text-muted-foreground">
-                      {g.content.slice(0, 60)}
-                      {g.content.length > 60 ? "..." : ""}
-                    </span>
-                  )}
+                  <span className="font-medium">
+                    {extractGuidelineTitle(
+                      g.content,
+                      g.source_type,
+                      g.pdf_path
+                    )}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {format(new Date(g.created_at), "yyyy.MM.dd HH:mm")}
+                  </span>
                 </li>
               ))}
             </ul>
