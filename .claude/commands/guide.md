@@ -8,8 +8,6 @@
 2. `lib/ai/resources/cc-list.json` — 사용자가 언급한 C.C. 존재 여부 확인용
 3. `ai-docs/pending-matches.md` — 대기 커넥션 확인 (섹션 1: C.C.→가이드라인 대기)
 
-이후 CLAUDE.md "가이드라인 추가 절차"를 단계별로 따릅니다.
-
 **C.C. 커넥션 확인:**
 
 파일 읽기 후, 반드시 사용자에게 명시적으로 질문합니다:

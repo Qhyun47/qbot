@@ -11,8 +11,6 @@
 5. `ai-docs/templates/chest-pain/template.json` — 템플릿 구조 참조 (fields, pe, history 섹션 구조 포함)
 6. `ai-docs/templates/chest-pain/schema.json` — 스키마 구조 참조
 
-이후 CLAUDE.md "상용구 추가 절차"를 단계별로 따릅니다.
-
 **대분류(카테고리) 확인:**
 
 파일 읽기 후, 반드시 사용자에게 명시적으로 질문합니다:
