@@ -36,8 +36,18 @@ function stripBackgroundColors(html: string): string {
   return result;
 }
 
+// HWP→HTML 변환 시 font-weight:"bold" 처럼 CSS 값에 따옴표가 붙는 버그를 수정
+function fixQuotedCssValues(html: string): string {
+  return html.replace(
+    /\b(font-weight|font-style|text-decoration|font-variant)\s*:\s*"([^"]+)"/gi,
+    "$1:$2"
+  );
+}
+
 function processGuideHtml(html: string): string {
-  return stripBackgroundColors(stripHtmlWrapper(html)).trim();
+  return fixQuotedCssValues(
+    stripBackgroundColors(stripHtmlWrapper(html))
+  ).trim();
 }
 
 export { processGuideHtml, stripHtmlWrapper, stripBackgroundColors };
