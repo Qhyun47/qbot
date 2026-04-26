@@ -1178,6 +1178,126 @@
     "patternOf": "** pain"
   },
   {
+    "cc": "Lt. 1st finger pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. 2nd finger pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. 3rd finger pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. 4th finger pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. 5th finger pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. 1st finger pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. 2nd finger pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. 3rd finger pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. 4th finger pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. 5th finger pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. 1st toe pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. 2nd toe pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. 3rd toe pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. 4th toe pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Lt. 5th toe pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. 1st toe pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. 2nd toe pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. 3rd toe pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. 4th toe pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. 5th toe pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
     "cc": "Back pain",
     "guideKeys": [
       { "key": "os-ns-back-pain", "rank": 0 },
@@ -1409,6 +1529,126 @@
   },
   {
     "cc": "Rt. foot laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. 1st finger laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. 2nd finger laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. 3rd finger laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. 4th finger laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. 5th finger laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. 1st finger laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. 2nd finger laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. 3rd finger laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. 4th finger laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. 5th finger laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. 1st toe laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. 2nd toe laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. 3rd toe laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. 4th toe laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. 5th toe laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. 1st toe laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. 2nd toe laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. 3rd toe laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. 4th toe laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. 5th toe laceration",
     "guideKeys": [],
     "templateKeys": [],
     "patternOf": "** laceration"
