@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export function RegenerateButton({ caseId }: { caseId: string }) {
   const router = useRouter();
@@ -15,18 +16,19 @@ export function RegenerateButton({ caseId }: { caseId: string }) {
       const res = await fetch(`/api/cases/${caseId}/generate`, {
         method: "POST",
       });
+      if (res.status === 403) {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error ?? "AI 기능은 사용이 제한되어 있습니다.");
+        return;
+      }
       if (res.status === 429) {
         const data = await res.json().catch(() => ({}));
-        alert(
-          data.error ??
-            "오늘 AI 차팅 생성 한도(30회)를 초과했습니다. 내일 다시 시도해주세요."
-        );
-        setLoading(false);
+        toast.error(data.error ?? "일일 생성 한도를 초과했습니다.");
         return;
       }
       router.refresh();
     } catch {
-      alert("네트워크 오류가 발생했습니다. 다시 시도해주세요.");
+      toast.error("네트워크 오류가 발생했습니다. 다시 시도해주세요.");
     } finally {
       setLoading(false);
     }

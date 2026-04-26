@@ -27,13 +27,13 @@ export async function POST(
   // AI 사용 권한 확인 (관리자 또는 approved 상태만 허용)
   const { data: profile } = await supabase
     .from("profiles")
-    .select("is_admin, ai_access_status")
+    .select("is_admin, service_access_status")
     .eq("id", user.id)
     .single();
 
-  if (!profile?.is_admin && profile?.ai_access_status !== "approved") {
+  if (!profile?.is_admin && profile?.service_access_status !== "approved") {
     return NextResponse.json(
-      { error: "AI 사용 권한이 없습니다. 관리자 승인 후 이용 가능합니다." },
+      { error: "AI 사용 권한이 없습니다." },
       { status: 403 }
     );
   }

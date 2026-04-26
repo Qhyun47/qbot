@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { getLayoutSettings } from "@/lib/settings/actions";
-import { getAiAccessInfo } from "@/lib/auth/ai-access";
+import { getServiceAccessStatus } from "@/lib/auth/service-access";
 import { NewCaseForm } from "@/components/cases/new-case-form";
 
 async function NewCaseFormLoader({
@@ -19,9 +19,13 @@ async function NewCaseFormLoader({
       guidelineFontSize,
       foldGuidelineFontSize,
     },
-    { status },
+    status,
     { fresh },
-  ] = await Promise.all([getLayoutSettings(), getAiAccessInfo(), searchParams]);
+  ] = await Promise.all([
+    getLayoutSettings(),
+    getServiceAccessStatus(),
+    searchParams,
+  ]);
 
   // fresh가 없는 경우(URL 직접 접근 등)에도 항상 고유한 key를 보장
   const formKey = fresh ?? String(Date.now());

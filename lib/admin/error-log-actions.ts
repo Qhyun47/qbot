@@ -12,28 +12,19 @@ export async function getErrorLogs(): Promise<ErrorLogWithEmail[]> {
 
   const supabase = await createClient();
 
-  // error_logs와 ai_access_requests 뷰(email 포함)를 join
   const { data, error } = await supabase
     .from("error_logs")
-    .select(
-      `
-      *,
-      profiles!error_logs_user_id_fkey(
-        ai_access_requests:id
-      )
-    `
-    )
+    .select("*")
     .order("created_at", { ascending: false })
     .limit(200);
 
   if (error) throw new Error(error.message);
 
-  // profiles 뷰에서 email을 가져오기 위해 별도 조회
   const logs = (data ?? []) as ErrorLog[];
 
   if (logs.length === 0) return [];
 
-  // user_id 목록으로 email 일괄 조회
+  // user_id 목록으로 email 일괄 조회 (service_access_requests 뷰 사용)
   const userIds = [
     ...new Set(logs.map((l) => l.user_id).filter(Boolean)),
   ] as string[];
@@ -41,7 +32,7 @@ export async function getErrorLogs(): Promise<ErrorLogWithEmail[]> {
   let emailMap: Record<string, string> = {};
   if (userIds.length > 0) {
     const { data: views } = await supabase
-      .from("ai_access_requests")
+      .from("service_access_requests")
       .select("id, email")
       .in("id", userIds);
 

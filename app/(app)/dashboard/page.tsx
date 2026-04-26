@@ -5,22 +5,14 @@ import { NewCaseButton } from "@/components/cases/new-case-button";
 import { StatusBoard } from "@/components/cases/status-board";
 import { HideAllFromBoardButton } from "@/components/cases/hide-all-from-board-button";
 import { listCasesByBed } from "@/lib/cases/queries";
-import { getAiAccessInfo } from "@/lib/auth/ai-access";
 import { getIsAdmin } from "@/lib/auth/is-admin";
 import { getPendingCount } from "@/lib/admin/user-access-actions";
-import { AiAccessOnboardingAlert } from "@/components/ai-access/ai-access-onboarding-alert";
 import { AdminPendingAlert } from "@/components/ai-access/admin-pending-alert";
 import { RealtimeRefresh } from "@/components/cases/realtime-refresh";
 
 async function StatusBoardSection() {
   const cases = await listCasesByBed();
   return <StatusBoard cases={cases} />;
-}
-
-async function OnboardingAlertSection() {
-  const { status, dismissed } = await getAiAccessInfo();
-  if (status !== "none" || dismissed) return null;
-  return <AiAccessOnboardingAlert />;
 }
 
 async function AdminAlertSection() {
@@ -47,9 +39,6 @@ export default function DashboardPage() {
       <RealtimeRefresh table="cases" />
       <Suspense fallback={null}>
         <AdminAlertSection />
-      </Suspense>
-      <Suspense fallback={null}>
-        <OnboardingAlertSection />
       </Suspense>
 
       {/* 페이지 헤더 (데스크탑) */}

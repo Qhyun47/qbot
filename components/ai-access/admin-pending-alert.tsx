@@ -36,8 +36,8 @@ export function AdminPendingAlert({ count }: AdminPendingAlertProps) {
     <div className="flex items-center gap-3 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm dark:border-yellow-800 dark:bg-yellow-950">
       <Users className="size-4 shrink-0 text-yellow-600 dark:text-yellow-400" />
       <p className="flex-1 text-yellow-800 dark:text-yellow-200">
-        새로운 AI 사용 신청이 <span className="font-semibold">{count}건</span>{" "}
-        있습니다.
+        서비스 승인 대기 중인 사용자가{" "}
+        <span className="font-semibold">{count}명</span> 있습니다.
       </p>
       <Button
         asChild

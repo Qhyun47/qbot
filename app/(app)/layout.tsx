@@ -10,6 +10,8 @@ import { FontSizeInit } from "@/components/font-size-init";
 import { ConditionalHeader } from "@/components/layout/conditional-header";
 import { getIsAdmin } from "@/lib/auth/is-admin";
 import { getLayoutSettings } from "@/lib/settings/actions";
+import { getServiceAccessStatus } from "@/lib/auth/service-access";
+import { redirect } from "next/navigation";
 import { FullscreenManager } from "@/components/pwa/fullscreen-manager";
 import { AiDisclaimerModal } from "@/components/ai-disclaimer-modal";
 
@@ -39,6 +41,14 @@ async function FontSizeInitWithData() {
 async function FullscreenManagerWithData() {
   const { fullscreenMode } = await getLayoutSettings();
   return <FullscreenManager fullscreenMode={fullscreenMode} />;
+}
+
+async function ServiceAccessGuard({ children }: { children: ReactNode }) {
+  const status = await getServiceAccessStatus();
+  if (status === "pending" || status === "held" || status === "denied") {
+    redirect("/waiting");
+  }
+  return <>{children}</>;
 }
 
 export default function AppLayout({ children }: { children: ReactNode }) {
@@ -77,7 +87,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           </header>
         </ConditionalHeader>
       </Suspense>
-      <main className="flex flex-1 flex-col">{children}</main>
+      <ServiceAccessGuard>
+        <main className="flex flex-1 flex-col">{children}</main>
+      </ServiceAccessGuard>
       <AiDisclaimerModal />
       <Toaster />
     </div>

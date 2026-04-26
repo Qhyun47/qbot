@@ -229,10 +229,6 @@ export type Database = {
       };
       profiles: {
         Row: {
-          ai_access_alert_dismissed: boolean;
-          ai_access_name: string | null;
-          ai_access_requested_at: string | null;
-          ai_access_status: "none" | "pending" | "approved" | "denied";
           avatar_url: string | null;
           created_at: string;
           fold_auto_switch: boolean;
@@ -247,14 +243,16 @@ export type Database = {
           is_admin: boolean;
           case_input_font_size: number;
           mobile_font_size: number;
+          service_access_status:
+            | "pending"
+            | "approved"
+            | "ai_excluded"
+            | "denied"
+            | "held";
           split_ratio: number;
           updated_at: string;
         };
         Insert: {
-          ai_access_alert_dismissed?: boolean;
-          ai_access_name?: string | null;
-          ai_access_requested_at?: string | null;
-          ai_access_status?: "none" | "pending" | "approved" | "denied";
           avatar_url?: string | null;
           case_input_font_size?: number;
           created_at?: string;
@@ -269,14 +267,16 @@ export type Database = {
           input_layout?: Database["public"]["Enums"]["input_layout"];
           is_admin?: boolean;
           mobile_font_size?: number;
+          service_access_status?:
+            | "pending"
+            | "approved"
+            | "ai_excluded"
+            | "denied"
+            | "held";
           split_ratio?: number;
           updated_at?: string;
         };
         Update: {
-          ai_access_alert_dismissed?: boolean;
-          ai_access_name?: string | null;
-          ai_access_requested_at?: string | null;
-          ai_access_status?: "none" | "pending" | "approved" | "denied";
           avatar_url?: string | null;
           case_input_font_size?: number;
           created_at?: string;
@@ -291,6 +291,12 @@ export type Database = {
           input_layout?: Database["public"]["Enums"]["input_layout"];
           is_admin?: boolean;
           mobile_font_size?: number;
+          service_access_status?:
+            | "pending"
+            | "approved"
+            | "ai_excluded"
+            | "denied"
+            | "held";
           split_ratio?: number;
           updated_at?: string;
         };
@@ -372,12 +378,18 @@ export type Database = {
       };
     };
     Views: {
-      ai_access_requests: {
+      service_access_requests: {
         Row: {
           id: string;
-          ai_access_name: string | null;
-          ai_access_status: "none" | "pending" | "approved" | "denied";
-          ai_access_requested_at: string | null;
+          full_name: string | null;
+          service_access_status:
+            | "pending"
+            | "approved"
+            | "ai_excluded"
+            | "denied"
+            | "held";
+          is_admin: boolean;
+          created_at: string;
           email: string | null;
         };
         Relationships: [];
@@ -567,4 +579,9 @@ export type CaseStatus = Database["public"]["Enums"]["case_status"];
 export type BedZone = Database["public"]["Enums"]["bed_zone"];
 export type InputLayout = Database["public"]["Enums"]["input_layout"];
 export type FoldFallbackLayout = "single" | "split_vertical";
-export type AiAccessStatus = "none" | "pending" | "approved" | "denied";
+export type ServiceAccessStatus =
+  | "pending"
+  | "approved"
+  | "ai_excluded"
+  | "denied"
+  | "held";

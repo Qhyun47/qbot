@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
-import { ChevronDown } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,39 +23,42 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  approveAiAccess,
-  denyAiAccess,
-  revokeAiAccess,
+  approveServiceAccess,
+  approveServiceAccessAiExcluded,
+  denyServiceAccess,
+  holdServiceAccess,
+  updateServiceAccessStatus,
 } from "@/lib/admin/user-access-actions";
-import type { AiAccessUser } from "@/lib/admin/user-access-actions";
+import type { ServiceAccessUser } from "@/lib/admin/user-access-actions";
+import type { ServiceAccessStatus } from "@/lib/supabase/types";
 
-const STATUS_LABELS = {
-  none: "미신청",
-  pending: "심사 중",
+const STATUS_LABELS: Record<ServiceAccessStatus, string> = {
+  pending: "대기 중",
   approved: "승인됨",
-  denied: "거부됨",
-} as const;
+  ai_excluded: "AI 제외 승인",
+  denied: "거절됨",
+  held: "보류",
+};
 
-const STATUS_VARIANTS = {
-  none: "outline",
+const STATUS_VARIANTS: Record<
+  ServiceAccessStatus,
+  "secondary" | "default" | "outline" | "destructive"
+> = {
   pending: "secondary",
   approved: "default",
+  ai_excluded: "outline",
   denied: "destructive",
-} as const;
+  held: "secondary",
+};
 
-interface UserAccessTableProps {
-  users: AiAccessUser[];
-  showAll?: boolean;
-}
-
-function UserRow({ user }: { user: AiAccessUser }) {
+function PendingUserRow({ user }: { user: ServiceAccessUser }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const displayName = user.ai_access_name ?? user.email ?? user.id;
+  const displayName = user.full_name ?? user.email ?? user.id;
 
   function handleApprove() {
     startTransition(async () => {
-      const result = await approveAiAccess(user.id);
+      const result = await approveServiceAccess(user.id);
       if (result.error) {
         toast.error(result.error);
       } else {
@@ -65,111 +68,180 @@ function UserRow({ user }: { user: AiAccessUser }) {
     });
   }
 
+  function handleApproveAiExcluded() {
+    startTransition(async () => {
+      const result = await approveServiceAccessAiExcluded(user.id);
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success(`${displayName}님을 AI 제외로 승인했습니다.`);
+        router.refresh();
+      }
+    });
+  }
+
   function handleDeny() {
     startTransition(async () => {
-      const result = await denyAiAccess(user.id);
+      const result = await denyServiceAccess(user.id);
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success(`${displayName}님을 거부했습니다.`);
+        toast.success(`${displayName}님을 거절했습니다.`);
         router.refresh();
       }
     });
   }
 
-  function handleRevoke() {
+  function handleHold() {
     startTransition(async () => {
-      const result = await revokeAiAccess(user.id);
+      const result = await holdServiceAccess(user.id);
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success(`${displayName}님을 차단했습니다.`);
+        toast.success(`${displayName}님을 보류 처리했습니다.`);
         router.refresh();
       }
     });
   }
-
-  // "none" 상태는 신청일 대신 가입일 표시
-  const dateLabel =
-    user.ai_access_status === "none"
-      ? user.created_at
-      : user.ai_access_requested_at;
-
-  const statusCell =
-    user.ai_access_status === "approved" ? (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild disabled={isPending}>
-          <button className="flex items-center gap-0.5 rounded focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-            <Badge variant="default">승인됨</Badge>
-            <ChevronDown className="size-3 text-muted-foreground" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
-          <DropdownMenuItem
-            className="text-destructive focus:text-destructive"
-            onSelect={handleRevoke}
-          >
-            차단 (거부 처리)
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ) : (
-      <Badge variant={STATUS_VARIANTS[user.ai_access_status]}>
-        {STATUS_LABELS[user.ai_access_status]}
-      </Badge>
-    );
 
   return (
     <TableRow>
-      <TableCell className="font-medium">
-        {user.ai_access_name ?? "-"}
-      </TableCell>
+      <TableCell className="font-medium">{user.full_name ?? "-"}</TableCell>
       <TableCell className="text-muted-foreground">
         {user.email ?? "-"}
       </TableCell>
       <TableCell className="text-muted-foreground">
-        {dateLabel
-          ? format(new Date(dateLabel), "MM/dd HH:mm", { locale: ko })
+        {user.created_at
+          ? format(new Date(user.created_at), "MM/dd HH:mm", { locale: ko })
           : "-"}
       </TableCell>
-      <TableCell>{statusCell}</TableCell>
       <TableCell>
-        <div className="flex items-center gap-2">
-          {user.ai_access_status !== "approved" &&
-            user.ai_access_status !== "none" && (
-              <Button
-                size="sm"
-                variant="default"
-                onClick={handleApprove}
-                disabled={isPending}
-              >
-                승인
-              </Button>
-            )}
-          {user.ai_access_status === "pending" && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleDeny}
-              disabled={isPending}
-            >
-              거부
-            </Button>
-          )}
+        <Badge variant={STATUS_VARIANTS[user.service_access_status]}>
+          {STATUS_LABELS[user.service_access_status]}
+        </Badge>
+      </TableCell>
+      <TableCell>
+        <div className="flex flex-wrap items-center gap-1.5">
+          <Button
+            size="sm"
+            variant="default"
+            onClick={handleApprove}
+            disabled={isPending}
+          >
+            전체 승인
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={handleApproveAiExcluded}
+            disabled={isPending}
+          >
+            AI 제외 승인
+          </Button>
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={handleDeny}
+            disabled={isPending}
+          >
+            거절
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleHold}
+            disabled={isPending}
+          >
+            보류
+          </Button>
         </div>
       </TableCell>
     </TableRow>
   );
 }
 
-export function UserAccessTable({
-  users,
-  showAll = false,
-}: UserAccessTableProps) {
+function AllUserRow({ user }: { user: ServiceAccessUser }) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const displayName = user.full_name ?? user.email ?? user.id;
+
+  function handleStatusChange(status: ServiceAccessStatus) {
+    startTransition(async () => {
+      const result = await updateServiceAccessStatus(user.id, status);
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success(`${displayName}님의 상태를 변경했습니다.`);
+        router.refresh();
+      }
+    });
+  }
+
+  return (
+    <TableRow>
+      <TableCell className="font-medium">
+        <div className="flex items-center gap-1.5">
+          {user.full_name ?? "-"}
+          {user.is_admin && (
+            <Badge variant="outline" className="text-xs">
+              관리자
+            </Badge>
+          )}
+        </div>
+      </TableCell>
+      <TableCell className="text-muted-foreground">
+        {user.email ?? "-"}
+      </TableCell>
+      <TableCell className="text-muted-foreground">
+        {user.created_at
+          ? format(new Date(user.created_at), "MM/dd HH:mm", { locale: ko })
+          : "-"}
+      </TableCell>
+      <TableCell>
+        <Badge variant={STATUS_VARIANTS[user.service_access_status]}>
+          {STATUS_LABELS[user.service_access_status]}
+        </Badge>
+      </TableCell>
+      <TableCell>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild disabled={user.is_admin || isPending}>
+            <Button size="sm" variant="ghost" className="size-8 p-0">
+              <MoreHorizontal className="size-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onSelect={() => handleStatusChange("approved")}>
+              승인
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={() => handleStatusChange("ai_excluded")}
+            >
+              AI 제외 승인
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => handleStatusChange("held")}>
+              보류
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-destructive focus:text-destructive"
+              onSelect={() => handleStatusChange("denied")}
+            >
+              거절
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => handleStatusChange("pending")}>
+              대기 중으로 되돌리기
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </TableCell>
+    </TableRow>
+  );
+}
+
+export function PendingUserTable({ users }: { users: ServiceAccessUser[] }) {
   if (users.length === 0) {
     return (
       <p className="py-8 text-center text-sm text-muted-foreground">
-        {showAll ? "가입된 회원이 없습니다." : "대기 중인 신청이 없습니다."}
+        대기 중인 사용자가 없습니다.
       </p>
     );
   }
@@ -180,14 +252,43 @@ export function UserAccessTable({
         <TableRow>
           <TableHead>이름</TableHead>
           <TableHead>이메일</TableHead>
-          <TableHead>신청일</TableHead>
+          <TableHead>가입일</TableHead>
           <TableHead>상태</TableHead>
           <TableHead>처리</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {users.map((user) => (
-          <UserRow key={user.id} user={user} />
+          <PendingUserRow key={user.id} user={user} />
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+export function AllUserTable({ users }: { users: ServiceAccessUser[] }) {
+  if (users.length === 0) {
+    return (
+      <p className="py-8 text-center text-sm text-muted-foreground">
+        가입된 회원이 없습니다.
+      </p>
+    );
+  }
+
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>이름</TableHead>
+          <TableHead>이메일</TableHead>
+          <TableHead>가입일</TableHead>
+          <TableHead>상태</TableHead>
+          <TableHead>처리</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {users.map((user) => (
+          <AllUserRow key={user.id} user={user} />
         ))}
       </TableBody>
     </Table>
