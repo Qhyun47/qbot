@@ -59,11 +59,14 @@ export async function listCasesByBed(): Promise<Case[]> {
   } = await supabase.auth.getUser();
   if (!user) return [];
 
+  const since12h = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
+
   const { data } = await supabase
     .from("cases")
     .select("*")
     .eq("user_id", user.id)
     .is("board_hidden_at", null)
+    .gte("created_at", since12h)
     .or(
       "status.neq.draft,cc.not.is.null,has_inputs.eq.true,bed_explicitly_set.eq.true"
     )
@@ -80,7 +83,7 @@ export async function listCasesWithin12h(): Promise<Case[]> {
   } = await supabase.auth.getUser();
   if (!user) return [];
 
-  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const since = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
 
   const { data } = await supabase
     .from("cases")

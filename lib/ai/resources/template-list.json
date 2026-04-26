@@ -36,6 +36,11 @@
     "category": "0. IM"
   },
   {
+    "templateKey": "ey",
+    "displayName": "EY",
+    "category": "5. EY/OL"
+  },
+  {
     "templateKey": "nu-code-red",
     "displayName": "CODE RED",
     "category": "1. NU"

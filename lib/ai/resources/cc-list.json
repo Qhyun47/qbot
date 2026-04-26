@@ -235,8 +235,14 @@
   },
   {
     "cc": "Visual disturbance",
-    "guideKeys": [{ "key": "nu-code-red", "rank": 1 }],
-    "templateKeys": [{ "key": "nu-code-red", "rank": 1 }]
+    "guideKeys": [
+      { "key": "ey", "rank": 0 },
+      { "key": "nu-code-red", "rank": 1 }
+    ],
+    "templateKeys": [
+      { "key": "ey", "rank": 0 },
+      { "key": "nu-code-red", "rank": 1 }
+    ]
   },
   {
     "cc": "Lt. visual disturbance",
@@ -258,6 +264,12 @@
   },
   {
     "cc": "Visual disturbance(OD)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual disturbance"
+  },
+  {
+    "cc": "Both visual disturbance",
     "guideKeys": [],
     "templateKeys": [],
     "aliasOf": "Visual disturbance"
@@ -492,10 +504,12 @@
   {
     "cc": "Orbital pain",
     "guideKeys": [
+      { "key": "ey", "rank": 1 },
       { "key": "ps", "rank": 2 },
       { "key": "trauma-traffic-accident", "rank": 3 }
     ],
     "templateKeys": [
+      { "key": "ey", "rank": 1 },
       { "key": "ps", "rank": 2 },
       { "key": "trauma", "rank": 3 },
       { "key": "ta", "rank": 4 }
@@ -1434,5 +1448,110 @@
       { "key": "ps", "rank": 1 },
       { "key": "trauma", "rank": 2 }
     ]
+  },
+  {
+    "cc": "Eye pain",
+    "guideKeys": [{ "key": "ey", "rank": 0 }],
+    "templateKeys": [{ "key": "ey", "rank": 0 }]
+  },
+  {
+    "cc": "Lt. eye pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Eye pain"
+  },
+  {
+    "cc": "Rt. eye pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Eye pain"
+  },
+  {
+    "cc": "Both eye pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Eye pain"
+  },
+  {
+    "cc": "Eye pain(OS)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Eye pain"
+  },
+  {
+    "cc": "Eye pain(OD)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Eye pain"
+  },
+  {
+    "cc": "Eye pain(OU)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Eye pain"
+  },
+  {
+    "cc": "Foreign body in eye",
+    "guideKeys": [{ "key": "ey", "rank": 0 }],
+    "templateKeys": [{ "key": "ey", "rank": 0 }]
+  },
+  {
+    "cc": "Foreign body in eye(OS)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Foreign body in eye"
+  },
+  {
+    "cc": "Foreign body in eye(OD)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Foreign body in eye"
+  },
+  {
+    "cc": "Foreign body in eye(OU)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Foreign body in eye"
+  },
+  {
+    "cc": "Visual field defect",
+    "guideKeys": [{ "key": "ey", "rank": 0 }],
+    "templateKeys": [{ "key": "ey", "rank": 0 }]
+  },
+  {
+    "cc": "Lt. visual field defect",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual field defect"
+  },
+  {
+    "cc": "Rt. visual field defect",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual field defect"
+  },
+  {
+    "cc": "Both visual field defect",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual field defect"
+  },
+  {
+    "cc": "Visual field defect(OS)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual field defect"
+  },
+  {
+    "cc": "Visual field defect(OD)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual field defect"
+  },
+  {
+    "cc": "Visual field defect(OU)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual field defect"
   }
 ]

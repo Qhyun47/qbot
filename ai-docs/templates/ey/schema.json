@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EyeCase",
+  "description": "안과 관련(시각 이상, 안통 등) 환자의 키워드 카드를 정규화한 구조화된 JSON. AI Stage 1 출력 형식.",
+  "type": "object",
+  "required": [
+    "inputs",
+    "past_history",
+    "medication_history",
+    "operation_history",
+    "family_history"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "description": "의사가 입력한 키워드 카드 목록. 각 카드는 raw_text, normalized_text, category, sections를 포함.",
+      "items": {
+        "type": "object",
+        "required": ["raw_text", "normalized_text", "category", "sections"],
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "description": "의사가 입력한 원본 텍스트. 절대 수정 금지."
+          },
+          "normalized_text": {
+            "type": "string",
+            "description": "AI가 표준 의학 용어로 정규화한 텍스트."
+          },
+          "category": {
+            "type": "string",
+            "description": "카드의 임상 분류. 아래 enum 값 중 가장 적합한 것 하나를 선택.",
+            "enum": [
+              "onset",
+              "location",
+              "character",
+              "severity",
+              "associated_symptom",
+              "aggravating_relieving_factor",
+              "trauma_history",
+              "contact_lens_history",
+              "prior_episode",
+              "vital_sign",
+              "past_history",
+              "medication_history",
+              "operation_history",
+              "family_history",
+              "other"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "이 카드가 사용될 섹션 목록. 복수 선택 가능. 카드-섹션 매핑 기준: onset/location/character/severity/associated_symptom/aggravating_relieving_factor/trauma_history/contact_lens_history → [pi, template] | prior_episode/vital_sign → [pi] | past_history/medication_history/operation_history/family_history → [history] 전용",
+            "items": {
+              "type": "string",
+              "enum": ["pi", "template", "history", "pe"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "onset": {
+      "type": ["string", "null"],
+      "description": "증상 발생 시점 (예: '3일 전', '금일 오전'). 없으면 null."
+    },
+    "onset_character": {
+      "type": ["string", "null"],
+      "description": "발생 양상 — 'sudden'(갑작스러운) 또는 'gradual'(서서히 악화). 없으면 null."
+    },
+    "laterality": {
+      "type": ["string", "null"],
+      "description": "침범 안구 — 'OD'(우안), 'OS'(좌안), 'OU'(양안). 없으면 null."
+    },
+    "character": {
+      "type": ["string", "null"],
+      "description": "시각 이상 양상 (예: 'blurring', 'floaters', 'scotoma', 'photopsia', 'curtain effect', 'double vision', 'redness', 'pain'). 없으면 null."
+    },
+    "severity": {
+      "type": ["string", "null"],
+      "description": "증상 강도 (예: 'NRS 5/10', 'severe pain'). 없으면 null."
+    },
+    "associated_symptoms": {
+      "type": ["array", "null"],
+      "description": "동반 증상 목록 (예: pain, redness, discharge, photophobia, tearing, nausea 등). 없으면 null.",
+      "items": { "type": "string" }
+    },
+    "trauma_history": {
+      "type": ["string", "null"],
+      "description": "외상 이력 (예: '이물질 튀김', '주먹으로 가격', '화학물질 접촉'). 없으면 null."
+    },
+    "contact_lens": {
+      "type": ["string", "null"],
+      "description": "콘택트렌즈 착용 이력 (예: '착용 후 수면', 'daily lens 착용 중'). 없으면 null."
+    },
+    "aggravating_factor": {
+      "type": ["string", "null"],
+      "description": "악화 요인. 없으면 null."
+    },
+    "relieving_factor": {
+      "type": ["string", "null"],
+      "description": "완화 요인. 없으면 null."
+    },
+    "prior_episode": {
+      "type": ["string", "null"],
+      "description": "유사 증상 과거 에피소드. 없으면 null."
+    },
+    "past_history": {
+      "type": ["array", "null"],
+      "description": "과거력 목록 (안과 과거력 포함: 녹내장, 백내장, 라식라섹, 쌍커풀 등). History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": { "type": "string" }
+    },
+    "medication_history": {
+      "type": ["array", "null"],
+      "description": "복용 약물 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": { "type": "string" }
+    },
+    "operation_history": {
+      "type": ["array", "null"],
+      "description": "수술력 목록. History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
+      "items": { "type": "string" }
+    },
+    "family_history": {
+      "type": ["array", "null"],
+      "description": "가족력 목록. null이면 History 출력 시 해당 항목 전체 생략.",
+      "items": { "type": "string" }
+    }
+  }
+}
