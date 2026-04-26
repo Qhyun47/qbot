@@ -63,7 +63,6 @@ export default function DashboardPage() {
             현황판
           </h2>
           <div className="flex items-center gap-2">
-            <MedicationTriggerButton />
             <NewCaseButton className="xl:hidden" size="sm" />
             <HideAllFromBoardButton />
             <Link

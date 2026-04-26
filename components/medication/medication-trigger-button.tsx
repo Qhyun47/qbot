@@ -15,12 +15,14 @@ interface MedicationTriggerButtonProps {
   caseId?: string;
   defaultPastHx?: string;
   currentHistory?: string;
+  size?: "default" | "sm";
 }
 
 export function MedicationTriggerButton({
   caseId,
   defaultPastHx,
   currentHistory,
+  size = "default",
 }: MedicationTriggerButtonProps) {
   const [open, setOpen] = useState(false);
 
@@ -31,7 +33,7 @@ export function MedicationTriggerButton({
           <TooltipTrigger asChild>
             <Button
               variant="outline"
-              size="sm"
+              size={size}
               onClick={() => setOpen(true)}
               className="inline-flex gap-1.5"
             >
