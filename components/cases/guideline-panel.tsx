@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { BookOpen, FileText } from "lucide-react";
 import {
   loadGuideline,
@@ -28,6 +28,7 @@ interface TemplateListEntry {
 interface GuideListEntry {
   guideKey: string;
   displayName: string;
+  dividerAfter?: boolean;
 }
 
 const ccList = ccListRaw as CcListEntry[];
@@ -375,23 +376,27 @@ export function GuidelinePanel({
                         전체 목록
                       </p>
                       {otherGuides.map((g) => (
-                        <button
-                          key={g.guideKey}
-                          type="button"
-                          disabled={loadingKey === g.guideKey}
-                          onClick={() => handleGuidelineSelect(g.guideKey)}
-                          className={cn(
-                            "rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
-                            "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
-                            "disabled:cursor-not-allowed disabled:opacity-50",
-                            activeGuideKey === g.guideKey &&
-                              "border-primary bg-primary/5"
+                        <Fragment key={g.guideKey}>
+                          <button
+                            type="button"
+                            disabled={loadingKey === g.guideKey}
+                            onClick={() => handleGuidelineSelect(g.guideKey)}
+                            className={cn(
+                              "rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
+                              "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
+                              "disabled:cursor-not-allowed disabled:opacity-50",
+                              activeGuideKey === g.guideKey &&
+                                "border-primary bg-primary/5"
+                            )}
+                          >
+                            {loadingKey === g.guideKey
+                              ? "불러오는 중..."
+                              : g.displayName}
+                          </button>
+                          {g.dividerAfter && (
+                            <div className="my-1 h-px bg-border" />
                           )}
-                        >
-                          {loadingKey === g.guideKey
-                            ? "불러오는 중..."
-                            : g.displayName}
-                        </button>
+                        </Fragment>
                       ))}
                     </>
                   )}

@@ -5,11 +5,19 @@
   { "guideKey": "hemoptysis", "displayName": "IM - Hemoptysis" },
   { "guideKey": "abdominal-pain", "displayName": "IM/GS - Abd pain" },
   { "guideKey": "gi-bleeding", "displayName": "IM - GI bleeding" },
-  { "guideKey": "ckd-hd-pd", "displayName": "IM - CKD, HD/PD" },
-  { "guideKey": "og", "displayName": "OG" },
+  {
+    "guideKey": "ckd-hd-pd",
+    "displayName": "IM - CKD, HD/PD",
+    "dividerAfter": true
+  },
+  { "guideKey": "og", "displayName": "OG", "dividerAfter": true },
   { "guideKey": "pd-fever-vomiting", "displayName": "PD - Fever ≒ Vomiting" },
   { "guideKey": "pd-seizure", "displayName": "PD - Seizure" },
-  { "guideKey": "ns-head-trauma", "displayName": "NS - 소아 head trauma" },
+  {
+    "guideKey": "ns-head-trauma",
+    "displayName": "NS - 소아 head trauma",
+    "dividerAfter": true
+  },
   { "guideKey": "nu-code-red", "displayName": "NU - CODE RED" },
   {
     "guideKey": "im-dka-hhs-mental-change",
@@ -21,8 +29,12 @@
   { "guideKey": "nu-facial-palsy", "displayName": "NU - Facial palsy" },
   { "guideKey": "nu-memory-loss", "displayName": "NU - Memory loss" },
   { "guideKey": "nu-headache", "displayName": "NU - Headache" },
-  { "guideKey": "nu-dizziness", "displayName": "NU - Dizziness" },
-  { "guideKey": "pc", "displayName": "PC" },
+  {
+    "guideKey": "nu-dizziness",
+    "displayName": "NU - Dizziness",
+    "dividerAfter": true
+  },
+  { "guideKey": "pc", "displayName": "PC", "dividerAfter": true },
   {
     "guideKey": "trauma-traffic-accident",
     "displayName": "Trauma / Traffic accident"
@@ -30,16 +42,24 @@
   { "guideKey": "ps", "displayName": "PS" },
   { "guideKey": "os-ns-back-pain", "displayName": "OS/NS - Back pain" },
   { "guideKey": "ey", "displayName": "EY" },
-  { "guideKey": "dt", "displayName": "DT" },
+  { "guideKey": "dt", "displayName": "DT", "dividerAfter": true },
   { "guideKey": "ol-ear-pain", "displayName": "OL - Ear pain" },
   { "guideKey": "ol-epistaxis", "displayName": "OL - Epistaxis" },
   {
     "guideKey": "ol-foreign-body-neck",
     "displayName": "OL - Foreign body in neck"
   },
-  { "guideKey": "ol-sore-throat", "displayName": "IM/OL - Sore throat" },
+  {
+    "guideKey": "ol-sore-throat",
+    "displayName": "IM/OL - Sore throat",
+    "dividerAfter": true
+  },
   { "guideKey": "dm-urticaria", "displayName": "DM - Urticaria" },
-  { "guideKey": "dm-skin-lesion", "displayName": "DM - 피부병변" },
-  { "guideKey": "peg", "displayName": "PEG" },
+  {
+    "guideKey": "dm-skin-lesion",
+    "displayName": "DM - 피부병변",
+    "dividerAfter": true
+  },
+  { "guideKey": "peg", "displayName": "PEG", "dividerAfter": true },
   { "guideKey": "ur", "displayName": "UR" }
 ]

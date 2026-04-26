@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { Fragment, useEffect, useRef, useState, useTransition } from "react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { FileUp, Loader2, Save, Trash2, RefreshCw } from "lucide-react";
@@ -10,6 +10,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -30,7 +31,12 @@ import {
   deleteGuidelinePdf,
   getGuidelinePdfSignedUrl,
 } from "@/lib/guidelines/actions";
-import { processGuideHtml } from "@/lib/utils/html-utils";
+import {
+  processGuideHtml,
+  extractImgFilenames,
+  resizeImageToBase64,
+  replaceImgSrcs,
+} from "@/lib/utils/html-utils";
 import type { Guideline } from "@/lib/supabase/types";
 
 type InputMode = "text" | "markdown" | "html" | "pdf";
@@ -38,6 +44,7 @@ type InputMode = "text" | "markdown" | "html" | "pdf";
 interface GuideListItem {
   guideKey: string;
   displayName: string;
+  dividerAfter?: boolean;
 }
 
 interface GuidelinesEditorProps {
@@ -124,6 +131,7 @@ export function GuidelinesEditor({
     setPdfFileName("");
     setPdfDisplayUrl("");
     setRawHtmlInput("");
+    setImageFiles([]);
     setEncodingHelpOpen(false);
   }
 
@@ -202,6 +210,7 @@ export function GuidelinesEditor({
         setPdfDisplayUrl("");
         setInputMode("text");
         setRawHtmlInput("");
+        setImageFiles([]);
       } catch {
         toast.error("삭제에 실패했습니다.");
       }
@@ -249,13 +258,66 @@ export function GuidelinesEditor({
   const [htmlDialogOpen, setHtmlDialogOpen] = useState(false);
   const [rawHtmlInput, setRawHtmlInput] = useState("");
   const [encodingHelpOpen, setEncodingHelpOpen] = useState(false);
+  const [detectedImgFilenames, setDetectedImgFilenames] = useState<string[]>(
+    []
+  );
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [isHtmlProcessing, setIsHtmlProcessing] = useState(false);
+  const imgInputRef = useRef<HTMLInputElement>(null);
 
-  function handleHtmlProcess() {
-    const processed = processGuideHtml(rawHtmlInput);
-    setCustomContent(processed);
-    setRawHtmlInput("");
-    setEncodingHelpOpen(false);
-    setHtmlDialogOpen(false);
+  useEffect(() => {
+    if (!rawHtmlInput.trim()) {
+      setDetectedImgFilenames([]);
+      return;
+    }
+    setDetectedImgFilenames(extractImgFilenames(rawHtmlInput));
+  }, [rawHtmlInput]);
+
+  function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = "";
+    if (files.length > 3) {
+      toast.error("이미지는 최대 3장까지 첨부할 수 있습니다.");
+      return;
+    }
+    for (const file of files) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error(`${file.name}: 이미지 파일은 2MB를 초과할 수 없습니다.`);
+        return;
+      }
+    }
+    setImageFiles(files);
+  }
+
+  async function handleHtmlProcess() {
+    setIsHtmlProcessing(true);
+    try {
+      let html = rawHtmlInput;
+      if (imageFiles.length > 0) {
+        const imageMap = new Map<string, string>();
+        for (const file of imageFiles) {
+          const base64 = await resizeImageToBase64(file, 1200);
+          imageMap.set(file.name, base64);
+        }
+        html = replaceImgSrcs(html, imageMap);
+        const remaining = extractImgFilenames(html);
+        if (remaining.length > 0) {
+          toast.warning(`첨부되지 않은 이미지: ${remaining.join(", ")}`);
+        }
+      }
+      const processed = processGuideHtml(html);
+      setCustomContent(processed);
+      setRawHtmlInput("");
+      setImageFiles([]);
+      setEncodingHelpOpen(false);
+      setHtmlDialogOpen(false);
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "이미지 처리에 실패했습니다."
+      );
+    } finally {
+      setIsHtmlProcessing(false);
+    }
   }
 
   const hasPdf = !!pdfFile || !!savedPdfPath;
@@ -288,9 +350,12 @@ export function GuidelinesEditor({
             className="max-h-[min(360px,var(--radix-select-content-available-height))] overflow-y-auto"
           >
             {guideList.map((item) => (
-              <SelectItem key={item.guideKey} value={item.guideKey}>
-                {item.displayName}
-              </SelectItem>
+              <Fragment key={item.guideKey}>
+                <SelectItem value={item.guideKey}>
+                  {item.displayName}
+                </SelectItem>
+                {item.dividerAfter && <SelectSeparator />}
+              </Fragment>
             ))}
           </SelectContent>
         </Select>
@@ -437,6 +502,7 @@ export function GuidelinesEditor({
                   className="gap-1.5"
                   onClick={() => {
                     setRawHtmlInput("");
+                    setImageFiles([]);
                     setHtmlDialogOpen(true);
                   }}
                 >
@@ -475,6 +541,7 @@ export function GuidelinesEditor({
                     onClick={() => {
                       setCustomContent("");
                       setRawHtmlInput("");
+                      setImageFiles([]);
                       setHtmlDialogOpen(true);
                     }}
                   >
@@ -628,19 +695,79 @@ export function GuidelinesEditor({
               )}
             </div>
           </div>
+          {detectedImgFilenames.length > 0 && (
+            <div className="space-y-2 rounded-md border bg-amber-50 p-3 dark:bg-amber-950/20">
+              <p className="text-xs font-semibold text-amber-900 dark:text-amber-200">
+                이미지 {detectedImgFilenames.length}장 감지됨
+              </p>
+              <p className="text-xs text-amber-800 dark:text-amber-300">
+                HTML에 로컬 이미지 파일이 포함되어 있습니다. 아래 파일명과
+                동일한 이미지를 선택하면 자동으로 삽입됩니다.
+              </p>
+              <ul className="space-y-0.5 text-xs">
+                {detectedImgFilenames.map((name) => {
+                  const matched = imageFiles.some((f) => f.name === name);
+                  return (
+                    <li
+                      key={name}
+                      className={
+                        matched
+                          ? "text-green-700 dark:text-green-400"
+                          : "text-amber-800 dark:text-amber-300"
+                      }
+                    >
+                      {matched ? "✓ " : "• "}
+                      {name}
+                    </li>
+                  );
+                })}
+              </ul>
+              <input
+                ref={imgInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/gif,image/webp"
+                multiple
+                className="hidden"
+                onChange={handleImageSelect}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                onClick={() => imgInputRef.current?.click()}
+              >
+                <FileUp className="size-3.5" />
+                {imageFiles.length > 0
+                  ? `${imageFiles.length}장 선택됨 — 변경`
+                  : "이미지 파일 선택"}
+              </Button>
+            </div>
+          )}
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => {
                 setHtmlDialogOpen(false);
                 setRawHtmlInput("");
+                setImageFiles([]);
                 setEncodingHelpOpen(false);
               }}
             >
               취소
             </Button>
-            <Button onClick={handleHtmlProcess} disabled={!rawHtmlInput.trim()}>
-              처리
+            <Button
+              onClick={handleHtmlProcess}
+              disabled={!rawHtmlInput.trim() || isHtmlProcessing}
+            >
+              {isHtmlProcessing ? (
+                <>
+                  <Loader2 className="size-3.5 animate-spin" />
+                  처리 중...
+                </>
+              ) : (
+                "처리"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
