@@ -298,7 +298,7 @@ export function DashboardGallerySheet({
                 저장된 사진이 없습니다.
               </p>
             ) : (
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6">
                 {photos.map((photo, idx) => (
                   <div key={photo.id} className="relative aspect-square">
                     {photo.url ? (
