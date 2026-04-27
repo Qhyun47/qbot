@@ -52,6 +52,41 @@ function GeneratingSkeleton() {
   );
 }
 
+function parseGeminiError(
+  text: string
+): { code?: number; status?: string } | null {
+  // 순수 JSON 또는 "접두사: {json}" 패턴에서 Gemini 에러 객체를 추출
+  const jsonMatch = text.match(/(\{[\s\S]+\})/);
+  if (!jsonMatch) return null;
+  try {
+    const parsed = JSON.parse(jsonMatch[1]) as {
+      error?: { code?: number; status?: string };
+    };
+    return parsed?.error ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function formatAiErrorMessage(raw: string): string {
+  // Gemini API가 반환하는 에러 JSON을 사용자 친화적인 문구로 변환
+  const segments = raw.split(" / ").map((segment) => {
+    const err = parseGeminiError(segment);
+    if (err?.status === "UNAVAILABLE" || err?.code === 503) {
+      return "AI 서버가 일시적으로 혼잡합니다. 재생성을 시도해 주세요.";
+    }
+    if (err?.status === "RESOURCE_EXHAUSTED" || err?.code === 429) {
+      return "AI 사용 한도에 도달했습니다. 잠시 후 다시 시도해 주세요.";
+    }
+    if (err) {
+      // 알 수 없는 Gemini 에러 코드는 JSON 대신 코드만 노출
+      return `AI 오류 (코드: ${err.code ?? "unknown"})`;
+    }
+    return segment;
+  });
+  return segments.join(" / ");
+}
+
 function FailedState({ errorMessage }: { errorMessage: string | null }) {
   return (
     <div className="flex flex-col items-center gap-4 rounded-lg border border-red-200 bg-red-50 p-10 text-center dark:border-red-800 dark:bg-red-950/30">
@@ -61,7 +96,9 @@ function FailedState({ errorMessage }: { errorMessage: string | null }) {
           차팅 생성 실패
         </p>
         <p className="text-sm text-red-600/80 dark:text-red-500/80">
-          {errorMessage ?? "알 수 없는 오류가 발생했습니다."}
+          {errorMessage
+            ? formatAiErrorMessage(errorMessage)
+            : "알 수 없는 오류가 발생했습니다."}
         </p>
       </div>
       <Button variant="destructive" size="sm" disabled>
@@ -187,7 +224,7 @@ async function CaseContent({
                   <div>
                     <p className="font-medium">일부 생성 실패</p>
                     <p className="mt-0.5 text-xs opacity-80">
-                      {result.error_message}
+                      {formatAiErrorMessage(result.error_message)}
                     </p>
                   </div>
                 </div>

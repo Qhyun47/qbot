@@ -1,10 +1,10 @@
 import { GoogleGenAI } from "@google/genai";
 
-const MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
+const MODEL = process.env.GEMINI_MODEL ?? "gemini-3-flash-preview";
 
 function createClient(): GoogleGenAI {
-  const apiKey = process.env.GOOGLE_GENAI_API_KEY;
-  if (!apiKey) throw new Error("GOOGLE_GENAI_API_KEY 미설정");
+  const apiKey = process.env.GEMINI_FREE_API_KEY;
+  if (!apiKey) throw new Error("GEMINI_FREE_API_KEY 미설정");
   return new GoogleGenAI({ apiKey });
 }
 

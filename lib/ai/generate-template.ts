@@ -9,7 +9,10 @@ export async function generateTemplate(
   templateKey: string,
   _cc: string
 ): Promise<string> {
-  const template = loadTemplate(templateKey);
+  const template = loadTemplate(templateKey) as Record<string, unknown>;
+  // pe, history 섹션은 별도 Stage에서 생성되므로 AI에 노출하지 않음
+  // (모델이 output_example 범위를 벗어나 해당 섹션까지 출력하는 것을 방지)
+  const { pe: _pe, history: _history, ...templateForAi } = template;
 
   const { inputs, ...ccSpecificFields } = structuredCase;
   const templateInputs = inputs.filter((i) => i.sections.includes("template"));
@@ -24,7 +27,7 @@ export async function generateTemplate(
   const promptData: Record<string, unknown> = {
     templateInputs,
     ccSpecificFields,
-    template,
+    template: templateForAi,
   };
   if (referenceExamples.length > 0) {
     promptData.referenceExamples = referenceExamples;
