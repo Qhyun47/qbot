@@ -59,7 +59,7 @@ export async function listCasesByBed(): Promise<Case[]> {
   } = await supabase.auth.getUser();
   if (!user) return [];
 
-  const since12h = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
+  const since12h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
   const { data } = await supabase
     .from("cases")
@@ -83,7 +83,7 @@ export async function listCasesWithin12h(): Promise<Case[]> {
   } = await supabase.auth.getUser();
   if (!user) return [];
 
-  const since = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
   const { data } = await supabase
     .from("cases")

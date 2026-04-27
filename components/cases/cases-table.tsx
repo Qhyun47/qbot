@@ -38,7 +38,7 @@ export function CasesTable({ cases }: CasesTableProps) {
     return (
       <div className="flex flex-col items-center gap-4 rounded-lg border border-dashed py-16 text-center">
         <p className="text-sm text-muted-foreground">
-          최근 12시간 이내 케이스가 없습니다.
+          최근 24시간 이내 케이스가 없습니다.
         </p>
       </div>
     );
