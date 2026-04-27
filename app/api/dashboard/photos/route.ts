@@ -39,6 +39,50 @@ export async function GET(_req: NextRequest) {
   return NextResponse.json(photosWithUrl);
 }
 
+export async function DELETE(_req: NextRequest) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { data: photos, error: fetchError } = await supabase
+    .from("dashboard_photos")
+    .select("id, storage_path")
+    .eq("user_id", user.id);
+
+  if (fetchError) {
+    return NextResponse.json(
+      { error: "조회에 실패했습니다." },
+      { status: 500 }
+    );
+  }
+
+  if (!photos || photos.length === 0) {
+    return NextResponse.json({ deleted: 0 });
+  }
+
+  const storagePaths = photos.map((p) => p.storage_path);
+  await supabase.storage.from("case-photos").remove(storagePaths);
+
+  const { error: deleteError } = await supabase
+    .from("dashboard_photos")
+    .delete()
+    .eq("user_id", user.id);
+
+  if (deleteError) {
+    return NextResponse.json(
+      { error: "삭제에 실패했습니다." },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json({ deleted: photos.length });
+}
+
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
 

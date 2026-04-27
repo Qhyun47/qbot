@@ -11,6 +11,7 @@ import {
   Loader2,
   RotateCcw,
   RotateCw,
+  Trash2,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -93,6 +94,8 @@ export function DashboardGallerySheet({
   const [rotation, setRotation] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
   const [savingPhotoId, setSavingPhotoId] = useState<string | null>(null);
+  const [confirmDeleteAll, setConfirmDeleteAll] = useState(false);
+  const [deletingAll, setDeletingAll] = useState(false);
 
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const albumInputRef = useRef<HTMLInputElement>(null);
@@ -194,6 +197,22 @@ export function DashboardGallerySheet({
     }
   };
 
+  const handleDeleteAll = async () => {
+    setDeletingAll(true);
+    try {
+      const res = await fetch("/api/dashboard/photos", { method: "DELETE" });
+      if (res.ok) {
+        setPhotos([]);
+        toast("모든 사진이 삭제되었습니다.");
+      } else {
+        toast.error("삭제 중 오류가 발생했습니다.");
+      }
+    } finally {
+      setDeletingAll(false);
+      setConfirmDeleteAll(false);
+    }
+  };
+
   const handleDownloadAll = () => {
     photos.forEach((photo, i) => {
       setTimeout(() => triggerDownload(photo), i * 500);
@@ -226,22 +245,40 @@ export function DashboardGallerySheet({
           <DrawerHeader>
             <div className="flex items-center justify-between pr-2">
               <DrawerTitle>사진 갤러리</DrawerTitle>
-              {!loading && photos.length >= 2 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="hidden gap-1.5 text-xs text-muted-foreground is-desktop:flex"
-                  onClick={handleDownloadAll}
-                  disabled={savingPhotoId !== null}
-                >
-                  {savingPhotoId !== null ? (
-                    <Loader2 className="size-3.5 animate-spin" />
-                  ) : (
-                    <DownloadCloud className="size-3.5" />
-                  )}
-                  모두 다운로드
-                </Button>
-              )}
+              <div className="hidden items-center gap-1 is-desktop:flex">
+                {!loading && photos.length >= 2 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1.5 text-xs text-muted-foreground"
+                    onClick={handleDownloadAll}
+                    disabled={savingPhotoId !== null || deletingAll}
+                  >
+                    {savingPhotoId !== null ? (
+                      <Loader2 className="size-3.5 animate-spin" />
+                    ) : (
+                      <DownloadCloud className="size-3.5" />
+                    )}
+                    모두 다운로드
+                  </Button>
+                )}
+                {!loading && photos.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1.5 text-xs text-destructive hover:text-destructive"
+                    onClick={() => setConfirmDeleteAll(true)}
+                    disabled={savingPhotoId !== null || deletingAll}
+                  >
+                    {deletingAll ? (
+                      <Loader2 className="size-3.5 animate-spin" />
+                    ) : (
+                      <Trash2 className="size-3.5" />
+                    )}
+                    전체 삭제
+                  </Button>
+                )}
+              </div>
             </div>
           </DrawerHeader>
 
@@ -312,6 +349,22 @@ export function DashboardGallerySheet({
 
             {/* 업로드 버튼 — 모바일 전용 */}
             <div className="flex flex-col gap-4 is-desktop:hidden">
+              {photos.length > 0 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full text-destructive hover:text-destructive"
+                  onClick={() => setConfirmDeleteAll(true)}
+                  disabled={deletingAll || savingPhotoId !== null}
+                >
+                  {deletingAll ? (
+                    <Loader2 className="mr-2 size-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="mr-2 size-4" />
+                  )}
+                  전체 삭제
+                </Button>
+              )}
               <div className="h-px bg-border" />
               <div className="flex gap-3">
                 <Button
@@ -499,6 +552,31 @@ export function DashboardGallerySheet({
           <AlertDialogFooter>
             <AlertDialogCancel>취소</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete}>삭제</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* 전체 삭제 확인 다이얼로그 */}
+      <AlertDialog
+        open={confirmDeleteAll}
+        onOpenChange={(v) => {
+          if (!v && !deletingAll) setConfirmDeleteAll(false);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>전체 삭제</AlertDialogTitle>
+            <AlertDialogDescription>
+              모든 사진({photos.length}장)을 삭제하면 복구할 수 없습니다.
+              삭제하시겠습니까?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deletingAll}>취소</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteAll} disabled={deletingAll}>
+              {deletingAll && <Loader2 className="mr-2 size-4 animate-spin" />}
+              삭제
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
