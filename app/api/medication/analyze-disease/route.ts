@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateMedAnalysisText } from "@/lib/medication/gemini-free-client";
 
+export const maxDuration = 30;
+
 const SYSTEM_INSTRUCTION =
   "당신은 임상 의사입니다. 제공된 약물 목록과 사용자가 명시한 기저질환을 종합하여 추가 가능성 있는 기저질환을 마크다운으로 분석하세요. 사용자 명시 기저질환과 약물의 정합성·설명되지 않는 약물도 함께 분석.";
 

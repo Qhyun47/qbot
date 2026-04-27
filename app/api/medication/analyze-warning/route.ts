@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateMedAnalysisText } from "@/lib/medication/gemini-free-client";
 
+export const maxDuration = 30;
+
 const SYSTEM_INSTRUCTION =
   "당신은 임상 약사입니다. 제공된 약물 목록에서 수술/시술 전 중단이 필요한 항혈소판제·항응고제 성분을 식별하여 마크다운 리스트로 반환하세요. 발견 안 되면 '확인된 항혈전제 없음'으로 답변.";
 

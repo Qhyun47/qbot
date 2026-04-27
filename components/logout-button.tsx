@@ -21,7 +21,7 @@ export function LogoutButton() {
   return (
     <Button onClick={logout} disabled={isPending}>
       {isPending && <Loader2 className="size-4 animate-spin" />}
-      {isPending ? "로그아웃 중..." : "Logout"}
+      {isPending ? "로그아웃 중..." : "로그아웃"}
     </Button>
   );
 }

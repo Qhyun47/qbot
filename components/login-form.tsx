@@ -42,7 +42,7 @@ export function LoginForm({
       // Update this route to redirect to an authenticated route. The user already has an active session.
       router.push("/dashboard");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(error instanceof Error ? error.message : "오류가 발생했습니다");
     } finally {
       setIsLoading(false);
     }
