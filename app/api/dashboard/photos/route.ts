@@ -88,17 +88,19 @@ export async function POST(req: NextRequest) {
   }
 
   const ext = file.name.split(".").pop() ?? "jpg";
-  const storagePath = `dashboard/${user.id}/${Date.now()}.${ext}`;
+  const storagePath = `${user.id}/dashboard/${Date.now()}.${ext}`;
+  const contentType = file.type || "image/jpeg";
   const buffer = Buffer.from(await file.arrayBuffer());
 
   const { error: uploadError } = await supabase.storage
     .from("case-photos")
     .upload(storagePath, buffer, {
-      contentType: file.type,
+      contentType,
       upsert: false,
     });
 
   if (uploadError) {
+    console.error("[dashboard/photos] 업로드 실패:", uploadError.message);
     return NextResponse.json(
       { error: "사진 업로드에 실패했습니다." },
       { status: 500 }

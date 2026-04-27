@@ -54,16 +54,6 @@ export default function DashboardPage() {
         </div>
         <div className="flex items-center gap-2">
           <MedicationTriggerButton />
-          <DashboardGallerySheet>
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              aria-label="사진 갤러리"
-            >
-              <Camera className="size-4" />
-            </Button>
-          </DashboardGallerySheet>
           <NewCaseButton className="gap-1.5" />
         </div>
       </div>
@@ -98,16 +88,16 @@ export default function DashboardPage() {
         <VersionBadge />
       </Suspense>
 
-      {/* 모바일 FAB */}
-      <div className="fixed bottom-6 right-4 z-50 xl:hidden">
+      {/* 사진 갤러리 FAB — 모바일/PC 공통 */}
+      <div className="fixed bottom-6 right-4 z-50">
         <DashboardGallerySheet>
           <Button
             type="button"
             size="icon"
-            className="size-14 rounded-full shadow-lg"
+            className="size-16 rounded-full shadow-lg"
             aria-label="사진 갤러리"
           >
-            <Camera className="size-6" />
+            <Camera className="size-7" />
           </Button>
         </DashboardGallerySheet>
       </div>

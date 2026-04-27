@@ -32,14 +32,17 @@ export async function PATCH(
   }
 
   // CDN 캐시 우회를 위해 새 경로에 저장
-  const ext = photo.storage_path.split(".").pop() ?? "jpg";
-  const newStoragePath = `dashboard/${user.id}/${Date.now()}.${ext}`;
+  const newStoragePath = `${user.id}/dashboard/${Date.now()}.jpg`;
 
   const { error: uploadError } = await supabase.storage
     .from("case-photos")
-    .upload(newStoragePath, file);
+    .upload(newStoragePath, file, {
+      contentType: "image/jpeg",
+      upsert: false,
+    });
 
   if (uploadError) {
+    console.error("[dashboard/photos/patch] 저장 실패:", uploadError.message);
     return NextResponse.json(
       { error: "사진 저장에 실패했습니다." },
       { status: 500 }

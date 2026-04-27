@@ -138,7 +138,7 @@ export function DashboardGallerySheet({
         await fetchPhotos();
       } else {
         const err = await res.json().catch(() => ({}));
-        alert(err.error ?? "업로드에 실패했습니다.");
+        toast.error(err.error ?? "업로드에 실패했습니다.");
       }
     } finally {
       setUploadingCount((c) => c - 1);
@@ -230,7 +230,7 @@ export function DashboardGallerySheet({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="gap-1.5 text-xs text-muted-foreground"
+                  className="hidden gap-1.5 text-xs text-muted-foreground is-desktop:flex"
                   onClick={handleDownloadAll}
                   disabled={savingPhotoId !== null}
                 >
@@ -245,7 +245,7 @@ export function DashboardGallerySheet({
             </div>
           </DrawerHeader>
 
-          <div className="flex flex-col gap-4 px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+          <div className="flex min-h-[55vh] flex-col gap-4 overflow-y-auto px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
             <p className="text-xs text-muted-foreground">
               사진은 업로드 후 12시간이 지나면 자동으로 삭제됩니다.
             </p>
@@ -261,7 +261,7 @@ export function DashboardGallerySheet({
                 저장된 사진이 없습니다.
               </p>
             ) : (
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {photos.map((photo, idx) => (
                   <div key={photo.id} className="relative aspect-square">
                     {photo.url ? (
@@ -289,20 +289,20 @@ export function DashboardGallerySheet({
                     <button
                       type="button"
                       onClick={() => setDeleteTarget(photo)}
-                      className="absolute right-0.5 top-0.5 flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+                      className="absolute right-0.5 top-0.5 flex size-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
                       aria-label="삭제"
                     >
-                      <X className="size-3" />
+                      <X className="size-3.5" />
                     </button>
                     {photo.url && (
                       <button
                         type="button"
                         onClick={() => triggerDownload(photo)}
                         disabled={savingPhotoId === photo.id}
-                        className="absolute bottom-0.5 right-0.5 flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
+                        className="absolute bottom-0.5 right-0.5 flex size-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
                         aria-label="다운로드"
                       >
-                        <Download className="size-3" />
+                        <Download className="size-3.5" />
                       </button>
                     )}
                   </div>
@@ -310,28 +310,29 @@ export function DashboardGallerySheet({
               </div>
             )}
 
-            <div className="h-px bg-border" />
-
-            {/* 업로드 버튼 */}
-            <div className="flex gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1"
-                onClick={() => cameraInputRef.current?.click()}
-              >
-                <Camera className="mr-2 size-4" />
-                카메라
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1"
-                onClick={() => albumInputRef.current?.click()}
-              >
-                <ImagePlus className="mr-2 size-4" />
-                갤러리
-              </Button>
+            {/* 업로드 버튼 — 모바일 전용 */}
+            <div className="flex flex-col gap-4 is-desktop:hidden">
+              <div className="h-px bg-border" />
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1 sm:hidden"
+                  onClick={() => cameraInputRef.current?.click()}
+                >
+                  <Camera className="mr-2 size-4" />
+                  카메라
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => albumInputRef.current?.click()}
+                >
+                  <ImagePlus className="mr-2 size-4" />
+                  갤러리
+                </Button>
+              </div>
             </div>
 
             {uploadingCount > 0 && (
