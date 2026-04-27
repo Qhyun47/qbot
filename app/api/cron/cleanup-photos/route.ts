@@ -47,5 +47,28 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: deleteError.message }, { status: 500 });
   }
 
-  return NextResponse.json({ deleted: photos.length });
+  // 12시간 이상 된 대시보드 사진 삭제 (케이스 삭제와 독립적으로 처리)
+  let dashboardDeleted = 0;
+  try {
+    const { data: dashboardPhotos } = await supabase
+      .from("dashboard_photos")
+      .select("id, storage_path")
+      .lt(
+        "created_at",
+        new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
+      );
+
+    if (dashboardPhotos && dashboardPhotos.length > 0) {
+      const dashboardPaths = dashboardPhotos.map((p) => p.storage_path);
+      const dashboardIds = dashboardPhotos.map((p) => p.id);
+
+      await supabase.storage.from("case-photos").remove(dashboardPaths);
+      await supabase.from("dashboard_photos").delete().in("id", dashboardIds);
+      dashboardDeleted = dashboardPhotos.length;
+    }
+  } catch {
+    // 대시보드 사진 삭제 실패는 전체 응답에 영향 없음
+  }
+
+  return NextResponse.json({ deleted: photos.length, dashboardDeleted });
 }

@@ -8,7 +8,7 @@ import { generateHistory, buildHistoryDraft } from "@/lib/ai/generate-history";
 import type { StructuredCase } from "@/lib/ai/types";
 import type { Json } from "@/lib/supabase/types";
 
-const MODEL_VERSION = process.env.GEMINI_MODEL ?? "gemini-3-flash-preview";
+const MODEL_VERSION = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
 
 export async function POST(
   _req: NextRequest,
