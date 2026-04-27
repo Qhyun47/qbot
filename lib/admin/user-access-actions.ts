@@ -14,18 +14,29 @@ export interface ServiceAccessUser {
   created_at: string;
 }
 
+async function buildEmailMap(supabase: ReturnType<typeof createAdminClient>) {
+  const { data } = await supabase.auth.admin.listUsers({ perPage: 1000 });
+  return new Map((data?.users ?? []).map((u) => [u.id, u.email ?? null]));
+}
+
 export async function getPendingUsers(): Promise<ServiceAccessUser[]> {
   const isAdmin = await getIsAdmin();
   if (!isAdmin) return [];
 
   try {
     const supabase = createAdminClient();
-    const { data } = await supabase
-      .from("service_access_requests")
-      .select("*")
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, full_name, service_access_status, is_admin, created_at")
       .in("service_access_status", ["pending", "held"])
       .order("created_at", { ascending: true });
-    return (data ?? []) as ServiceAccessUser[];
+
+    const emailMap = await buildEmailMap(supabase);
+
+    return (profiles ?? []).map((p) => ({
+      ...p,
+      email: emailMap.get(p.id) ?? null,
+    })) as ServiceAccessUser[];
   } catch {
     return [];
   }
@@ -37,11 +48,17 @@ export async function getAllUsers(): Promise<ServiceAccessUser[]> {
 
   try {
     const supabase = createAdminClient();
-    const { data } = await supabase
-      .from("service_access_requests")
-      .select("*")
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, full_name, service_access_status, is_admin, created_at")
       .order("created_at", { ascending: false });
-    return (data ?? []) as ServiceAccessUser[];
+
+    const emailMap = await buildEmailMap(supabase);
+
+    return (profiles ?? []).map((p) => ({
+      ...p,
+      email: emailMap.get(p.id) ?? null,
+    })) as ServiceAccessUser[];
   } catch {
     return [];
   }
