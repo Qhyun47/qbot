@@ -4,6 +4,7 @@ import Link from "next/link";
 import { NewCaseButton } from "@/components/cases/new-case-button";
 import { MedicationTriggerButton } from "@/components/medication/medication-trigger-button";
 import { DashboardGallerySheet } from "@/components/dashboard/dashboard-gallery-sheet";
+import { RefreshButton } from "@/components/dashboard/refresh-button";
 import { Button } from "@/components/ui/button";
 import { StatusBoard } from "@/components/cases/status-board";
 import { HideAllFromBoardButton } from "@/components/cases/hide-all-from-board-button";
@@ -66,6 +67,7 @@ export default function DashboardPage() {
           </h2>
           <div className="flex items-center gap-2">
             <NewCaseButton className="xl:hidden" size="sm" />
+            <RefreshButton />
             <HideAllFromBoardButton />
             <Link
               href="/cases"
