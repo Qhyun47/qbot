@@ -108,10 +108,34 @@ export function NewCaseForm({
   const rootRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const prevCardsLengthRef = useRef(0);
+  // caseId가 아직 없을 때 선택된 베드/CC를 임시 보관 — createCase() 응답 전 선택 시 유실 방지
+  const pendingBedRef = useRef<{ zone: BedZone; number: number } | null>(null);
+  const pendingCcRef = useRef<{
+    cc: string;
+    hasTemplate: boolean;
+    templateKey: string | null;
+  } | null>(null);
 
   useEffect(() => {
     createCase().then((id) => setCaseId(id));
   }, []);
+
+  // caseId가 생기면 임시 보관된 베드/CC를 즉시 저장
+  useEffect(() => {
+    if (!caseId) return;
+    if (pendingBedRef.current) {
+      const { zone, number } = pendingBedRef.current;
+      pendingBedRef.current = null;
+      startTransition(() => updateCaseBed(caseId, zone, number));
+    }
+    if (pendingCcRef.current) {
+      const { cc: pendingCc, hasTemplate, templateKey } = pendingCcRef.current;
+      pendingCcRef.current = null;
+      startTransition(() =>
+        updateCaseCc(caseId, pendingCc, hasTemplate, templateKey)
+      );
+    }
+  }, [caseId]);
 
   // Android Chrome: 키보드가 올라오면 visual viewport가 스크롤되어
   // fixed 컨테이너가 화면 위로 밀려나는 문제를 보정
@@ -229,7 +253,11 @@ export function NewCaseForm({
     setBedNumber(number);
     if (number !== null) {
       setBedPickerOpen(false);
-      if (caseId) startTransition(() => updateCaseBed(caseId, zone, number));
+      if (caseId) {
+        startTransition(() => updateCaseBed(caseId, zone, number));
+      } else {
+        pendingBedRef.current = { zone, number };
+      }
     }
   };
 
@@ -244,9 +272,15 @@ export function NewCaseForm({
     if (templateEntries.length === 0) {
       setPendingTemplateKeys(null);
       setSelectedTemplateKey(null);
-      startTransition(() => {
-        if (caseId) updateCaseCc(caseId, selectedCc, false, null);
-      });
+      if (caseId) {
+        startTransition(() => updateCaseCc(caseId, selectedCc, false, null));
+      } else {
+        pendingCcRef.current = {
+          cc: selectedCc,
+          hasTemplate: false,
+          templateKey: null,
+        };
+      }
       return;
     }
 
@@ -255,9 +289,15 @@ export function NewCaseForm({
       const key = rank0?.key ?? templateEntries[0].key;
       setPendingTemplateKeys(null);
       setSelectedTemplateKey(key);
-      startTransition(() => {
-        if (caseId) updateCaseCc(caseId, selectedCc, true, key);
-      });
+      if (caseId) {
+        startTransition(() => updateCaseCc(caseId, selectedCc, true, key));
+      } else {
+        pendingCcRef.current = {
+          cc: selectedCc,
+          hasTemplate: true,
+          templateKey: key,
+        };
+      }
     } else {
       const sortedKeys = [...templateEntries]
         .sort((a, b) => a.rank - b.rank)
