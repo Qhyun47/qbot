@@ -3,37 +3,37 @@
   "cc": "Fever",
   "description": "소아 발열 환자 EMR 상용구 템플릿",
   "hpi_hints": "발열 시작 시점과 해열제 반응을 반드시 포함. 동반 증상(기침/가래/콧물, 구역/구토, 설사)과 활동도·수유/식이 변화, 가족 내 URI 이력이 확인된 경우 포함.",
-  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. default 값이 있는 field(Activity, Urination & Defecation, Oral Intake, Vaccination)는 정보 없으면 default 값을 사용하라. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 \u0027open\u0027인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. default 값이 있는 field(Activity, Urination \u0026 Defecation, Oral Intake, Vaccination)는 정보 없으면 default 값을 사용하라. type이 \u0027symptom_check\u0027인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 \u0027+\u0027, 언급 없으면 반드시 \u0027-\u0027를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라. output_example의 모든 줄을 위에서부터 순서대로 빠짐없이 출력하라. 값이 없어도 라벨 줄 자체는 절대 삭제하거나 생략하지 않는다.",
   "fields": [
     {
       "key": "onset",
       "label": "Onset",
       "type": "open",
-      "description": "발열 시작 시점 (예: '2일 전', '금일 오전'). 정보 없으면 빈 문자열."
+      "description": "발열 시작 시점 (예: \u00272일 전\u0027, \u0027금일 오전\u0027). 정보 없으면 빈 문자열."
     },
     {
       "key": "duration",
       "label": "Duration",
       "type": "open",
-      "description": "발열 지속 형태 (예: '지속적', '간헐적'). 정보 없으면 빈 문자열."
+      "description": "발열 지속 형태 (예: \u0027지속적\u0027, \u0027간헐적\u0027). 정보 없으면 빈 문자열."
     },
     {
       "key": "antipyretic",
       "label": "해열제",
       "type": "open",
-      "description": "사용한 해열제 종류 (예: '타이레놀', '부루펜', '타이레놀+부루펜 교대'). 사용하지 않았으면 '없음'. 정보 없으면 빈 문자열."
+      "description": "사용한 해열제 종류 (예: \u0027타이레놀\u0027, \u0027부루펜\u0027, \u0027타이레놀+부루펜 교대\u0027). 사용하지 않았으면 \u0027없음\u0027. 정보 없으면 빈 문자열."
     },
     {
       "key": "antipyretic_last_time",
       "label": "해열제 마지막 먹은 시간",
       "type": "open",
-      "description": "해열제 마지막 투여 시간 (예: '3시간 전', '오전 8시'). 해열제 미사용이면 빈 문자열."
+      "description": "해열제 마지막 투여 시간 (예: \u00273시간 전\u0027, \u0027오전 8시\u0027). 해열제 미사용이면 빈 문자열."
     },
     {
       "key": "axillary_bt",
       "label": "내원시 axillary BT",
       "type": "open",
-      "description": "내원 시 측정한 겨드랑이 체온 (예: '38.5℃'). 정보 없으면 빈 문자열."
+      "description": "내원 시 측정한 겨드랑이 체온 (예: \u002738.5℃\u0027). 정보 없으면 빈 문자열."
     },
     {
       "key": "fever_chill",
@@ -127,43 +127,43 @@
       "label": "Activity",
       "type": "open",
       "default": "N-S",
-      "description": "활동도 변화. 정상이면 'N-S'. 저하되었으면 구체적 서술 (예: '저하', '기면'). 정보 없으면 'N-S'."
+      "description": "활동도 변화. 정상이면 \u0027N-S\u0027. 저하되었으면 구체적 서술 (예: \u0027저하\u0027, \u0027기면\u0027). 정보 없으면 \u0027N-S\u0027."
     },
     {
       "key": "urination_defecation",
-      "label": "Urination & Defecation",
+      "label": "Urination \u0026 Defecation",
       "type": "open",
       "default": "N-S",
-      "description": "배뇨·배변 상태. 정상이면 'N-S'. 이상 있으면 구체적 서술. 정보 없으면 'N-S'."
+      "description": "배뇨·배변 상태. 정상이면 \u0027N-S\u0027. 이상 있으면 구체적 서술. 정보 없으면 \u0027N-S\u0027."
     },
     {
       "key": "oral_intake",
       "label": "Oral Intake",
       "type": "open",
       "default": "N-S",
-      "description": "수유 또는 식이 섭취 상태. 정상이면 'N-S'. 감소/거부 등 변화 있으면 구체적 서술. 정보 없으면 'N-S'."
+      "description": "수유 또는 식이 섭취 상태. 정상이면 \u0027N-S\u0027. 감소/거부 등 변화 있으면 구체적 서술. 정보 없으면 \u0027N-S\u0027."
     },
     {
       "key": "family_uri_hx",
       "label": "Family URI Hx.",
       "type": "open",
-      "description": "가족 내 URI(상기도감염) 이력 (예: '형, 아빠 감기'). 정보 없으면 빈 문자열."
+      "description": "가족 내 URI(상기도감염) 이력 (예: \u0027형, 아빠 감기\u0027). 정보 없으면 빈 문자열."
     },
     {
       "key": "birth_history",
       "label": "Birth History",
       "type": "open",
-      "description": "출생력. 형식: '{주수}wks {체중}kg {출생순위} NSVD 또는 C-sec' (예: '38wks 3.2kg 1st NSVD'). 정보 없으면 빈 문자열."
+      "description": "출생력. 형식: \u0027{주수}wks {체중}kg {출생순위} NSVD 또는 C-sec\u0027 (예: \u002738wks 3.2kg 1st NSVD\u0027). 정보 없으면 빈 문자열."
     },
     {
       "key": "vaccination",
       "label": "Vaccination",
       "type": "open",
       "default": "as scheduled, 최근 1달 이내 접종( )",
-      "description": "예방접종 상태. 기본: 'as scheduled, 최근 1달 이내 접종( )'. 최근 1달 이내 접종이 있으면 괄호 안에 종류 기재. 정보 없으면 default 사용."
+      "description": "예방접종 상태. 기본: \u0027as scheduled, 최근 1달 이내 접종( )\u0027. 최근 1달 이내 접종이 있으면 괄호 안에 종류 기재. 정보 없으면 default 사용."
     }
   ],
-  "output_example": "Onset : \nDuration : \n해열제 : \n해열제 마지막 먹은 시간 : \n내원시 axillary BT : \n\nF/C(-/-)  C/S/R(-/-/-)  A/N/V/D/C (-/-/-/-/-)\n\nActivity : N-S\nUrination & Defecation : N-S\nOral Intake : N-S\nFamily URI Hx. : \nBirth History :  wks  kg  1st 2nd  NSVD C-sec\nVaccination : as scheduled, 최근 1달 이내 접종( )",
+  "output_example": "Onset : \nDuration : \n해열제 : \n해열제 마지막 먹은 시간 : \n내원시 axillary BT : \n\nF/C(-/-)  C/S/R(-/-/-)  A/N/V/D/C (-/-/-/-/-)\n\nActivity : N-S\nUrination \u0026 Defecation : N-S\nOral Intake : N-S\nFamily URI Hx. : \nBirth History :  wks  kg  1st 2nd  NSVD C-sec\nVaccination : as scheduled, 최근 1달 이내 접종( )",
   "pe": {
     "fields": [
       {
@@ -179,7 +179,7 @@
       {
         "key": "abdomen",
         "label": "Abd.",
-        "default": "soft & flat / Tr(-) rTr(-) /CVA Tr(-)"
+        "default": "soft \u0026 flat / Tr(-) rTr(-) /CVA Tr(-)"
       },
       {
         "key": "pitting_edema",
@@ -192,13 +192,25 @@
         "default": "(-)"
       }
     ],
-    "output_example": "Lung sound : clear  / Throat inj. (-)\nBowel sound : N-S\nAbd. soft & flat / Tr(-) rTr(-) /CVA Tr(-)\nPitting edema (-)\nPalpable LN (-)"
+    "output_example": "Lung sound : clear  / Throat inj. (-)\nBowel sound : N-S\nAbd. soft \u0026 flat / Tr(-) rTr(-) /CVA Tr(-)\nPitting edema (-)\nPalpable LN (-)"
   },
   "history": {
     "fields": [
-      { "key": "past", "label": "PHx", "default": "" },
-      { "key": "medication", "label": "Med Hx", "default": "" },
-      { "key": "operation", "label": "OP Hx", "default": "" }
+      {
+        "key": "past",
+        "label": "PHx",
+        "default": ""
+      },
+      {
+        "key": "medication",
+        "label": "Med Hx",
+        "default": ""
+      },
+      {
+        "key": "operation",
+        "label": "OP Hx",
+        "default": ""
+      }
     ],
     "output_example": "PHx: \nMed Hx: \nOP Hx.:"
   }

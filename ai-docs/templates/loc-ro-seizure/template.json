@@ -3,19 +3,19 @@
   "cc": "LOC (R/O Seizure)",
   "description": "의식소실(LOC) R/O Seizure 환자 EMR 상용구 템플릿",
   "hpi_hints": "의식소실의 전후 상황을 시간순으로 서술. seizure 시사 소견(post-ictal confusion, tongue bite, urination, eyeball deviation)과 syncope 시사 소견(전구 증상, 체위 변화, 자율신경계 증상)을 구분하여 기술.",
-  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+'로 교체하고, 언급 없으면 반드시 해당 slot의 default 값을 유지하라. '( )' 스타일 항목(default 공백): 언급 시 '(+)', 없으면 '( )' 그대로 유지. '(-)' 스타일 항목(default '-'): 언급 시 '(+)', 없으면 '(-)' 유지. post ictal confusion 항목: 언급 시 '(+) / duration [시간]', 없으면 '(-) / duration'. output_example의 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 \u0027open\u0027인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 \u0027symptom_check\u0027인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 \u0027+\u0027로 교체하고, 언급 없으면 반드시 해당 slot의 default 값을 유지하라. \u0027( )\u0027 스타일 항목(default 공백): 언급 시 \u0027(+)\u0027, 없으면 \u0027( )\u0027 그대로 유지. \u0027(-)\u0027 스타일 항목(default \u0027-\u0027): 언급 시 \u0027(+)\u0027, 없으면 \u0027(-)\u0027 유지. post ictal confusion 항목: 언급 시 \u0027(+) / duration [시간]\u0027, 없으면 \u0027(-) / duration\u0027. output_example의 줄 순서, 공백, 구두점을 그대로 유지하라. output_example의 모든 줄을 위에서부터 순서대로 빠짐없이 출력하라. 값이 없어도 라벨 줄 자체는 절대 삭제하거나 생략하지 않는다.",
   "fields": [
     {
       "key": "first_syncope",
       "label": "1st syncope",
       "type": "open",
-      "description": "초발 실신 여부. 처음이면 '(+)', 이전 에피소드가 있으면 '(-)', 정보 없으면 '(-)'."
+      "description": "초발 실신 여부. 처음이면 \u0027(+)\u0027, 이전 에피소드가 있으면 \u0027(-)\u0027, 정보 없으면 \u0027(-)\u0027."
     },
     {
       "key": "duration",
       "label": "Duration",
       "type": "open",
-      "description": "의식소실 지속 시간 (예: '약 1분', '수초간'). 정보 없으면 빈 문자열."
+      "description": "의식소실 지속 시간 (예: \u0027약 1분\u0027, \u0027수초간\u0027). 정보 없으면 빈 문자열."
     },
     {
       "key": "loc_detail",
@@ -54,7 +54,7 @@
           "default": " "
         }
       ],
-      "description": "실신 직전 자세. 언급된 항목은 '+'로, 언급 없으면 ' '(공백) 유지."
+      "description": "실신 직전 자세. 언급된 항목은 \u0027+\u0027로, 언급 없으면 \u0027 \u0027(공백) 유지."
     },
     {
       "key": "pre_emotion",
@@ -93,7 +93,7 @@
           "default": " "
         }
       ],
-      "description": "실신 직전 감정 유발 요인. 언급된 항목은 '+'로, 없으면 ' '(공백) 유지."
+      "description": "실신 직전 감정 유발 요인. 언급된 항목은 \u0027+\u0027로, 없으면 \u0027 \u0027(공백) 유지."
     },
     {
       "key": "pre_situation",
@@ -132,7 +132,7 @@
           "default": " "
         }
       ],
-      "description": "실신 직전 상황적 유발 요인. 언급된 항목은 '+'로, 없으면 ' '(공백) 유지."
+      "description": "실신 직전 상황적 유발 요인. 언급된 항목은 \u0027+\u0027로, 없으면 \u0027 \u0027(공백) 유지."
     },
     {
       "key": "cp_palp_doe_sob",
@@ -345,7 +345,7 @@
           "default": " "
         }
       ],
-      "description": "의식소실 중 seizure 관련 소견. 언급 시 '+'로, 없으면 ' '(공백) 유지."
+      "description": "의식소실 중 seizure 관련 소견. 언급 시 \u0027+\u0027로, 없으면 \u0027 \u0027(공백) 유지."
     },
     {
       "key": "during_other",
@@ -408,25 +408,25 @@
           "default": " "
         }
       ],
-      "description": "의식소실 중 기타 소견. 언급 시 '+'로, 없으면 ' '(공백) 유지."
+      "description": "의식소실 중 기타 소견. 언급 시 \u0027+\u0027로, 없으면 \u0027 \u0027(공백) 유지."
     },
     {
       "key": "post_ictal_confusion",
       "label": "post ictal confusion",
       "type": "open",
-      "description": "의식 회복 직후 post-ictal confusion 여부. 있으면 '(+) / duration [시간]', 없으면 '(-) / duration'."
+      "description": "의식 회복 직후 post-ictal confusion 여부. 있으면 \u0027(+) / duration [시간]\u0027, 없으면 \u0027(-) / duration\u0027."
     },
     {
       "key": "post_resyncope",
       "label": "재실신",
       "type": "open",
-      "description": "의식 회복 직후 바로 재실신 여부. 있으면 '(+)', 없으면 '(-)'."
+      "description": "의식 회복 직후 바로 재실신 여부. 있으면 \u0027(+)\u0027, 없으면 \u0027(-)\u0027."
     },
     {
       "key": "post_trauma",
       "label": "외상 여부",
       "type": "open",
-      "description": "의식소실 후 외상 여부. 있으면 '(+)', 없으면 '(-)'."
+      "description": "의식소실 후 외상 여부. 있으면 \u0027(+)\u0027, 없으면 \u0027(-)\u0027."
     },
     {
       "key": "post_headache_myalgia",
@@ -508,25 +508,41 @@
         "label": "EOM / nystagmus / diplopia",
         "default": "EOM intact, nystagmus, diplopia(-/-)"
       },
-      { "key": "facial", "label": "Facial Motor sensory", "default": "intact" },
+      {
+        "key": "facial",
+        "label": "Facial Motor sensory",
+        "default": "intact"
+      },
       {
         "key": "limb_motor",
         "label": "Limb Motor power",
         "default": "5 5\n                 5 5"
       },
-      { "key": "limb_sensory", "label": "Limb Sensory", "default": "intact" }
+      {
+        "key": "limb_sensory",
+        "label": "Limb Sensory",
+        "default": "intact"
+      }
     ],
     "output_example": "Vital stable, Mental alert, Pupil 3+/3+\nEOM intact, nystagmus, diplopia(-/-)\nFacial Motor sensory intact\nLimb Motor power 5 5\n                 5 5\nLimb Sensory intact"
   },
   "history": {
     "fields": [
-      { "key": "past", "label": "Past Hx.", "default": "" },
+      {
+        "key": "past",
+        "label": "Past Hx.",
+        "default": ""
+      },
       {
         "key": "medication",
         "label": "Med Hx.",
         "default": "(약 / 약 변동사항 (특히 HTN, BPH))"
       },
-      { "key": "operation", "label": "Op Hx.", "default": "" },
+      {
+        "key": "operation",
+        "label": "Op Hx.",
+        "default": ""
+      },
       {
         "key": "alcohol",
         "label": "Alcohol",

@@ -35,7 +35,7 @@ export async function generateTemplate(
 
   const userPrompt = JSON.stringify(promptData, null, 2);
 
-  const result = await generateText(userPrompt, systemPrompt, 3000);
+  const result = await generateText(userPrompt, systemPrompt, 5000);
   if (!result) throw new Error("상용구 생성 실패: 빈 응답");
   return result;
 }

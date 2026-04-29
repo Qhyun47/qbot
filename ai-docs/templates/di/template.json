@@ -3,7 +3,7 @@
   "cc": "Drug overdose",
   "description": "Drug intoxication / Drug overdose 환자 EMR 상용구 템플릿",
   "hpi_hints": "복용 물질과 양, 복용 시기를 반드시 포함. 발견 경위와 발견 당시 의식 상태 확인. CO 중독의 경우 CO Hb, 밀폐 공간 여부, O2 이송 여부 포함. 정신건강의학과 관련 병력(PC Hx) 확인.",
-  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 \u0027open\u0027인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 \u0027symptom_check\u0027인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 \u0027+\u0027, 언급 없으면 반드시 \u0027-\u0027를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라. output_example의 모든 줄을 위에서부터 순서대로 빠짐없이 출력하라. 값이 없어도 라벨 줄 자체는 절대 삭제하거나 생략하지 않는다.",
   "fields": [
     {
       "key": "interview_ready",
@@ -15,55 +15,55 @@
       "key": "substance",
       "label": "복용물질",
       "type": "open",
-      "description": "복용한 물질 이름 (예: '수면제', '아세트아미노펜', 'CO'). 정보 없으면 빈 문자열."
+      "description": "복용한 물질 이름 (예: \u0027수면제\u0027, \u0027아세트아미노펜\u0027, \u0027CO\u0027). 정보 없으면 빈 문자열."
     },
     {
       "key": "amount",
       "label": "양",
       "type": "open",
-      "description": "복용량 (예: '10알', '불명'). 정보 없으면 빈 문자열."
+      "description": "복용량 (예: \u002710알\u0027, \u0027불명\u0027). 정보 없으면 빈 문자열."
     },
     {
       "key": "ingestion_time",
       "label": "복용시기",
       "type": "open",
-      "description": "복용 시각 또는 시점 (예: '금일 오후 3시경', '2시간 전'). 정보 없으면 빈 문자열."
+      "description": "복용 시각 또는 시점 (예: \u0027금일 오후 3시경\u0027, \u00272시간 전\u0027). 정보 없으면 빈 문자열."
     },
     {
       "key": "reason_motive",
       "label": "원인, 동기",
       "type": "open",
-      "description": "복용 이유 및 동기 (예: '자해 목적', '실수로 과다 복용'). 정보 없으면 빈 문자열."
+      "description": "복용 이유 및 동기 (예: \u0027자해 목적\u0027, \u0027실수로 과다 복용\u0027). 정보 없으면 빈 문자열."
     },
     {
       "key": "obtain_route",
       "label": "약을 구한 경로",
       "type": "open",
-      "description": "약을 구한 경로 (예: '본인 처방약', '편의점 구입'). 정보 없으면 빈 문자열."
+      "description": "약을 구한 경로 (예: \u0027본인 처방약\u0027, \u0027편의점 구입\u0027). 정보 없으면 빈 문자열."
     },
     {
       "key": "discovery_to_arrival",
       "label": "발견~내원",
       "type": "open",
-      "description": "발견 시점부터 내원까지의 경과 (예: '가족이 오후 5시 발견 후 119 신고, 30분 후 내원'). 정보 없으면 빈 문자열."
+      "description": "발견 시점부터 내원까지의 경과 (예: \u0027가족이 오후 5시 발견 후 119 신고, 30분 후 내원\u0027). 정보 없으면 빈 문자열."
     },
     {
       "key": "consciousness_at_discovery",
       "label": "발견 당시 의식상태",
       "type": "open",
-      "description": "발견 당시 의식 수준 (예: '반응 없음', '의식 명료', 'GCS 10'). 정보 없으면 빈 문자열."
+      "description": "발견 당시 의식 수준 (예: \u0027반응 없음\u0027, \u0027의식 명료\u0027, \u0027GCS 10\u0027). 정보 없으면 빈 문자열."
     },
     {
       "key": "vomiting_before_arrival",
       "label": "내원전까지 구토여부",
       "type": "open",
-      "description": "내원 전 구토 여부 (예: '+', '-', '2회'). 정보 없으면 빈 문자열."
+      "description": "내원 전 구토 여부 (예: \u0027+\u0027, \u0027-\u0027, \u00272회\u0027). 정보 없으면 빈 문자열."
     },
     {
       "key": "co_hb",
       "label": "CO Hb",
       "type": "open",
-      "description": "CO 중독 시 initial ABGA CO Hb 수치 (예: '25%'). CO 중독이 아니면 빈 문자열."
+      "description": "CO 중독 시 initial ABGA CO Hb 수치 (예: \u002725%\u0027). CO 중독이 아니면 빈 문자열."
     },
     {
       "key": "fire_start_time",
@@ -81,7 +81,7 @@
       "key": "combustion_degree",
       "label": "얼마나 연소 되었는지",
       "type": "open",
-      "description": "CO 중독 시 연소 정도 (예: '조금 탐', '전소'). 정보 없으면 빈 문자열."
+      "description": "CO 중독 시 연소 정도 (예: \u0027조금 탐\u0027, \u0027전소\u0027). 정보 없으면 빈 문자열."
     },
     {
       "key": "report_and_ems_time",
@@ -198,20 +198,56 @@
   "output_example": "* 환자 면담 원하는 상태인지 : \n\n복용물질 : \n양 :\n복용시기 :\n원인, 동기 :\n약을 구한 경로 :\n발견~내원 :\n발견 당시 의식상태 :\n내원전까지 구토여부 :\n\n--\n\n일산화 탄소 중독 일때, 아래내용을 체크해주세요. \n\n- CO Hb  ; initial ABGA  %\n- 불 붙인 시간 ; \n- 밀폐된 공간인지?(문을 닫고 있었는지)\n- 얼마나 연소 되었는지(조금 탔는지, 전소)\n- 신고시간, 119는 언제 도착 시간\n- 119가 이송할때, O2 full mask 주었는지, room air 로 왔는지\n- LOC 여부\n\n--\n\n** PC\n사고내용:\n사고과정:\nDuration:\n\nAuditory hallucination/Visual hallucination(-/-)\nSuicide thinking/attempt:\nRecent stress:\n\n성격:\n직업:\n결혼:\n학력:\n경제상황:\n가족관계(현재)\n종교:",
   "pe": {
     "fields": [
-      { "key": "vital", "label": "Initial v/s", "default": "" },
-      { "key": "mental", "label": "Mental", "default": "" },
-      { "key": "gcs", "label": "GCS", "default": "" },
-      { "key": "pupil", "label": "Pupil", "default": "" },
-      { "key": "abd_tenderness", "label": "Abd. Tenderness", "default": "(-)" },
-      { "key": "lung_sound", "label": "Lung sound", "default": "clear" }
+      {
+        "key": "vital",
+        "label": "Initial v/s",
+        "default": ""
+      },
+      {
+        "key": "mental",
+        "label": "Mental",
+        "default": ""
+      },
+      {
+        "key": "gcs",
+        "label": "GCS",
+        "default": ""
+      },
+      {
+        "key": "pupil",
+        "label": "Pupil",
+        "default": ""
+      },
+      {
+        "key": "abd_tenderness",
+        "label": "Abd. Tenderness",
+        "default": "(-)"
+      },
+      {
+        "key": "lung_sound",
+        "label": "Lung sound",
+        "default": "clear"
+      }
     ],
     "output_example": "Initial v/s : \nMental : \nGCS : \nPupil : \n\nAbd. Tenderness : (-)\nLung sound : clear"
   },
   "history": {
     "fields": [
-      { "key": "past", "label": "Past Hx.", "default": "" },
-      { "key": "medication", "label": "Med Hx.", "default": "" },
-      { "key": "pc", "label": "PC Hx.", "default": "" }
+      {
+        "key": "past",
+        "label": "Past Hx.",
+        "default": ""
+      },
+      {
+        "key": "medication",
+        "label": "Med Hx.",
+        "default": ""
+      },
+      {
+        "key": "pc",
+        "label": "PC Hx.",
+        "default": ""
+      }
     ],
     "output_example": "Past Hx. : \nMed Hx. :\nPC Hx. :"
   }

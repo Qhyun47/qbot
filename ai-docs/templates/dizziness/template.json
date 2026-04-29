@@ -3,25 +3,25 @@
   "cc": "Dizziness",
   "description": "어지럼증 환자 EMR 상용구 템플릿",
   "hpi_hints": "어지럼증 유형(whirling vs non-whirling), 발생 시기 및 양상, 동반 신경학적 증상 포함 여부를 중점으로 서술.",
-  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 \u0027open\u0027인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 \u0027symptom_check\u0027인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 \u0027+\u0027, 언급 없으면 반드시 \u0027-\u0027를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라. output_example의 모든 줄을 위에서부터 순서대로 빠짐없이 출력하라. 값이 없어도 라벨 줄 자체는 절대 삭제하거나 생략하지 않는다.",
   "fields": [
     {
       "key": "type",
       "label": "Type",
       "type": "open",
-      "description": "어지럼증 유형. whirling(회전성, 물체가 빙빙 도는 느낌)이면 'whirling', non-whirling(비회전성, 멀미하는 듯한 느낌)이면 'non-whirling'. 둘 다 언급된 경우 'whirling + non-whirling'. 정보 없으면 빈 문자열."
+      "description": "어지럼증 유형. whirling(회전성, 물체가 빙빙 도는 느낌)이면 \u0027whirling\u0027, non-whirling(비회전성, 멀미하는 듯한 느낌)이면 \u0027non-whirling\u0027. 둘 다 언급된 경우 \u0027whirling + non-whirling\u0027. 정보 없으면 빈 문자열."
     },
     {
       "key": "situation",
       "label": "상황",
       "type": "open",
-      "description": "어지럼증 발생 상황 상세 서술 (예: '앉아 있다 갑자기 일어났을 때', '아무런 유발 요인 없이'). 정보 없으면 빈 문자열."
+      "description": "어지럼증 발생 상황 상세 서술 (예: \u0027앉아 있다 갑자기 일어났을 때\u0027, \u0027아무런 유발 요인 없이\u0027). 정보 없으면 빈 문자열."
     },
     {
       "key": "onset_time",
       "label": "Onset time",
       "type": "open",
-      "description": "발병 시기(예: '3일 전', '금일 오전')와 발생 양상(갑자기/서서히/간헐적). 해당되는 항목의 괄호 안에 체크 또는 구체적 내용 기재. 정보 없으면 빈 문자열."
+      "description": "발병 시기(예: \u00273일 전\u0027, \u0027금일 오전\u0027)와 발생 양상(갑자기/서서히/간헐적). 해당되는 항목의 괄호 안에 체크 또는 구체적 내용 기재. 정보 없으면 빈 문자열."
     },
     {
       "key": "intensity",
@@ -33,7 +33,7 @@
       "key": "frequency_duration",
       "label": "Frequency/Duration",
       "type": "open",
-      "description": "어지럼증 빈도 및 지속 시간 (예: '하루 2~3회, 1회 수분간 지속', '내원 시까지 지속'). 정보 없으면 빈 문자열."
+      "description": "어지럼증 빈도 및 지속 시간 (예: \u0027하루 2~3회, 1회 수분간 지속\u0027, \u0027내원 시까지 지속\u0027). 정보 없으면 빈 문자열."
     },
     {
       "key": "asso_neuro",
@@ -317,16 +317,32 @@
   },
   "history": {
     "fields": [
-      { "key": "past", "label": "Past Hx", "default": "" },
+      {
+        "key": "past",
+        "label": "Past Hx",
+        "default": ""
+      },
       {
         "key": "medication",
         "label": "Med Hx",
         "default": "",
         "hint": "HTN 과거력 있으면 최근 약 바꾼 것 있는지"
       },
-      { "key": "operation", "label": "Op. Hx.", "default": "" },
-      { "key": "alcohol", "label": "Alcohol", "default": "" },
-      { "key": "smoking", "label": "Smoking", "default": "" }
+      {
+        "key": "operation",
+        "label": "Op. Hx.",
+        "default": ""
+      },
+      {
+        "key": "alcohol",
+        "label": "Alcohol",
+        "default": ""
+      },
+      {
+        "key": "smoking",
+        "label": "Smoking",
+        "default": ""
+      }
     ],
     "output_example": "Past Hx:\nMed Hx: (HTN 과거력 있으면 최근 약 바꾼 것 있는지)\nOp. Hx. : \nAlcohol :     , Smoking : "
   }

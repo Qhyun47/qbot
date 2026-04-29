@@ -14,23 +14,22 @@ export function loadTemplateList(): TemplateListEntry[] {
 const GUIDES_DIR = path.join(process.cwd(), "ai-docs", "guides");
 const TEMPLATES_DIR = path.join(process.cwd(), "ai-docs", "templates");
 
+function readJsonFile(filePath: string): object {
+  const raw = fs.readFileSync(filePath, "utf-8").replace(/^﻿/, "");
+  return JSON.parse(raw);
+}
+
 export function loadSchema(templateKey: string): object {
   const schemaPath = path.join(TEMPLATES_DIR, templateKey, "schema.json");
   if (fs.existsSync(schemaPath)) {
-    return JSON.parse(fs.readFileSync(schemaPath, "utf-8"));
+    return readJsonFile(schemaPath);
   }
-  // generic fallback
-  return JSON.parse(
-    fs.readFileSync(
-      path.join(TEMPLATES_DIR, "_generic", "schema.json"),
-      "utf-8"
-    )
-  );
+  return readJsonFile(path.join(TEMPLATES_DIR, "_generic", "schema.json"));
 }
 
 export function loadTemplate(templateKey: string): object {
   const filePath = path.join(TEMPLATES_DIR, templateKey, "template.json");
-  return JSON.parse(fs.readFileSync(filePath, "utf-8"));
+  return readJsonFile(filePath);
 }
 
 export function loadHpiHints(templateKey: string): string | null {

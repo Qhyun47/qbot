@@ -3,19 +3,19 @@
   "cc": "Hanging",
   "description": "Hanging 환자 EMR 상용구 템플릿",
   "hpi_hints": "Hanging 시간, 발견 시간, 자세(complete/incomplete), 끈 위치 및 종류를 반드시 포함. 사고 내용 및 과정, 자살 의도 포함.",
-  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. 출력 형식은 output_example을 따르라.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 \u0027open\u0027인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 \u0027symptom_check\u0027인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 \u0027+\u0027, 언급 없으면 반드시 \u0027-\u0027를 유지하라. 출력 형식은 output_example을 따르라. output_example의 모든 줄을 위에서부터 순서대로 빠짐없이 출력하라. 값이 없어도 라벨 줄 자체는 절대 삭제하거나 생략하지 않는다.",
   "fields": [
     {
       "key": "hanging_time",
       "label": "시간(Hanging 시간 / 발견시간)",
       "type": "open",
-      "description": "Hanging 발생 시간 및 발견 시간 (예: '23:00경 / 23:30 발견'). 정보 없으면 빈 문자열."
+      "description": "Hanging 발생 시간 및 발견 시간 (예: \u002723:00경 / 23:30 발견\u0027). 정보 없으면 빈 문자열."
     },
     {
       "key": "posture",
       "label": "자세(complete/incomplete)",
       "type": "open",
-      "description": "발이 공중에 완전히 떴으면 'complete', 바닥에 닿아 있으면 'incomplete'. 정보 없으면 빈 문자열."
+      "description": "발이 공중에 완전히 떴으면 \u0027complete\u0027, 바닥에 닿아 있으면 \u0027incomplete\u0027. 정보 없으면 빈 문자열."
     },
     {
       "key": "rope_position",
@@ -133,7 +133,11 @@
       "label": "Alcohol (CAGE)",
       "type": "cage",
       "slots": [
-        { "key": "C", "question": "술 끊으려고 해봤나", "default": "-" },
+        {
+          "key": "C",
+          "question": "술 끊으려고 해봤나",
+          "default": "-"
+        },
         {
           "key": "A",
           "question": "술마시고 남들에게 비판받은 적 있나",
@@ -150,7 +154,7 @@
           "default": "-"
         }
       ],
-      "description": "CAGE 알코올 선별 검사. 양성이면 '+', 음성이면 '-' 유지."
+      "description": "CAGE 알코올 선별 검사. 양성이면 \u0027+\u0027, 음성이면 \u0027-\u0027 유지."
     }
   ],
   "output_example": "1. 시간(Hanging 시간 / 발견시간) : \n2. 자세(complete/incomplete) : $발이 공중에 떴는가 / 안 떴는가\n3. 끈 위치(목 양쪽 or 한쪽 조였는지, 목에 흔적 있으면 사진 등록) : \n4. 끈 종류 : \n\n* 환자 면담을 원하는지 : \n\n사고내용:\n사고과정:\nDuration:\n\nAuditory hallucination/Visual hallucination(-/-)\nSuicide thinking/attempt:\nRecent stress:\n\n성격:\n직업:\n결혼:\n학력:\n경제상황:\n가족관계(현재):\n종교:\n\nAlcohol (CAGE)\nC 술 끊으려고 해봤나                (-)\nA 술마시고 남들에게 비판받은 적 있나 (-)\nG 술마시고 죄책감 느낀 적 있나       (-)\nE 술마시고 일어나서 다시 술 마시나   (-)",
@@ -174,7 +178,7 @@
       {
         "key": "abdomen",
         "label": "Abdomen",
-        "default": "soft & flat / Tr(-) rTr(-) /CVA Tr(-)"
+        "default": "soft \u0026 flat / Tr(-) rTr(-) /CVA Tr(-)"
       },
       {
         "key": "pitting_edema",
@@ -187,14 +191,30 @@
         "default": "(-)"
       }
     ],
-    "output_example": "Vital stable, Mental alert\nLung sound : clear  / Throat inj. (-)\nBowel sound : N-S\nAbd. soft & flat / Tr(-) rTr(-) /CVA Tr(-)\nPitting edema (-)\nPalpable LN (-)"
+    "output_example": "Vital stable, Mental alert\nLung sound : clear  / Throat inj. (-)\nBowel sound : N-S\nAbd. soft \u0026 flat / Tr(-) rTr(-) /CVA Tr(-)\nPitting edema (-)\nPalpable LN (-)"
   },
   "history": {
     "fields": [
-      { "key": "pc", "label": "PC Hx", "default": "" },
-      { "key": "past", "label": "Past Hx", "default": "" },
-      { "key": "medication", "label": "Med Hx", "default": "" },
-      { "key": "operation", "label": "Op Hx", "default": "" }
+      {
+        "key": "pc",
+        "label": "PC Hx",
+        "default": ""
+      },
+      {
+        "key": "past",
+        "label": "Past Hx",
+        "default": ""
+      },
+      {
+        "key": "medication",
+        "label": "Med Hx",
+        "default": ""
+      },
+      {
+        "key": "operation",
+        "label": "Op Hx",
+        "default": ""
+      }
     ],
     "output_example": "PC Hx:\nPast Hx: \nMed Hx:\nOp Hx:"
   }
