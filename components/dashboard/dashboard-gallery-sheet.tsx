@@ -38,10 +38,6 @@ import type { DashboardPhoto } from "@/lib/supabase/types";
 
 type DashboardPhotoWithUrl = DashboardPhoto & { url: string | null };
 
-interface DashboardGallerySheetProps {
-  children: React.ReactNode;
-}
-
 async function triggerDownload(photo: DashboardPhotoWithUrl) {
   if (!photo.url) return;
   const res = await fetch(photo.url);
@@ -81,9 +77,7 @@ function createRotatedBlob(
   });
 }
 
-export function DashboardGallerySheet({
-  children,
-}: DashboardGallerySheetProps) {
+export function DashboardGallerySheet() {
   const [open, setOpen] = useState(false);
   const [photos, setPhotos] = useState<DashboardPhotoWithUrl[]>([]);
   const [loading, setLoading] = useState(false);
@@ -240,7 +234,18 @@ export function DashboardGallerySheet({
   return (
     <>
       <Drawer open={open} onOpenChange={handleOpenChange}>
-        <DrawerTrigger asChild>{children}</DrawerTrigger>
+        <div className="fixed bottom-6 right-4 z-50">
+          <DrawerTrigger asChild>
+            <Button
+              type="button"
+              size="icon"
+              className="size-16 rounded-full shadow-lg"
+              aria-label="사진 갤러리"
+            >
+              <Camera className="size-7" />
+            </Button>
+          </DrawerTrigger>
+        </div>
         <DrawerContent>
           <DrawerHeader>
             <div className="flex items-center justify-between pr-2">

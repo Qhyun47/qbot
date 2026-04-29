@@ -1,11 +1,10 @@
 import { Suspense } from "react";
-import { Camera, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { NewCaseButton } from "@/components/cases/new-case-button";
 import { MedicationTriggerButton } from "@/components/medication/medication-trigger-button";
 import { DashboardGallerySheet } from "@/components/dashboard/dashboard-gallery-sheet";
 import { RefreshButton } from "@/components/dashboard/refresh-button";
-import { Button } from "@/components/ui/button";
 import { StatusBoard } from "@/components/cases/status-board";
 import { HideAllFromBoardButton } from "@/components/cases/hide-all-from-board-button";
 import { listCasesByBed } from "@/lib/cases/queries";
@@ -66,6 +65,9 @@ export default function DashboardPage() {
             현황판
           </h2>
           <div className="flex items-center gap-2">
+            <div className="xl:hidden">
+              <MedicationTriggerButton size="sm" />
+            </div>
             <NewCaseButton className="xl:hidden" size="sm" />
             <RefreshButton />
             <HideAllFromBoardButton />
@@ -91,18 +93,7 @@ export default function DashboardPage() {
       </Suspense>
 
       {/* 사진 갤러리 FAB — 모바일/PC 공통 */}
-      <div className="fixed bottom-6 right-4 z-50">
-        <DashboardGallerySheet>
-          <Button
-            type="button"
-            size="icon"
-            className="size-16 rounded-full shadow-lg"
-            aria-label="사진 갤러리"
-          >
-            <Camera className="size-7" />
-          </Button>
-        </DashboardGallerySheet>
-      </div>
+      <DashboardGallerySheet />
     </div>
   );
 }
