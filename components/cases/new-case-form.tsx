@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Rows2, Columns2, Square, Zap, Loader2 } from "lucide-react";
 import {
@@ -104,6 +110,8 @@ export function NewCaseForm({
   const [generating, setGenerating] = useState(false);
   const [navigatingBack, setNavigatingBack] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [setupDone, setSetupDone] = useState(false);
+  const [setupExiting, setSetupExiting] = useState(false);
   const [, startTransition] = useTransition();
   const rootRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -207,6 +215,12 @@ export function NewCaseForm({
     prevCardsLengthRef.current = cards.length;
   }, [cards.length]);
 
+  useLayoutEffect(() => {
+    if (document.documentElement.getAttribute("data-view") === "desktop") {
+      setSetupDone(true);
+    }
+  }, []);
+
   const navigateToDashboard = () => {
     // router.refresh()로 라우터 캐시를 무효화한 후 이동 → 현황판에 최신 케이스 반영
     router.refresh();
@@ -246,6 +260,16 @@ export function NewCaseForm({
 
     // 일부만 입력된 상태 → 확인 다이얼로그
     setShowSaveDialog(true);
+  };
+
+  const handleSetupConfirm = () => {
+    setSetupExiting(true);
+  };
+
+  const handleSetupSkip = () => {
+    setBedPickerOpen(false);
+    setCcEditing(false);
+    setSetupExiting(true);
   };
 
   const handleBedChange = (zone: BedZone, number: number | null) => {
@@ -546,6 +570,56 @@ export function NewCaseForm({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {!setupDone && (
+        <div
+          className={cn(
+            "fixed inset-0 z-10 flex flex-col bg-background transition-transform duration-300",
+            setupExiting && "-translate-y-full"
+          )}
+          onTransitionEnd={() => {
+            if (setupExiting) setSetupDone(true);
+          }}
+        >
+          <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleBack}
+              disabled={navigatingBack}
+              aria-label="뒤로 가기"
+            >
+              {navigatingBack ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <ArrowLeft className="size-4" />
+              )}
+            </Button>
+            <span className="flex-1 text-sm font-semibold">새 케이스 입력</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground"
+              onClick={handleSetupSkip}
+            >
+              건너뛰기
+            </Button>
+          </header>
+          <div className="flex flex-1 flex-col gap-6 overflow-y-auto p-4">
+            <BedPicker
+              bedZone={bedZone}
+              bedNumber={bedNumber}
+              onChange={handleBedChange}
+            />
+            <Separator />
+            <CcAutocomplete value={cc ?? ""} onSelect={handleCcSelect} />
+          </div>
+          <div className="shrink-0 border-t p-4">
+            <Button className="w-full" onClick={handleSetupConfirm}>
+              확인
+            </Button>
+          </div>
+        </div>
+      )}
       <div
         ref={rootRef}
         className="fixed inset-0 flex flex-col"
