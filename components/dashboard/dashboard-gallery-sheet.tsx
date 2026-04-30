@@ -386,7 +386,7 @@ export function DashboardGallerySheet() {
               className="size-16 rounded-full shadow-lg"
               aria-label="사진 갤러리"
             >
-              <Camera className="size-7" />
+              <Camera className="size-8" />
             </Button>
           </DrawerTrigger>
         </div>
