@@ -1,7 +1,14 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { Camera, ImagePlus, X } from "lucide-react";
+import { useCallback, useRef, useState } from "react";
+import {
+  Camera,
+  ChevronLeft,
+  ChevronRight,
+  ImagePlus,
+  Trash2,
+  X,
+} from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -19,6 +26,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import type { CasePhoto } from "@/lib/supabase/types";
 
@@ -36,8 +44,19 @@ export function PhotoBottomSheet({ caseId }: PhotoBottomSheetProps) {
   const [deleteTarget, setDeleteTarget] = useState<CasePhotoWithUrl | null>(
     null
   );
+  const [viewingIndex, setViewingIndex] = useState<number | null>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const albumInputRef = useRef<HTMLInputElement>(null);
+
+  const viewingPhoto = viewingIndex !== null ? photos[viewingIndex] : null;
+
+  const showPrev = useCallback(() => {
+    setViewingIndex((i) => (i !== null && i > 0 ? i - 1 : i));
+  }, []);
+
+  const showNext = useCallback(() => {
+    setViewingIndex((i) => (i !== null && i < photos.length - 1 ? i + 1 : i));
+  }, [photos.length]);
 
   const fetchPhotos = async () => {
     if (!caseId) return;
@@ -120,15 +139,22 @@ export function PhotoBottomSheet({ caseId }: PhotoBottomSheetProps) {
               </p>
             ) : (
               <div className="grid grid-cols-4 gap-2">
-                {photos.map((photo) => (
+                {photos.map((photo, idx) => (
                   <div key={photo.id} className="relative aspect-square">
                     {photo.url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={photo.url}
-                        alt={photo.file_name}
-                        className="h-full w-full rounded object-cover"
-                      />
+                      <button
+                        type="button"
+                        className="h-full w-full"
+                        onClick={() => setViewingIndex(idx)}
+                        aria-label="사진 확대"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={photo.url}
+                          alt={photo.file_name}
+                          className="h-full w-full rounded object-cover"
+                        />
+                      </button>
                     ) : (
                       <div className="h-full w-full rounded bg-muted" />
                     )}
@@ -207,6 +233,68 @@ export function PhotoBottomSheet({ caseId }: PhotoBottomSheetProps) {
           e.target.value = "";
         }}
       />
+
+      {/* 사진 뷰어 */}
+      <Dialog
+        open={viewingIndex !== null}
+        onOpenChange={(open) => {
+          if (!open) setViewingIndex(null);
+        }}
+      >
+        <DialogContent className="flex max-h-[90vh] max-w-[90vw] flex-col gap-3 p-4">
+          {viewingPhoto && (
+            <>
+              <div className="flex items-center justify-between pr-8">
+                <span className="text-sm text-muted-foreground">
+                  {(viewingIndex ?? 0) + 1} / {photos.length}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setViewingIndex(null);
+                    setDeleteTarget(viewingPhoto);
+                  }}
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-destructive"
+                  aria-label="삭제"
+                >
+                  <Trash2 className="size-4" />
+                  삭제
+                </button>
+              </div>
+              <div className="relative flex flex-1 items-center justify-center overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={viewingPhoto.url ?? ""}
+                  alt={viewingPhoto.file_name}
+                  className="max-h-[75vh] max-w-full rounded-md object-contain"
+                />
+                {photos.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={showPrev}
+                      disabled={(viewingIndex ?? 0) === 0}
+                      className="absolute left-2 flex size-8 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 disabled:opacity-30"
+                      aria-label="이전 사진"
+                    >
+                      <ChevronLeft className="size-5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={showNext}
+                      disabled={(viewingIndex ?? 0) === photos.length - 1}
+                      className="absolute right-2 flex size-8 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 disabled:opacity-30"
+                      aria-label="다음 사진"
+                    >
+                      <ChevronRight className="size-5" />
+                    </button>
+                  </>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* 삭제 확인 다이얼로그 */}
       <AlertDialog
