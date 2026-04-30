@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getIsAdmin } from "@/lib/auth/is-admin";
 import type { ErrorLog } from "@/lib/supabase/types";
@@ -45,4 +46,29 @@ export async function getErrorLogs(): Promise<ErrorLogWithEmail[]> {
     ...log,
     email: log.user_id ? (emailMap[log.user_id] ?? null) : null,
   }));
+}
+
+export async function deleteErrorLog(id: string): Promise<void> {
+  const isAdmin = await getIsAdmin();
+  if (!isAdmin) throw new Error("권한 없음");
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("error_logs").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin/error-logs");
+}
+
+export async function deleteAllErrorLogs(): Promise<void> {
+  const isAdmin = await getIsAdmin();
+  if (!isAdmin) throw new Error("권한 없음");
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("error_logs")
+    .delete()
+    .neq("id", "00000000-0000-0000-0000-000000000000");
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin/error-logs");
 }

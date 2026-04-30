@@ -101,23 +101,7 @@ export async function updateCaseBed(
     if (conflictingCases && conflictingCases.length > 0) {
       const conflictingIds = conflictingCases.map((c) => c.id);
 
-      // 사진 일괄 조회 후 Storage + 테이블 정리
-      const { data: allPhotos } = await supabase
-        .from("case_photos")
-        .select("storage_path, case_id")
-        .in("case_id", conflictingIds);
-
-      if (allPhotos && allPhotos.length > 0) {
-        await supabase.storage
-          .from("case-photos")
-          .remove(allPhotos.map((p) => p.storage_path));
-        await supabase
-          .from("case_photos")
-          .delete()
-          .in("case_id", conflictingIds);
-      }
-
-      // 현황판에서 일괄 제거
+      // 현황판에서 일괄 제거 (사진은 12시간 cron이 처리)
       await supabase
         .from("cases")
         .update({ board_hidden_at: new Date().toISOString() })
@@ -273,18 +257,6 @@ export async function updateCaseMemo(
 
 export async function hideFromBoard(caseId: string): Promise<void> {
   const { supabase, user } = await getAuthUser();
-
-  // cases 행은 DB에 보존되므로 ON DELETE CASCADE 미작동 → 사진 명시적 삭제
-  const { data: photos } = await supabase
-    .from("case_photos")
-    .select("storage_path")
-    .eq("case_id", caseId);
-  if (photos && photos.length > 0) {
-    await supabase.storage
-      .from("case-photos")
-      .remove(photos.map((p) => p.storage_path));
-  }
-  await supabase.from("case_photos").delete().eq("case_id", caseId);
 
   const { error } = await supabase
     .from("cases")

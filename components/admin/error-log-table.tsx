@@ -1,22 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
+import { Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import type { ErrorLogWithEmail } from "@/lib/admin/error-log-actions";
 
 interface ErrorLogTableProps {
   logs: ErrorLogWithEmail[];
+  onDelete: (id: string) => Promise<void>;
 }
 
-export function ErrorLogTable({ logs }: ErrorLogTableProps) {
+export function ErrorLogTable({ logs, onDelete }: ErrorLogTableProps) {
   const [selected, setSelected] = useState<ErrorLogWithEmail | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  const handleDelete = (id: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setDeletingId(id);
+    startTransition(async () => {
+      await onDelete(id);
+      setDeletingId(null);
+      if (selected?.id === id) setSelected(null);
+    });
+  };
 
   if (logs.length === 0) {
     return (
@@ -35,7 +50,8 @@ export function ErrorLogTable({ logs }: ErrorLogTableProps) {
               <th className="pb-2 pr-4 font-medium">날짜/시간</th>
               <th className="pb-2 pr-4 font-medium">페이지</th>
               <th className="pb-2 pr-4 font-medium">에러 메시지</th>
-              <th className="pb-2 font-medium">사용자</th>
+              <th className="pb-2 pr-4 font-medium">사용자</th>
+              <th className="pb-2 font-medium"></th>
             </tr>
           </thead>
           <tbody>
@@ -61,8 +77,17 @@ export function ErrorLogTable({ logs }: ErrorLogTableProps) {
                     {log.error_message.length > 100 && "…"}
                   </span>
                 </td>
-                <td className="py-2.5 text-xs text-muted-foreground">
+                <td className="py-2.5 pr-4 text-xs text-muted-foreground">
                   {log.email ?? "비로그인"}
+                </td>
+                <td className="py-2.5">
+                  <button
+                    onClick={(e) => handleDelete(log.id, e)}
+                    disabled={deletingId === log.id && isPending}
+                    className="rounded p-1 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-40"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
                 </td>
               </tr>
             ))}
@@ -111,13 +136,25 @@ export function ErrorLogTable({ logs }: ErrorLogTableProps) {
                   </pre>
                 </div>
               )}
-              <div className="flex gap-6 text-xs text-muted-foreground">
-                <span>사용자: {selected.email ?? "비로그인"}</span>
-                {selected.user_agent && (
-                  <span className="max-w-xs truncate">
-                    {selected.user_agent}
-                  </span>
-                )}
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <div className="flex gap-6">
+                  <span>사용자: {selected.email ?? "비로그인"}</span>
+                  {selected.user_agent && (
+                    <span className="max-w-xs truncate">
+                      {selected.user_agent}
+                    </span>
+                  )}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDelete(selected.id)}
+                  disabled={deletingId === selected.id && isPending}
+                  className="h-7 gap-1.5 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  삭제
+                </Button>
               </div>
             </div>
           )}
