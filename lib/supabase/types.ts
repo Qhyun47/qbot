@@ -98,44 +98,6 @@ export type Database = {
           },
         ];
       };
-      dashboard_photos: {
-        Row: {
-          id: string;
-          user_id: string;
-          storage_path: string;
-          file_name: string;
-          file_size: number;
-          mime_type: string;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          storage_path: string;
-          file_name: string;
-          file_size: number;
-          mime_type: string;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          storage_path?: string;
-          file_name?: string;
-          file_size?: number;
-          mime_type?: string;
-          created_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "dashboard_photos_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
       case_photos: {
         Row: {
           case_id: string;
@@ -273,6 +235,7 @@ export type Database = {
           board_hidden_at: string | null;
           cc: string | null;
           cc_has_template: boolean;
+          ccs: string[] | null;
           created_at: string;
           current_result_id: string | null;
           has_inputs: boolean;
@@ -290,6 +253,7 @@ export type Database = {
           board_hidden_at?: string | null;
           cc?: string | null;
           cc_has_template?: boolean;
+          ccs?: string[] | null;
           created_at?: string;
           current_result_id?: string | null;
           has_inputs?: boolean;
@@ -307,6 +271,7 @@ export type Database = {
           board_hidden_at?: string | null;
           cc?: string | null;
           cc_has_template?: boolean;
+          ccs?: string[] | null;
           created_at?: string;
           current_result_id?: string | null;
           has_inputs?: boolean;
@@ -334,6 +299,51 @@ export type Database = {
           },
           {
             foreignKeyName: "cases_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "service_access_requests";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      dashboard_photos: {
+        Row: {
+          created_at: string;
+          file_name: string;
+          file_size: number;
+          id: string;
+          mime_type: string;
+          storage_path: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          file_name: string;
+          file_size: number;
+          id?: string;
+          mime_type: string;
+          storage_path: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          file_name?: string;
+          file_size?: number;
+          id?: string;
+          mime_type?: string;
+          storage_path?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "dashboard_photos_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "dashboard_photos_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "service_access_requests";
@@ -652,60 +662,17 @@ export const Constants = {
   },
 } as const;
 
-// 편의 타입 — profiles
-export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
-export type ProfileInsert = Database["public"]["Tables"]["profiles"]["Insert"];
-export type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
-
-// 편의 타입 — cases
-export type Case = Database["public"]["Tables"]["cases"]["Row"];
-export type CaseInsert = Database["public"]["Tables"]["cases"]["Insert"];
-export type CaseUpdate = Database["public"]["Tables"]["cases"]["Update"];
-
-// 편의 타입 — case_inputs
-export type CaseInput = Database["public"]["Tables"]["case_inputs"]["Row"];
-export type CaseInputInsert =
-  Database["public"]["Tables"]["case_inputs"]["Insert"];
-
-// 편의 타입 — case_results
-export type CaseResult = Database["public"]["Tables"]["case_results"]["Row"];
-export type CaseResultInsert =
-  Database["public"]["Tables"]["case_results"]["Insert"];
-export type CaseResultUpdate =
-  Database["public"]["Tables"]["case_results"]["Update"];
-
-// 편의 타입 — interview_guidelines
-export type Guideline =
-  Database["public"]["Tables"]["interview_guidelines"]["Row"];
-export type GuidelineInsert =
-  Database["public"]["Tables"]["interview_guidelines"]["Insert"];
-export type GuidelineUpdate =
-  Database["public"]["Tables"]["interview_guidelines"]["Update"];
-
-// 편의 타입 — case_photos
-export type CasePhoto = Database["public"]["Tables"]["case_photos"]["Row"];
-export type CasePhotoInsert =
-  Database["public"]["Tables"]["case_photos"]["Insert"];
-
-// 편의 타입 — dashboard_photos
-export type DashboardPhoto =
-  Database["public"]["Tables"]["dashboard_photos"]["Row"];
-export type DashboardPhotoInsert =
-  Database["public"]["Tables"]["dashboard_photos"]["Insert"];
-
-// 편의 타입 — error_logs
-export type ErrorLog = Database["public"]["Tables"]["error_logs"]["Row"];
-export type ErrorLogInsert =
-  Database["public"]["Tables"]["error_logs"]["Insert"];
-
-// 편의 타입 — enum
-export type CaseStatus = Database["public"]["Enums"]["case_status"];
+// 편의 타입 별칭
 export type BedZone = Database["public"]["Enums"]["bed_zone"];
+export type CaseStatus = Database["public"]["Enums"]["case_status"];
 export type InputLayout = Database["public"]["Enums"]["input_layout"];
 export type FoldFallbackLayout = "single" | "split_vertical";
-export type ServiceAccessStatus =
-  | "pending"
-  | "approved"
-  | "ai_excluded"
-  | "denied"
-  | "held";
+
+export type Case = Tables<"cases">;
+export type CaseInput = Tables<"case_inputs">;
+export type CaseResult = Tables<"case_results">;
+export type CasePhoto = Tables<"case_photos">;
+export type DashboardPhoto = Tables<"dashboard_photos">;
+export type Guideline = Tables<"interview_guidelines">;
+export type ErrorLog = Tables<"error_logs">;
+export type ServiceAccessStatus = string;

@@ -11,7 +11,7 @@ import ccListRaw from "@/lib/ai/resources/cc-list.json";
 import guideListRaw from "@/lib/ai/resources/guide-list.json";
 import templateListRaw from "@/lib/ai/resources/template-list.json";
 import type { CcListEntry } from "@/lib/ai/resources/cc-types";
-import { resolveEntries } from "@/lib/ai/resources/cc-types";
+import { mergeCcGuideEntries } from "@/lib/ai/resources/cc-types";
 
 interface GuideListEntry {
   guideKey: string;
@@ -238,57 +238,35 @@ export async function loadGuideByKey(guideKey: string): Promise<GuidelineData> {
   }
 }
 
-function findCcEntry(list: CcListEntry[], cc: string): CcListEntry | undefined {
-  const exact = list.find((i) => i.cc === cc);
-  if (exact) return exact;
+export async function loadGuideline(ccs: string[]): Promise<GuidelineResult> {
+  if (ccs.length === 0) return { mode: "none" };
 
-  const q = cc.toLowerCase();
-  return list.find((i) => {
-    if (i.cc.endsWith(" **")) {
-      const prefix = i.cc.slice(0, -3).toLowerCase();
-      return q.startsWith(prefix + " ") && q.length > prefix.length + 1;
-    }
-    if (i.cc.startsWith("** ")) {
-      const suffix = i.cc.slice(3).toLowerCase();
-      return q.endsWith(" " + suffix) && q.length > suffix.length + 1;
-    }
-    return false;
-  });
-}
-
-export async function loadGuideline(cc: string): Promise<GuidelineResult> {
   const list = ccListRaw as CcListEntry[];
   const guideList = guideListRaw as GuideListEntry[];
 
-  const item = findCcEntry(list, cc);
-  if (!item) return { mode: "none" };
+  const mergedEntries = mergeCcGuideEntries(ccs, list);
+  if (mergedEntries.length === 0) return { mode: "none" };
 
-  const entries = resolveEntries(item, "guideKeys", list);
-  if (entries.length === 0) return { mode: "none" };
+  const toDisplayEntry = (key: string) => ({
+    guideKey: key,
+    displayName: guideList.find((g) => g.guideKey === key)?.displayName ?? key,
+  });
 
-  const rank0 = entries.find((e) => e.rank === 0);
+  const rank0 = mergedEntries.find((e) => e.rank === 0);
 
   if (rank0) {
     const data = await loadGuideByKey(rank0.key);
     if (!data.content && !data.pdfSignedUrl) {
       // rank-0 콘텐츠 없으면 나머지 항목으로 추천 목록 폴백
-      const rest = entries
-        .filter((e) => e.rank !== 0)
-        .map((e) => ({
-          guideKey: e.key,
-          displayName:
-            guideList.find((g) => g.guideKey === e.key)?.displayName ?? e.key,
-        }));
+      const rest = mergedEntries
+        .filter((e) => e.key !== rank0.key)
+        .map((e) => toDisplayEntry(e.key));
       if (rest.length === 0) return { mode: "none" };
       return { mode: "recommendations", suggestions: rest };
     }
-    const additionalSuggestions = entries
-      .filter((e) => e.rank !== 0)
-      .map((e) => ({
-        guideKey: e.key,
-        displayName:
-          guideList.find((g) => g.guideKey === e.key)?.displayName ?? e.key,
-      }));
+    const additionalSuggestions = mergedEntries
+      .filter((e) => e.key !== rank0.key)
+      .map((e) => toDisplayEntry(e.key));
     return {
       mode: "auto",
       guideKey: rank0.key,
@@ -298,11 +276,7 @@ export async function loadGuideline(cc: string): Promise<GuidelineResult> {
   }
 
   // rank-0 없음 → 전체 목록 추천
-  const suggestions = entries.map((e) => ({
-    guideKey: e.key,
-    displayName:
-      guideList.find((g) => g.guideKey === e.key)?.displayName ?? e.key,
-  }));
+  const suggestions = mergedEntries.map((e) => toDisplayEntry(e.key));
   return { mode: "recommendations", suggestions };
 }
 

@@ -21,6 +21,46 @@ export function getKeyStrings(entries: CcConnectionEntry[]): string[] {
   return [...entries].sort((a, b) => a.rank - b.rank).map((e) => e.key);
 }
 
+/** 다중 CC의 templateKeys를 CC 순서 우선, 중복 제거하여 머지 */
+export function mergeCcTemplateEntries(
+  ccs: string[],
+  list: CcListEntry[]
+): CcConnectionEntry[] {
+  const seen = new Set<string>();
+  const result: CcConnectionEntry[] = [];
+  for (const cc of ccs) {
+    const item = list.find((e) => e.cc === cc);
+    if (!item) continue;
+    for (const entry of resolveEntries(item, "templateKeys", list)) {
+      if (!seen.has(entry.key)) {
+        seen.add(entry.key);
+        result.push(entry);
+      }
+    }
+  }
+  return result;
+}
+
+/** 다중 CC의 guideKeys를 CC 순서 우선, 중복 제거하여 머지 */
+export function mergeCcGuideEntries(
+  ccs: string[],
+  list: CcListEntry[]
+): CcConnectionEntry[] {
+  const seen = new Set<string>();
+  const result: CcConnectionEntry[] = [];
+  for (const cc of ccs) {
+    const item = list.find((e) => e.cc === cc);
+    if (!item) continue;
+    for (const entry of resolveEntries(item, "guideKeys", list)) {
+      if (!seen.has(entry.key)) {
+        seen.add(entry.key);
+        result.push(entry);
+      }
+    }
+  }
+  return result;
+}
+
 /**
  * aliasOf/patternOf 원본 항목의 연결을 상속한 뒤 rank 오름차순으로 정렬.
  * 원본이 없거나 항목 자체에 연결이 있으면 그대로 반환.

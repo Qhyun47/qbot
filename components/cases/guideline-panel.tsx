@@ -17,7 +17,7 @@ import templateListRaw from "@/lib/ai/resources/template-list.json";
 import guideListRaw from "@/lib/ai/resources/guide-list.json";
 import categoriesRaw from "@/lib/ai/resources/template-categories.json";
 import type { CcListEntry } from "@/lib/ai/resources/cc-types";
-import { resolveEntries } from "@/lib/ai/resources/cc-types";
+import { mergeCcTemplateEntries } from "@/lib/ai/resources/cc-types";
 
 interface TemplateListEntry {
   templateKey: string;
@@ -41,7 +41,7 @@ function getCategoryLabel(category: string): string {
 }
 
 interface GuidelinePanelProps {
-  cc: string | null;
+  ccs: string[];
   templateKey: string | null;
   onGuidelineChange: (guideKey: string) => void;
   onTemplateChange: (templateKey: string | null) => void;
@@ -59,12 +59,9 @@ function getTemplateLabel(key: string | null): string | null {
   return templateList.find((t) => t.templateKey === key)?.displayName ?? key;
 }
 
-/** rank 오름차순 정렬된 templateKey 문자열 배열 반환 */
-function getSuggestedTemplateKeys(cc: string | null): string[] {
-  if (!cc) return [];
-  const item = ccList.find((i) => i.cc.toLowerCase() === cc.toLowerCase());
-  if (!item) return [];
-  return resolveEntries(item, "templateKeys", ccList).map((e) => e.key);
+/** 다중 CC 기준 rank 오름차순 머지된 templateKey 문자열 배열 반환 */
+function getSuggestedTemplateKeys(ccs: string[]): string[] {
+  return mergeCcTemplateEntries(ccs, ccList).map((e) => e.key);
 }
 
 function TabButton({
@@ -137,7 +134,7 @@ function TemplateSectionBlock({
 }
 
 export function GuidelinePanel({
-  cc,
+  ccs,
   templateKey,
   onGuidelineChange,
   onTemplateChange,
@@ -166,8 +163,9 @@ export function GuidelinePanel({
   const [isTemplateLoading, setIsTemplateLoading] = useState(false);
 
   // C.C. 변경 시 가이드라인 자동 로드 + 뷰 초기화
+  const ccsKey = ccs.join("||");
   useEffect(() => {
-    if (!cc) {
+    if (ccs.length === 0) {
       setGuideContent(null);
       setGuidePdfUrl(null);
       setActiveGuideKey(null);
@@ -181,7 +179,7 @@ export function GuidelinePanel({
     setActiveView("guide");
     setShowSelector(false);
     setIsGuideLoading(true);
-    loadGuideline(cc)
+    loadGuideline(ccs)
       .then((result) => {
         if (result.mode === "auto") {
           setGuideContent(result.content);
@@ -211,7 +209,8 @@ export function GuidelinePanel({
         setRecommendedGuideKeys([]);
       })
       .finally(() => setIsGuideLoading(false));
-  }, [cc]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ccsKey]);
 
   // 상용구 키 변경 시 내용 미리 로드
   useEffect(() => {
@@ -264,7 +263,7 @@ export function GuidelinePanel({
   };
 
   const templateLabel = getTemplateLabel(templateKey);
-  const suggestedTemplateKeys = getSuggestedTemplateKeys(cc);
+  const suggestedTemplateKeys = getSuggestedTemplateKeys(ccs);
   const otherTemplates = templateList.filter(
     (t) => !suggestedTemplateKeys.includes(t.templateKey)
   );
@@ -305,7 +304,7 @@ export function GuidelinePanel({
         label="가이드라인"
         subLabel={activeGuideKey ? getGuideLabel(activeGuideKey) : undefined}
         active={activeView === "guide"}
-        disabled={!cc}
+        disabled={ccs.length === 0}
         onClick={handleGuideTabClick}
       />
       <div className="w-px shrink-0 self-stretch bg-border" />
@@ -314,7 +313,7 @@ export function GuidelinePanel({
         label="상용구"
         subLabel={templateLabel}
         active={activeView === "template"}
-        disabled={!cc}
+        disabled={ccs.length === 0}
         onClick={handleTemplateTabClick}
       />
     </div>
@@ -522,7 +521,7 @@ export function GuidelinePanel({
               )
             ) : activeView === "guide" ? (
               /* 가이드라인 뷰 */
-              !cc ? (
+              ccs.length === 0 ? (
                 <p className="text-sm text-muted-foreground">
                   C.C.를 입력하면 해당 증상에 맞는 문진 가이드라인이 표시됩니다.
                 </p>
@@ -574,7 +573,7 @@ export function GuidelinePanel({
                 </p>
               )
             ) : /* 상용구 뷰 */
-            !cc ? (
+            ccs.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 C.C.를 입력하면 상용구를 선택할 수 있습니다.
               </p>

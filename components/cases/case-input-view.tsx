@@ -16,7 +16,7 @@ import templateListJson from "@/lib/ai/resources/template-list.json";
 import { cn } from "@/lib/utils";
 import {
   updateCaseBed,
-  updateCaseCc,
+  updateCaseCcs,
   addCaseInput,
   overrideTemplateKey,
   reorderCaseInputs,
@@ -133,7 +133,7 @@ export function CaseInputView({
 
   useEffect(() => {
     if (defaultCc) {
-      loadGuideline(defaultCc)
+      loadGuideline([defaultCc])
         .then((result) => {
           setGuidelineContent(result.mode === "auto" ? result.content : null);
         })
@@ -181,7 +181,7 @@ export function CaseInputView({
 
     const loadGuide = async () => {
       try {
-        const result = await loadGuideline(selectedCc);
+        const result = await loadGuideline([selectedCc]);
         setGuidelineContent(result.mode === "auto" ? result.content : null);
       } catch {
         setGuidelineContent(null);
@@ -192,7 +192,7 @@ export function CaseInputView({
       setPendingTemplateKeys(null);
       setSelectedTemplateKey(null);
       startTransition(async () => {
-        await updateCaseCc(caseId, selectedCc, false, null);
+        await updateCaseCcs(caseId, [selectedCc], null);
         await loadGuide();
       });
       return;
@@ -204,7 +204,7 @@ export function CaseInputView({
       setPendingTemplateKeys(null);
       setSelectedTemplateKey(key);
       startTransition(async () => {
-        await updateCaseCc(caseId, selectedCc, true, key);
+        await updateCaseCcs(caseId, [selectedCc], key);
         await loadGuide();
       });
     } else {
@@ -221,7 +221,7 @@ export function CaseInputView({
     setPendingTemplateKeys(null);
     setSelectedTemplateKey(key);
     if (cc) {
-      startTransition(() => updateCaseCc(caseId, cc, key !== null, key));
+      startTransition(() => updateCaseCcs(caseId, [cc], key));
     }
   };
 
@@ -388,7 +388,7 @@ export function CaseInputView({
   const GuideArea = (
     <div className="h-full">
       <GuidelinePanel
-        cc={cc}
+        ccs={cc ? [cc] : []}
         templateKey={selectedTemplateKey}
         onGuidelineChange={handleGuidelineChange}
         onTemplateChange={handleTemplateChange}

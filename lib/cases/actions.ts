@@ -113,17 +113,21 @@ export async function updateCaseBed(
   }
 }
 
-export async function updateCaseCc(
+export async function updateCaseCcs(
   caseId: string,
-  cc: string,
-  ccHasTemplate: boolean,
+  ccs: string[],
   templateKey: string | null
 ): Promise<void> {
   const { supabase, user } = await getAuthUser();
 
   const { error } = await supabase
     .from("cases")
-    .update({ cc, cc_has_template: ccHasTemplate, template_key: templateKey })
+    .update({
+      ccs,
+      cc: ccs[0] ?? null,
+      cc_has_template: templateKey !== null,
+      template_key: templateKey,
+    })
     .eq("id", caseId)
     .eq("user_id", user.id);
 

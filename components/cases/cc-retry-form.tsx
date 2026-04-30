@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { updateCaseCc } from "@/lib/cases/actions";
+import { updateCaseCcs } from "@/lib/cases/actions";
 import ccList from "@/lib/ai/resources/cc-list.json";
 import type { CcListEntry } from "@/lib/ai/resources/cc-types";
 import { getPrimaryKey } from "@/lib/ai/resources/cc-types";
@@ -33,12 +33,11 @@ export function CcRetryForm({ caseId, currentCc }: CcRetryFormProps) {
       const resolved = found?.aliasOf
         ? (list.find((i) => i.cc === found.aliasOf) ?? found)
         : found;
-      const hasTemplate = (resolved?.templateKeys?.length ?? 0) > 0;
       const templateKey =
         getPrimaryKey(resolved?.templateKeys ?? []) ??
         resolved?.templateKeys?.[0]?.key ??
         null;
-      await updateCaseCc(caseId, cc.trim(), hasTemplate, templateKey);
+      await updateCaseCcs(caseId, [cc.trim()], templateKey);
       const res = await fetch(`/api/cases/${caseId}/generate`, {
         method: "POST",
       });

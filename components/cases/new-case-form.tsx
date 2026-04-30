@@ -1,14 +1,16 @@
 "use client";
 
-import {
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-  useTransition,
-} from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Rows2, Columns2, Square, Zap, Loader2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Rows2,
+  Columns2,
+  Square,
+  X,
+  Zap,
+  Loader2,
+} from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,7 +24,7 @@ import {
 import { ResizableSplit } from "@/components/cases/resizable-split";
 import { CardInputBar } from "@/components/cases/card-input-bar";
 import { CardTimeline } from "@/components/cases/card-timeline";
-import { CcAutocomplete } from "@/components/cases/cc-autocomplete";
+import { MultiCcInput } from "@/components/cases/multi-cc-input";
 import { BedPicker } from "@/components/cases/bed-picker";
 import { BedBadge } from "@/components/cases/bed-badge";
 import { GuidelinePanel } from "@/components/cases/guideline-panel";
@@ -35,11 +37,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import templateListJson from "@/lib/ai/resources/template-list.json";
+import ccListRaw from "@/lib/ai/resources/cc-list.json";
 import { cn } from "@/lib/utils";
 import {
   createCase,
   updateCaseBed,
-  updateCaseCc,
+  updateCaseCcs,
   addCaseInput,
   deleteCase,
   overrideTemplateKey,
@@ -48,13 +51,19 @@ import {
   deleteCaseInput,
   updateCaseInputText,
 } from "@/lib/cases/actions";
-import type { CcConnectionEntry } from "@/lib/ai/resources/cc-types";
+import type {
+  CcConnectionEntry,
+  CcListEntry,
+} from "@/lib/ai/resources/cc-types";
+import { mergeCcTemplateEntries } from "@/lib/ai/resources/cc-types";
 import type {
   BedZone,
   CaseInput,
   FoldFallbackLayout,
   InputLayout,
 } from "@/lib/supabase/types";
+
+const ccList = ccListRaw as CcListEntry[];
 
 const LAYOUT_OPTIONS: {
   value: InputLayout;
@@ -93,9 +102,8 @@ export function NewCaseForm({
   const [caseId, setCaseId] = useState<string | null>(null);
   const [bedZone, setBedZone] = useState<BedZone>("A");
   const [bedNumber, setBedNumber] = useState<number | null>(null);
-  const [bedPickerOpen, setBedPickerOpen] = useState(true);
-  const [cc, setCc] = useState<string | null>(null);
-  const [ccEditing, setCcEditing] = useState(true);
+  const [ccs, setCcs] = useState<string[]>([]);
+  const [setupCcs, setSetupCcs] = useState<string[]>([]);
   const [selectedTemplateKey, setSelectedTemplateKey] = useState<string | null>(
     null
   );
@@ -116,11 +124,9 @@ export function NewCaseForm({
   const rootRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const prevCardsLengthRef = useRef(0);
-  // caseId가 아직 없을 때 선택된 베드/CC를 임시 보관 — createCase() 응답 전 선택 시 유실 방지
   const pendingBedRef = useRef<{ zone: BedZone; number: number } | null>(null);
-  const pendingCcRef = useRef<{
-    cc: string;
-    hasTemplate: boolean;
+  const pendingCcsRef = useRef<{
+    ccs: string[];
     templateKey: string | null;
   } | null>(null);
 
@@ -136,12 +142,10 @@ export function NewCaseForm({
       pendingBedRef.current = null;
       startTransition(() => updateCaseBed(caseId, zone, number));
     }
-    if (pendingCcRef.current) {
-      const { cc: pendingCc, hasTemplate, templateKey } = pendingCcRef.current;
-      pendingCcRef.current = null;
-      startTransition(() =>
-        updateCaseCc(caseId, pendingCc, hasTemplate, templateKey)
-      );
+    if (pendingCcsRef.current) {
+      const { ccs: pendingCcs, templateKey } = pendingCcsRef.current;
+      pendingCcsRef.current = null;
+      startTransition(() => updateCaseCcs(caseId, pendingCcs, templateKey));
     }
   }, [caseId]);
 
@@ -215,14 +219,7 @@ export function NewCaseForm({
     prevCardsLengthRef.current = cards.length;
   }, [cards.length]);
 
-  useLayoutEffect(() => {
-    if (document.documentElement.getAttribute("data-view") === "desktop") {
-      setSetupDone(true);
-    }
-  }, []);
-
   const navigateToDashboard = () => {
-    // router.refresh()로 라우터 캐시를 무효화한 후 이동 → 현황판에 최신 케이스 반영
     router.refresh();
     router.push("/dashboard");
   };
@@ -231,7 +228,6 @@ export function NewCaseForm({
     if (caseId) {
       try {
         await deleteCase(caseId);
-        // deleteCase 내부에서 revalidatePath("/dashboard") 호출됨
       } catch {
         // 삭제 실패해도 대시보드로 이동 (의도적)
       }
@@ -241,42 +237,63 @@ export function NewCaseForm({
 
   const handleBack = async () => {
     const hasBed = bedNumber !== null;
-    const hasCC = cc !== null;
+    const hasCC = ccs.length > 0;
     const hasCards = cards.length > 0;
 
-    // 아무것도 입력하지 않은 상태 → 자동 삭제
     if (!hasBed && !hasCC && !hasCards) {
       setNavigatingBack(true);
       await handleDeleteCase();
       return;
     }
 
-    // 3가지 조건 모두 충족 → 자동 저장
     if (hasBed && hasCC && hasCards) {
       setNavigatingBack(true);
       navigateToDashboard();
       return;
     }
 
-    // 일부만 입력된 상태 → 확인 다이얼로그
     setShowSaveDialog(true);
   };
 
-  const handleSetupConfirm = () => {
+  const finalizeSetup = (finalCcs: string[], templateKey: string | null) => {
+    setCcs(finalCcs);
+    setSelectedTemplateKey(templateKey);
+    if (caseId) {
+      startTransition(() => updateCaseCcs(caseId, finalCcs, templateKey));
+    } else {
+      pendingCcsRef.current = { ccs: finalCcs, templateKey };
+    }
+    setPendingTemplateKeys(null);
     setSetupExiting(true);
   };
 
+  const handleSetupConfirm = () => {
+    if (setupCcs.length === 0) {
+      setSetupExiting(true);
+      return;
+    }
+    const mergedEntries = mergeCcTemplateEntries(setupCcs, ccList);
+    const rank0 = mergedEntries.find((e) => e.rank === 0);
+    if (mergedEntries.length === 0 || mergedEntries.length === 1 || rank0) {
+      const key = rank0?.key ?? mergedEntries[0]?.key ?? null;
+      finalizeSetup(setupCcs, key);
+    } else {
+      setPendingTemplateKeys(mergedEntries.map((e) => e.key));
+    }
+  };
+
   const handleSetupSkip = () => {
-    setBedPickerOpen(false);
-    setCcEditing(false);
     setSetupExiting(true);
+  };
+
+  const handleTemplateKeyConfirm = (key: string | null) => {
+    finalizeSetup(setupCcs, key);
   };
 
   const handleBedChange = (zone: BedZone, number: number | null) => {
     setBedZone(zone);
     setBedNumber(number);
     if (number !== null) {
-      setBedPickerOpen(false);
       if (caseId) {
         startTransition(() => updateCaseBed(caseId, zone, number));
       } else {
@@ -285,57 +302,11 @@ export function NewCaseForm({
     }
   };
 
-  const handleCcSelect = (
-    selectedCc: string,
-    _hasTemplate: boolean,
-    templateEntries: CcConnectionEntry[]
-  ) => {
-    setCc(selectedCc);
-    setCcEditing(false);
-
-    if (templateEntries.length === 0) {
-      setPendingTemplateKeys(null);
-      setSelectedTemplateKey(null);
-      if (caseId) {
-        startTransition(() => updateCaseCc(caseId, selectedCc, false, null));
-      } else {
-        pendingCcRef.current = {
-          cc: selectedCc,
-          hasTemplate: false,
-          templateKey: null,
-        };
-      }
-      return;
-    }
-
-    const rank0 = templateEntries.find((e) => e.rank === 0);
-    if (templateEntries.length === 1 || rank0) {
-      const key = rank0?.key ?? templateEntries[0].key;
-      setPendingTemplateKeys(null);
-      setSelectedTemplateKey(key);
-      if (caseId) {
-        startTransition(() => updateCaseCc(caseId, selectedCc, true, key));
-      } else {
-        pendingCcRef.current = {
-          cc: selectedCc,
-          hasTemplate: true,
-          templateKey: key,
-        };
-      }
-    } else {
-      const sortedKeys = [...templateEntries]
-        .sort((a, b) => a.rank - b.rank)
-        .map((e) => e.key);
-      setPendingTemplateKeys(sortedKeys);
-      setSelectedTemplateKey(null);
-    }
-  };
-
-  const handleTemplateKeyConfirm = (key: string | null) => {
-    setPendingTemplateKeys(null);
-    setSelectedTemplateKey(key);
-    if (caseId && cc) {
-      startTransition(() => updateCaseCc(caseId, cc, key !== null, key));
+  const handleRemoveCc = (cc: string) => {
+    const next = ccs.filter((c) => c !== cc);
+    setCcs(next);
+    if (caseId) {
+      startTransition(() => updateCaseCcs(caseId, next, selectedTemplateKey));
     }
   };
 
@@ -436,83 +407,10 @@ export function NewCaseForm({
 
   const InputArea = (
     <div className="flex h-full flex-col">
-      {/* BedPicker·CC·카드 타임라인을 하나의 스크롤 영역으로 묶음 —
-          키보드가 올라와 공간이 줄어들어도 잘리지 않고 스크롤로 접근 가능 */}
       <div
         ref={scrollAreaRef}
         className="flex-1 overflow-y-auto overscroll-y-contain"
       >
-        {bedPickerOpen && (
-          <>
-            <div className="p-4">
-              <BedPicker
-                bedZone={bedZone}
-                bedNumber={bedNumber}
-                onChange={handleBedChange}
-              />
-            </div>
-            <Separator />
-          </>
-        )}
-        {ccEditing && (
-          <>
-            <div className="p-4">
-              <CcAutocomplete value={cc ?? ""} onSelect={handleCcSelect} />
-            </div>
-            <Separator />
-          </>
-        )}
-        {!ccEditing &&
-          pendingTemplateKeys &&
-          pendingTemplateKeys.length >= 2 && (
-            <>
-              <div className="p-4">
-                <p className="mb-2 text-sm font-medium">
-                  어떤 상용구로 생성할까요?
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {pendingTemplateKeys.map((key) => {
-                    const entry = (
-                      templateListJson as {
-                        templateKey: string;
-                        displayName: string;
-                        category?: string;
-                      }[]
-                    ).find((t) => t.templateKey === key);
-                    const label = entry?.displayName ?? key;
-                    const catLabel = entry?.category?.replace(/^\d+\.\s*/, "");
-                    return (
-                      <Button
-                        key={key}
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleTemplateKeyConfirm(key)}
-                        className="gap-1.5"
-                      >
-                        {label}
-                        {catLabel && (
-                          <span className="rounded bg-muted px-1 py-0.5 text-[10px] font-semibold text-muted-foreground">
-                            {catLabel}
-                          </span>
-                        )}
-                      </Button>
-                    );
-                  })}
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="text-muted-foreground"
-                    onClick={() => handleTemplateKeyConfirm(null)}
-                  >
-                    상용구 없이 진행
-                  </Button>
-                </div>
-              </div>
-              <Separator />
-            </>
-          )}
         <div className="p-4">
           <CardTimeline
             cards={cards}
@@ -529,7 +427,7 @@ export function NewCaseForm({
   const GuideArea = (
     <div className="h-full">
       <GuidelinePanel
-        cc={cc}
+        ccs={ccs}
         templateKey={selectedTemplateKey}
         onGuidelineChange={handleGuidelineChange}
         onTemplateChange={handleTemplateChange}
@@ -570,6 +468,8 @@ export function NewCaseForm({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* 설정 화면 (데스크탑+모바일 공통) */}
       {!setupDone && (
         <div
           className={cn(
@@ -604,6 +504,7 @@ export function NewCaseForm({
               건너뛰기
             </Button>
           </header>
+
           <div className="flex flex-1 flex-col gap-6 overflow-y-auto p-4">
             <BedPicker
               bedZone={bedZone}
@@ -611,15 +512,84 @@ export function NewCaseForm({
               onChange={handleBedChange}
             />
             <Separator />
-            <CcAutocomplete value={cc ?? ""} onSelect={handleCcSelect} />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                C.C (Chief Complaint)
+              </label>
+              <MultiCcInput
+                values={setupCcs}
+                onChange={(
+                  newCcs: string[],
+                  _lastEntries: CcConnectionEntry[]
+                ) => setSetupCcs(newCcs)}
+              />
+            </div>
+
+            {/* 상용구 선택 단계 (설정 화면 내) */}
+            {pendingTemplateKeys && pendingTemplateKeys.length >= 2 && (
+              <>
+                <Separator />
+                <div className="flex flex-col gap-2">
+                  <p className="text-sm font-medium">
+                    어떤 상용구로 생성할까요?
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {pendingTemplateKeys.map((key) => {
+                      const entry = (
+                        templateListJson as {
+                          templateKey: string;
+                          displayName: string;
+                          category?: string;
+                        }[]
+                      ).find((t) => t.templateKey === key);
+                      const label = entry?.displayName ?? key;
+                      const catLabel = entry?.category?.replace(
+                        /^\d+\.\s*/,
+                        ""
+                      );
+                      return (
+                        <Button
+                          key={key}
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleTemplateKeyConfirm(key)}
+                          className="gap-1.5"
+                        >
+                          {label}
+                          {catLabel && (
+                            <span className="rounded bg-muted px-1 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                              {catLabel}
+                            </span>
+                          )}
+                        </Button>
+                      );
+                    })}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="text-muted-foreground"
+                      onClick={() => handleTemplateKeyConfirm(null)}
+                    >
+                      상용구 없이 진행
+                    </Button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
-          <div className="shrink-0 border-t p-4">
-            <Button className="w-full" onClick={handleSetupConfirm}>
-              확인
-            </Button>
-          </div>
+
+          {!pendingTemplateKeys && (
+            <div className="shrink-0 border-t p-4">
+              <Button className="w-full" onClick={handleSetupConfirm}>
+                확인
+              </Button>
+            </div>
+          )}
         </div>
       )}
+
       <div
         ref={rootRef}
         className="fixed inset-0 flex flex-col"
@@ -627,7 +597,6 @@ export function NewCaseForm({
       >
         {/* 페이지 헤더 */}
         <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
-          {/* 뒤로가기 */}
           <Button
             variant="ghost"
             size="icon"
@@ -645,29 +614,28 @@ export function NewCaseForm({
 
           <span className="shrink-0 text-sm font-semibold">새 케이스 입력</span>
 
-          {/* 헤더 칩: 베드 배지 (접힌 상태일 때만 표시) */}
-          {!bedPickerOpen && bedNumber !== null && (
-            <button
-              type="button"
-              onClick={() => setBedPickerOpen(true)}
-              className="shrink-0"
-              aria-label="베드 선택 열기"
-            >
-              <BedBadge bedZone={bedZone} bedNumber={bedNumber} size="sm" />
-            </button>
+          {/* 헤더 칩: 베드 배지 */}
+          {bedNumber !== null && (
+            <BedBadge bedZone={bedZone} bedNumber={bedNumber} size="sm" />
           )}
 
-          {/* 헤더 칩: CC 텍스트 (접힌 상태일 때만 표시) */}
-          {!ccEditing && (
-            <button
-              type="button"
-              onClick={() => setCcEditing(true)}
-              className="rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors hover:bg-muted"
-              aria-label="C.C 편집"
+          {/* 헤더 칩: 다중 CC */}
+          {ccs.map((cc) => (
+            <div
+              key={cc}
+              className="flex items-center gap-0.5 rounded-full border px-2 py-0.5"
             >
-              {cc ?? <span className="text-muted-foreground">C.C 입력</span>}
-            </button>
-          )}
+              <span className="text-xs">{cc}</span>
+              <button
+                type="button"
+                onClick={() => handleRemoveCc(cc)}
+                className="ml-0.5 rounded-full p-0.5 text-muted-foreground hover:text-foreground"
+                aria-label={`${cc} 삭제`}
+              >
+                <X className="size-3" />
+              </button>
+            </div>
+          ))}
 
           <div className="flex flex-1 items-center justify-end gap-2">
             {/* 레이아웃 전환 토글 */}
