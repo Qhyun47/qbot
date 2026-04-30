@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "prepare": "husky",
     "clean": "npx rimraf .next",
-    "dev:clean": "npx rimraf .next && next dev"
+    "dev:clean": "npx rimraf .next && next dev",
+    "splash": "node scripts/generate-splash.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

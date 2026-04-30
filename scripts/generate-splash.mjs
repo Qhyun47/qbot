@@ -7,8 +7,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, "..");
 
 const BG = "#18181b";
-const TEXT_COLOR = "#ffffff";
-const TAGLINE_COLOR = "#71717a";
+const TEXT_COLOR = "#52525b";
+const TAGLINE_COLOR = "#3f3f46";
 
 const DIMENSIONS = [
   { w: 1290, h: 2796, file: "splash-1290x2796.png" },
@@ -45,10 +45,10 @@ for (const { w, h, file } of DIMENSIONS) {
       x="${w / 2}" y="${titleY}"
       text-anchor="middle"
       font-family="'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif"
-      font-weight="800"
+      font-weight="200"
       font-size="${titleSize}"
       fill="${TEXT_COLOR}"
-      letter-spacing="${Math.floor(w * 0.006)}"
+      letter-spacing="${Math.floor(w * 0.018)}"
     >규봇</text>
     <text
       x="${w / 2}" y="${taglineY}"
