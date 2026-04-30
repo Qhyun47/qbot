@@ -65,6 +65,16 @@ export async function updateCaseBed(
   const parsed = bedSchema.parse({ bedZone, bedNumber });
   const { supabase, user } = await getAuthUser();
 
+  // 처음 베드가 설정되는 신규 환자인지 확인 (bed_explicitly_set: false → true 전환 시점)
+  const { data: existingCase } = await supabase
+    .from("cases")
+    .select("bed_explicitly_set")
+    .eq("id", caseId)
+    .eq("user_id", user.id)
+    .single();
+
+  const isFirstBedAssignment = existingCase && !existingCase.bed_explicitly_set;
+
   const { error } = await supabase
     .from("cases")
     .update({
@@ -76,6 +86,47 @@ export async function updateCaseBed(
     .eq("user_id", user.id);
 
   if (error) throw new Error(error.message);
+
+  // 신규 환자 추가인 경우에만: 동일 베드 현황판 케이스 자동 제거
+  if (isFirstBedAssignment) {
+    const { data: conflictingCases } = await supabase
+      .from("cases")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("bed_zone", parsed.bedZone)
+      .eq("bed_number", parsed.bedNumber)
+      .is("board_hidden_at", null)
+      .neq("id", caseId);
+
+    if (conflictingCases && conflictingCases.length > 0) {
+      const conflictingIds = conflictingCases.map((c) => c.id);
+
+      // 사진 일괄 조회 후 Storage + 테이블 정리
+      const { data: allPhotos } = await supabase
+        .from("case_photos")
+        .select("storage_path, case_id")
+        .in("case_id", conflictingIds);
+
+      if (allPhotos && allPhotos.length > 0) {
+        await supabase.storage
+          .from("case-photos")
+          .remove(allPhotos.map((p) => p.storage_path));
+        await supabase
+          .from("case_photos")
+          .delete()
+          .in("case_id", conflictingIds);
+      }
+
+      // 현황판에서 일괄 제거
+      await supabase
+        .from("cases")
+        .update({ board_hidden_at: new Date().toISOString() })
+        .in("id", conflictingIds);
+
+      revalidatePath("/dashboard");
+      revalidatePath("/cases");
+    }
+  }
 }
 
 export async function updateCaseCc(
