@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import type { FoldFallbackLayout, InputLayout } from "@/lib/supabase/types";
@@ -90,6 +91,15 @@ export async function updateLayoutSettings(
     .eq("id", user.id);
 
   if (error) throw new Error(error.message);
+
+  // 글자 크기를 쿠키에도 저장 — PWA 바로가기 등 새로고침 진입 시 SSR에서 즉시 읽기 위함
+  const cookieStore = await cookies();
+  cookieStore.set("mobile-font-size", String(parsedFontSize), {
+    path: "/",
+    maxAge: 31536000,
+    httpOnly: false,
+    sameSite: "lax",
+  });
 
   revalidatePath("/settings");
   revalidatePath("/cases/new");

@@ -98,9 +98,23 @@ export default async function RootLayout({
   const deviceTypeCookie = cookieStore.get("x-device-type")?.value;
   const dataView = deviceTypeCookie === "desktop" ? "desktop" : undefined;
 
+  // PWA 바로가기 등 새로고침 진입 시 Supabase 조회 전에 글자 크기를 즉시 적용
+  const mobileFontSizeCookie = cookieStore.get("mobile-font-size")?.value;
+  const mobileFontSize = mobileFontSizeCookie
+    ? parseInt(mobileFontSizeCookie, 10)
+    : null;
+
   return (
     <html lang="ko" data-view={dataView} suppressHydrationWarning>
-      <head />
+      <head>
+        {mobileFontSize && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `document.documentElement.style.setProperty('--mobile-font-size','${mobileFontSize}px');`,
+            }}
+          />
+        )}
+      </head>
       <body className={`${geistSans.className} antialiased`}>
         <ThemeProvider
           attribute="class"
