@@ -34,7 +34,16 @@ export function MedicationOrganizerDialog({
   const [rawText, setRawText] = useState("");
   const [organizedText, setOrganizedText] = useState("");
   const [excludeEnded, setExcludeEnded] = useState(true);
-  const [includeDetails, setIncludeDetails] = useState(false);
+  const [includeDetails, setIncludeDetails] = useState(() => {
+    if (typeof window === "undefined") return true;
+    const stored = localStorage.getItem("medication-include-details");
+    return stored === null ? true : stored === "true";
+  });
+
+  function handleIncludeDetailsChange(value: boolean) {
+    setIncludeDetails(value);
+    localStorage.setItem("medication-include-details", String(value));
+  }
 
   function handleOrganize() {
     const result = processMedicationText(rawText, {
@@ -48,7 +57,6 @@ export function MedicationOrganizerDialog({
     setRawText("");
     setOrganizedText("");
     setExcludeEnded(true);
-    setIncludeDetails(false);
   }
 
   async function handleAddToHistory() {
@@ -78,7 +86,7 @@ export function MedicationOrganizerDialog({
               excludeEnded={excludeEnded}
               onExcludeEndedChange={setExcludeEnded}
               includeDetails={includeDetails}
-              onIncludeDetailsChange={setIncludeDetails}
+              onIncludeDetailsChange={handleIncludeDetailsChange}
               onOrganize={handleOrganize}
               onReset={handleReset}
             />
