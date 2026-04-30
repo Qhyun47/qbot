@@ -60,20 +60,20 @@ export default function DashboardPage() {
 
       {/* 현황판 섹션 */}
       <section className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-between gap-y-1">
+          <h2 className="shrink-0 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
             현황판
           </h2>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-1">
             <div className="xl:hidden">
               <MedicationTriggerButton size="sm" />
             </div>
-            <NewCaseButton className="xl:hidden" size="sm" />
+            <NewCaseButton className="whitespace-nowrap xl:hidden" size="sm" />
             <RefreshButton />
             <HideAllFromBoardButton />
             <Link
               href="/cases"
-              className="flex items-center gap-0.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+              className="flex shrink-0 items-center gap-0.5 whitespace-nowrap text-xs text-muted-foreground transition-colors hover:text-foreground"
             >
               전체 보기
               <ChevronRight className="size-3" />

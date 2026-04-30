@@ -33,7 +33,7 @@ export function HideAllFromBoardButton() {
         <Button
           variant="ghost"
           size="sm"
-          className="h-6 gap-1 px-2 text-xs text-muted-foreground hover:text-destructive"
+          className="h-6 shrink-0 gap-1 whitespace-nowrap px-2 text-xs text-muted-foreground hover:text-destructive"
         >
           <Trash2 className="size-3" />
           전체 삭제

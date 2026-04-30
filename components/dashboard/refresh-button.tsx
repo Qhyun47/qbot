@@ -20,7 +20,7 @@ export function RefreshButton() {
     <Button
       variant="ghost"
       size="sm"
-      className="h-6 gap-1 px-2 text-xs text-muted-foreground"
+      className="h-6 shrink-0 gap-1 whitespace-nowrap px-2 text-xs text-muted-foreground"
       onClick={handleRefresh}
       disabled={isPending}
       aria-label="현황판 새로고침"
