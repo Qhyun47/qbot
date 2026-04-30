@@ -443,6 +443,7 @@ export function NewCaseForm({
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={async () => {
                 setShowSaveDialog(false);
+                setNavigatingBack(true);
                 await handleDeleteCase();
               }}
             >
@@ -451,6 +452,7 @@ export function NewCaseForm({
             <AlertDialogAction
               onClick={() => {
                 setShowSaveDialog(false);
+                setNavigatingBack(true);
                 navigateToDashboard();
               }}
             >
