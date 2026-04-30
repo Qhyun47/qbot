@@ -2,15 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import {
-  ArrowLeft,
-  Rows2,
-  Columns2,
-  Square,
-  X,
-  Zap,
-  Loader2,
-} from "lucide-react";
+import { ArrowLeft, Rows2, Columns2, Square, Zap, Loader2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -302,12 +294,11 @@ export function NewCaseForm({
     }
   };
 
-  const handleRemoveCc = (cc: string) => {
-    const next = ccs.filter((c) => c !== cc);
-    setCcs(next);
-    if (caseId) {
-      startTransition(() => updateCaseCcs(caseId, next, selectedTemplateKey));
-    }
+  const handleOpenSetup = () => {
+    setSetupCcs(ccs);
+    setPendingTemplateKeys(null);
+    setSetupExiting(false);
+    setSetupDone(false);
   };
 
   const handleGuidelineChange = (_guideKey: string) => {
@@ -612,32 +603,36 @@ export function NewCaseForm({
             )}
           </Button>
 
-          <span className="shrink-0 text-sm font-semibold">새 케이스 입력</span>
-
-          {/* 헤더 칩: 베드 배지 */}
+          {/* 헤더 칩: 베드 배지 (클릭 시 설정 화면 재오픈) */}
           {bedNumber !== null && (
-            <BedBadge bedZone={bedZone} bedNumber={bedNumber} size="sm" />
+            <button
+              type="button"
+              onClick={handleOpenSetup}
+              className="shrink-0"
+              aria-label="베드 선택 변경"
+            >
+              <BedBadge bedZone={bedZone} bedNumber={bedNumber} size="sm" />
+            </button>
           )}
 
-          {/* 헤더 칩: 다중 CC */}
-          {ccs.map((cc) => (
-            <div
-              key={cc}
-              className="flex items-center gap-0.5 rounded-full border px-2 py-0.5"
+          {/* 헤더 칩: 다중 CC (클릭 시 설정 화면 재오픈, 한 줄 truncate) */}
+          {ccs.length > 0 && (
+            <button
+              type="button"
+              onClick={handleOpenSetup}
+              className="flex min-w-0 flex-1 items-center gap-0.5 overflow-hidden rounded-full border px-2 py-0.5 text-left hover:bg-muted"
+              aria-label="C.C 변경"
             >
-              <span className="text-xs">{cc}</span>
-              <button
-                type="button"
-                onClick={() => handleRemoveCc(cc)}
-                className="ml-0.5 rounded-full p-0.5 text-muted-foreground hover:text-foreground"
-                aria-label={`${cc} 삭제`}
-              >
-                <X className="size-3" />
-              </button>
-            </div>
-          ))}
+              <span className="shrink-0 text-xs">{ccs[0]}</span>
+              {ccs.length > 1 && (
+                <span className="min-w-0 truncate text-xs text-muted-foreground">
+                  , {ccs.slice(1).join(", ")}
+                </span>
+              )}
+            </button>
+          )}
 
-          <div className="flex flex-1 items-center justify-end gap-2">
+          <div className="flex shrink-0 items-center justify-end gap-2">
             {/* 레이아웃 전환 토글 */}
             <div className="hidden items-center gap-0.5 rounded-md border p-0.5 is-desktop:flex">
               {LAYOUT_OPTIONS.map(({ value, Icon, label }) => (
