@@ -18,8 +18,9 @@ export async function GET(req: NextRequest) {
   const { data: photos, error: fetchError } = await supabase
     .from("case_photos")
     .select("id, storage_path, cases!inner(created_at)")
-    .lt(
+    .filter(
       "cases.created_at",
+      "lt",
       new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
     );
 

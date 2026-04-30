@@ -34,11 +34,23 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import type { DashboardPhoto } from "@/lib/supabase/types";
+import type { CasePhoto, DashboardPhoto } from "@/lib/supabase/types";
 
 type DashboardPhotoWithUrl = DashboardPhoto & { url: string | null };
+type CasePhotoWithUrl = CasePhoto & { url: string | null };
+type CasePhotoGroup = {
+  caseId: string;
+  bedZone: string;
+  bedNumber: number | null;
+  cc: string | null;
+  photos: CasePhotoWithUrl[];
+};
+type CaseViewingState = { groupIdx: number; photoIdx: number };
 
-async function triggerDownload(photo: DashboardPhotoWithUrl) {
+async function triggerDownload(photo: {
+  url: string | null;
+  file_name: string;
+}) {
   if (!photo.url) return;
   const res = await fetch(photo.url);
   const raw = await res.blob();
@@ -78,6 +90,7 @@ function createRotatedBlob(
 }
 
 export function DashboardGallerySheet() {
+  // 대시보드 사진 상태
   const [open, setOpen] = useState(false);
   const [photos, setPhotos] = useState<DashboardPhotoWithUrl[]>([]);
   const [loading, setLoading] = useState(false);
@@ -95,19 +108,52 @@ export function DashboardGallerySheet() {
   const albumInputRef = useRef<HTMLInputElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
 
+  // 케이스 사진 상태
+  const [casePhotoGroups, setCasePhotoGroups] = useState<CasePhotoGroup[]>([]);
+  const [caseViewingState, setCaseViewingState] =
+    useState<CaseViewingState | null>(null);
+  const [caseDeleteTarget, setCaseDeleteTarget] = useState<{
+    group: CasePhotoGroup;
+    photo: CasePhotoWithUrl;
+  } | null>(null);
+  const [caseSavingPhotoId, setCaseSavingPhotoId] = useState<string | null>(
+    null
+  );
+  const [caseRotation, setCaseRotation] = useState(0);
+  const [caseIsDownloading, setCaseIsDownloading] = useState(false);
+  const caseImgRef = useRef<HTMLImageElement>(null);
+
   const normalizedRotation = ((rotation % 360) + 360) % 360;
+  const caseNormalizedRotation = ((caseRotation % 360) + 360) % 360;
   const viewingPhoto = viewingIndex !== null ? photos[viewingIndex] : null;
+  const caseViewingGroup =
+    caseViewingState !== null
+      ? casePhotoGroups[caseViewingState.groupIdx]
+      : null;
+  const caseViewingPhoto = caseViewingGroup
+    ? caseViewingGroup.photos[caseViewingState!.photoIdx]
+    : null;
 
   useEffect(() => {
     setRotation(0);
     setIsDownloading(false);
   }, [viewingIndex]);
 
+  useEffect(() => {
+    setCaseRotation(0);
+    setCaseIsDownloading(false);
+  }, [caseViewingState]);
+
   const fetchPhotos = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/dashboard/photos");
-      if (res.ok) setPhotos(await res.json());
+      await fetch("/api/photos/cleanup-expired", { method: "POST" });
+      const [dashRes, caseRes] = await Promise.all([
+        fetch("/api/dashboard/photos"),
+        fetch("/api/cases/all-photos"),
+      ]);
+      if (dashRes.ok) setPhotos(await dashRes.json());
+      if (caseRes.ok) setCasePhotoGroups(await caseRes.json());
     } finally {
       setLoading(false);
     }
@@ -231,6 +277,104 @@ export function DashboardGallerySheet() {
     return () => window.removeEventListener("keydown", onKey);
   }, [viewingIndex, showPrev, showNext]);
 
+  // 케이스 사진 헬퍼
+  function formatCaseHeader(group: CasePhotoGroup): string {
+    const num =
+      group.bedNumber != null ? String(group.bedNumber).padStart(2, "0") : "";
+    const parts = [group.bedZone + num];
+    if (group.cc) parts.push(group.cc);
+    return parts.join(" ");
+  }
+
+  const handleCaseDelete = async () => {
+    if (!caseDeleteTarget) return;
+    const { group, photo } = caseDeleteTarget;
+    const res = await fetch(`/api/cases/${group.caseId}/photos/${photo.id}`, {
+      method: "DELETE",
+    });
+    setCaseDeleteTarget(null);
+    if (res.ok) {
+      setCasePhotoGroups((prev) =>
+        prev
+          .map((g) =>
+            g.caseId === group.caseId
+              ? { ...g, photos: g.photos.filter((p) => p.id !== photo.id) }
+              : g
+          )
+          .filter((g) => g.photos.length > 0)
+      );
+    }
+  };
+
+  const uploadCaseRotatedBlob = async (
+    caseId: string,
+    photo: CasePhotoWithUrl,
+    blob: Blob
+  ) => {
+    const formData = new FormData();
+    formData.append(
+      "file",
+      new File([blob], photo.file_name, { type: "image/jpeg" })
+    );
+    await fetch(`/api/cases/${caseId}/photos/${photo.id}`, {
+      method: "PATCH",
+      body: formData,
+    });
+  };
+
+  const handleCaseLightboxDownload = async () => {
+    if (!caseViewingPhoto?.url || caseIsDownloading) return;
+    setCaseIsDownloading(true);
+    try {
+      if (caseNormalizedRotation !== 0 && caseImgRef.current) {
+        const raw = await createRotatedBlob(
+          caseImgRef.current,
+          caseNormalizedRotation
+        );
+        const blob = new Blob([raw], { type: "application/octet-stream" });
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = caseViewingPhoto.file_name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+      } else {
+        await triggerDownload(caseViewingPhoto);
+      }
+    } finally {
+      setCaseIsDownloading(false);
+    }
+  };
+
+  const showCasePrev = useCallback(() => {
+    setCaseViewingState((s) =>
+      s && s.photoIdx > 0 ? { ...s, photoIdx: s.photoIdx - 1 } : s
+    );
+  }, []);
+
+  const showCaseNext = useCallback(() => {
+    setCaseViewingState((s) => {
+      if (!s) return s;
+      const group = casePhotoGroups[s.groupIdx];
+      if (!group) return s;
+      return s.photoIdx < group.photos.length - 1
+        ? { ...s, photoIdx: s.photoIdx + 1 }
+        : s;
+    });
+  }, [casePhotoGroups]);
+
+  useEffect(() => {
+    if (caseViewingState === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") showCasePrev();
+      if (e.key === "ArrowRight") showCaseNext();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [caseViewingState, showCasePrev, showCaseNext]);
+
   return (
     <>
       <Drawer open={open} onOpenChange={handleOpenChange}>
@@ -292,7 +436,7 @@ export function DashboardGallerySheet() {
               사진은 업로드 후 12시간이 지나면 자동으로 삭제됩니다.
             </p>
 
-            {/* 썸네일 그리드 */}
+            {/* 대시보드 사진 썸네일 그리드 */}
             {loading ? (
               <div className="flex items-center justify-center gap-2 py-4 text-sm text-muted-foreground">
                 <Loader2 className="size-4 animate-spin" />
@@ -350,6 +494,77 @@ export function DashboardGallerySheet() {
                   </div>
                 ))}
               </div>
+            )}
+
+            {/* 케이스 사진 섹션 */}
+            {!loading && casePhotoGroups.length > 0 && (
+              <>
+                <div className="h-px bg-border" />
+                <p className="text-xs font-medium text-muted-foreground">
+                  환자별 사진
+                </p>
+                {casePhotoGroups.map((group, groupIdx) => (
+                  <div key={group.caseId} className="flex flex-col gap-2">
+                    <h3 className="text-sm font-semibold">
+                      {formatCaseHeader(group)}
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {group.photos.map((photo, photoIdx) => (
+                        <div
+                          key={photo.id}
+                          className="relative size-24 shrink-0"
+                        >
+                          {photo.url ? (
+                            <button
+                              type="button"
+                              className="h-full w-full"
+                              onClick={() =>
+                                setCaseViewingState({ groupIdx, photoIdx })
+                              }
+                              aria-label="사진 확대"
+                            >
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={photo.url}
+                                alt={photo.file_name}
+                                className="h-full w-full rounded-md object-cover"
+                              />
+                            </button>
+                          ) : (
+                            <div className="h-full w-full rounded-md bg-muted" />
+                          )}
+                          {caseSavingPhotoId === photo.id && (
+                            <div className="absolute inset-0 flex items-center justify-center rounded-md bg-black/40">
+                              <Loader2 className="size-6 animate-spin text-white" />
+                            </div>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setCaseDeleteTarget({ group, photo })
+                            }
+                            className="absolute right-1 top-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+                            aria-label="삭제"
+                          >
+                            <X className="size-3" />
+                          </button>
+                          {photo.url && (
+                            <button
+                              type="button"
+                              onClick={() => triggerDownload(photo)}
+                              disabled={caseSavingPhotoId === photo.id}
+                              className="absolute bottom-1 right-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
+                              aria-label="다운로드"
+                            >
+                              <Download className="size-3" />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </>
             )}
 
             {/* 업로드 버튼 — 모바일 전용 */}
@@ -430,7 +645,7 @@ export function DashboardGallerySheet() {
         }}
       />
 
-      {/* 라이트박스 뷰어 */}
+      {/* 대시보드 사진 라이트박스 */}
       <Dialog
         open={viewingIndex !== null}
         onOpenChange={async (open) => {
@@ -540,7 +755,126 @@ export function DashboardGallerySheet() {
         </DialogContent>
       </Dialog>
 
-      {/* 삭제 확인 다이얼로그 */}
+      {/* 케이스 사진 라이트박스 */}
+      <Dialog
+        open={caseViewingState !== null}
+        onOpenChange={async (open) => {
+          if (open) return;
+          const photoToSave = caseViewingPhoto;
+          const groupToSave = caseViewingGroup;
+          const rotationToSave = caseNormalizedRotation;
+          const imgEl = caseImgRef.current;
+
+          setCaseViewingState(null);
+          setCaseRotation(0);
+
+          if (rotationToSave !== 0 && photoToSave && groupToSave && imgEl) {
+            let blob: Blob | null = null;
+            try {
+              blob = await createRotatedBlob(imgEl, rotationToSave);
+            } catch {
+              // Canvas 오류 시 저장 생략
+            }
+            if (blob) {
+              setCaseSavingPhotoId(photoToSave.id);
+              try {
+                await uploadCaseRotatedBlob(
+                  groupToSave.caseId,
+                  photoToSave,
+                  blob
+                );
+                const res = await fetch("/api/cases/all-photos");
+                if (res.ok) setCasePhotoGroups(await res.json());
+              } finally {
+                setCaseSavingPhotoId(null);
+              }
+            }
+          }
+        }}
+      >
+        <DialogContent className="flex max-h-[90vh] max-w-[90vw] flex-col gap-3 p-4">
+          {caseViewingPhoto && caseViewingGroup && (
+            <>
+              <div className="flex items-center justify-between pr-8">
+                <span className="text-sm text-muted-foreground">
+                  {(caseViewingState?.photoIdx ?? 0) + 1} /{" "}
+                  {caseViewingGroup.photos.length}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleCaseLightboxDownload}
+                  disabled={caseIsDownloading}
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
+                  aria-label="다운로드"
+                >
+                  {caseIsDownloading ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Download className="size-4" />
+                  )}
+                  다운로드
+                </button>
+              </div>
+              <div className="relative flex flex-1 items-center justify-center overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  ref={caseImgRef}
+                  src={caseViewingPhoto.url ?? ""}
+                  alt={caseViewingPhoto.file_name}
+                  crossOrigin="anonymous"
+                  className="max-h-[75vh] max-w-full rounded-md object-contain transition-transform duration-200"
+                  style={{ transform: `rotate(${caseRotation}deg)` }}
+                />
+                {caseViewingGroup.photos.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={showCasePrev}
+                      disabled={(caseViewingState?.photoIdx ?? 0) === 0}
+                      className="absolute left-2 flex size-8 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 disabled:opacity-30"
+                      aria-label="이전 사진"
+                    >
+                      <ChevronLeft className="size-5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={showCaseNext}
+                      disabled={
+                        (caseViewingState?.photoIdx ?? 0) ===
+                        caseViewingGroup.photos.length - 1
+                      }
+                      className="absolute right-2 flex size-8 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 disabled:opacity-30"
+                      aria-label="다음 사진"
+                    >
+                      <ChevronRight className="size-5" />
+                    </button>
+                  </>
+                )}
+              </div>
+              <div className="flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCaseRotation((r) => r - 90)}
+                  className="flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+                  aria-label="반시계 방향 회전"
+                >
+                  <RotateCcw className="size-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCaseRotation((r) => r + 90)}
+                  className="flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+                  aria-label="시계 방향 회전"
+                >
+                  <RotateCw className="size-4" />
+                </button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* 대시보드 사진 삭제 확인 다이얼로그 */}
       <AlertDialog
         open={!!deleteTarget}
         onOpenChange={(v) => {
@@ -580,6 +914,29 @@ export function DashboardGallerySheet() {
             <AlertDialogCancel disabled={deletingAll}>취소</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteAll} disabled={deletingAll}>
               {deletingAll && <Loader2 className="mr-2 size-4 animate-spin" />}
+              삭제
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* 케이스 사진 삭제 확인 다이얼로그 */}
+      <AlertDialog
+        open={!!caseDeleteTarget}
+        onOpenChange={(v) => {
+          if (!v) setCaseDeleteTarget(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>사진 삭제</AlertDialogTitle>
+            <AlertDialogDescription>
+              이 사진을 삭제하면 복구할 수 없습니다. 삭제하시겠습니까?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>취소</AlertDialogCancel>
+            <AlertDialogAction onClick={handleCaseDelete}>
               삭제
             </AlertDialogAction>
           </AlertDialogFooter>
