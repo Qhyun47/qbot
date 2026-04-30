@@ -65,10 +65,6 @@ export default function DashboardPage() {
             현황판
           </h2>
           <div className="flex flex-wrap items-center justify-end gap-1">
-            <div className="xl:hidden">
-              <MedicationTriggerButton size="sm" />
-            </div>
-            <NewCaseButton className="whitespace-nowrap xl:hidden" size="sm" />
             <RefreshButton />
             <HideAllFromBoardButton />
             <Link
