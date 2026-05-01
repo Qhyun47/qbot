@@ -24,14 +24,6 @@ export function useVisualViewport(ref: RefObject<HTMLElement | null>) {
 
     const update = () => {
       el.style.height = `${getHeight()}px`;
-
-      // 디버그 오버레이 업데이트
-      const dbg = document.getElementById("vvp-debug");
-      if (dbg) {
-        const winH = window.innerHeight;
-        const vvH = vv ? Math.round(vv.height) : winH;
-        dbg.textContent = `win.h=${winH} | vv.h=${vvH} | applied=${Math.min(winH, vvH)}`;
-      }
     };
 
     // 이벤트 기반 (Android Chrome 108+, 데스크탑)

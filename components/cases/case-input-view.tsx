@@ -386,13 +386,6 @@ export function CaseInputView({
       ref={containerRef}
       className="fixed inset-x-0 top-0 flex h-[100dvh] flex-col"
     >
-      {/* 임시 디버그 오버레이 — 검증 후 제거 */}
-      <div
-        id="vvp-debug"
-        className="fixed bottom-24 right-2 z-50 rounded bg-black/80 px-2 py-1 font-mono text-[10px] text-white"
-      >
-        로딩 중...
-      </div>
       <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
         {/* 뒤로가기 */}
         <Button
