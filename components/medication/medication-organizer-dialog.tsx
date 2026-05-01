@@ -89,7 +89,7 @@ export function MedicationOrganizerDialog({
               </span>
               하고,{" "}
               <span className="font-medium text-foreground">
-                AI 분석 결과를 케이스에 저장
+                AI 분석 결과를 환자 기록에 저장
               </span>
               할 수 있습니다.
             </p>

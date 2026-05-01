@@ -176,7 +176,7 @@ async function CaseContent({
           <Button variant="ghost" size="sm" className="-ml-2 gap-1" asChild>
             <Link href={from === "cases" ? "/cases" : "/dashboard"}>
               <ArrowLeft className="size-4" />
-              {from === "cases" ? "케이스 목록" : "대시보드"}
+              {from === "cases" ? "환자 목록" : "대시보드"}
             </Link>
           </Button>
         )}

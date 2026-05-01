@@ -263,8 +263,7 @@ export function LayoutSettings({
         <div>
           <p className="text-sm font-medium">입력 화면 레이아웃</p>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            새 케이스 입력 화면에서 가이드라인 패널을 어떻게 배치할지
-            선택하세요.
+            문진 입력 화면에서 가이드라인 패널을 어떻게 배치할지 선택하세요.
           </p>
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -404,7 +403,7 @@ export function LayoutSettings({
 
           <div className="space-y-2">
             <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-              접었을 때 케이스 입력 글자 크기
+              접었을 때 문진 입력 글자 크기
             </p>
             <Select
               value={String(foldCaseInputFontSize)}
@@ -475,9 +474,9 @@ export function LayoutSettings({
 
       <div className="space-y-3 md:hidden">
         <div>
-          <p className="text-sm font-medium">케이스 입력 글자 크기</p>
+          <p className="text-sm font-medium">문진 입력 글자 크기</p>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            케이스 입력 화면에만 별도로 적용됩니다. 두 영역을 동시에 보거나
+            문진 입력 화면에만 별도로 적용됩니다. 두 영역을 동시에 보거나
             키보드가 올라와 있을 때 더 작은 글자로 설정하면 화면을 넓게 쓸 수
             있습니다.
           </p>

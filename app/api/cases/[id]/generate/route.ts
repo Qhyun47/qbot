@@ -83,7 +83,7 @@ export async function POST(
 
   if (!caseRow) {
     return NextResponse.json(
-      { error: "케이스를 찾을 수 없습니다" },
+      { error: "환자를 찾을 수 없습니다" },
       { status: 404 }
     );
   }
@@ -100,10 +100,7 @@ export async function POST(
     .single();
 
   if (!locked) {
-    return NextResponse.json(
-      { error: "이미 생성 중인 케이스입니다" },
-      { status: 409 }
-    );
+    return NextResponse.json({ error: "이미 처리 중입니다." }, { status: 409 });
   }
 
   const { data: inputRows } = await supabase

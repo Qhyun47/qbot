@@ -474,7 +474,7 @@ export function NewCaseForm({
                 <ArrowLeft className="size-4" />
               )}
             </Button>
-            <span className="flex-1 text-sm font-semibold">새 케이스 입력</span>
+            <span className="flex-1 text-sm font-semibold">환자 추가</span>
             <Button
               variant="ghost"
               size="sm"

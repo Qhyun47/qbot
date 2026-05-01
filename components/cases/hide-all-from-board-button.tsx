@@ -43,7 +43,7 @@ export function HideAllFromBoardButton() {
         <AlertDialogHeader>
           <AlertDialogTitle>현황판 전체 삭제</AlertDialogTitle>
           <AlertDialogDescription>
-            현황판의 모든 케이스를 숨깁니다. 케이스 목록에서는 계속 확인할 수
+            현황판의 모든 환자를 숨깁니다. 환자 목록에서는 계속 확인할 수
             있습니다.
           </AlertDialogDescription>
         </AlertDialogHeader>

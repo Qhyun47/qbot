@@ -8,7 +8,7 @@ async function CasesLoader() {
   return (
     <>
       <p className="mt-1 text-sm text-muted-foreground">
-        최근 24시간 · {cases.length}개 케이스
+        최근 24시간 · {cases.length}명
       </p>
       <div className="mt-6">
         <CasesTable cases={cases} />
@@ -22,7 +22,7 @@ export default function CasesPage() {
     <div className="p-4 md:p-8">
       <RealtimeRefresh table="cases" />
       <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">케이스 목록</h1>
+        <h1 className="text-2xl font-bold tracking-tight">환자 목록</h1>
         <Suspense
           fallback={
             <p className="mt-1 text-sm text-muted-foreground">불러오는 중...</p>

@@ -25,7 +25,7 @@ export async function GET(
 
   if (!row) {
     return NextResponse.json(
-      { error: "케이스를 찾을 수 없습니다" },
+      { error: "환자를 찾을 수 없습니다" },
       { status: 404 }
     );
   }

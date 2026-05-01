@@ -78,7 +78,7 @@ export function StatusBoardCard({ case: c }: StatusBoardCardProps) {
     startTransition(async () => {
       await hideFromBoard(c.id);
       toast.success(
-        "현황판에서 제거했습니다. 케이스 목록에서 다시 추가할 수 있습니다."
+        "현황판에서 제거했습니다. 환자 목록에서 다시 추가할 수 있습니다."
       );
     });
   }
@@ -147,7 +147,7 @@ export function StatusBoardCard({ case: c }: StatusBoardCardProps) {
               if (!isPending) setDeleteOpen(true);
             }}
             disabled={isPending}
-            aria-label="케이스 삭제"
+            aria-label="환자 삭제"
             className="size-7 p-0 text-muted-foreground hover:text-destructive"
           >
             {isPending ? (
@@ -164,7 +164,7 @@ export function StatusBoardCard({ case: c }: StatusBoardCardProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>현황판에서 제거하시겠습니까?</AlertDialogTitle>
             <AlertDialogDescription>
-              케이스는 삭제되지 않으며 케이스 목록에서 다시 현황판에 추가할 수
+              환자는 삭제되지 않으며 환자 목록에서 다시 현황판에 추가할 수
               있습니다.
             </AlertDialogDescription>
           </AlertDialogHeader>
