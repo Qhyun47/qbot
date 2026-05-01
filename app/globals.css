@@ -45,18 +45,24 @@ html[data-view="mobile"] .lg\:inline-flex {
   display: none !important;
 }
 
-/* PC 강제: 모바일에서 lg: 반응형 강제 적용 */
-html[data-view="desktop"] .lg\:hidden {
-  display: none !important;
-}
-html[data-view="desktop"] .lg\:flex {
-  display: flex !important;
-}
-html[data-view="desktop"] .lg\:block {
-  display: block !important;
-}
-html[data-view="desktop"] .lg\:inline-flex {
-  display: inline-flex !important;
+/* PC 강제: 터치 기기(모바일)에서 "PC 버전으로 보기" 선택 시에만 lg: 강제 적용
+   pointer:fine(마우스/PC)에서는 미적용 → 창 너비 축소 시 반응형 동작 정상 작동 */
+@media (pointer: coarse) {
+  html[data-view="desktop"] .lg\:hidden {
+    display: none !important;
+  }
+  html[data-view="desktop"] .lg\:flex {
+    display: flex !important;
+  }
+  html[data-view="desktop"] .lg\:block {
+    display: block !important;
+  }
+  html[data-view="desktop"] .lg\:inline-flex {
+    display: inline-flex !important;
+  }
+  html[data-view="desktop"] .lg\:inline {
+    display: inline !important;
+  }
 }
 
 @layer base {
