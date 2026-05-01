@@ -177,9 +177,27 @@ export function CasesTable({ cases }: CasesTableProps) {
                         {format(parseISO(c.created_at), "M/d HH:mm")}
                       </td>
                       <td className="h-14 px-4 font-medium">
-                        {c.cc ?? (
-                          <span className="text-muted-foreground">-</span>
-                        )}
+                        <div className="flex items-center gap-1">
+                          <span className="truncate">
+                            {c.ccs?.[0] ?? c.cc ?? (
+                              <span className="text-muted-foreground">-</span>
+                            )}
+                          </span>
+                          {(c.ccs?.length ?? 0) > 1 && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className="shrink-0 cursor-default rounded-full bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+                                    +{c.ccs!.length - 1}
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  {c.ccs!.slice(1).join(", ")}
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
+                        </div>
                       </td>
                       <td className="h-14 px-4">
                         <StatusBadge status={c.status as CaseStatus} />
