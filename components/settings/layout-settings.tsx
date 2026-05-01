@@ -50,7 +50,7 @@ const LAYOUT_OPTIONS: LayoutOptionItem[] = [
   {
     value: "split_horizontal",
     label: "좌우 분할",
-    description: "좌측 입력 / 우측 가이드 (폴드/태블릿)",
+    description: "좌측 가이드 / 우측 입력 (폴드/태블릿)",
     Icon: Columns,
   },
 ];
@@ -180,8 +180,8 @@ export function LayoutSettings({
 
   const isSplit = selectedLayout !== "single";
 
-  const firstLabel = selectedLayout === "split_vertical" ? "가이드" : "입력";
-  const secondLabel = selectedLayout === "split_vertical" ? "입력" : "가이드";
+  const firstLabel = "가이드";
+  const secondLabel = "입력";
 
   return (
     <div className="space-y-8">

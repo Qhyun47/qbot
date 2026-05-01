@@ -704,8 +704,8 @@ export function NewCaseForm({
         {layout === "split_horizontal" && (
           <ResizableSplit
             direction="horizontal"
-            first={InputArea}
-            second={GuideArea}
+            first={GuideArea}
+            second={InputArea}
             defaultFirstPercent={defaultSplitRatio}
           />
         )}
