@@ -142,13 +142,13 @@ export async function getLayoutSettings(): Promise<{
   const caseInputFontSize = data?.case_input_font_size ?? 16;
   const guidelineFontSize = data?.guideline_font_size ?? 12;
   return {
-    layout: data?.input_layout ?? "single",
+    layout: data?.input_layout ?? "split_vertical",
     splitRatio: data?.split_ratio ?? 50,
     mobileFontSize: data?.mobile_font_size ?? 16,
     caseInputFontSize,
     foldAutoSwitch: data?.fold_auto_switch ?? false,
     foldFallbackLayout:
-      (data?.fold_fallback_layout as FoldFallbackLayout) ?? "single",
+      (data?.fold_fallback_layout as FoldFallbackLayout) ?? "split_vertical",
     foldCaseInputFontSize: data?.fold_case_input_font_size ?? caseInputFontSize,
     guidelineFontSize,
     foldGuidelineFontSize: data?.fold_guideline_font_size ?? guidelineFontSize,

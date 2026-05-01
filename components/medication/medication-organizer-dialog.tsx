@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { Info } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -78,6 +79,22 @@ export function MedicationOrganizerDialog({
         <DialogHeader className="border-b px-6 py-4">
           <DialogTitle>의약품 정리</DialogTitle>
         </DialogHeader>
+        {!caseId && (
+          <div className="flex items-start gap-2.5 border-b bg-muted/60 px-6 py-3">
+            <Info className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">
+              환자 페이지에서 의약품 정리를 이용하면 정리된 약물 목록을{" "}
+              <span className="font-medium text-foreground">
+                차팅(History)에 바로 추가
+              </span>
+              하고,{" "}
+              <span className="font-medium text-foreground">
+                AI 분석 결과를 케이스에 저장
+              </span>
+              할 수 있습니다.
+            </p>
+          </div>
+        )}
         <div className="flex-1 overflow-y-auto p-6">
           <div className="grid grid-cols-1 gap-4 min-[920px]:grid-cols-2">
             <MedicationInputPanel
