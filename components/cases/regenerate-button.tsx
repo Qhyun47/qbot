@@ -4,6 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, RefreshCw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import type { CaseStatus } from "@/lib/supabase/types";
 
@@ -43,48 +49,37 @@ export function RegenerateButton({
     }
   }
 
-  if (isGenerating) {
-    return (
-      <Button variant="outline" size="sm" className="ml-auto gap-1.5" disabled>
-        <Loader2 className="size-3.5 animate-spin" />
-        생성 중…
-      </Button>
-    );
-  }
+  const label = isGenerating
+    ? "생성 중…"
+    : status === "draft"
+      ? "차팅 생성"
+      : "재생성";
 
-  if (status === "draft") {
-    return (
-      <Button
-        variant="outline"
-        size="sm"
-        className="ml-auto gap-1.5"
-        onClick={handleRegenerate}
-        disabled={loading}
-      >
-        {loading ? (
-          <Loader2 className="size-3.5 animate-spin" />
-        ) : (
-          <Sparkles className="size-3.5" />
-        )}
-        차팅 생성
-      </Button>
+  const icon =
+    isGenerating || loading ? (
+      <Loader2 className="size-3.5 animate-spin" />
+    ) : status === "draft" ? (
+      <Sparkles className="size-3.5" />
+    ) : (
+      <RefreshCw className="size-3.5" />
     );
-  }
 
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      className="ml-auto gap-1.5"
-      onClick={handleRegenerate}
-      disabled={loading}
-    >
-      {loading ? (
-        <Loader2 className="size-3.5 animate-spin" />
-      ) : (
-        <RefreshCw className="size-3.5" />
-      )}
-      재생성
-    </Button>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="outline"
+            onClick={isGenerating ? undefined : handleRegenerate}
+            disabled={isGenerating || loading}
+            className="inline-flex gap-1.5"
+          >
+            {icon}
+            <span className="hidden xl:inline">{label}</span>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent className="xl:hidden">{label}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
