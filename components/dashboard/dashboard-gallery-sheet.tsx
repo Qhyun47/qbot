@@ -383,7 +383,7 @@ export function DashboardGallerySheet() {
             <Button
               type="button"
               size="icon"
-              className="size-16 rounded-full shadow-lg [&_svg]:size-7"
+              className="size-16 rounded-full shadow-lg [&_svg]:size-6"
               aria-label="사진 갤러리"
             >
               <Camera />
