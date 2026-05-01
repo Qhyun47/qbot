@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2 } from "lucide-react";
+import { Trash2, Loader2 } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import { toast } from "sonner";
 import { hideFromBoard, updateCaseMemo } from "@/lib/cases/actions";
@@ -144,12 +144,17 @@ export function StatusBoardCard({ case: c }: StatusBoardCardProps) {
             size="sm"
             onClick={(e) => {
               e.stopPropagation();
-              setDeleteOpen(true);
+              if (!isPending) setDeleteOpen(true);
             }}
+            disabled={isPending}
             aria-label="케이스 삭제"
             className="size-7 p-0 text-muted-foreground hover:text-destructive"
           >
-            <Trash2 className="size-3.5" />
+            {isPending ? (
+              <Loader2 className="size-3.5 animate-spin" />
+            ) : (
+              <Trash2 className="size-3.5" />
+            )}
           </Button>
         </div>
       </div>
