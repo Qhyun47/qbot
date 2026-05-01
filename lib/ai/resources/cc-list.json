@@ -144,6 +144,18 @@
     "aliasOf": "Abdominal pain"
   },
   {
+    "cc": "Lower abdominal pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Abdominal pain"
+  },
+  {
+    "cc": "Upper abdominal pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Abdominal pain"
+  },
+  {
     "cc": "Chest discomfort",
     "guideKeys": [],
     "templateKeys": [],
@@ -1152,6 +1164,24 @@
     "patternOf": "** pain"
   },
   {
+    "cc": "Lt. leg pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Rt. leg pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
+    "cc": "Both leg pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** pain"
+  },
+  {
     "cc": "Ankle pain",
     "guideKeys": [],
     "templateKeys": [],
@@ -1515,6 +1545,24 @@
   },
   {
     "cc": "Rt. lower leg laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Lt. leg laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Rt. leg laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** laceration"
+  },
+  {
+    "cc": "Both leg laceration",
     "guideKeys": [],
     "templateKeys": [],
     "patternOf": "** laceration"
@@ -2041,5 +2089,22 @@
     "guideKeys": [],
     "templateKeys": [],
     "aliasOf": "Visual loss"
+  },
+  {
+    "cc": "Hearing loss",
+    "guideKeys": [{ "key": "ol-ear-pain", "rank": 0 }],
+    "templateKeys": [{ "key": "ear-pain", "rank": 0 }]
+  },
+  {
+    "cc": "Lt. hearing loss",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Hearing loss"
+  },
+  {
+    "cc": "Rt. hearing loss",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Hearing loss"
   }
 ]
