@@ -55,11 +55,11 @@ export default function SettingsPage() {
           <SettingsContent />
         </Suspense>
         <Separator />
-        <InstallSection />
-        <Separator />
         <Suspense fallback={null}>
           <FullscreenSectionWrapper />
         </Suspense>
+        <Separator />
+        <InstallSection />
         <Separator />
         <p className="text-center text-xs text-muted-foreground">
           버전{" "}
