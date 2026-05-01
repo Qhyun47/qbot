@@ -86,112 +86,119 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
       </Button>
 
       {open && (
-        <div className="absolute left-0 right-0 top-14 z-50 border-b bg-white shadow-lg dark:bg-zinc-950">
-          <nav className="flex flex-col px-4 py-2">
-            {NAV_LINKS.map(({ href, label }) => {
-              const isActive =
-                pathname === href ||
-                (href !== "/dashboard" && pathname.startsWith(href));
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={handleClose}
-                  className={cn(
-                    "rounded-md px-2 py-3 text-sm transition-colors",
-                    isActive
-                      ? "font-medium text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  {label}
-                </Link>
-              );
-            })}
+        <>
+          <div
+            className="fixed inset-0 z-40"
+            onClick={handleClose}
+            aria-hidden="true"
+          />
+          <div className="absolute left-0 right-0 top-14 z-50 border-b bg-white shadow-lg dark:bg-zinc-950">
+            <nav className="flex flex-col px-4 py-2">
+              {NAV_LINKS.map(({ href, label }) => {
+                const isActive =
+                  pathname === href ||
+                  (href !== "/dashboard" && pathname.startsWith(href));
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={handleClose}
+                    className={cn(
+                      "rounded-md px-2 py-3 text-sm transition-colors",
+                      isActive
+                        ? "font-medium text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
 
-            {/* 관리자 서브메뉴 */}
-            {isAdmin && (
-              <div className="mt-1 border-t pt-1">
-                <button
-                  onClick={() => setAdminOpen((prev) => !prev)}
-                  className={cn(
-                    "flex w-full items-center gap-2 rounded-md px-2 py-3 text-sm transition-colors",
-                    isAdminActive
-                      ? "font-medium text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                  aria-expanded={adminOpen}
-                >
-                  <Shield className="size-4 shrink-0" />
-                  관리자 페이지
-                  {adminOpen ? (
-                    <ChevronDown className="ml-auto size-4 shrink-0" />
-                  ) : (
-                    <ChevronRight className="ml-auto size-4 shrink-0" />
-                  )}
-                </button>
+              {/* 관리자 서브메뉴 */}
+              {isAdmin && (
+                <div className="mt-1 border-t pt-1">
+                  <button
+                    onClick={() => setAdminOpen((prev) => !prev)}
+                    className={cn(
+                      "flex w-full items-center gap-2 rounded-md px-2 py-3 text-sm transition-colors",
+                      isAdminActive
+                        ? "font-medium text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                    aria-expanded={adminOpen}
+                  >
+                    <Shield className="size-4 shrink-0" />
+                    관리자 페이지
+                    {adminOpen ? (
+                      <ChevronDown className="ml-auto size-4 shrink-0" />
+                    ) : (
+                      <ChevronRight className="ml-auto size-4 shrink-0" />
+                    )}
+                  </button>
 
-                {adminOpen && (
-                  <div className="ml-6 flex flex-col pb-1">
-                    {ADMIN_LINKS.map(({ href, label }) => {
-                      const isActive =
-                        pathname === href || pathname.startsWith(href);
-                      return (
-                        <Link
-                          key={href}
-                          href={href}
-                          onClick={handleClose}
-                          className={cn(
-                            "rounded-md px-2 py-2.5 text-sm transition-colors",
-                            isActive
-                              ? "font-medium text-foreground"
-                              : "text-muted-foreground hover:text-foreground"
-                          )}
-                        >
-                          {label}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
+                  {adminOpen && (
+                    <div className="ml-6 flex flex-col pb-1">
+                      {ADMIN_LINKS.map(({ href, label }) => {
+                        const isActive =
+                          pathname === href || pathname.startsWith(href);
+                        return (
+                          <Link
+                            key={href}
+                            href={href}
+                            onClick={handleClose}
+                            className={cn(
+                              "rounded-md px-2 py-2.5 text-sm transition-colors",
+                              isActive
+                                ? "font-medium text-foreground"
+                                : "text-muted-foreground hover:text-foreground"
+                            )}
+                          >
+                            {label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
 
-            {/* 뷰 모드 전환 버튼
+              {/* 뷰 모드 전환 버튼
                 - auto + PC 기기: data-view="desktop"이 자동으로 설정되어 있으므로 버튼 불필요
                 - auto + 모바일 기기: "PC 버전으로 보기" 표시
                 - 명시적 desktop 모드: "PC 버전 보는 중 (취소)" 표시 */}
-            {!(actuallyDesktop && viewMode === "auto") && (
-              <div className="my-2 border-t pt-2">
+              {!(actuallyDesktop && viewMode === "auto") && (
+                <div className="my-2 border-t pt-2">
+                  <button
+                    onClick={handleDesktopToggle}
+                    className={cn(
+                      "flex w-full items-center gap-2 rounded-md px-2 py-3 text-sm transition-colors",
+                      viewMode === "desktop"
+                        ? "font-medium text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Monitor className="size-4 shrink-0" />
+                    {viewMode === "desktop"
+                      ? "PC 버전 보는 중 (취소)"
+                      : "PC 버전으로 보기"}
+                  </button>
+                </div>
+              )}
+
+              {/* 로그아웃 */}
+              <div className="mb-2 border-t pt-2">
                 <button
-                  onClick={handleDesktopToggle}
-                  className={cn(
-                    "flex w-full items-center gap-2 rounded-md px-2 py-3 text-sm transition-colors",
-                    viewMode === "desktop"
-                      ? "font-medium text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
+                  onClick={handleLogout}
+                  className="flex w-full items-center gap-2 rounded-md px-2 py-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  <Monitor className="size-4 shrink-0" />
-                  {viewMode === "desktop"
-                    ? "PC 버전 보는 중 (취소)"
-                    : "PC 버전으로 보기"}
+                  <LogOut className="size-4 shrink-0" />
+                  로그아웃
                 </button>
               </div>
-            )}
-
-            {/* 로그아웃 */}
-            <div className="mb-2 border-t pt-2">
-              <button
-                onClick={handleLogout}
-                className="flex w-full items-center gap-2 rounded-md px-2 py-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
-              >
-                <LogOut className="size-4 shrink-0" />
-                로그아웃
-              </button>
-            </div>
-          </nav>
-        </div>
+            </nav>
+          </div>
+        </>
       )}
     </div>
   );
