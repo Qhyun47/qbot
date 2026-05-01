@@ -2000,5 +2000,46 @@
     "cc": "Risk for self directed violence",
     "guideKeys": [{ "key": "pc", "rank": 0 }],
     "templateKeys": [{ "key": "pc-hx", "rank": 0 }]
+  },
+  {
+    "cc": "Visual loss",
+    "guideKeys": [{ "key": "ey", "rank": 0 }],
+    "templateKeys": [{ "key": "ey", "rank": 0 }]
+  },
+  {
+    "cc": "Lt. visual loss",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual loss"
+  },
+  {
+    "cc": "Rt. visual loss",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual loss"
+  },
+  {
+    "cc": "Both visual loss",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual loss"
+  },
+  {
+    "cc": "Visual loss(OS)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual loss"
+  },
+  {
+    "cc": "Visual loss(OD)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual loss"
+  },
+  {
+    "cc": "Visual loss(OU)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual loss"
   }
 ]
