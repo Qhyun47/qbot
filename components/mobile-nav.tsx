@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   Menu,
@@ -32,6 +32,7 @@ interface MobileNavProps {
 export function MobileNav({ isAdmin }: MobileNavProps) {
   const [open, setOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
+  const navRef = useRef<HTMLDivElement>(null);
   // data-view="desktop" 여부: auto 모드에서 PC 기기로 판정된 경우 true
   const [actuallyDesktop, setActuallyDesktop] = useState(false);
   const pathname = usePathname();
@@ -57,6 +58,21 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
     setAdminOpen(false);
   }
 
+  useEffect(() => {
+    if (!open) return;
+    function handleOutside(e: MouseEvent | TouchEvent) {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        handleClose();
+      }
+    }
+    document.addEventListener("mousedown", handleOutside);
+    document.addEventListener("touchstart", handleOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleOutside);
+      document.removeEventListener("touchstart", handleOutside);
+    };
+  }, [open]);
+
   function handleDesktopToggle() {
     setViewMode(viewMode === "desktop" ? "auto" : "desktop");
     handleClose();
@@ -74,7 +90,7 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
   );
 
   return (
-    <div className="xl:hidden">
+    <div className="xl:hidden" ref={navRef}>
       <Button
         variant="ghost"
         size="icon"
@@ -87,11 +103,6 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
 
       {open && (
         <>
-          <div
-            className="fixed inset-0 z-40"
-            onClick={handleClose}
-            aria-hidden="true"
-          />
           <div className="absolute left-0 right-0 top-14 z-50 border-b bg-white shadow-lg dark:bg-zinc-950">
             <nav className="flex flex-col px-4 py-2">
               {NAV_LINKS.map(({ href, label }) => {
