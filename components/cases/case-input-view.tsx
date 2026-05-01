@@ -81,8 +81,8 @@ export function CaseInputView({
   from,
 }: CaseInputViewProps) {
   const router = useRouter();
-  const { height: vpHeight, offsetTop: vpOffsetTop } = useVisualViewport();
   const containerRef = useRef<HTMLDivElement>(null);
+  useVisualViewport(containerRef);
   const [bedZone, setBedZone] = useState<BedZone>(defaultBedZone);
   const [bedNumber, setBedNumber] = useState<number>(defaultBedNumber);
   const [bedPickerOpen, setBedPickerOpen] = useState(false);
@@ -382,14 +382,7 @@ export function CaseInputView({
   );
 
   return (
-    <div
-      ref={containerRef}
-      className="fixed inset-x-0 flex flex-col"
-      style={{
-        top: vpOffsetTop,
-        height: vpHeight || undefined,
-      }}
-    >
+    <div ref={containerRef} className="fixed inset-x-0 top-0 flex flex-col">
       <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
         {/* 뒤로가기 */}
         <Button
