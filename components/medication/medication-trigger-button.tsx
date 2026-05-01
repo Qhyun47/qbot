@@ -38,10 +38,10 @@ export function MedicationTriggerButton({
               className="inline-flex gap-1.5"
             >
               <Pill className="size-3.5" />
-              <span className="hidden xl:inline">의약품 정리</span>
+              <span className="hidden lg:inline">의약품 정리</span>
             </Button>
           </TooltipTrigger>
-          <TooltipContent className="xl:hidden">의약품 정리</TooltipContent>
+          <TooltipContent className="lg:hidden">의약품 정리</TooltipContent>
         </Tooltip>
       </TooltipProvider>
       <MedicationOrganizerDialog

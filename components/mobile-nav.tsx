@@ -90,7 +90,7 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
   );
 
   return (
-    <div className="xl:hidden" ref={navRef}>
+    <div className="lg:hidden" ref={navRef}>
       <Button
         variant="ghost"
         size="icon"

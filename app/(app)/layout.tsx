@@ -63,24 +63,24 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <Suspense fallback={null}>
         <ConditionalHeader>
           <header className="sticky top-0 z-50 flex h-14 items-center border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-            <Suspense fallback={<div className="size-8 xl:hidden" />}>
+            <Suspense fallback={<div className="size-8 lg:hidden" />}>
               <MobileNavWithAdmin />
             </Suspense>
             <Link
               href="/dashboard"
-              className="ml-2 xl:ml-0"
+              className="ml-2 lg:ml-0"
               aria-label="규봇 홈으로 이동"
             >
               <Logo className="size-6" />
             </Link>
-            <Suspense fallback={<div className="ml-8 hidden xl:flex" />}>
+            <Suspense fallback={<div className="ml-8 hidden lg:flex" />}>
               <NavLinksWithAdmin />
             </Suspense>
             <div className="ml-auto flex items-center gap-2">
               {/* 모바일 환경에서만 표시되는 환자 추가 버튼 (viewMode 기반) */}
               <HeaderNewCaseButton />
-              {/* 넓은 화면(1280px 이상): 로그아웃 버튼 */}
-              <div className="hidden xl:block">
+              {/* 넓은 화면(1024px 이상): 로그아웃 버튼 */}
+              <div className="hidden lg:block">
                 <LogoutButton />
               </div>
             </div>

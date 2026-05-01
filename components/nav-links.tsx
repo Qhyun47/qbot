@@ -33,7 +33,7 @@ export function NavLinks({ isAdmin }: NavLinksProps) {
   );
 
   return (
-    <nav className="ml-8 hidden items-center gap-1 xl:flex">
+    <nav className="ml-8 hidden items-center gap-1 lg:flex">
       {NAV_LINKS.map(({ href, label }) => {
         const isActive =
           pathname === href ||
