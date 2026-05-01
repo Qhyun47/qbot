@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { useVisualViewport } from "@/hooks/use-visual-viewport";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Rows2, Columns2, Square, Zap, Loader2 } from "lucide-react";
 import { ResizableSplit } from "@/components/cases/resizable-split";
@@ -80,6 +81,8 @@ export function CaseInputView({
   from,
 }: CaseInputViewProps) {
   const router = useRouter();
+  const { height: vpHeight, offsetTop: vpOffsetTop } = useVisualViewport();
+  const containerRef = useRef<HTMLDivElement>(null);
   const [bedZone, setBedZone] = useState<BedZone>(defaultBedZone);
   const [bedNumber, setBedNumber] = useState<number>(defaultBedNumber);
   const [bedPickerOpen, setBedPickerOpen] = useState(false);
@@ -379,7 +382,14 @@ export function CaseInputView({
   );
 
   return (
-    <div className="fixed inset-x-0 top-0 flex h-[100dvh] flex-col">
+    <div
+      ref={containerRef}
+      className="fixed inset-x-0 flex flex-col"
+      style={{
+        top: vpOffsetTop,
+        height: vpHeight || undefined,
+      }}
+    >
       <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
         {/* 뒤로가기 */}
         <Button

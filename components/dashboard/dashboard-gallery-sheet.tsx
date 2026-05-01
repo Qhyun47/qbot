@@ -35,6 +35,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import type { CasePhoto, DashboardPhoto } from "@/lib/supabase/types";
+import { normalizeImageOrientation } from "@/lib/utils/image";
 
 type DashboardPhotoWithUrl = DashboardPhoto & { url: string | null };
 type CasePhotoWithUrl = CasePhoto & { url: string | null };
@@ -167,8 +168,12 @@ export function DashboardGallerySheet() {
   const handleFileSelect = async (file: File) => {
     setUploadingCount((c) => c + 1);
     try {
+      const normalized = await normalizeImageOrientation(file);
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append(
+        "file",
+        new File([normalized], file.name, { type: "image/jpeg" })
+      );
       const res = await fetch("/api/dashboard/photos", {
         method: "POST",
         body: formData,
