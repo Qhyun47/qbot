@@ -2,13 +2,22 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { RefreshCw } from "lucide-react";
+import { Loader2, RefreshCw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import type { CaseStatus } from "@/lib/supabase/types";
 
-export function RegenerateButton({ caseId }: { caseId: string }) {
+export function RegenerateButton({
+  caseId,
+  status,
+}: {
+  caseId: string;
+  status: CaseStatus;
+}) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+
+  const isGenerating = status === "generating";
 
   async function handleRegenerate() {
     setLoading(true);
@@ -34,6 +43,34 @@ export function RegenerateButton({ caseId }: { caseId: string }) {
     }
   }
 
+  if (isGenerating) {
+    return (
+      <Button variant="outline" size="sm" className="ml-auto gap-1.5" disabled>
+        <Loader2 className="size-3.5 animate-spin" />
+        생성 중…
+      </Button>
+    );
+  }
+
+  if (status === "draft") {
+    return (
+      <Button
+        variant="outline"
+        size="sm"
+        className="ml-auto gap-1.5"
+        onClick={handleRegenerate}
+        disabled={loading}
+      >
+        {loading ? (
+          <Loader2 className="size-3.5 animate-spin" />
+        ) : (
+          <Sparkles className="size-3.5" />
+        )}
+        차팅 생성
+      </Button>
+    );
+  }
+
   return (
     <Button
       variant="outline"
@@ -42,7 +79,11 @@ export function RegenerateButton({ caseId }: { caseId: string }) {
       onClick={handleRegenerate}
       disabled={loading}
     >
-      <RefreshCw className={`size-3.5 ${loading ? "animate-spin" : ""}`} />
+      {loading ? (
+        <Loader2 className="size-3.5 animate-spin" />
+      ) : (
+        <RefreshCw className="size-3.5" />
+      )}
       재생성
     </Button>
   );

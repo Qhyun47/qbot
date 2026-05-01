@@ -195,7 +195,7 @@ async function CaseContent({
           </h1>
         </div>
         <StatusBadge status={status} />
-        <RegenerateButton caseId={caseData.id} />
+        <RegenerateButton caseId={caseData.id} status={status} />
         <MedicationTriggerButton
           caseId={caseData.id}
           currentHistory={result?.history_edited ?? result?.history_draft ?? ""}
