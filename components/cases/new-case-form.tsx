@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import { useVisualViewport } from "@/hooks/use-visual-viewport";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Rows2, Columns2, Square, Zap, Loader2 } from "lucide-react";
 import {
@@ -113,6 +114,8 @@ export function NewCaseForm({
   const [setupDone, setSetupDone] = useState(false);
   const [setupExiting, setSetupExiting] = useState(false);
   const [, startTransition] = useTransition();
+  const containerRef = useRef<HTMLDivElement>(null);
+  useVisualViewport(containerRef);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const prevCardsLengthRef = useRef(0);
   const pendingBedRef = useRef<{ zone: BedZone; number: number } | null>(null);
@@ -567,7 +570,17 @@ export function NewCaseForm({
         </div>
       )}
 
-      <div className="fixed inset-x-0 top-0 flex h-[100dvh] flex-col">
+      <div
+        ref={containerRef}
+        className="fixed inset-x-0 top-0 flex h-[100dvh] flex-col"
+      >
+        {/* 임시 디버그 오버레이 — 검증 후 제거 */}
+        <div
+          id="vvp-debug"
+          className="fixed bottom-24 right-2 z-50 rounded bg-black/80 px-2 py-1 font-mono text-[10px] text-white"
+        >
+          로딩 중...
+        </div>
         {/* 페이지 헤더 */}
         <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
           <Button
