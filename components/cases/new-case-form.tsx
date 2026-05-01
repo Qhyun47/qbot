@@ -113,7 +113,6 @@ export function NewCaseForm({
   const [setupDone, setSetupDone] = useState(false);
   const [setupExiting, setSetupExiting] = useState(false);
   const [, startTransition] = useTransition();
-  const rootRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const prevCardsLengthRef = useRef(0);
   const pendingBedRef = useRef<{ zone: BedZone; number: number } | null>(null);
@@ -140,26 +139,6 @@ export function NewCaseForm({
       startTransition(() => updateCaseCcs(caseId, pendingCcs, templateKey));
     }
   }, [caseId]);
-
-  // Android Chrome: 키보드가 올라오면 visual viewport가 스크롤되어
-  // fixed 컨테이너가 화면 위로 밀려나는 문제를 보정
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-    const update = () => {
-      const el = rootRef.current;
-      if (!el) return;
-      el.style.top = `${vv.offsetTop}px`;
-      el.style.height = `${vv.height}px`;
-    };
-    vv.addEventListener("resize", update);
-    vv.addEventListener("scroll", update);
-    update();
-    return () => {
-      vv.removeEventListener("resize", update);
-      vv.removeEventListener("scroll", update);
-    };
-  }, []);
 
   useEffect(() => {
     const original =
@@ -588,7 +567,7 @@ export function NewCaseForm({
         </div>
       )}
 
-      <div ref={rootRef} className="fixed inset-0 flex flex-col">
+      <div className="fixed inset-x-0 top-0 flex h-[100dvh] flex-col">
         {/* 페이지 헤더 */}
         <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
           <Button
