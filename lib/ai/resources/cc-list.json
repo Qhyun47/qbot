@@ -670,6 +670,18 @@
     "aliasOf": "Facial pain"
   },
   {
+    "cc": "Lip pain",
+    "guideKeys": [
+      { "key": "ps", "rank": 0 },
+      { "key": "dt", "rank": 1 },
+      { "key": "trauma-traffic-accident", "rank": 2 }
+    ],
+    "templateKeys": [
+      { "key": "ps", "rank": 1 },
+      { "key": "trauma", "rank": 2 }
+    ]
+  },
+  {
     "cc": "Facial laceration",
     "guideKeys": [
       { "key": "ps", "rank": 1 },
@@ -770,6 +782,18 @@
     "guideKeys": [],
     "templateKeys": [],
     "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Lip laceration",
+    "guideKeys": [
+      { "key": "ps", "rank": 0 },
+      { "key": "dt", "rank": 1 },
+      { "key": "trauma-traffic-accident", "rank": 2 }
+    ],
+    "templateKeys": [
+      { "key": "ps", "rank": 1 },
+      { "key": "trauma", "rank": 2 }
+    ]
   },
   {
     "cc": "** pain",
