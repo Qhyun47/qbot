@@ -3,7 +3,15 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useVisualViewport } from "@/hooks/use-visual-viewport";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Rows2, Columns2, Square, Zap, Loader2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Rows2,
+  Columns2,
+  Square,
+  Zap,
+  Loader2,
+  X,
+} from "lucide-react";
 import { ResizableSplit } from "@/components/cases/resizable-split";
 import { CardInputBar } from "@/components/cases/card-input-bar";
 import { CardTimeline } from "@/components/cases/card-timeline";
@@ -285,27 +293,7 @@ export function CaseInputView({
 
   const InputArea = (
     <div className="flex h-full flex-col overflow-hidden">
-      {bedPickerOpen && (
-        <>
-          <div className="shrink-0 p-4">
-            <BedPicker
-              bedZone={bedZone}
-              bedNumber={bedNumber}
-              onChange={handleBedChange}
-            />
-          </div>
-          <Separator />
-        </>
-      )}
-      {ccEditing && (
-        <>
-          <div className="shrink-0 p-4">
-            <CcAutocomplete value={cc ?? ""} onSelect={handleCcSelect} />
-          </div>
-          <Separator />
-        </>
-      )}
-      {!ccEditing && pendingTemplateKeys && pendingTemplateKeys.length >= 2 && (
+      {pendingTemplateKeys && pendingTemplateKeys.length >= 2 && (
         <>
           <div className="shrink-0 p-4">
             <p className="mb-2 text-sm font-medium">
@@ -382,42 +370,76 @@ export function CaseInputView({
   );
 
   return (
-    <div
-      ref={containerRef}
-      className="fixed inset-x-0 top-0 flex h-[100dvh] flex-col"
-    >
-      <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
-        {/* 뒤로가기 */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="shrink-0"
-          onClick={() => {
-            setNavigatingBack(true);
-            router.push(from === "cases" ? "/cases" : "/dashboard");
-          }}
-          disabled={navigatingBack}
-          aria-label="뒤로 가기"
-        >
-          {navigatingBack ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <ArrowLeft className="size-4" />
-          )}
-        </Button>
+    <>
+      {/* 베드/CC 편집 전체 화면 오버레이 */}
+      {(bedPickerOpen || ccEditing) && (
+        <div className="fixed inset-0 z-10 flex flex-col bg-background">
+          <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
+            <span className="flex-1 text-sm font-semibold">
+              {bedPickerOpen ? "베드 변경" : "C.C 변경"}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                setBedPickerOpen(false);
+                setCcEditing(false);
+              }}
+              aria-label="닫기"
+            >
+              <X className="size-4" />
+            </Button>
+          </header>
+          <div className="flex-1 overflow-y-auto p-4">
+            {bedPickerOpen && (
+              <BedPicker
+                bedZone={bedZone}
+                bedNumber={bedNumber}
+                onChange={handleBedChange}
+              />
+            )}
+            {ccEditing && (
+              <CcAutocomplete value={cc ?? ""} onSelect={handleCcSelect} />
+            )}
+          </div>
+        </div>
+      )}
 
-        {/* 헤더 칩: 베드 배지 */}
-        <button
-          type="button"
-          onClick={() => setBedPickerOpen(true)}
-          className="shrink-0"
-          aria-label="베드 선택 열기"
-        >
-          <BedBadge bedZone={bedZone} bedNumber={bedNumber} size="sm" />
-        </button>
+      <div
+        ref={containerRef}
+        className="fixed inset-x-0 top-0 flex h-[100dvh] flex-col"
+      >
+        <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
+          {/* 뒤로가기 */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="shrink-0"
+            onClick={() => {
+              setNavigatingBack(true);
+              router.push(from === "cases" ? "/cases" : "/dashboard");
+            }}
+            disabled={navigatingBack}
+            aria-label="뒤로 가기"
+          >
+            {navigatingBack ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <ArrowLeft className="size-4" />
+            )}
+          </Button>
 
-        {/* 헤더 칩: CC 텍스트 (접힌 상태일 때만 표시) */}
-        {!ccEditing && (
+          {/* 헤더 칩: 베드 배지 */}
+          <button
+            type="button"
+            onClick={() => setBedPickerOpen(true)}
+            className="shrink-0"
+            aria-label="베드 선택 열기"
+          >
+            <BedBadge bedZone={bedZone} bedNumber={bedNumber} size="sm" />
+          </button>
+
+          {/* 헤더 칩: CC 텍스트 */}
           <button
             type="button"
             onClick={() => setCcEditing(true)}
@@ -426,78 +448,78 @@ export function CaseInputView({
           >
             {cc ?? <span className="text-muted-foreground">C.C 입력</span>}
           </button>
+
+          <div className="flex flex-1 items-center justify-end gap-2">
+            <div className="hidden items-center gap-0.5 rounded-md border p-0.5 is-desktop:flex">
+              {LAYOUT_OPTIONS.map(({ value, Icon, label }) => (
+                <button
+                  key={value}
+                  type="button"
+                  aria-label={`${label} 레이아웃`}
+                  title={label}
+                  onClick={() => setLayout(value)}
+                  className={cn(
+                    "rounded p-1.5 transition-colors",
+                    layout === value
+                      ? "bg-foreground text-background"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Icon className="size-3.5" />
+                </button>
+              ))}
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                router.replace(
+                  `/cases/${caseId}?view=result${from ? `&from=${from}` : ""}`
+                )
+              }
+            >
+              AI 차팅 보기
+            </Button>
+
+            <Button
+              size="sm"
+              onClick={handleGenerate}
+              disabled={generating}
+              className="gap-1.5"
+            >
+              <Zap className="size-3.5" />
+              {generating
+                ? "생성 중..."
+                : status === "draft"
+                  ? "차팅 생성"
+                  : "재생성"}
+            </Button>
+          </div>
+        </header>
+
+        {layout === "single" && (
+          <div className="flex-1 overflow-hidden">{InputArea}</div>
         )}
 
-        <div className="flex flex-1 items-center justify-end gap-2">
-          <div className="hidden items-center gap-0.5 rounded-md border p-0.5 is-desktop:flex">
-            {LAYOUT_OPTIONS.map(({ value, Icon, label }) => (
-              <button
-                key={value}
-                type="button"
-                aria-label={`${label} 레이아웃`}
-                title={label}
-                onClick={() => setLayout(value)}
-                className={cn(
-                  "rounded p-1.5 transition-colors",
-                  layout === value
-                    ? "bg-foreground text-background"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <Icon className="size-3.5" />
-              </button>
-            ))}
-          </div>
+        {layout === "split_vertical" && (
+          <ResizableSplit
+            direction="vertical"
+            first={GuideArea}
+            second={InputArea}
+            defaultFirstPercent={defaultSplitRatio}
+          />
+        )}
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              router.replace(
-                `/cases/${caseId}?view=result${from ? `&from=${from}` : ""}`
-              )
-            }
-          >
-            AI 차팅 보기
-          </Button>
-
-          <Button
-            size="sm"
-            onClick={handleGenerate}
-            disabled={generating}
-            className="gap-1.5"
-          >
-            <Zap className="size-3.5" />
-            {generating
-              ? "생성 중..."
-              : status === "draft"
-                ? "차팅 생성"
-                : "재생성"}
-          </Button>
-        </div>
-      </header>
-
-      {layout === "single" && (
-        <div className="flex-1 overflow-hidden">{InputArea}</div>
-      )}
-
-      {layout === "split_vertical" && (
-        <ResizableSplit
-          direction="vertical"
-          first={GuideArea}
-          second={InputArea}
-          defaultFirstPercent={defaultSplitRatio}
-        />
-      )}
-
-      {layout === "split_horizontal" && (
-        <ResizableSplit
-          direction="horizontal"
-          first={GuideArea}
-          second={InputArea}
-          defaultFirstPercent={defaultSplitRatio}
-        />
-      )}
-    </div>
+        {layout === "split_horizontal" && (
+          <ResizableSplit
+            direction="horizontal"
+            first={GuideArea}
+            second={InputArea}
+            defaultFirstPercent={defaultSplitRatio}
+          />
+        )}
+      </div>
+    </>
   );
 }
