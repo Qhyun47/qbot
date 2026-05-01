@@ -11,6 +11,12 @@ import { StatusBadge } from "@/components/cases/status-badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -95,12 +101,26 @@ export function StatusBoardCard({ case: c }: StatusBoardCardProps) {
         </div>
 
         {/* C.C + 등록 시간 */}
-        <div className="flex items-baseline justify-between gap-2">
-          <p className="text-sm font-medium leading-snug">
-            {c.cc ?? (
-              <span className="italic text-muted-foreground">C.C 미입력</span>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex min-w-0 flex-1 items-center gap-1">
+            <p className="truncate text-sm font-medium leading-snug">
+              {c.ccs?.[0] ?? c.cc ?? (
+                <span className="italic text-muted-foreground">C.C 미입력</span>
+              )}
+            </p>
+            {(c.ccs?.length ?? 0) > 1 && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="shrink-0 cursor-default rounded-full bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+                      +{c.ccs!.length - 1}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>{c.ccs!.slice(1).join(", ")}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
-          </p>
+          </div>
           <span className="shrink-0 text-xs text-muted-foreground/70">
             {formatRegisteredAt(c.created_at)}
           </span>

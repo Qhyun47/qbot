@@ -2,6 +2,12 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { BedBadge } from "@/components/cases/bed-badge";
 import { StatusBadge } from "@/components/cases/status-badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { Case, BedZone, CaseStatus } from "@/lib/supabase/types";
 
 interface CaseCardProps {
@@ -21,11 +27,25 @@ export function CaseCard({ case: c }: CaseCardProps) {
           />
           <StatusBadge status={c.status as CaseStatus} />
         </div>
-        <p className="flex-1 text-sm font-medium leading-snug">
-          {c.cc ?? (
-            <span className="italic text-muted-foreground">C.C 미입력</span>
+        <div className="flex min-w-0 flex-1 items-start gap-1">
+          <p className="truncate text-sm font-medium leading-snug">
+            {c.ccs?.[0] ?? c.cc ?? (
+              <span className="italic text-muted-foreground">C.C 미입력</span>
+            )}
+          </p>
+          {(c.ccs?.length ?? 0) > 1 && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="mt-0.5 shrink-0 cursor-default rounded-full bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+                    +{c.ccs!.length - 1}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>{c.ccs!.slice(1).join(", ")}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
-        </p>
+        </div>
         <p className="text-xs text-muted-foreground">
           {format(new Date(c.created_at), "M월 d일 HH:mm")}
         </p>

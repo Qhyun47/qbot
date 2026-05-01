@@ -9,6 +9,12 @@ import { restoreToBoard } from "@/lib/cases/actions";
 import { BedBadge } from "@/components/cases/bed-badge";
 import { StatusBadge } from "@/components/cases/status-badge";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { Case, BedZone, CaseStatus } from "@/lib/supabase/types";
 
 interface CasesTableProps {
@@ -76,13 +82,29 @@ export function CasesTable({ cases }: CasesTableProps) {
 
                 {/* C.C + 날짜 */}
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold leading-tight">
-                    {c.cc ?? (
-                      <span className="font-normal text-muted-foreground">
-                        C.C 없음
-                      </span>
+                  <div className="flex items-center gap-1">
+                    <p className="truncate text-sm font-semibold leading-tight">
+                      {c.ccs?.[0] ?? c.cc ?? (
+                        <span className="font-normal text-muted-foreground">
+                          C.C 없음
+                        </span>
+                      )}
+                    </p>
+                    {(c.ccs?.length ?? 0) > 1 && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="shrink-0 cursor-default rounded-full bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+                              +{c.ccs!.length - 1}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {c.ccs!.slice(1).join(", ")}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     )}
-                  </p>
+                  </div>
                   <p className="mt-0.5 text-xs text-muted-foreground">
                     {format(parseISO(c.created_at), "M/d HH:mm")}
                   </p>

@@ -12,6 +12,7 @@ import { CardInputSection } from "@/components/cases/card-input-section";
 import { ResultSection } from "@/components/cases/result-section";
 import { GenerationPoller } from "@/components/cases/generation-poller";
 import { RegenerateButton } from "@/components/cases/regenerate-button";
+import { CcHeaderDisplay } from "@/components/cases/cc-header-display";
 import { CcRetryForm } from "@/components/cases/cc-retry-form";
 import { getCase, getCaseInputs, getCurrentResult } from "@/lib/cases/queries";
 import {
@@ -186,12 +187,8 @@ async function CaseContent({
           size="lg"
         />
         <div className="flex flex-1 flex-col gap-1">
-          <h1 className="text-xl font-bold tracking-tight">
-            {caseData.cc ?? (
-              <span className="font-normal italic text-muted-foreground">
-                C.C 미입력
-              </span>
-            )}
+          <h1 className="min-w-0 text-xl font-bold tracking-tight">
+            <CcHeaderDisplay cc={caseData.cc} ccs={caseData.ccs} />
           </h1>
         </div>
         <StatusBadge status={status} />
