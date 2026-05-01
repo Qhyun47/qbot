@@ -10,15 +10,23 @@ body {
   overscroll-behavior: none;
 }
 
-/* ───── 모바일 글자 크기 ───── */
+/* ───── 케이스 입력 영역 글자 크기 ───── */
 :root {
   --mobile-font-size: 16px;
 }
 
-@media (max-width: 767px) {
-  html {
-    font-size: var(--mobile-font-size);
-  }
+/* html 전체가 아닌, 케이스 카드 입력 영역에만 폰트 크기를 적용 */
+.case-input-font-scope {
+  font-size: var(--mobile-font-size);
+}
+.case-input-font-scope .text-xs {
+  font-size: 0.75em;
+}
+.case-input-font-scope .text-sm {
+  font-size: 0.875em;
+}
+.case-input-font-scope .text-base {
+  font-size: 1em;
 }
 
 /* ───── 뷰 모드 강제 오버라이드 ───── */

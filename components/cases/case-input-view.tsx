@@ -372,7 +372,7 @@ export function CaseInputView({
           <Separator />
         </>
       )}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="case-input-font-scope flex-1 overflow-y-auto p-4">
         <CardTimeline
           cards={cards}
           generatedAt={generatedAt}
@@ -381,7 +381,9 @@ export function CaseInputView({
           onEdit={handleCardEdit}
         />
       </div>
-      <CardInputBar onSubmit={handleCardSubmit} caseId={caseId} />
+      <div className="case-input-font-scope shrink-0">
+        <CardInputBar onSubmit={handleCardSubmit} caseId={caseId} />
+      </div>
     </div>
   );
 
@@ -398,11 +400,7 @@ export function CaseInputView({
   );
 
   return (
-    <div
-      ref={rootRef}
-      className="fixed inset-0 flex flex-col"
-      style={{ fontSize: `${caseInputFontSize}px` }}
-    >
+    <div ref={rootRef} className="fixed inset-0 flex flex-col">
       <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
         {/* 뒤로가기 */}
         <Button

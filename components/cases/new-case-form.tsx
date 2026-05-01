@@ -400,7 +400,7 @@ export function NewCaseForm({
     <div className="flex h-full flex-col">
       <div
         ref={scrollAreaRef}
-        className="flex-1 overflow-y-auto overscroll-y-contain"
+        className="case-input-font-scope flex-1 overflow-y-auto overscroll-y-contain"
       >
         <div className="p-4">
           <CardTimeline
@@ -411,7 +411,12 @@ export function NewCaseForm({
           />
         </div>
       </div>
-      <CardInputBar onSubmit={handleCardSubmit} caseId={caseId ?? undefined} />
+      <div className="case-input-font-scope shrink-0">
+        <CardInputBar
+          onSubmit={handleCardSubmit}
+          caseId={caseId ?? undefined}
+        />
+      </div>
     </div>
   );
 
@@ -575,7 +580,7 @@ export function NewCaseForm({
 
           {!pendingTemplateKeys && (
             <div className="shrink-0 border-t p-4">
-              <Button className="w-full" onClick={handleSetupConfirm}>
+              <Button className="w-full" size="lg" onClick={handleSetupConfirm}>
                 확인
               </Button>
             </div>
@@ -583,11 +588,7 @@ export function NewCaseForm({
         </div>
       )}
 
-      <div
-        ref={rootRef}
-        className="fixed inset-0 flex flex-col"
-        style={{ fontSize: `${activeFontSize}px` }}
-      >
+      <div ref={rootRef} className="fixed inset-0 flex flex-col">
         {/* 페이지 헤더 */}
         <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
           <Button
