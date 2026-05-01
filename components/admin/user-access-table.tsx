@@ -1,11 +1,11 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -51,16 +51,21 @@ const STATUS_VARIANTS: Record<
   held: "secondary",
 };
 
+type PendingAction = "approve" | "ai_excluded" | "deny" | "hold" | null;
+
 function PendingUserRow({ user }: { user: ServiceAccessUser }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
   const displayName = user.full_name ?? user.email ?? user.id;
 
   function handleApprove() {
+    setPendingAction("approve");
     startTransition(async () => {
       const result = await approveServiceAccess(user.id);
       if (result.error) {
         toast.error(result.error);
+        setPendingAction(null);
       } else {
         toast.success(`${displayName}님을 승인했습니다.`);
         router.refresh();
@@ -69,10 +74,12 @@ function PendingUserRow({ user }: { user: ServiceAccessUser }) {
   }
 
   function handleApproveAiExcluded() {
+    setPendingAction("ai_excluded");
     startTransition(async () => {
       const result = await approveServiceAccessAiExcluded(user.id);
       if (result.error) {
         toast.error(result.error);
+        setPendingAction(null);
       } else {
         toast.success(`${displayName}님을 AI 제외로 승인했습니다.`);
         router.refresh();
@@ -81,10 +88,12 @@ function PendingUserRow({ user }: { user: ServiceAccessUser }) {
   }
 
   function handleDeny() {
+    setPendingAction("deny");
     startTransition(async () => {
       const result = await denyServiceAccess(user.id);
       if (result.error) {
         toast.error(result.error);
+        setPendingAction(null);
       } else {
         toast.success(`${displayName}님을 거절했습니다.`);
         router.refresh();
@@ -93,10 +102,12 @@ function PendingUserRow({ user }: { user: ServiceAccessUser }) {
   }
 
   function handleHold() {
+    setPendingAction("hold");
     startTransition(async () => {
       const result = await holdServiceAccess(user.id);
       if (result.error) {
         toast.error(result.error);
+        setPendingAction(null);
       } else {
         toast.success(`${displayName}님을 보류 처리했습니다.`);
         router.refresh();
@@ -128,6 +139,9 @@ function PendingUserRow({ user }: { user: ServiceAccessUser }) {
             onClick={handleApprove}
             disabled={isPending}
           >
+            {pendingAction === "approve" && isPending && (
+              <Loader2 className="mr-1 size-3.5 animate-spin" />
+            )}
             전체 승인
           </Button>
           <Button
@@ -136,6 +150,9 @@ function PendingUserRow({ user }: { user: ServiceAccessUser }) {
             onClick={handleApproveAiExcluded}
             disabled={isPending}
           >
+            {pendingAction === "ai_excluded" && isPending && (
+              <Loader2 className="mr-1 size-3.5 animate-spin" />
+            )}
             AI 제외 승인
           </Button>
           <Button
@@ -144,6 +161,9 @@ function PendingUserRow({ user }: { user: ServiceAccessUser }) {
             onClick={handleDeny}
             disabled={isPending}
           >
+            {pendingAction === "deny" && isPending && (
+              <Loader2 className="mr-1 size-3.5 animate-spin" />
+            )}
             거절
           </Button>
           <Button
@@ -152,6 +172,9 @@ function PendingUserRow({ user }: { user: ServiceAccessUser }) {
             onClick={handleHold}
             disabled={isPending}
           >
+            {pendingAction === "hold" && isPending && (
+              <Loader2 className="mr-1 size-3.5 animate-spin" />
+            )}
             보류
           </Button>
         </div>
@@ -206,7 +229,11 @@ function AllUserRow({ user }: { user: ServiceAccessUser }) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild disabled={user.is_admin || isPending}>
             <Button size="sm" variant="ghost" className="size-8 p-0">
-              <MoreHorizontal className="size-4" />
+              {isPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <MoreHorizontal className="size-4" />
+              )}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">

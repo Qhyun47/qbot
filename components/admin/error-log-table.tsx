@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
-import { Trash2 } from "lucide-react";
+import { Trash2, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -86,7 +86,11 @@ export function ErrorLogTable({ logs, onDelete }: ErrorLogTableProps) {
                     disabled={deletingId === log.id && isPending}
                     className="rounded p-1 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-40"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    {deletingId === log.id && isPending ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-3.5 w-3.5" />
+                    )}
                   </button>
                 </td>
               </tr>
@@ -152,8 +156,14 @@ export function ErrorLogTable({ logs, onDelete }: ErrorLogTableProps) {
                   disabled={deletingId === selected.id && isPending}
                   className="h-7 gap-1.5 text-destructive hover:bg-destructive/10 hover:text-destructive"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
-                  삭제
+                  {deletingId === selected.id && isPending ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-3.5 w-3.5" />
+                  )}
+                  {deletingId === selected.id && isPending
+                    ? "삭제 중..."
+                    : "삭제"}
                 </Button>
               </div>
             </div>
