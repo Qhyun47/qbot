@@ -460,6 +460,12 @@
     "templateKeys": [{ "key": "pc-hx", "rank": 0 }]
   },
   {
+    "cc": "Agitation",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Abnormal behavior"
+  },
+  {
     "cc": "Agressive behavior",
     "guideKeys": [],
     "templateKeys": [],
@@ -2141,6 +2147,16 @@
       { "key": "im-basic", "rank": 0 },
       { "key": "headache", "rank": 1 }
     ]
+  },
+  {
+    "cc": "Desaturation",
+    "guideKeys": [{ "key": "dyspnea", "rank": 0 }],
+    "templateKeys": [{ "key": "dyspnea", "rank": 0 }]
+  },
+  {
+    "cc": "Low BP",
+    "guideKeys": [{ "key": "im-basic", "rank": 0 }],
+    "templateKeys": [{ "key": "im-basic", "rank": 0 }]
   },
   {
     "cc": "Autophony",
