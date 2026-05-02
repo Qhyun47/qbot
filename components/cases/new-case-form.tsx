@@ -38,7 +38,7 @@ import {
   updateCaseCcs,
   addCaseInput,
   deleteCase,
-  overrideTemplateKey,
+  overrideTemplateKeys,
   reorderCaseInputs,
   moveCaseInputSection,
   deleteCaseInput,
@@ -97,8 +97,8 @@ export function NewCaseForm({
   const [bedNumber, setBedNumber] = useState<number | null>(null);
   const [ccs, setCcs] = useState<string[]>([]);
   const [setupCcs, setSetupCcs] = useState<string[]>([]);
-  const [selectedTemplateKey, setSelectedTemplateKey] = useState<string | null>(
-    null
+  const [selectedTemplateKeys, setSelectedTemplateKeys] = useState<string[]>(
+    []
   );
   const [pendingTemplateKeys, setPendingTemplateKeys] = useState<
     string[] | null
@@ -121,7 +121,7 @@ export function NewCaseForm({
   const pendingBedRef = useRef<{ zone: BedZone; number: number } | null>(null);
   const pendingCcsRef = useRef<{
     ccs: string[];
-    templateKey: string | null;
+    templateKeys: string[];
   } | null>(null);
 
   useEffect(() => {
@@ -137,9 +137,9 @@ export function NewCaseForm({
       startTransition(() => updateCaseBed(caseId, zone, number));
     }
     if (pendingCcsRef.current) {
-      const { ccs: pendingCcs, templateKey } = pendingCcsRef.current;
+      const { ccs: pendingCcs, templateKeys } = pendingCcsRef.current;
       pendingCcsRef.current = null;
-      startTransition(() => updateCaseCcs(caseId, pendingCcs, templateKey));
+      startTransition(() => updateCaseCcs(caseId, pendingCcs, templateKeys));
     }
   }, [caseId]);
 
@@ -229,13 +229,13 @@ export function NewCaseForm({
     setShowSaveDialog(true);
   };
 
-  const finalizeSetup = (finalCcs: string[], templateKey: string | null) => {
+  const finalizeSetup = (finalCcs: string[], templateKeys: string[]) => {
     setCcs(finalCcs);
-    setSelectedTemplateKey(templateKey);
+    setSelectedTemplateKeys(templateKeys);
     if (caseId) {
-      startTransition(() => updateCaseCcs(caseId, finalCcs, templateKey));
+      startTransition(() => updateCaseCcs(caseId, finalCcs, templateKeys));
     } else {
-      pendingCcsRef.current = { ccs: finalCcs, templateKey };
+      pendingCcsRef.current = { ccs: finalCcs, templateKeys };
     }
     setPendingTemplateKeys(null);
     setSetupExiting(true);
@@ -250,7 +250,7 @@ export function NewCaseForm({
     const rank0 = mergedEntries.find((e) => e.rank === 0);
     if (mergedEntries.length === 0 || mergedEntries.length === 1 || rank0) {
       const key = rank0?.key ?? mergedEntries[0]?.key ?? null;
-      finalizeSetup(setupCcs, key);
+      finalizeSetup(setupCcs, key ? [key] : []);
     } else {
       setPendingTemplateKeys(mergedEntries.map((e) => e.key));
     }
@@ -261,7 +261,7 @@ export function NewCaseForm({
   };
 
   const handleTemplateKeyConfirm = (key: string | null) => {
-    finalizeSetup(setupCcs, key);
+    finalizeSetup(setupCcs, key ? [key] : []);
   };
 
   const handleBedChange = (zone: BedZone, number: number | null) => {
@@ -287,10 +287,10 @@ export function NewCaseForm({
     // GuidelinePanel 내부에서 콘텐츠 로드까지 처리
   };
 
-  const handleTemplateChange = (newTemplateKey: string | null) => {
-    setSelectedTemplateKey(newTemplateKey);
+  const handleTemplateChange = (keys: string[]) => {
+    setSelectedTemplateKeys(keys);
     if (caseId) {
-      startTransition(() => overrideTemplateKey(caseId, newTemplateKey));
+      startTransition(() => overrideTemplateKeys(caseId, keys));
     }
   };
 
@@ -406,7 +406,7 @@ export function NewCaseForm({
     <div className="h-full">
       <GuidelinePanel
         ccs={ccs}
-        templateKey={selectedTemplateKey}
+        templateKeys={selectedTemplateKeys}
         onGuidelineChange={handleGuidelineChange}
         onTemplateChange={handleTemplateChange}
         guidelineFontSize={activeGuidelineFontSize}

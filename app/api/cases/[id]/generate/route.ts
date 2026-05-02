@@ -112,6 +112,14 @@ export async function POST(
 
   const inputs = inputRows ?? [];
 
+  // template_keys 우선, 없으면 template_key 단일로 fallback
+  const templateKeys: string[] =
+    caseRow.template_keys && caseRow.template_keys.length > 0
+      ? caseRow.template_keys
+      : caseRow.template_key
+        ? [caseRow.template_key]
+        : [];
+
   // Stage 1: 정규화 (실패 시 전체 failed)
   let structured: StructuredCase;
   let normalizeInputTokens = 0;
@@ -124,7 +132,7 @@ export async function POST(
         timeTag: i.time_tag,
         timeOffsetMinutes: i.time_offset_minutes,
       })),
-      caseRow.template_key
+      templateKeys[0] ?? null
     );
     structured = normalizeResult.result;
     normalizeInputTokens = normalizeResult.inputTokens;
@@ -141,7 +149,8 @@ export async function POST(
         history_draft: buildHistoryDraft(null),
         structured_json: {} as Json,
         model_version: MODEL_VERSION,
-        template_key_used: caseRow.template_key ?? "",
+        template_key_used: templateKeys[0] ?? "",
+        template_keys_used: templateKeys,
         error_message: errorMessage,
       })
       .select("id")
@@ -165,35 +174,41 @@ export async function POST(
 
   const zero = { text: "", inputTokens: 0, outputTokens: 0 };
 
-  const [piResult, templateResult, peResult, historyResult] = await Promise.all(
-    [
+  // generateTemplate: 각 상용구별 병렬 호출 후 \n\n 합산
+  const templateResultsPromise =
+    templateKeys.length > 0
+      ? Promise.all(
+          templateKeys.map((key) =>
+            generateTemplate(structured, key, cc).catch((e) => {
+              templateError = e instanceof Error ? e.message : String(e);
+              console.error("[generate] Stage 3 Template 실패:", templateError);
+              return zero;
+            })
+          )
+        )
+      : Promise.resolve([zero]);
+
+  const [piResult, templateResults, peResult, historyResult] =
+    await Promise.all([
       ENABLE_HPI
         ? generatePi(
             structured,
             inputs.map((i) => ({ rawText: i.raw_text, timeTag: i.time_tag })),
             cc,
-            caseRow.template_key
+            templateKeys[0] ?? null
           ).catch((e) => {
             piError = e instanceof Error ? e.message : String(e);
             console.error("[generate] Stage 2 P.I 실패:", piError);
             return zero;
           })
         : Promise.resolve(zero),
-      caseRow.cc_has_template && caseRow.template_key
-        ? generateTemplate(structured, caseRow.template_key, cc).catch((e) => {
-            templateError = e instanceof Error ? e.message : String(e);
-            console.error("[generate] Stage 3 Template 실패:", templateError);
-            return zero;
-          })
-        : Promise.resolve(zero),
-      caseRow.cc_has_template && caseRow.template_key
-        ? generatePe(structured, caseRow.template_key, cc).catch((e) => {
-            peError = e instanceof Error ? e.message : String(e);
-            console.error("[generate] Stage 4 P/E 실패:", peError);
-            return zero;
-          })
-        : Promise.resolve(zero),
-      generateHistory(structured, caseRow.template_key, cc).catch((e) => {
+      templateResultsPromise,
+      generatePe(structured, templateKeys, cc).catch((e) => {
+        peError = e instanceof Error ? e.message : String(e);
+        console.error("[generate] Stage 4 P/E 실패:", peError);
+        return zero;
+      }),
+      generateHistory(structured, templateKeys, cc).catch((e) => {
         historyError = e instanceof Error ? e.message : String(e);
         console.error("[generate] Stage 5 History 실패:", historyError);
         return {
@@ -202,24 +217,35 @@ export async function POST(
           outputTokens: 0,
         };
       }),
-    ]
-  );
+    ]);
 
   const piDraft = piResult.text;
-  const templateDraft = templateResult.text;
+  const templateDraft = templateResults
+    .map((r) => r.text)
+    .filter(Boolean)
+    .join("\n\n");
   const peDraft = peResult.text;
   const historyDraft = historyResult.text;
+
+  const templateInputTokens = templateResults.reduce(
+    (sum, r) => sum + r.inputTokens,
+    0
+  );
+  const templateOutputTokens = templateResults.reduce(
+    (sum, r) => sum + r.outputTokens,
+    0
+  );
 
   const totalInputTokens =
     normalizeInputTokens +
     piResult.inputTokens +
-    templateResult.inputTokens +
+    templateInputTokens +
     peResult.inputTokens +
     historyResult.inputTokens;
   const totalOutputTokens =
     normalizeOutputTokens +
     piResult.outputTokens +
-    templateResult.outputTokens +
+    templateOutputTokens +
     peResult.outputTokens +
     historyResult.outputTokens;
 
@@ -239,7 +265,8 @@ export async function POST(
       history_draft: historyDraft,
       structured_json: structured as unknown as Json,
       model_version: MODEL_VERSION,
-      template_key_used: caseRow.template_key ?? "",
+      template_key_used: templateKeys[0] ?? "",
+      template_keys_used: templateKeys,
       error_message: partialErrorMessage,
     })
     .select("id")

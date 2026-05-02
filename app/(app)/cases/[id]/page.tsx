@@ -310,7 +310,10 @@ async function CaseContent({
           defaultBedZone={caseData.bed_zone as BedZone}
           defaultBedNumber={caseData.bed_number}
           defaultCc={caseData.cc}
-          defaultTemplateKey={caseData.template_key ?? null}
+          defaultTemplateKeys={
+            caseData.template_keys ??
+            (caseData.template_key ? [caseData.template_key] : [])
+          }
           initialCards={inputs}
           defaultLayout={inputLayout}
           defaultSplitRatio={splitRatio}

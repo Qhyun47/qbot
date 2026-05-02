@@ -36,15 +36,17 @@ const templateList = templateListRaw as TemplateListEntry[];
 const guideList = guideListRaw as GuideListEntry[];
 const allCategories = categoriesRaw as string[];
 
+const CIRCLED = ["①", "②", "③"];
+
 function getCategoryLabel(category: string): string {
   return category.replace(/^\d+\.\s*/, "");
 }
 
 interface GuidelinePanelProps {
   ccs: string[];
-  templateKey: string | null;
+  templateKeys: string[];
   onGuidelineChange: (guideKey: string) => void;
-  onTemplateChange: (templateKey: string | null) => void;
+  onTemplateChange: (templateKeys: string[]) => void;
   guidelineFontSize?: number;
 }
 
@@ -54,8 +56,7 @@ function getGuideLabel(guideKey: string): string {
   );
 }
 
-function getTemplateLabel(key: string | null): string | null {
-  if (!key) return null;
+function getTemplateLabel(key: string): string | null {
   return templateList.find((t) => t.templateKey === key)?.displayName ?? key;
 }
 
@@ -135,7 +136,7 @@ function TemplateSectionBlock({
 
 export function GuidelinePanel({
   ccs,
-  templateKey,
+  templateKeys,
   onGuidelineChange,
   onTemplateChange,
   guidelineFontSize,
@@ -149,18 +150,21 @@ export function GuidelinePanel({
   const [isGuideLoading, setIsGuideLoading] = useState(false);
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
 
-  // auto 모드의 추가 추천 (rank > 0)
   const [additionalGuideKeys, setAdditionalGuideKeys] = useState<
     { guideKey: string; displayName: string }[]
   >([]);
-  // recommendations 모드의 전체 추천 목록
   const [recommendedGuideKeys, setRecommendedGuideKeys] = useState<
     { guideKey: string; displayName: string }[]
   >([]);
 
-  const [templateContent, setTemplateContent] =
-    useState<TemplateContent | null>(null);
+  const [templateContents, setTemplateContents] = useState<TemplateContent[]>(
+    []
+  );
   const [isTemplateLoading, setIsTemplateLoading] = useState(false);
+
+  // 다중 선택 모드
+  const [multiSelectMode, setMultiSelectMode] = useState(false);
+  const [multiSelected, setMultiSelected] = useState<string[]>([]);
 
   // C.C. 변경 시 가이드라인 자동 로드 + 뷰 초기화
   const ccsKey = ccs.join("||");
@@ -173,11 +177,13 @@ export function GuidelinePanel({
       setRecommendedGuideKeys([]);
       setActiveView("guide");
       setShowSelector(false);
+      setMultiSelectMode(false);
       return;
     }
 
     setActiveView("guide");
     setShowSelector(false);
+    setMultiSelectMode(false);
     setIsGuideLoading(true);
     loadGuideline(ccs)
       .then((result) => {
@@ -212,34 +218,51 @@ export function GuidelinePanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ccsKey]);
 
-  // 상용구 키 변경 시 내용 미리 로드
+  // templateKeys 변경 시 내용 로드
+  const templateKeysKey = templateKeys.join("||");
   useEffect(() => {
-    if (!templateKey) {
-      setTemplateContent(null);
+    if (templateKeys.length === 0) {
+      setTemplateContents([]);
       return;
     }
     setIsTemplateLoading(true);
-    loadTemplateContent(templateKey)
-      .then(setTemplateContent)
-      .catch(() => setTemplateContent(null))
+    Promise.all(
+      templateKeys.map((key) => loadTemplateContent(key).catch(() => null))
+    )
+      .then((results) =>
+        setTemplateContents(results.filter(Boolean) as TemplateContent[])
+      )
+      .catch(() => setTemplateContents([]))
       .finally(() => setIsTemplateLoading(false));
-  }, [templateKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [templateKeysKey]);
+
+  const closeSelector = () => {
+    setShowSelector(false);
+    setMultiSelectMode(false);
+    setMultiSelected([]);
+  };
 
   const handleGuideTabClick = () => {
     if (activeView === "guide") {
       setShowSelector((v) => !v);
+      if (showSelector) setMultiSelectMode(false);
     } else {
       setActiveView("guide");
-      setShowSelector(false);
+      closeSelector();
     }
   };
 
   const handleTemplateTabClick = () => {
     if (activeView === "template") {
-      setShowSelector((v) => !v);
+      if (showSelector) {
+        closeSelector();
+      } else {
+        setShowSelector(true);
+      }
     } else {
       setActiveView("template");
-      setShowSelector(false);
+      closeSelector();
     }
   };
 
@@ -251,24 +274,105 @@ export function GuidelinePanel({
       setGuidePdfUrl(data.pdfSignedUrl);
       setActiveGuideKey(guideKey);
       onGuidelineChange(guideKey);
-      setShowSelector(false);
+      closeSelector();
     } finally {
       setLoadingKey(null);
     }
   };
 
-  const handleTemplateSelect = (key: string | null) => {
-    onTemplateChange(key);
-    setShowSelector(false);
+  // 다중 선택 모드 진입
+  const handleMultiSelectToggle = () => {
+    if (!multiSelectMode) {
+      setMultiSelectMode(true);
+      setMultiSelected([...templateKeys]);
+    } else {
+      setMultiSelectMode(false);
+      setMultiSelected([]);
+    }
   };
 
-  const templateLabel = getTemplateLabel(templateKey);
+  // 다중 선택 모드에서 항목 클릭
+  const handleMultiItemClick = (key: string) => {
+    const idx = multiSelected.indexOf(key);
+    if (idx >= 0) {
+      setMultiSelected((prev) => prev.filter((k) => k !== key));
+    } else {
+      if (multiSelected.length >= 3) return;
+      setMultiSelected((prev) => [...prev, key]);
+    }
+  };
+
+  // 다중 선택 적용
+  const handleMultiApply = () => {
+    onTemplateChange(multiSelected);
+    closeSelector();
+  };
+
+  // 단일 선택 (일반 모드)
+  const handleSingleSelect = (key: string | null) => {
+    onTemplateChange(key ? [key] : []);
+    closeSelector();
+  };
+
+  // 상용구 항목 렌더링 (단일/다중 모드 분기)
+  const renderTemplateItem = (key: string) => {
+    const label = getTemplateLabel(key) ?? key;
+    if (multiSelectMode) {
+      const selIdx = multiSelected.indexOf(key);
+      const isSelected = selIdx >= 0;
+      const isDisabled = !isSelected && multiSelected.length >= 3;
+      return (
+        <button
+          key={key}
+          type="button"
+          disabled={isDisabled}
+          onClick={() => handleMultiItemClick(key)}
+          className={cn(
+            "flex w-full items-center justify-between rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
+            "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
+            "disabled:cursor-not-allowed disabled:opacity-40",
+            isSelected && "border-primary bg-primary/5"
+          )}
+        >
+          <span>{label}</span>
+          {isSelected && (
+            <span className="ml-2 flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
+              {selIdx + 1}
+            </span>
+          )}
+        </button>
+      );
+    }
+    return (
+      <button
+        key={key}
+        type="button"
+        onClick={() => handleSingleSelect(key)}
+        className={cn(
+          "w-full rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
+          "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
+          templateKeys.includes(key) && "border-primary bg-primary/5"
+        )}
+      >
+        {label}
+      </button>
+    );
+  };
+
+  const templateSubLabel =
+    templateKeys.length > 0
+      ? templateKeys
+          .map((k) => getTemplateLabel(k))
+          .filter(Boolean)
+          .join(" / ")
+      : null;
+
   const suggestedTemplateKeys = getSuggestedTemplateKeys(ccs);
   const otherTemplates = templateList.filter(
     (t) => !suggestedTemplateKeys.includes(t.templateKey)
   );
 
-  // 선택기에 표시할 추천 가이드 목록: activeGuideKey + additional + recommended (중복 제거)
+  // 선택기에 표시할 추천 가이드 목록
   const selectorSuggestedGuides = (() => {
     const result: { guideKey: string; displayName: string }[] = [];
     const seen = new Set<string>();
@@ -294,6 +398,8 @@ export function GuidelinePanel({
     (g) => !selectorSuggestedKeys.has(g.guideKey)
   );
 
+  const showMultipleContents = templateContents.length > 1;
+
   const showPdf =
     activeView === "guide" && !showSelector && guidePdfUrl && !isGuideLoading;
 
@@ -311,7 +417,7 @@ export function GuidelinePanel({
       <TabButton
         icon={<FileText className="size-3 shrink-0" />}
         label="상용구"
-        subLabel={templateLabel}
+        subLabel={templateSubLabel}
         active={activeView === "template"}
         disabled={ccs.length === 0}
         onClick={handleTemplateTabClick}
@@ -321,17 +427,13 @@ export function GuidelinePanel({
 
   return (
     <div className="flex h-full flex-col overflow-hidden bg-muted/30">
-      {/* 콘텐츠 영역 */}
       {showPdf ? (
-        // PDF 모드: HTML 모드와 동일하게 단일 스크롤 컨테이너 사용
-        // → 탭바·줌 버튼이 스크롤 시 함께 올라감
         <div className="flex-1 overflow-y-auto overscroll-y-contain">
           {tabBar}
           <PdfViewer url={guidePdfUrl!} embedded />
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto overscroll-y-contain">
-          {/* 탭 바: 스크롤과 함께 이동 */}
           {tabBar}
           <div className="p-4">
             {showSelector ? (
@@ -401,50 +503,60 @@ export function GuidelinePanel({
                   )}
                   <button
                     type="button"
-                    onClick={() => setShowSelector(false)}
+                    onClick={closeSelector}
                     className="mt-1 text-xs text-muted-foreground underline-offset-2 hover:underline"
                   >
                     취소
                   </button>
                 </div>
               ) : (
+                /* 상용구 선택기 */
                 <div className="flex flex-col gap-1">
+                  {/* 다중 상용구 적용 토글 */}
                   <button
                     type="button"
-                    onClick={() => handleTemplateSelect(null)}
+                    onClick={handleMultiSelectToggle}
                     className={cn(
-                      "rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
-                      "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
-                      templateKey === null && "border-primary bg-primary/5"
+                      "mb-1 rounded-md border px-3 py-2 text-left text-sm font-medium transition-colors",
+                      multiSelectMode
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-dashed bg-background text-muted-foreground hover:border-foreground/40 hover:text-foreground"
                     )}
                   >
-                    없음
+                    {multiSelectMode
+                      ? `다중 선택 중 (${multiSelected.length}/3) — 취소`
+                      : "다중 상용구 적용"}
                   </button>
+
+                  {/* 없음 버튼 (단일 모드에서만) */}
+                  {!multiSelectMode && (
+                    <button
+                      type="button"
+                      onClick={() => handleSingleSelect(null)}
+                      className={cn(
+                        "rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
+                        "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
+                        templateKeys.length === 0 &&
+                          "border-primary bg-primary/5"
+                      )}
+                    >
+                      없음
+                    </button>
+                  )}
+
+                  {/* 추천 상용구 */}
                   {suggestedTemplateKeys.length > 0 && (
                     <>
                       <p className="mt-2 text-xs font-semibold text-muted-foreground">
                         추천 상용구
                       </p>
-                      {suggestedTemplateKeys.map((key) => {
-                        const label = getTemplateLabel(key) ?? key;
-                        return (
-                          <button
-                            key={key}
-                            type="button"
-                            onClick={() => handleTemplateSelect(key)}
-                            className={cn(
-                              "rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
-                              "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
-                              templateKey === key &&
-                                "border-primary bg-primary/5"
-                            )}
-                          >
-                            {label}
-                          </button>
-                        );
-                      })}
+                      {suggestedTemplateKeys.map((key) =>
+                        renderTemplateItem(key)
+                      )}
                     </>
                   )}
+
+                  {/* 전체 목록 */}
                   {otherTemplates.length > 0 && (
                     <>
                       <p className="mt-2 text-xs font-semibold text-muted-foreground">
@@ -469,50 +581,39 @@ export function GuidelinePanel({
                                 <p className="mt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
                                   {group.label}
                                 </p>
-                                {group.items.map((t) => (
-                                  <button
-                                    key={t.templateKey}
-                                    type="button"
-                                    onClick={() =>
-                                      handleTemplateSelect(t.templateKey)
-                                    }
-                                    className={cn(
-                                      "w-full rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
-                                      "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
-                                      templateKey === t.templateKey &&
-                                        "border-primary bg-primary/5"
-                                    )}
-                                  >
-                                    {t.displayName}
-                                  </button>
-                                ))}
+                                {group.items.map((t) =>
+                                  renderTemplateItem(t.templateKey)
+                                )}
                               </div>
                             ))}
-                            {uncategorized.map((t) => (
-                              <button
-                                key={t.templateKey}
-                                type="button"
-                                onClick={() =>
-                                  handleTemplateSelect(t.templateKey)
-                                }
-                                className={cn(
-                                  "w-full rounded-md border bg-background px-3 py-2 text-left text-sm transition-colors",
-                                  "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
-                                  templateKey === t.templateKey &&
-                                    "border-primary bg-primary/5"
-                                )}
-                              >
-                                {t.displayName}
-                              </button>
-                            ))}
+                            {uncategorized.map((t) =>
+                              renderTemplateItem(t.templateKey)
+                            )}
                           </>
                         );
                       })()}
                     </>
                   )}
+
+                  {/* 다중 선택 적용 버튼 */}
+                  {multiSelectMode && (
+                    <button
+                      type="button"
+                      onClick={handleMultiApply}
+                      disabled={multiSelected.length === 0}
+                      className={cn(
+                        "mt-2 rounded-md border border-primary bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors",
+                        "hover:bg-primary/90 active:bg-primary/80",
+                        "disabled:cursor-not-allowed disabled:opacity-50"
+                      )}
+                    >
+                      적용 ({multiSelected.length}개)
+                    </button>
+                  )}
+
                   <button
                     type="button"
-                    onClick={() => setShowSelector(false)}
+                    onClick={closeSelector}
                     className="mt-1 text-xs text-muted-foreground underline-offset-2 hover:underline"
                   >
                     취소
@@ -543,7 +644,6 @@ export function GuidelinePanel({
                   <MarkdownPreview content={guideContent} />
                 )
               ) : recommendedGuideKeys.length > 0 ? (
-                /* recommendations 모드: 추천 목록 바로 표시 */
                 <div className="flex flex-col gap-1">
                   <p className="mb-1 text-xs font-semibold text-muted-foreground">
                     관련 가이드라인
@@ -581,27 +681,45 @@ export function GuidelinePanel({
               <p className="text-sm text-muted-foreground">
                 상용구 불러오는 중...
               </p>
-            ) : templateContent ? (
+            ) : templateContents.length > 0 ? (
               <div className="space-y-4">
-                <TemplateSectionBlock
-                  title="P.I. 상용구"
-                  content={templateContent.mainExample}
-                  fontSize={guidelineFontSize}
-                />
-                <TemplateSectionBlock
-                  title="History"
-                  content={templateContent.historyExample}
-                  fontSize={guidelineFontSize}
-                />
-                <TemplateSectionBlock
-                  title="P/E"
-                  content={templateContent.peExample}
-                  fontSize={guidelineFontSize}
-                />
+                {/* P.I. 상용구 섹션 — 1,2,3 순서 */}
+                {templateContents.map((tc, i) => (
+                  <TemplateSectionBlock
+                    key={`pi-${i}`}
+                    title={
+                      showMultipleContents
+                        ? `P.I. 상용구 ${CIRCLED[i]}`
+                        : "P.I. 상용구"
+                    }
+                    content={tc.mainExample}
+                    fontSize={guidelineFontSize}
+                  />
+                ))}
+                {/* History 섹션 — 1,2,3 순서 */}
+                {templateContents.map((tc, i) => (
+                  <TemplateSectionBlock
+                    key={`hist-${i}`}
+                    title={
+                      showMultipleContents ? `History ${CIRCLED[i]}` : "History"
+                    }
+                    content={tc.historyExample}
+                    fontSize={guidelineFontSize}
+                  />
+                ))}
+                {/* P/E 섹션 — 1,2,3 순서 */}
+                {templateContents.map((tc, i) => (
+                  <TemplateSectionBlock
+                    key={`pe-${i}`}
+                    title={showMultipleContents ? `P/E ${CIRCLED[i]}` : "P/E"}
+                    content={tc.peExample}
+                    fontSize={guidelineFontSize}
+                  />
+                ))}
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">
-                {templateKey
+                {templateKeys.length > 0
                   ? "상용구 내용을 불러올 수 없습니다."
                   : "위 탭을 클릭해 상용구를 선택하세요."}
               </p>

@@ -178,6 +178,7 @@ export type Database = {
           template_draft: string;
           template_edited: string | null;
           template_key_used: string;
+          template_keys_used: string[];
           underlying_disease: string | null;
           underlying_disease_at: string | null;
         };
@@ -199,6 +200,7 @@ export type Database = {
           template_draft: string;
           template_edited?: string | null;
           template_key_used: string;
+          template_keys_used?: string[];
           underlying_disease?: string | null;
           underlying_disease_at?: string | null;
         };
@@ -220,6 +222,7 @@ export type Database = {
           template_draft?: string;
           template_edited?: string | null;
           template_key_used?: string;
+          template_keys_used?: string[];
           underlying_disease?: string | null;
           underlying_disease_at?: string | null;
         };
@@ -249,6 +252,7 @@ export type Database = {
           memo: string | null;
           status: Database["public"]["Enums"]["case_status"];
           template_key: string | null;
+          template_keys: string[];
           updated_at: string;
           user_id: string;
         };
@@ -267,6 +271,7 @@ export type Database = {
           memo?: string | null;
           status?: Database["public"]["Enums"]["case_status"];
           template_key?: string | null;
+          template_keys?: string[];
           updated_at?: string;
           user_id: string;
         };
@@ -285,6 +290,7 @@ export type Database = {
           memo?: string | null;
           status?: Database["public"]["Enums"]["case_status"];
           template_key?: string | null;
+          template_keys?: string[];
           updated_at?: string;
           user_id?: string;
         };

@@ -37,7 +37,11 @@ export function CcRetryForm({ caseId, currentCc }: CcRetryFormProps) {
         getPrimaryKey(resolved?.templateKeys ?? []) ??
         resolved?.templateKeys?.[0]?.key ??
         null;
-      await updateCaseCcs(caseId, [cc.trim()], templateKey);
+      await updateCaseCcs(
+        caseId,
+        [cc.trim()],
+        templateKey ? [templateKey] : []
+      );
       const res = await fetch(`/api/cases/${caseId}/generate`, {
         method: "POST",
       });

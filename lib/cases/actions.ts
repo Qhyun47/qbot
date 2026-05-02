@@ -116,7 +116,7 @@ export async function updateCaseBed(
 export async function updateCaseCcs(
   caseId: string,
   ccs: string[],
-  templateKey: string | null
+  templateKeys: string[]
 ): Promise<void> {
   const { supabase, user } = await getAuthUser();
 
@@ -125,8 +125,9 @@ export async function updateCaseCcs(
     .update({
       ccs,
       cc: ccs[0] ?? null,
-      cc_has_template: templateKey !== null,
-      template_key: templateKey,
+      cc_has_template: templateKeys.length > 0,
+      template_key: templateKeys[0] ?? null,
+      template_keys: templateKeys,
     })
     .eq("id", caseId)
     .eq("user_id", user.id);
@@ -226,22 +227,30 @@ export async function updateHistoryEdited(
   if (error) throw new Error(error.message);
 }
 
-export async function overrideTemplateKey(
+export async function overrideTemplateKeys(
   caseId: string,
-  templateKey: string | null
+  templateKeys: string[]
 ): Promise<void> {
   const { supabase, user } = await getAuthUser();
 
   const { error } = await supabase
     .from("cases")
     .update({
-      template_key: templateKey,
-      cc_has_template: templateKey !== null,
+      template_key: templateKeys[0] ?? null,
+      template_keys: templateKeys,
+      cc_has_template: templateKeys.length > 0,
     })
     .eq("id", caseId)
     .eq("user_id", user.id);
 
   if (error) throw new Error(error.message);
+}
+
+export async function overrideTemplateKey(
+  caseId: string,
+  templateKey: string | null
+): Promise<void> {
+  return overrideTemplateKeys(caseId, templateKey ? [templateKey] : []);
 }
 
 export async function updateCaseMemo(

@@ -27,7 +27,7 @@ import {
   updateCaseBed,
   updateCaseCcs,
   addCaseInput,
-  overrideTemplateKey,
+  overrideTemplateKeys,
   reorderCaseInputs,
   moveCaseInputSection,
   deleteCaseInput,
@@ -58,7 +58,7 @@ interface CaseInputViewProps {
   defaultBedZone: BedZone;
   defaultBedNumber: number;
   defaultCc: string | null;
-  defaultTemplateKey: string | null;
+  defaultTemplateKeys: string[];
   initialCards: CaseInput[];
   defaultLayout: InputLayout;
   defaultSplitRatio: number;
@@ -76,7 +76,7 @@ export function CaseInputView({
   defaultBedZone,
   defaultBedNumber,
   defaultCc,
-  defaultTemplateKey,
+  defaultTemplateKeys,
   initialCards,
   defaultLayout,
   defaultSplitRatio,
@@ -99,9 +99,9 @@ export function CaseInputView({
   const [_guidelineContent, setGuidelineContent] = useState<string | null>(
     null
   );
-  const [selectedTemplateKey, setSelectedTemplateKey] = useState<string | null>(
-    defaultTemplateKey
-  );
+  const [selectedTemplateKeys, setSelectedTemplateKeys] =
+    useState<string[]>(defaultTemplateKeys);
+  const [templateSelectorOpen, setTemplateSelectorOpen] = useState(false);
   const [pendingTemplateKeys, setPendingTemplateKeys] = useState<
     string[] | null
   >(null);
@@ -180,9 +180,9 @@ export function CaseInputView({
 
     if (templateEntries.length === 0) {
       setPendingTemplateKeys(null);
-      setSelectedTemplateKey(null);
+      setSelectedTemplateKeys([]);
       startTransition(async () => {
-        await updateCaseCcs(caseId, [selectedCc], null);
+        await updateCaseCcs(caseId, [selectedCc], []);
         await loadGuide();
       });
       return;
@@ -192,9 +192,9 @@ export function CaseInputView({
     if (templateEntries.length === 1 || rank0) {
       const key = rank0?.key ?? templateEntries[0].key;
       setPendingTemplateKeys(null);
-      setSelectedTemplateKey(key);
+      setSelectedTemplateKeys([key]);
       startTransition(async () => {
-        await updateCaseCcs(caseId, [selectedCc], key);
+        await updateCaseCcs(caseId, [selectedCc], [key]);
         await loadGuide();
       });
     } else {
@@ -202,16 +202,16 @@ export function CaseInputView({
         .sort((a, b) => a.rank - b.rank)
         .map((e) => e.key);
       setPendingTemplateKeys(sortedKeys);
-      setSelectedTemplateKey(null);
+      setSelectedTemplateKeys([]);
       startTransition(loadGuide);
     }
   };
 
   const handleTemplateKeyConfirm = (key: string | null) => {
     setPendingTemplateKeys(null);
-    setSelectedTemplateKey(key);
+    setSelectedTemplateKeys(key ? [key] : []);
     if (cc) {
-      startTransition(() => updateCaseCcs(caseId, [cc], key));
+      startTransition(() => updateCaseCcs(caseId, [cc], key ? [key] : []));
     }
   };
 
@@ -219,9 +219,9 @@ export function CaseInputView({
     // GuidelinePanel 내부에서 콘텐츠 로드까지 처리
   };
 
-  const handleTemplateChange = (newTemplateKey: string | null) => {
-    setSelectedTemplateKey(newTemplateKey);
-    startTransition(() => overrideTemplateKey(caseId, newTemplateKey));
+  const handleTemplateChange = (keys: string[]) => {
+    setSelectedTemplateKeys(keys);
+    startTransition(() => overrideTemplateKeys(caseId, keys));
   };
 
   const handleCardSubmit = async (
@@ -357,11 +357,26 @@ export function CaseInputView({
     </div>
   );
 
+  const templateBarLabel =
+    selectedTemplateKeys.length > 0
+      ? selectedTemplateKeys
+          .map((key) => {
+            const entry = (
+              templateListJson as {
+                templateKey: string;
+                displayName: string;
+              }[]
+            ).find((t) => t.templateKey === key);
+            return entry?.displayName ?? key;
+          })
+          .join(" / ")
+      : "상용구 없음";
+
   const GuideArea = (
     <div className="h-full">
       <GuidelinePanel
         ccs={cc ? [cc] : []}
-        templateKey={selectedTemplateKey}
+        templateKeys={selectedTemplateKeys}
         onGuidelineChange={handleGuidelineChange}
         onTemplateChange={handleTemplateChange}
         guidelineFontSize={guidelineFontSize}
@@ -371,6 +386,35 @@ export function CaseInputView({
 
   return (
     <>
+      {/* 단독 모드 상용구 선택 오버레이 */}
+      {templateSelectorOpen && (
+        <div className="fixed inset-0 z-10 flex flex-col bg-background">
+          <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
+            <span className="flex-1 text-sm font-semibold">상용구 선택</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTemplateSelectorOpen(false)}
+              aria-label="닫기"
+            >
+              <X className="size-4" />
+            </Button>
+          </header>
+          <div className="flex-1 overflow-hidden">
+            <GuidelinePanel
+              ccs={cc ? [cc] : []}
+              templateKeys={selectedTemplateKeys}
+              onGuidelineChange={handleGuidelineChange}
+              onTemplateChange={(keys) => {
+                handleTemplateChange(keys);
+                setTemplateSelectorOpen(false);
+              }}
+              guidelineFontSize={guidelineFontSize}
+            />
+          </div>
+        </div>
+      )}
+
       {/* 베드/CC 편집 전체 화면 오버레이 */}
       {(bedPickerOpen || ccEditing) && (
         <div className="fixed inset-0 z-10 flex flex-col bg-background">
@@ -499,7 +543,21 @@ export function CaseInputView({
         </header>
 
         {layout === "single" && (
-          <div className="flex-1 overflow-hidden">{InputArea}</div>
+          <div className="flex flex-1 flex-col overflow-hidden">
+            {cc !== null && (
+              <button
+                type="button"
+                onClick={() => setTemplateSelectorOpen(true)}
+                className="flex shrink-0 items-center border-b px-3 py-1.5 text-left"
+                aria-label="상용구 선택"
+              >
+                <span className="text-xs text-muted-foreground">
+                  {templateBarLabel}
+                </span>
+              </button>
+            )}
+            <div className="flex-1 overflow-hidden">{InputArea}</div>
+          </div>
         )}
 
         {layout === "split_vertical" && (

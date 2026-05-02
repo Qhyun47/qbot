@@ -151,7 +151,7 @@ async function run() {
       text: pe,
       inputTokens: s4In,
       outputTokens: s4Out,
-    } = await generatePe(structuredCase, templateKey, cc);
+    } = await generatePe(structuredCase, templateKey ? [templateKey] : [], cc);
 
     if (pe) {
       console.log("\n[생성된 P/E]");

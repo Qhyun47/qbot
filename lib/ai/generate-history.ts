@@ -22,20 +22,24 @@ export function buildHistoryDraft(structured: StructuredCase | null): string {
 
 export async function generateHistory(
   structuredCase: StructuredCase,
-  templateKey: string | null | undefined,
+  templateKeys: string[],
   _cc: string
 ): Promise<{ text: string } & TokenUsage> {
-  if (!templateKey)
+  if (templateKeys.length === 0)
     return {
       text: buildHistoryDraft(structuredCase),
       inputTokens: 0,
       outputTokens: 0,
     };
 
-  const templateData = loadTemplate(templateKey) as Record<string, unknown>;
-  const historyTemplate = templateData.history ?? null;
+  const historyTemplates = templateKeys
+    .map((key) => {
+      const templateData = loadTemplate(key) as Record<string, unknown>;
+      return templateData.history ?? null;
+    })
+    .filter(Boolean);
 
-  if (!historyTemplate)
+  if (historyTemplates.length === 0)
     return {
       text: buildHistoryDraft(structuredCase),
       inputTokens: 0,
@@ -45,17 +49,24 @@ export async function generateHistory(
   const { inputs, ...ccSpecificFields } = structuredCase;
   const historyInputs = inputs.filter((i) => i.sections.includes("history"));
 
-  const referenceExamples = loadExamples(templateKey).history.slice(0, 10);
+  const referenceExamples = loadExamples(templateKeys[0]).history.slice(0, 10);
+
+  const multiTemplateInstruction =
+    templateKeys.length > 1
+      ? `\n\n## 다중 상용구 지시\n\nhistoryTemplates 배열에 ${templateKeys.length}개의 History 양식이 있습니다. 첫 번째 양식의 내용을 전부 차팅하세요. 두 번째 양식부터는 첫 번째에 이미 포함된 항목(section)은 생략하고, 이전에 없던 새 항목만 추가하여 차팅하세요.`
+      : "";
 
   const systemPrompt =
     referenceExamples.length > 0
-      ? `${GENERATE_HISTORY_SYSTEM_PROMPT}\n\n## Style Reference\n\n${FEW_SHOT_GUARD}`
-      : GENERATE_HISTORY_SYSTEM_PROMPT;
+      ? `${GENERATE_HISTORY_SYSTEM_PROMPT}${multiTemplateInstruction}\n\n## Style Reference\n\n${FEW_SHOT_GUARD}`
+      : `${GENERATE_HISTORY_SYSTEM_PROMPT}${multiTemplateInstruction}`;
 
   const promptData: Record<string, unknown> = {
     historyInputs,
     ccSpecificFields,
-    historyTemplate,
+    ...(historyTemplates.length === 1
+      ? { historyTemplate: historyTemplates[0] }
+      : { historyTemplates }),
   };
   if (referenceExamples.length > 0) {
     promptData.referenceExamples = referenceExamples;
