@@ -3,7 +3,15 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useVisualViewport } from "@/hooks/use-visual-viewport";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Rows2, Columns2, Square, Zap, Loader2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Rows2,
+  Columns2,
+  Square,
+  Zap,
+  Loader2,
+  X,
+} from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -108,6 +116,7 @@ export function NewCaseForm({
   const [activeFontSize, setActiveFontSize] = useState(caseInputFontSize);
   const [activeGuidelineFontSize, setActiveGuidelineFontSize] =
     useState(guidelineFontSize);
+  const [templateSelectorOpen, setTemplateSelectorOpen] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [navigatingBack, setNavigatingBack] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
@@ -378,6 +387,21 @@ export function NewCaseForm({
     }
   };
 
+  const templateBarLabel =
+    selectedTemplateKeys.length > 0
+      ? selectedTemplateKeys
+          .map((key) => {
+            const entry = (
+              templateListJson as {
+                templateKey: string;
+                displayName: string;
+              }[]
+            ).find((t) => t.templateKey === key);
+            return entry?.displayName ?? key;
+          })
+          .join(" / ")
+      : "상용구 없음";
+
   const InputArea = (
     <div className="flex h-full flex-col">
       <div
@@ -448,6 +472,35 @@ export function NewCaseForm({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* 단독 모드 상용구 선택 오버레이 */}
+      {templateSelectorOpen && (
+        <div className="fixed inset-0 z-10 flex flex-col bg-background">
+          <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
+            <span className="flex-1 text-sm font-semibold">상용구 선택</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTemplateSelectorOpen(false)}
+              aria-label="닫기"
+            >
+              <X className="size-4" />
+            </Button>
+          </header>
+          <div className="flex-1 overflow-hidden">
+            <GuidelinePanel
+              ccs={ccs}
+              templateKeys={selectedTemplateKeys}
+              onGuidelineChange={handleGuidelineChange}
+              onTemplateChange={(keys) => {
+                handleTemplateChange(keys);
+                setTemplateSelectorOpen(false);
+              }}
+              guidelineFontSize={activeGuidelineFontSize}
+            />
+          </div>
+        </div>
+      )}
 
       {/* 설정 화면 (데스크탑+모바일 공통) */}
       {!setupDone && (
@@ -674,7 +727,21 @@ export function NewCaseForm({
 
         {/* 레이아웃 본문 */}
         {layout === "single" && (
-          <div className="flex-1 overflow-hidden">{InputArea}</div>
+          <div className="flex flex-1 flex-col overflow-hidden">
+            {ccs.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setTemplateSelectorOpen(true)}
+                className="flex shrink-0 items-center border-b px-3 py-1.5 text-left"
+                aria-label="상용구 선택"
+              >
+                <span className="text-xs text-muted-foreground">
+                  {templateBarLabel}
+                </span>
+              </button>
+            )}
+            <div className="flex-1 overflow-hidden">{InputArea}</div>
+          </div>
         )}
 
         {layout === "split_vertical" && (

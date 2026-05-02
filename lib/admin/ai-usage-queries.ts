@@ -8,12 +8,6 @@ import { getIsAdmin } from "@/lib/auth/is-admin";
 const INPUT_COST_PER_TOKEN = 0.15 / 1_000_000;
 const OUTPUT_COST_PER_TOKEN = 0.6 / 1_000_000;
 
-function calcEstimatedCost(inputTokens: number, outputTokens: number): number {
-  return (
-    inputTokens * INPUT_COST_PER_TOKEN + outputTokens * OUTPUT_COST_PER_TOKEN
-  );
-}
-
 export interface UserActivitySummary {
   id: string;
   email: string | null;
@@ -254,21 +248,24 @@ export async function getUsageStats(
     stat.total_calls += 1;
     stat.input_tokens += inputT;
     stat.output_tokens += outputT;
-    stat.estimated_cost += calcEstimatedCost(inputT, outputT);
+    stat.estimated_cost +=
+      inputT * INPUT_COST_PER_TOKEN + outputT * OUTPUT_COST_PER_TOKEN;
 
     const dayEntry = stat.daily.find((d) => d.date === date);
     if (dayEntry) {
       dayEntry.total_calls += 1;
       dayEntry.input_tokens += inputT;
       dayEntry.output_tokens += outputT;
-      dayEntry.estimated_cost += calcEstimatedCost(inputT, outputT);
+      dayEntry.estimated_cost +=
+        inputT * INPUT_COST_PER_TOKEN + outputT * OUTPUT_COST_PER_TOKEN;
     } else {
       stat.daily.push({
         date,
         total_calls: 1,
         input_tokens: inputT,
         output_tokens: outputT,
-        estimated_cost: calcEstimatedCost(inputT, outputT),
+        estimated_cost:
+          inputT * INPUT_COST_PER_TOKEN + outputT * OUTPUT_COST_PER_TOKEN,
       });
     }
   }
