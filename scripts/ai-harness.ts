@@ -81,8 +81,13 @@ async function run() {
   // Stage 1
   separator("Stage 1: 입력 정규화");
   console.log("처리 중...");
-  const structuredCase = await normalizeInputs(cc, fixture.inputs);
+  const {
+    result: structuredCase,
+    inputTokens: s1In,
+    outputTokens: s1Out,
+  } = await normalizeInputs(cc, fixture.inputs);
   console.log(JSON.stringify(structuredCase, null, 2));
+  console.log(`\n[토큰] 입력: ${s1In}, 출력: ${s1Out}`);
 
   // Stage 2
   separator("Stage 2: P.I 생성");
@@ -91,10 +96,15 @@ async function run() {
     rawText: i.rawText,
     timeTag: i.timeTag,
   }));
-  const pi = await generatePi(structuredCase, rawInputs, cc, templateKey);
+  const {
+    text: pi,
+    inputTokens: s2In,
+    outputTokens: s2Out,
+  } = await generatePi(structuredCase, rawInputs, cc, templateKey);
 
   console.log("\n[생성된 P.I]");
   console.log(pi);
+  console.log(`\n[토큰] 입력: ${s2In}, 출력: ${s2Out}`);
 
   if (fixture.expectedPi) {
     console.log("\n[예상 P.I (참고)]");
@@ -113,10 +123,15 @@ async function run() {
   if (templateKey) {
     separator("Stage 3: EMR 상용구 채움");
     console.log("처리 중...");
-    const template = await generateTemplate(structuredCase, templateKey, cc);
+    const {
+      text: template,
+      inputTokens: s3In,
+      outputTokens: s3Out,
+    } = await generateTemplate(structuredCase, templateKey, cc);
 
     console.log("\n[생성된 상용구]");
     console.log(template);
+    console.log(`\n[토큰] 입력: ${s3In}, 출력: ${s3Out}`);
 
     if (fixture.expectedTemplate) {
       console.log("\n[예상 상용구 (참고)]");
@@ -132,11 +147,16 @@ async function run() {
     // Stage 4
     separator("Stage 4: P/E 채움");
     console.log("처리 중...");
-    const pe = await generatePe(structuredCase, templateKey, cc);
+    const {
+      text: pe,
+      inputTokens: s4In,
+      outputTokens: s4Out,
+    } = await generatePe(structuredCase, templateKey, cc);
 
     if (pe) {
       console.log("\n[생성된 P/E]");
       console.log(pe);
+      console.log(`\n[토큰] 입력: ${s4In}, 출력: ${s4Out}`);
     } else {
       console.log("(pe 필드 없음 — 건너뜀)");
     }

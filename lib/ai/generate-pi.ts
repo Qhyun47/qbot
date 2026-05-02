@@ -1,4 +1,5 @@
 import { generateText } from "@/lib/ai/gemini-client";
+import type { TokenUsage } from "@/lib/ai/gemini-client";
 import { GENERATE_PI_SYSTEM_PROMPT } from "@/lib/ai/prompts/generate-pi";
 import { FEW_SHOT_GUARD } from "@/lib/ai/prompts/few-shot-guard";
 import { loadExamples, loadHpiHints } from "@/lib/ai/load-resources";
@@ -9,7 +10,7 @@ export async function generatePi(
   rawInputs: Array<{ rawText: string; timeTag: string | null }>,
   _cc: string,
   templateKey?: string | null
-): Promise<string> {
+): Promise<{ text: string } & TokenUsage> {
   const piInputs = structuredCase.inputs.filter((i) =>
     i.sections.includes("pi")
   );
@@ -41,7 +42,11 @@ export async function generatePi(
 
   const userPrompt = JSON.stringify(promptData, null, 2);
 
-  const result = await generateText(userPrompt, systemPrompt, 2000);
-  if (!result) throw new Error("P.I 생성 실패: 빈 응답");
-  return result;
+  const { text, inputTokens, outputTokens } = await generateText(
+    userPrompt,
+    systemPrompt,
+    2000
+  );
+  if (!text) throw new Error("P.I 생성 실패: 빈 응답");
+  return { text, inputTokens, outputTokens };
 }

@@ -114,8 +114,10 @@ export async function POST(
 
   // Stage 1: 정규화 (실패 시 전체 failed)
   let structured: StructuredCase;
+  let normalizeInputTokens = 0;
+  let normalizeOutputTokens = 0;
   try {
-    structured = await normalizeInputs(
+    const normalizeResult = await normalizeInputs(
       caseRow.cc ?? "",
       inputs.map((i) => ({
         rawText: i.raw_text,
@@ -124,6 +126,9 @@ export async function POST(
       })),
       caseRow.template_key
     );
+    structured = normalizeResult.result;
+    normalizeInputTokens = normalizeResult.inputTokens;
+    normalizeOutputTokens = normalizeResult.outputTokens;
   } catch (e) {
     const errorMessage = `정규화 실패: ${e instanceof Error ? e.message : String(e)}`;
     const { data: failedResult } = await supabase
@@ -158,39 +163,65 @@ export async function POST(
   let peError: string | null = null;
   let historyError: string | null = null;
 
-  const [piDraft, templateDraft, peDraft, historyDraft] = await Promise.all([
-    ENABLE_HPI
-      ? generatePi(
-          structured,
-          inputs.map((i) => ({ rawText: i.raw_text, timeTag: i.time_tag })),
-          cc,
-          caseRow.template_key
-        ).catch((e) => {
-          piError = e instanceof Error ? e.message : String(e);
-          console.error("[generate] Stage 2 P.I 실패:", piError);
-          return "";
-        })
-      : Promise.resolve(""),
-    caseRow.cc_has_template && caseRow.template_key
-      ? generateTemplate(structured, caseRow.template_key, cc).catch((e) => {
-          templateError = e instanceof Error ? e.message : String(e);
-          console.error("[generate] Stage 3 Template 실패:", templateError);
-          return "";
-        })
-      : Promise.resolve(""),
-    caseRow.cc_has_template && caseRow.template_key
-      ? generatePe(structured, caseRow.template_key, cc).catch((e) => {
-          peError = e instanceof Error ? e.message : String(e);
-          console.error("[generate] Stage 4 P/E 실패:", peError);
-          return "";
-        })
-      : Promise.resolve(""),
-    generateHistory(structured, caseRow.template_key, cc).catch((e) => {
-      historyError = e instanceof Error ? e.message : String(e);
-      console.error("[generate] Stage 5 History 실패:", historyError);
-      return buildHistoryDraft(structured);
-    }),
-  ]);
+  const zero = { text: "", inputTokens: 0, outputTokens: 0 };
+
+  const [piResult, templateResult, peResult, historyResult] = await Promise.all(
+    [
+      ENABLE_HPI
+        ? generatePi(
+            structured,
+            inputs.map((i) => ({ rawText: i.raw_text, timeTag: i.time_tag })),
+            cc,
+            caseRow.template_key
+          ).catch((e) => {
+            piError = e instanceof Error ? e.message : String(e);
+            console.error("[generate] Stage 2 P.I 실패:", piError);
+            return zero;
+          })
+        : Promise.resolve(zero),
+      caseRow.cc_has_template && caseRow.template_key
+        ? generateTemplate(structured, caseRow.template_key, cc).catch((e) => {
+            templateError = e instanceof Error ? e.message : String(e);
+            console.error("[generate] Stage 3 Template 실패:", templateError);
+            return zero;
+          })
+        : Promise.resolve(zero),
+      caseRow.cc_has_template && caseRow.template_key
+        ? generatePe(structured, caseRow.template_key, cc).catch((e) => {
+            peError = e instanceof Error ? e.message : String(e);
+            console.error("[generate] Stage 4 P/E 실패:", peError);
+            return zero;
+          })
+        : Promise.resolve(zero),
+      generateHistory(structured, caseRow.template_key, cc).catch((e) => {
+        historyError = e instanceof Error ? e.message : String(e);
+        console.error("[generate] Stage 5 History 실패:", historyError);
+        return {
+          text: buildHistoryDraft(structured),
+          inputTokens: 0,
+          outputTokens: 0,
+        };
+      }),
+    ]
+  );
+
+  const piDraft = piResult.text;
+  const templateDraft = templateResult.text;
+  const peDraft = peResult.text;
+  const historyDraft = historyResult.text;
+
+  const totalInputTokens =
+    normalizeInputTokens +
+    piResult.inputTokens +
+    templateResult.inputTokens +
+    peResult.inputTokens +
+    historyResult.inputTokens;
+  const totalOutputTokens =
+    normalizeOutputTokens +
+    piResult.outputTokens +
+    templateResult.outputTokens +
+    peResult.outputTokens +
+    historyResult.outputTokens;
 
   // Stage 2/3/4/5 부분 실패 메시지 합산 (Stage 1 성공이므로 status는 completed 유지)
   const partialErrorMessage =
@@ -230,7 +261,12 @@ export async function POST(
   // 사용 이력 기록 (실패해도 생성 결과에 영향 없음)
   await supabase
     .from("ai_usage_logs")
-    .insert({ user_id: user.id, case_id: id });
+    .insert({
+      user_id: user.id,
+      case_id: id,
+      input_tokens: totalInputTokens,
+      output_tokens: totalOutputTokens,
+    });
 
   return NextResponse.json(
     { caseId: id, resultId: result.id },

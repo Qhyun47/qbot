@@ -17,6 +17,7 @@ const ADMIN_LINKS = [
   { href: "/admin/users", label: "사용자 관리" },
   { href: "/admin/resources", label: "AI 리소스" },
   { href: "/admin/error-logs", label: "에러 로그" },
+  { href: "/admin/ai-usage", label: "AI 사용 현황" },
 ] as const;
 
 interface NavLinksProps {

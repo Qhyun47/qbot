@@ -1,4 +1,5 @@
 import { generateText } from "@/lib/ai/gemini-client";
+import type { TokenUsage } from "@/lib/ai/gemini-client";
 import { GENERATE_HISTORY_SYSTEM_PROMPT } from "@/lib/ai/prompts/generate-history";
 import { FEW_SHOT_GUARD } from "@/lib/ai/prompts/few-shot-guard";
 import { loadTemplate, loadExamples } from "@/lib/ai/load-resources";
@@ -23,13 +24,23 @@ export async function generateHistory(
   structuredCase: StructuredCase,
   templateKey: string | null | undefined,
   _cc: string
-): Promise<string> {
-  if (!templateKey) return buildHistoryDraft(structuredCase);
+): Promise<{ text: string } & TokenUsage> {
+  if (!templateKey)
+    return {
+      text: buildHistoryDraft(structuredCase),
+      inputTokens: 0,
+      outputTokens: 0,
+    };
 
   const templateData = loadTemplate(templateKey) as Record<string, unknown>;
   const historyTemplate = templateData.history ?? null;
 
-  if (!historyTemplate) return buildHistoryDraft(structuredCase);
+  if (!historyTemplate)
+    return {
+      text: buildHistoryDraft(structuredCase),
+      inputTokens: 0,
+      outputTokens: 0,
+    };
 
   const { inputs, ...ccSpecificFields } = structuredCase;
   const historyInputs = inputs.filter((i) => i.sections.includes("history"));
@@ -52,7 +63,11 @@ export async function generateHistory(
 
   const userPrompt = JSON.stringify(promptData, null, 2);
 
-  const result = await generateText(userPrompt, systemPrompt, 2000);
-  if (!result) throw new Error("History 생성 실패: 빈 응답");
-  return result;
+  const { text, inputTokens, outputTokens } = await generateText(
+    userPrompt,
+    systemPrompt,
+    2000
+  );
+  if (!text) throw new Error("History 생성 실패: 빈 응답");
+  return { text, inputTokens, outputTokens };
 }

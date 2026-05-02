@@ -1,4 +1,5 @@
 import { generateText } from "@/lib/ai/gemini-client";
+import type { TokenUsage } from "@/lib/ai/gemini-client";
 import { GENERATE_PE_SYSTEM_PROMPT } from "@/lib/ai/prompts/generate-pe";
 import { FEW_SHOT_GUARD } from "@/lib/ai/prompts/few-shot-guard";
 import { loadTemplate, loadExamples } from "@/lib/ai/load-resources";
@@ -8,11 +9,11 @@ export async function generatePe(
   structuredCase: StructuredCase,
   templateKey: string,
   _cc: string
-): Promise<string> {
+): Promise<{ text: string } & TokenUsage> {
   const templateData = loadTemplate(templateKey) as Record<string, unknown>;
   const peTemplate = templateData.pe ?? null;
 
-  if (!peTemplate) return "";
+  if (!peTemplate) return { text: "", inputTokens: 0, outputTokens: 0 };
 
   const { inputs, ...ccSpecificFields } = structuredCase;
   const peInputs = inputs.filter((i) => i.sections.includes("pe"));
@@ -35,7 +36,11 @@ export async function generatePe(
 
   const userPrompt = JSON.stringify(promptData, null, 2);
 
-  const result = await generateText(userPrompt, systemPrompt, 2000);
-  if (!result) throw new Error("P/E 생성 실패: 빈 응답");
-  return result;
+  const { text, inputTokens, outputTokens } = await generateText(
+    userPrompt,
+    systemPrompt,
+    2000
+  );
+  if (!text) throw new Error("P/E 생성 실패: 빈 응답");
+  return { text, inputTokens, outputTokens };
 }

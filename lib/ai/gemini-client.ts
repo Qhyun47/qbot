@@ -2,6 +2,8 @@ import { GoogleGenAI } from "@google/genai";
 
 const MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
 
+export type TokenUsage = { inputTokens: number; outputTokens: number };
+
 function createClient(): GoogleGenAI {
   const apiKey = process.env.GOOGLE_GENAI_API_KEY;
   if (!apiKey) throw new Error("GOOGLE_GENAI_API_KEY 미설정");
@@ -33,14 +35,18 @@ export async function generateText(
   prompt: string,
   systemInstruction: string,
   maxOutputTokens?: number
-): Promise<string> {
+): Promise<{ text: string } & TokenUsage> {
   const client = createClient();
   const result = await client.models.generateContent({
     model: MODEL,
     contents: prompt,
     config: { systemInstruction, ...(maxOutputTokens && { maxOutputTokens }) },
   });
-  return result.text ?? "";
+  return {
+    text: result.text ?? "",
+    inputTokens: result.usageMetadata?.promptTokenCount ?? 0,
+    outputTokens: result.usageMetadata?.candidatesTokenCount ?? 0,
+  };
 }
 
 export async function generateStructured<T>(
@@ -48,7 +54,7 @@ export async function generateStructured<T>(
   systemInstruction: string,
   schema: object,
   maxOutputTokens?: number
-): Promise<T> {
+): Promise<{ result: T } & TokenUsage> {
   const client = createClient();
   const cleanedSchema = sanitizeSchemaForGemini(
     schema as Record<string, unknown>
@@ -66,13 +72,17 @@ export async function generateStructured<T>(
   });
 
   const rawText = result.text ?? "{}";
+  const tokens: TokenUsage = {
+    inputTokens: result.usageMetadata?.promptTokenCount ?? 0,
+    outputTokens: result.usageMetadata?.candidatesTokenCount ?? 0,
+  };
 
   try {
-    return JSON.parse(rawText) as T;
+    return { result: JSON.parse(rawText) as T, ...tokens };
   } catch {
     // 마크다운 코드블록이나 접두사 텍스트가 포함된 경우 재시도
     try {
-      return JSON.parse(extractJson(rawText)) as T;
+      return { result: JSON.parse(extractJson(rawText)) as T, ...tokens };
     } catch {
       const finishReason = result.candidates?.[0]?.finishReason;
       throw new Error(

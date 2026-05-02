@@ -19,18 +19,24 @@ export type Database = {
           case_id: string;
           created_at: string;
           id: string;
+          input_tokens: number | null;
+          output_tokens: number | null;
           user_id: string;
         };
         Insert: {
           case_id: string;
           created_at?: string;
           id?: string;
+          input_tokens?: number | null;
+          output_tokens?: number | null;
           user_id: string;
         };
         Update: {
           case_id?: string;
           created_at?: string;
           id?: string;
+          input_tokens?: number | null;
+          output_tokens?: number | null;
           user_id?: string;
         };
         Relationships: [

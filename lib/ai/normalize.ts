@@ -1,5 +1,6 @@
 import { loadSchema } from "@/lib/ai/load-resources";
 import { generateStructured } from "@/lib/ai/gemini-client";
+import type { TokenUsage } from "@/lib/ai/gemini-client";
 import { NORMALIZE_SYSTEM_PROMPT } from "@/lib/ai/prompts/normalize";
 import type { StructuredCase } from "@/lib/ai/types";
 
@@ -11,7 +12,7 @@ export async function normalizeInputs(
     timeOffsetMinutes: number | null;
   }>,
   templateKey?: string | null
-): Promise<StructuredCase> {
+): Promise<{ result: StructuredCase } & TokenUsage> {
   const schemaKey = templateKey ?? "_generic";
 
   const schema = loadSchema(schemaKey);
