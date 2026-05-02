@@ -14,6 +14,7 @@ import { getServiceAccessStatus } from "@/lib/auth/service-access";
 import { redirect } from "next/navigation";
 import { FullscreenManager } from "@/components/pwa/fullscreen-manager";
 import { AiDisclaimerModal } from "@/components/ai-disclaimer-modal";
+import { ScreenGuard } from "@/components/screen-guard";
 
 /**
  * 관리자 여부를 확인하고 NavLinks에 isAdmin을 주입하는 Server Component.
@@ -92,6 +93,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       </ServiceAccessGuard>
       <AiDisclaimerModal />
       <Toaster />
+      <ScreenGuard />
     </div>
   );
 }
