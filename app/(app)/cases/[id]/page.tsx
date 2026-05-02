@@ -29,6 +29,7 @@ import { MedicationTriggerButton } from "@/components/medication/medication-trig
 import { MedicationAnalysisSection } from "@/components/medication/medication-analysis-section";
 import { extractPastHx } from "@/lib/medication/text-utils";
 import type { CaseStatus, BedZone } from "@/lib/supabase/types";
+import { ENABLE_HPI } from "@/lib/ai/feature-flags";
 
 function GeneratingSkeleton() {
   return (
@@ -226,11 +227,13 @@ async function CaseContent({
                   </div>
                 </div>
               )}
-              <ResultSection
-                title="HPI"
-                value={result.pi_edited ?? result.pi_draft ?? ""}
-                onSave={updatePiEdited.bind(null, result.id)}
-              />
+              {ENABLE_HPI && (
+                <ResultSection
+                  title="HPI"
+                  value={result.pi_edited ?? result.pi_draft ?? ""}
+                  onSave={updatePiEdited.bind(null, result.id)}
+                />
+              )}
               {(result.template_draft || result.template_edited) && (
                 <ResultSection
                   title="P.I template"

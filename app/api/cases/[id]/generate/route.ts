@@ -7,6 +7,7 @@ import { generatePe } from "@/lib/ai/generate-pe";
 import { generateHistory, buildHistoryDraft } from "@/lib/ai/generate-history";
 import type { StructuredCase } from "@/lib/ai/types";
 import type { Json } from "@/lib/supabase/types";
+import { ENABLE_HPI } from "@/lib/ai/feature-flags";
 
 const MODEL_VERSION = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
 
@@ -158,16 +159,18 @@ export async function POST(
   let historyError: string | null = null;
 
   const [piDraft, templateDraft, peDraft, historyDraft] = await Promise.all([
-    generatePi(
-      structured,
-      inputs.map((i) => ({ rawText: i.raw_text, timeTag: i.time_tag })),
-      cc,
-      caseRow.template_key
-    ).catch((e) => {
-      piError = e instanceof Error ? e.message : String(e);
-      console.error("[generate] Stage 2 P.I 실패:", piError);
-      return "";
-    }),
+    ENABLE_HPI
+      ? generatePi(
+          structured,
+          inputs.map((i) => ({ rawText: i.raw_text, timeTag: i.time_tag })),
+          cc,
+          caseRow.template_key
+        ).catch((e) => {
+          piError = e instanceof Error ? e.message : String(e);
+          console.error("[generate] Stage 2 P.I 실패:", piError);
+          return "";
+        })
+      : Promise.resolve(""),
     caseRow.cc_has_template && caseRow.template_key
       ? generateTemplate(structured, caseRow.template_key, cc).catch((e) => {
           templateError = e instanceof Error ? e.message : String(e);
