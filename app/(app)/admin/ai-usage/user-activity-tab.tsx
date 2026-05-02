@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { ChevronDown, ChevronRight, Loader2, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   getUserActivityList,
   getUserCases,
@@ -12,6 +13,12 @@ import type {
   UserCaseSummary,
 } from "@/lib/admin/ai-usage-queries";
 import { CaseDetailPanel } from "./case-detail-panel";
+import templateList from "@/lib/ai/resources/template-list.json";
+
+const TEMPLATE_ORDER = new Map(templateList.map((t, i) => [t.templateKey, i]));
+const TEMPLATE_NAME = new Map(
+  templateList.map((t) => [t.templateKey, t.displayName])
+);
 
 const STATUS_LABEL: Record<string, string> = {
   draft: "작성 중",
@@ -27,8 +34,49 @@ const STATUS_CLASS: Record<string, string> = {
   failed: "text-destructive",
 };
 
+type CaseStatus = "draft" | "generating" | "completed" | "failed";
+type SortMode = "time" | "template";
+
+const STATUS_OPTIONS: { key: CaseStatus; label: string }[] = [
+  { key: "draft", label: "작성 중" },
+  { key: "generating", label: "생성 중" },
+  { key: "completed", label: "완료" },
+  { key: "failed", label: "실패" },
+];
+
+function applyFilterSort(
+  cases: UserCaseSummary[],
+  activeStatuses: Set<CaseStatus>,
+  sort: SortMode
+): UserCaseSummary[] {
+  let result = cases;
+
+  if (activeStatuses.size > 0) {
+    result = result.filter((c) => activeStatuses.has(c.status as CaseStatus));
+  }
+
+  if (sort === "template") {
+    result = [...result].sort((a, b) => {
+      const aKey = a.template_keys[0] ?? a.template_key ?? null;
+      const bKey = b.template_keys[0] ?? b.template_key ?? null;
+      const aIdx =
+        aKey !== null ? (TEMPLATE_ORDER.get(aKey) ?? Infinity) : Infinity;
+      const bIdx =
+        bKey !== null ? (TEMPLATE_ORDER.get(bKey) ?? Infinity) : Infinity;
+      if (aIdx !== bIdx) return aIdx - bIdx;
+      return b.created_at.localeCompare(a.created_at);
+    });
+  }
+
+  return result;
+}
+
 function CaseRow({ c }: { c: UserCaseSummary }) {
   const [open, setOpen] = useState(false);
+  const templateName =
+    (c.template_keys[0] ?? c.template_key)
+      ? TEMPLATE_NAME.get(c.template_keys[0] ?? c.template_key ?? "")
+      : null;
 
   return (
     <div className="border-b last:border-0">
@@ -44,6 +92,11 @@ function CaseRow({ c }: { c: UserCaseSummary }) {
         <span className="min-w-0 flex-1 truncate text-xs font-medium">
           {c.cc ?? c.ccs?.join(", ") ?? "(C.C. 없음)"}
         </span>
+        {templateName && (
+          <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+            {templateName}
+          </span>
+        )}
         <span className={cn("shrink-0 text-xs", STATUS_CLASS[c.status] ?? "")}>
           {STATUS_LABEL[c.status] ?? c.status}
         </span>
@@ -61,7 +114,13 @@ function CaseRow({ c }: { c: UserCaseSummary }) {
   );
 }
 
-function UserRow({ user }: { user: UserActivitySummary }) {
+interface UserRowProps {
+  user: UserActivitySummary;
+  activeStatuses: Set<CaseStatus>;
+  sort: SortMode;
+}
+
+function UserRow({ user, activeStatuses, sort }: UserRowProps) {
   const [open, setOpen] = useState(false);
   const [cases, setCases] = useState<UserCaseSummary[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -76,6 +135,9 @@ function UserRow({ user }: { user: UserActivitySummary }) {
     }
     setOpen((v) => !v);
   }
+
+  const visibleCases =
+    cases !== null ? applyFilterSort(cases, activeStatuses, sort) : null;
 
   return (
     <div className="border-b last:border-0">
@@ -121,12 +183,15 @@ function UserRow({ user }: { user: UserActivitySummary }) {
               불러오는 중...
             </div>
           )}
-          {cases !== null && cases.length === 0 && (
+          {visibleCases !== null && visibleCases.length === 0 && (
             <p className="px-4 py-3 text-xs text-muted-foreground">
-              케이스가 없습니다.
+              {activeStatuses.size > 0
+                ? "선택한 상태에 해당하는 케이스가 없습니다."
+                : "케이스가 없습니다."}
             </p>
           )}
-          {cases !== null && cases.map((c) => <CaseRow key={c.id} c={c} />)}
+          {visibleCases !== null &&
+            visibleCases.map((c) => <CaseRow key={c.id} c={c} />)}
         </div>
       )}
     </div>
@@ -136,6 +201,10 @@ function UserRow({ user }: { user: UserActivitySummary }) {
 export function UserActivityTab() {
   const [users, setUsers] = useState<UserActivitySummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeStatuses, setActiveStatuses] = useState<Set<CaseStatus>>(
+    new Set()
+  );
+  const [sort, setSort] = useState<SortMode>("time");
 
   useEffect(() => {
     getUserActivityList().then((u) => {
@@ -143,6 +212,15 @@ export function UserActivityTab() {
       setLoading(false);
     });
   }, []);
+
+  function toggleStatus(key: CaseStatus) {
+    setActiveStatuses((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }
 
   if (loading) {
     return (
@@ -163,6 +241,44 @@ export function UserActivityTab() {
 
   return (
     <div>
+      {/* 필터 / 정렬 옵션 바 */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b px-4 py-2.5">
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-muted-foreground">상태:</span>
+          {STATUS_OPTIONS.map(({ key, label }) => (
+            <Button
+              key={key}
+              variant={activeStatuses.has(key) ? "secondary" : "ghost"}
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => toggleStatus(key)}
+            >
+              {label}
+            </Button>
+          ))}
+        </div>
+        <div className="ml-auto flex items-center gap-1.5">
+          <span className="text-xs text-muted-foreground">정렬:</span>
+          <Button
+            variant={sort === "time" ? "secondary" : "ghost"}
+            size="sm"
+            className="h-7 text-xs"
+            onClick={() => setSort("time")}
+          >
+            시간순
+          </Button>
+          <Button
+            variant={sort === "template" ? "secondary" : "ghost"}
+            size="sm"
+            className="h-7 text-xs"
+            onClick={() => setSort("template")}
+          >
+            상용구별
+          </Button>
+        </div>
+      </div>
+
+      {/* 컬럼 헤더 */}
       <div className="flex items-center gap-3 border-b bg-muted/30 px-4 py-2 text-xs text-muted-foreground">
         <span className="w-4 shrink-0" />
         <span className="w-4 shrink-0" />
@@ -173,8 +289,14 @@ export function UserActivityTab() {
           <span className="w-28 text-right">마지막 활동</span>
         </div>
       </div>
+
       {users.map((u) => (
-        <UserRow key={u.id} user={u} />
+        <UserRow
+          key={u.id}
+          user={u}
+          activeStatuses={activeStatuses}
+          sort={sort}
+        />
       ))}
     </div>
   );

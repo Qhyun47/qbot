@@ -3,6 +3,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { getIsAdmin } from "@/lib/auth/is-admin";
+import templateList from "@/lib/ai/resources/template-list.json";
 
 // Gemini 2.5 Flash 기준 추정 단가 ($/토큰)
 const INPUT_COST_PER_TOKEN = 0.15 / 1_000_000;
@@ -24,6 +25,8 @@ export interface UserCaseSummary {
   status: string;
   created_at: string;
   has_result: boolean;
+  template_key: string | null;
+  template_keys: string[];
 }
 
 export interface CaseDetail {
@@ -131,7 +134,9 @@ export async function getUserCases(userId: string): Promise<UserCaseSummary[]> {
 
   const { data: cases } = await supabase
     .from("cases")
-    .select("id, cc, ccs, status, created_at, current_result_id")
+    .select(
+      "id, cc, ccs, status, created_at, current_result_id, template_key, template_keys"
+    )
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(100);
@@ -143,6 +148,8 @@ export async function getUserCases(userId: string): Promise<UserCaseSummary[]> {
     status: c.status,
     created_at: c.created_at,
     has_result: !!c.current_result_id,
+    template_key: c.template_key,
+    template_keys: c.template_keys ?? [],
   }));
 }
 
@@ -270,4 +277,93 @@ export async function getUsageStats(
   }
 
   return [...userMap.values()].sort((a, b) => b.total_calls - a.total_calls);
+}
+
+export interface TemplateUsageEntry {
+  templateKey: string;
+  displayName: string;
+  count: number;
+}
+
+export interface TemplateCaseSummary {
+  id: string;
+  user_name: string | null;
+  created_at: string;
+}
+
+export async function getTemplateCompletedSummary(
+  from: string,
+  to: string
+): Promise<TemplateUsageEntry[]> {
+  const isAdmin = await getIsAdmin();
+  if (!isAdmin) return [];
+
+  const supabase = await createClient();
+
+  const { data: cases } = await supabase
+    .from("cases")
+    .select("template_key, template_keys")
+    .eq("status", "completed")
+    .gte("created_at", from)
+    .lte("created_at", to);
+
+  if (!cases || cases.length === 0) return [];
+
+  const countMap = new Map<string, number>();
+  for (const c of cases) {
+    const keys = c.template_keys?.length
+      ? c.template_keys
+      : c.template_key
+        ? [c.template_key]
+        : [];
+    for (const key of keys) {
+      countMap.set(key, (countMap.get(key) ?? 0) + 1);
+    }
+  }
+
+  return templateList
+    .filter((t) => countMap.has(t.templateKey))
+    .map((t) => ({
+      templateKey: t.templateKey,
+      displayName: t.displayName,
+      count: countMap.get(t.templateKey)!,
+    }));
+}
+
+export async function getTemplateCases(
+  templateKey: string,
+  from: string,
+  to: string
+): Promise<TemplateCaseSummary[]> {
+  const isAdmin = await getIsAdmin();
+  if (!isAdmin) return [];
+
+  const supabase = await createClient();
+
+  const { data: cases } = await supabase
+    .from("cases")
+    .select("id, user_id, created_at")
+    .eq("status", "completed")
+    .gte("created_at", from)
+    .lte("created_at", to)
+    .or(`template_keys.cs.{"${templateKey}"},template_key.eq.${templateKey}`)
+    .order("created_at", { ascending: false })
+    .limit(200);
+
+  if (!cases || cases.length === 0) return [];
+
+  const userIds = [...new Set(cases.map((c) => c.user_id))];
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("id, full_name")
+    .in("id", userIds);
+  const nameMap = new Map(
+    (profiles ?? []).map((p) => [p.id, p.full_name ?? null])
+  );
+
+  return cases.map((c) => ({
+    id: c.id,
+    user_name: nameMap.get(c.user_id) ?? null,
+    created_at: c.created_at,
+  }));
 }

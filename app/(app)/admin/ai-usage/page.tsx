@@ -4,10 +4,12 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { UserActivityTab } from "./user-activity-tab";
 import { UsageStatsTab } from "./usage-stats-tab";
+import { ChartingResultsTab } from "./charting-results-tab";
 
 const TABS = [
   { key: "activity", label: "사용자 활동" },
   { key: "stats", label: "사용량 통계" },
+  { key: "charting", label: "차팅 결과" },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
@@ -44,8 +46,19 @@ export default function AdminAiUsagePage() {
       </div>
 
       {/* 탭 콘텐츠 */}
-      <div className="flex-1 overflow-auto">
-        {tab === "activity" ? <UserActivityTab /> : <UsageStatsTab />}
+      <div
+        className={cn(
+          "flex-1",
+          tab === "charting" ? "overflow-hidden" : "overflow-auto"
+        )}
+      >
+        {tab === "activity" ? (
+          <UserActivityTab />
+        ) : tab === "stats" ? (
+          <UsageStatsTab />
+        ) : (
+          <ChartingResultsTab />
+        )}
       </div>
     </div>
   );
