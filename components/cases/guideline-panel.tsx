@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useState } from "react";
-import { BookOpen, FileText } from "lucide-react";
+import { BookOpen, FileText, Layers } from "lucide-react";
 import {
   loadGuideline,
   loadGuideByKey,
@@ -111,19 +111,28 @@ function TabButton({
 
 function TemplateSectionBlock({
   title,
+  subtitle,
   content,
   fontSize,
 }: {
   title: string;
+  subtitle?: string;
   content: string;
   fontSize?: number;
 }) {
   if (!content) return null;
   return (
     <div className="space-y-1.5">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-        {title}
-      </p>
+      <div className="flex items-baseline gap-1.5">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          {title}
+        </p>
+        {subtitle && (
+          <span className="text-[10px] normal-case tracking-normal text-muted-foreground/60">
+            {subtitle}
+          </span>
+        )}
+      </div>
       <pre
         className="overflow-x-auto whitespace-pre-wrap rounded border bg-background p-3 text-xs leading-relaxed"
         style={fontSize ? { fontSize } : undefined}
@@ -512,21 +521,47 @@ export function GuidelinePanel({
               ) : (
                 /* 상용구 선택기 */
                 <div className="flex flex-col gap-1">
-                  {/* 다중 상용구 적용 토글 */}
-                  <button
-                    type="button"
-                    onClick={handleMultiSelectToggle}
-                    className={cn(
-                      "mb-1 rounded-md border px-3 py-2 text-left text-sm font-medium transition-colors",
-                      multiSelectMode
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-dashed bg-background text-muted-foreground hover:border-foreground/40 hover:text-foreground"
-                    )}
-                  >
-                    {multiSelectMode
-                      ? `다중 선택 중 (${multiSelected.length}/3) — 취소`
-                      : "다중 상용구 적용"}
-                  </button>
+                  {multiSelectMode ? (
+                    /* 다중 선택 모드: 상단 고정 취소/확인 행 */
+                    <div className="sticky top-0 z-10 mb-2 flex items-center gap-2 rounded-md border border-primary/30 bg-primary/5 p-2">
+                      <span className="flex-1 text-xs font-medium text-primary">
+                        {multiSelected.length}/3개 선택
+                      </span>
+                      <button
+                        type="button"
+                        onClick={closeSelector}
+                        className="rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                      >
+                        취소
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleMultiApply}
+                        disabled={multiSelected.length === 0}
+                        className={cn(
+                          "rounded-md border border-primary bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors",
+                          "hover:bg-primary/90 active:bg-primary/80",
+                          "disabled:cursor-not-allowed disabled:opacity-50"
+                        )}
+                      >
+                        적용 ({multiSelected.length}개)
+                      </button>
+                    </div>
+                  ) : (
+                    /* 단일 모드: 다중 상용구 적용 버튼 */
+                    <button
+                      type="button"
+                      onClick={handleMultiSelectToggle}
+                      className={cn(
+                        "mb-1 flex items-center gap-2 rounded-md border-2 border-dashed px-3 py-2 text-left text-sm font-medium transition-colors",
+                        "border-muted-foreground/25 bg-muted/40 text-muted-foreground",
+                        "hover:border-muted-foreground/45 hover:bg-muted/60 hover:text-foreground"
+                      )}
+                    >
+                      <Layers className="size-4 shrink-0" />
+                      다중 상용구 적용
+                    </button>
+                  )}
 
                   {/* 없음 버튼 (단일 모드에서만) */}
                   {!multiSelectMode && (
@@ -595,29 +630,16 @@ export function GuidelinePanel({
                     </>
                   )}
 
-                  {/* 다중 선택 적용 버튼 */}
-                  {multiSelectMode && (
+                  {/* 단일 모드 취소 */}
+                  {!multiSelectMode && (
                     <button
                       type="button"
-                      onClick={handleMultiApply}
-                      disabled={multiSelected.length === 0}
-                      className={cn(
-                        "mt-2 rounded-md border border-primary bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors",
-                        "hover:bg-primary/90 active:bg-primary/80",
-                        "disabled:cursor-not-allowed disabled:opacity-50"
-                      )}
+                      onClick={closeSelector}
+                      className="mt-1 text-xs text-muted-foreground underline-offset-2 hover:underline"
                     >
-                      적용 ({multiSelected.length}개)
+                      취소
                     </button>
                   )}
-
-                  <button
-                    type="button"
-                    onClick={closeSelector}
-                    className="mt-1 text-xs text-muted-foreground underline-offset-2 hover:underline"
-                  >
-                    취소
-                  </button>
                 </div>
               )
             ) : activeView === "guide" ? (
@@ -692,6 +714,11 @@ export function GuidelinePanel({
                         ? `P.I. 상용구 ${CIRCLED[i]}`
                         : "P.I. 상용구"
                     }
+                    subtitle={
+                      showMultipleContents
+                        ? (getTemplateLabel(templateKeys[i]) ?? undefined)
+                        : undefined
+                    }
                     content={tc.mainExample}
                     fontSize={guidelineFontSize}
                   />
@@ -703,6 +730,11 @@ export function GuidelinePanel({
                     title={
                       showMultipleContents ? `History ${CIRCLED[i]}` : "History"
                     }
+                    subtitle={
+                      showMultipleContents
+                        ? (getTemplateLabel(templateKeys[i]) ?? undefined)
+                        : undefined
+                    }
                     content={tc.historyExample}
                     fontSize={guidelineFontSize}
                   />
@@ -712,6 +744,11 @@ export function GuidelinePanel({
                   <TemplateSectionBlock
                     key={`pe-${i}`}
                     title={showMultipleContents ? `P/E ${CIRCLED[i]}` : "P/E"}
+                    subtitle={
+                      showMultipleContents
+                        ? (getTemplateLabel(templateKeys[i]) ?? undefined)
+                        : undefined
+                    }
                     content={tc.peExample}
                     fontSize={guidelineFontSize}
                   />
