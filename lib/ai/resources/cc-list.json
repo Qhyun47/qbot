@@ -2130,5 +2130,16 @@
     "guideKeys": [],
     "templateKeys": [],
     "aliasOf": "Hearing loss"
+  },
+  {
+    "cc": "High BP",
+    "guideKeys": [
+      { "key": "im-basic", "rank": 0 },
+      { "key": "nu-headache", "rank": 1 }
+    ],
+    "templateKeys": [
+      { "key": "im-basic", "rank": 0 },
+      { "key": "headache", "rank": 1 }
+    ]
   }
 ]
