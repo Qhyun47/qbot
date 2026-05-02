@@ -76,10 +76,10 @@ When extracting past_history and medication_history items, apply the following n
 
 - If the user wrote an abbreviation (e.g., HTN, DM, AF) → keep exactly as written: "HTN"
 - If the user wrote a full English name (e.g., Hypertension, Atrial Fibrillation) → keep exactly as written: "Hypertension"
-- If the user wrote in Korean → **always convert to English medical terminology**:
+- If the user wrote in Korean → **always convert to English medical terminology** (this rule applies only to condition names in past_history / medication_history arrays, not to normalized_text):
   - If a widely used abbreviation exists: use the abbreviation (e.g., 고혈압 → "HTN", 당뇨 → "DM", 심방세동 → "AF", 만성콩팥병 → "CKD")
   - If no standard abbreviation exists: use the full English medical name (e.g., 기흉 → "Pneumothorax", 폐렴 → "Pneumonia", 충수염 → "Appendicitis", 담낭염 → "Cholecystitis", 위염 → "Gastritis", 천식 → "Asthma", 갑상선기능항진증 → "Hyperthyroidism")
-  - **Never leave Korean in the output** — always translate to English
+  - **Never leave Korean in condition names** — always translate condition names to English
 - Never expand abbreviations or contract full names — preserve the user's chosen notation (or convert Korean → English as above)
 
 **Medication history format (for condition-linked medications):**
