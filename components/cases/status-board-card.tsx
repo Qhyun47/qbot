@@ -5,11 +5,21 @@ import { useRouter } from "next/navigation";
 import { Trash2, Loader2 } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import { toast } from "sonner";
-import { hideFromBoard, updateCaseMemo } from "@/lib/cases/actions";
+import {
+  hideFromBoard,
+  updateCaseMemo,
+  updateNotifyStatus,
+} from "@/lib/cases/actions";
 import { BedBadge } from "@/components/cases/bed-badge";
 import { StatusBadge } from "@/components/cases/status-badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Tooltip,
   TooltipContent,
@@ -27,6 +37,32 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import type { Case, BedZone, CaseStatus } from "@/lib/supabase/types";
+
+type NotifyStatus = "완료" | "예정" | "불필요" | null;
+
+const NOTIFY_OPTIONS: { value: NotifyStatus; label: string }[] = [
+  { value: null, label: "— 미확인" },
+  { value: "예정", label: "예정" },
+  { value: "완료", label: "완료" },
+  { value: "불필요", label: "불필요" },
+];
+
+function notifyStatusStyle(status: NotifyStatus) {
+  switch (status) {
+    case "완료":
+      return "text-emerald-600 dark:text-emerald-400";
+    case "예정":
+      return "text-amber-500 dark:text-amber-400";
+    case "불필요":
+      return "text-muted-foreground";
+    default:
+      return "text-muted-foreground/50";
+  }
+}
+
+function notifyStatusLabel(status: NotifyStatus) {
+  return status ?? "—";
+}
 
 function formatRegisteredAt(createdAt: string): string {
   const date = new Date(createdAt);
@@ -54,6 +90,9 @@ export function StatusBoardCard({ case: c }: StatusBoardCardProps) {
   const [debouncedMemo] = useDebounce(memo, 500);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [notifyStatus, setNotifyStatus] = useState<NotifyStatus>(
+    (c.notify_status as NotifyStatus) ?? null
+  );
   const savedRef = useRef(c.memo ?? "");
 
   useEffect(() => {
@@ -80,6 +119,14 @@ export function StatusBoardCard({ case: c }: StatusBoardCardProps) {
       toast.success(
         "현황판에서 제거했습니다. 환자 목록에서 다시 추가할 수 있습니다."
       );
+    });
+  }
+
+  function handleNotifyChange(status: NotifyStatus) {
+    setNotifyStatus(status);
+    updateNotifyStatus(c.id, status).catch(() => {
+      setNotifyStatus((c.notify_status as NotifyStatus) ?? null);
+      toast.error("노티 상태 저장에 실패했습니다.");
     });
   }
 
@@ -137,8 +184,35 @@ export function StatusBoardCard({ case: c }: StatusBoardCardProps) {
           className="resize-none text-xs text-muted-foreground placeholder:text-muted-foreground/50"
         />
 
-        {/* 하단: 삭제 버튼 */}
-        <div className="flex justify-end">
+        {/* 하단: 노티 상태 + 삭제 버튼 */}
+        <div className="flex items-center justify-between">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => e.stopPropagation()}
+                className={`h-6 px-1.5 text-xs font-medium ${notifyStatusStyle(notifyStatus)}`}
+              >
+                노티 {notifyStatusLabel(notifyStatus)}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="start"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {NOTIFY_OPTIONS.map((opt) => (
+                <DropdownMenuItem
+                  key={String(opt.value)}
+                  onSelect={() => handleNotifyChange(opt.value)}
+                  className={notifyStatusStyle(opt.value)}
+                >
+                  {opt.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <Button
             variant="ghost"
             size="sm"

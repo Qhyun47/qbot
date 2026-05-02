@@ -268,6 +268,23 @@ export async function updateCaseMemo(
   if (error) throw new Error(error.message);
 }
 
+export async function updateNotifyStatus(
+  caseId: string,
+  status: string | null
+): Promise<void> {
+  const { supabase, user } = await getAuthUser();
+
+  const { error } = await supabase
+    .from("cases")
+    .update({ notify_status: status })
+    .eq("id", caseId)
+    .eq("user_id", user.id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/dashboard");
+}
+
 export async function hideFromBoard(caseId: string): Promise<void> {
   const { supabase, user } = await getAuthUser();
 

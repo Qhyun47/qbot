@@ -250,6 +250,7 @@ export type Database = {
           has_inputs: boolean;
           id: string;
           memo: string | null;
+          notify_status: string | null;
           status: Database["public"]["Enums"]["case_status"];
           template_key: string | null;
           template_keys: string[];
@@ -269,6 +270,7 @@ export type Database = {
           has_inputs?: boolean;
           id?: string;
           memo?: string | null;
+          notify_status?: string | null;
           status?: Database["public"]["Enums"]["case_status"];
           template_key?: string | null;
           template_keys?: string[];
@@ -288,6 +290,7 @@ export type Database = {
           has_inputs?: boolean;
           id?: string;
           memo?: string | null;
+          notify_status?: string | null;
           status?: Database["public"]["Enums"]["case_status"];
           template_key?: string | null;
           template_keys?: string[];
