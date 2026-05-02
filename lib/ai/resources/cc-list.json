@@ -2141,5 +2141,15 @@
       { "key": "im-basic", "rank": 0 },
       { "key": "headache", "rank": 1 }
     ]
+  },
+  {
+    "cc": "Autophony",
+    "guideKeys": [{ "key": "ol-ear-pain", "rank": 0 }],
+    "templateKeys": [{ "key": "ear-pain", "rank": 0 }]
+  },
+  {
+    "cc": "For tra change",
+    "guideKeys": [],
+    "templateKeys": []
   }
 ]
