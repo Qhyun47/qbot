@@ -77,7 +77,6 @@ export async function getUserActivityList(): Promise<UserActivitySummary[]> {
   const { data: profiles } = await supabase
     .from("profiles")
     .select("id, full_name")
-    .eq("is_admin", false)
     .order("created_at", { ascending: false });
 
   if (!profiles || profiles.length === 0) return [];
