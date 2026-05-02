@@ -30,6 +30,7 @@ import { MedicationAnalysisSection } from "@/components/medication/medication-an
 import { extractPastHx } from "@/lib/medication/text-utils";
 import type { CaseStatus, BedZone } from "@/lib/supabase/types";
 import { ENABLE_HPI } from "@/lib/ai/feature-flags";
+import { ErrorReportButton } from "@/components/cases/error-report-button";
 
 function GeneratingSkeleton() {
   return (
@@ -71,8 +72,9 @@ function parseGeminiError(
 }
 
 function formatAiErrorMessage(raw: string): string {
-  // Gemini API가 반환하는 에러 JSON을 사용자 친화적인 문구로 변환
+  // Gemini API가 반환하는 에러를 사용자 친화적인 문구로 변환
   const segments = raw.split(" / ").map((segment) => {
+    // JSON 기반 Gemini API 에러 처리
     const err = parseGeminiError(segment);
     if (err?.status === "UNAVAILABLE" || err?.code === 503) {
       return "AI 서버가 일시적으로 혼잡합니다. 재생성을 시도해 주세요.";
@@ -81,9 +83,26 @@ function formatAiErrorMessage(raw: string): string {
       return "AI 사용 한도에 도달했습니다. 잠시 후 다시 시도해 주세요.";
     }
     if (err) {
-      // 알 수 없는 Gemini 에러 코드는 JSON 대신 코드만 노출
       return `AI 오류 (코드: ${err.code ?? "unknown"})`;
     }
+
+    // finishReason 기반 에러 처리
+    if (segment.includes("MAX_TOKENS")) {
+      return "AI 응답이 너무 길어 처리에 실패했습니다. 재생성을 시도해 주세요.";
+    }
+    if (segment.includes("finishReason: SAFETY")) {
+      return "안전 정책에 의해 AI 응답이 차단되었습니다.";
+    }
+    if (segment.includes("finishReason:")) {
+      const match = segment.match(/finishReason:\s*(\w+)/);
+      return `AI 응답 오류${match ? ` (${match[1]})` : ""}가 발생했습니다. 재생성을 시도해 주세요.`;
+    }
+
+    // 원문 데이터가 노출된 경우 제거하고 일반 메시지 반환
+    if (segment.includes("원문:")) {
+      return "AI 처리 중 오류가 발생했습니다. 재생성을 시도해 주세요.";
+    }
+
     return segment;
   });
   return segments.join(" / ");
@@ -106,6 +125,7 @@ function FailedState({ errorMessage }: { errorMessage: string | null }) {
       <Button variant="destructive" size="sm" disabled>
         재시도
       </Button>
+      <ErrorReportButton errorMessage={errorMessage ?? "알 수 없는 오류"} />
     </div>
   );
 }

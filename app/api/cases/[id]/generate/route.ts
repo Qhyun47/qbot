@@ -39,30 +39,30 @@ export async function POST(
     );
   }
 
-  // 일일 사용량 + 연속 생성 방지 체크 (관리자는 무제한)
+  // 24시간 사용량 + 연속 생성 방지 체크 (관리자는 무제한)
   if (!profile?.is_admin) {
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1_000);
     const tenSecondsAgo = new Date(Date.now() - 10_000);
 
-    const [{ count: todayCount }, { count: recentCount }] = await Promise.all([
-      supabase
-        .from("ai_usage_logs")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", user.id)
-        .gte("created_at", todayStart.toISOString()),
-      supabase
-        .from("ai_usage_logs")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", user.id)
-        .gte("created_at", tenSecondsAgo.toISOString()),
-    ]);
+    const [{ count: recentDayCount }, { count: recentCount }] =
+      await Promise.all([
+        supabase
+          .from("ai_usage_logs")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .gte("created_at", twentyFourHoursAgo.toISOString()),
+        supabase
+          .from("ai_usage_logs")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .gte("created_at", tenSecondsAgo.toISOString()),
+      ]);
 
-    if ((todayCount ?? 0) >= 50) {
+    if ((recentDayCount ?? 0) >= 15) {
       return NextResponse.json(
         {
           error:
-            "오늘 AI 차팅 생성 한도(50회)를 초과했습니다. 내일 다시 시도해주세요.",
+            "사용량 초과로 AI 차팅이 제한되었습니다. 24시간 이내 15회 한도를 초과하였습니다.",
         },
         { status: 429 }
       );
@@ -259,14 +259,12 @@ export async function POST(
     .eq("id", id);
 
   // 사용 이력 기록 (실패해도 생성 결과에 영향 없음)
-  await supabase
-    .from("ai_usage_logs")
-    .insert({
-      user_id: user.id,
-      case_id: id,
-      input_tokens: totalInputTokens,
-      output_tokens: totalOutputTokens,
-    });
+  await supabase.from("ai_usage_logs").insert({
+    user_id: user.id,
+    case_id: id,
+    input_tokens: totalInputTokens,
+    output_tokens: totalOutputTokens,
+  });
 
   return NextResponse.json(
     { caseId: id, resultId: result.id },
