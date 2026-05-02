@@ -2167,5 +2167,28 @@
     "cc": "For tra change",
     "guideKeys": [],
     "templateKeys": []
+  },
+  {
+    "cc": "Tinnitus",
+    "guideKeys": [{ "key": "ol-ear-pain", "rank": 0 }],
+    "templateKeys": [{ "key": "ear-pain", "rank": 0 }]
+  },
+  {
+    "cc": "Lt. tinnitus",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Tinnitus"
+  },
+  {
+    "cc": "Rt. tinnitus",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Tinnitus"
+  },
+  {
+    "cc": "Both tinnitus",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Tinnitus"
   }
 ]
