@@ -283,11 +283,14 @@ export interface TemplateUsageEntry {
   templateKey: string;
   displayName: string;
   count: number;
+  category?: string;
 }
 
 export interface TemplateCaseSummary {
   id: string;
   user_name: string | null;
+  cc: string | null;
+  ccs: string[] | null;
   created_at: string;
 }
 
@@ -327,6 +330,7 @@ export async function getTemplateCompletedSummary(
       templateKey: t.templateKey,
       displayName: t.displayName,
       count: countMap.get(t.templateKey)!,
+      category: t.category,
     }));
 }
 
@@ -342,7 +346,7 @@ export async function getTemplateCases(
 
   const { data: cases } = await supabase
     .from("cases")
-    .select("id, user_id, created_at")
+    .select("id, user_id, created_at, cc, ccs")
     .eq("status", "completed")
     .gte("created_at", from)
     .lte("created_at", to)
@@ -364,6 +368,8 @@ export async function getTemplateCases(
   return cases.map((c) => ({
     id: c.id,
     user_name: nameMap.get(c.user_id) ?? null,
+    cc: c.cc,
+    ccs: c.ccs,
     created_at: c.created_at,
   }));
 }

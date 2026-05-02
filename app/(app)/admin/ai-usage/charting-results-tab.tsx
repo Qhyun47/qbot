@@ -13,18 +13,47 @@ import type {
   TemplateCaseSummary,
 } from "@/lib/admin/ai-usage-queries";
 import { CaseDetailPanel } from "./case-detail-panel";
+import categoriesRaw from "@/lib/ai/resources/template-categories.json";
 
-function getDateRange(preset: "7d" | "30d" | "90d"): {
+const allCategories = categoriesRaw as string[];
+
+function getCategoryLabel(cat: string): string {
+  return cat.replace(/^\d+\.\s*/, "");
+}
+
+function groupTemplates(
+  templates: TemplateUsageEntry[]
+): { label: string; items: TemplateUsageEntry[] }[] {
+  const groups = allCategories
+    .map((cat) => ({
+      label: getCategoryLabel(cat),
+      items: templates.filter((t) => t.category === cat),
+    }))
+    .filter((g) => g.items.length > 0);
+  const uncategorized = templates.filter((t) => !t.category);
+  if (uncategorized.length > 0) {
+    groups.push({ label: "기타", items: uncategorized });
+  }
+  return groups;
+}
+
+function getDateRange(preset: "7d" | "30d" | "all"): {
   from: string;
   to: string;
 } {
   const to = new Date();
-  const from = new Date();
-  if (preset === "7d") from.setDate(from.getDate() - 7);
-  else if (preset === "30d") from.setDate(from.getDate() - 30);
-  else from.setDate(from.getDate() - 90);
   to.setHours(23, 59, 59, 999);
-  return { from: from.toISOString(), to: to.toISOString() };
+  if (preset === "7d") {
+    const from = new Date();
+    from.setDate(from.getDate() - 7);
+    return { from: from.toISOString(), to: to.toISOString() };
+  }
+  if (preset === "30d") {
+    const from = new Date();
+    from.setDate(from.getDate() - 30);
+    return { from: from.toISOString(), to: to.toISOString() };
+  }
+  return { from: "2020-01-01T00:00:00.000Z", to: to.toISOString() };
 }
 
 function CaseRow({ c }: { c: TemplateCaseSummary }) {
@@ -42,9 +71,15 @@ function CaseRow({ c }: { c: TemplateCaseSummary }) {
           <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
         )}
         <User className="size-4 shrink-0 text-muted-foreground" />
-        <span className="flex-1 text-sm font-medium">
-          {c.user_name ?? "(이름 없음)"}
-        </span>
+        <div className="min-w-0 flex-1">
+          <span className="text-sm font-medium">
+            {c.ccs?.join(", ") ?? c.cc ?? "(C.C. 없음)"}
+          </span>
+          <span className="text-sm text-muted-foreground">
+            {" / "}
+            {c.user_name ?? "(이름 없음)"}
+          </span>
+        </div>
         <span className="shrink-0 text-xs text-muted-foreground">
           {new Date(c.created_at).toLocaleString("ko-KR", {
             month: "2-digit",
@@ -60,14 +95,14 @@ function CaseRow({ c }: { c: TemplateCaseSummary }) {
 }
 
 export function ChartingResultsTab() {
-  const [preset, setPreset] = useState<"7d" | "30d" | "90d">("30d");
+  const [preset, setPreset] = useState<"7d" | "30d" | "all">("30d");
   const [templates, setTemplates] = useState<TemplateUsageEntry[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [cases, setCases] = useState<TemplateCaseSummary[]>([]);
   const [loadingCases, setLoadingCases] = useState(false);
 
-  const loadTemplates = useCallback((p: "7d" | "30d" | "90d") => {
+  const loadTemplates = useCallback((p: "7d" | "30d" | "all") => {
     setLoadingTemplates(true);
     setSelectedKey(null);
     setCases([]);
@@ -94,6 +129,7 @@ export function ChartingResultsTab() {
   }
 
   const selectedEntry = templates.find((t) => t.templateKey === selectedKey);
+  const templateGroups = groupTemplates(templates);
 
   return (
     <div className="flex h-full overflow-hidden">
@@ -101,7 +137,7 @@ export function ChartingResultsTab() {
       <div className="flex w-52 shrink-0 flex-col overflow-hidden border-r">
         {/* 날짜 필터 */}
         <div className="flex gap-1 border-b px-3 py-2">
-          {(["7d", "30d", "90d"] as const).map((p) => (
+          {(["7d", "30d", "all"] as const).map((p) => (
             <Button
               key={p}
               variant={preset === p ? "secondary" : "ghost"}
@@ -109,7 +145,7 @@ export function ChartingResultsTab() {
               className="h-7 flex-1 text-xs"
               onClick={() => setPreset(p)}
             >
-              {p === "7d" ? "7일" : p === "30d" ? "30일" : "90일"}
+              {p === "7d" ? "7일" : p === "30d" ? "30일" : "전체"}
             </Button>
           ))}
         </div>
@@ -120,29 +156,36 @@ export function ChartingResultsTab() {
             <div className="flex items-center justify-center py-10">
               <Loader2 className="size-4 animate-spin text-muted-foreground" />
             </div>
-          ) : templates.length === 0 ? (
+          ) : templateGroups.length === 0 ? (
             <p className="px-4 py-6 text-center text-xs text-muted-foreground">
               해당 기간에 완료된 케이스가 없습니다.
             </p>
           ) : (
-            templates.map((t) => (
-              <button
-                key={t.templateKey}
-                onClick={() => handleSelectTemplate(t.templateKey)}
-                className={cn(
-                  "flex w-full items-center justify-between px-4 py-2.5 text-left transition-colors hover:bg-muted/50",
-                  selectedKey === t.templateKey
-                    ? "bg-muted font-medium"
-                    : "font-normal"
-                )}
-              >
-                <span className="min-w-0 truncate text-sm">
-                  {t.displayName}
-                </span>
-                <span className="ml-2 shrink-0 text-xs text-muted-foreground">
-                  {t.count}건
-                </span>
-              </button>
+            templateGroups.map((group) => (
+              <div key={group.label}>
+                <p className="sticky top-0 bg-background/95 px-4 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+                  {group.label}
+                </p>
+                {group.items.map((t) => (
+                  <button
+                    key={t.templateKey}
+                    onClick={() => handleSelectTemplate(t.templateKey)}
+                    className={cn(
+                      "flex w-full items-center justify-between px-4 py-2.5 text-left transition-colors hover:bg-muted/50",
+                      selectedKey === t.templateKey
+                        ? "bg-muted font-medium"
+                        : "font-normal"
+                    )}
+                  >
+                    <span className="min-w-0 truncate text-sm">
+                      {t.displayName}
+                    </span>
+                    <span className="ml-2 shrink-0 text-xs text-muted-foreground">
+                      {t.count}건
+                    </span>
+                  </button>
+                ))}
+              </div>
             ))
           )}
         </div>

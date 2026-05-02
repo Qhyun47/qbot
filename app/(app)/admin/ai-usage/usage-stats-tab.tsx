@@ -18,20 +18,23 @@ function formatCost(usd: number): string {
   return `$${usd.toFixed(3)}`;
 }
 
-function getDateRange(preset: "7d" | "30d" | "90d"): {
+function getDateRange(preset: "7d" | "30d" | "all"): {
   from: string;
   to: string;
 } {
   const to = new Date();
-  const from = new Date();
-  if (preset === "7d") from.setDate(from.getDate() - 7);
-  else if (preset === "30d") from.setDate(from.getDate() - 30);
-  else from.setDate(from.getDate() - 90);
   to.setHours(23, 59, 59, 999);
-  return {
-    from: from.toISOString(),
-    to: to.toISOString(),
-  };
+  if (preset === "7d") {
+    const from = new Date();
+    from.setDate(from.getDate() - 7);
+    return { from: from.toISOString(), to: to.toISOString() };
+  }
+  if (preset === "30d") {
+    const from = new Date();
+    from.setDate(from.getDate() - 30);
+    return { from: from.toISOString(), to: to.toISOString() };
+  }
+  return { from: "2020-01-01T00:00:00.000Z", to: to.toISOString() };
 }
 
 function UserStatRow({ stat }: { stat: UserUsageStat }) {
@@ -108,11 +111,11 @@ function UserStatRow({ stat }: { stat: UserUsageStat }) {
 }
 
 export function UsageStatsTab() {
-  const [preset, setPreset] = useState<"7d" | "30d" | "90d">("30d");
+  const [preset, setPreset] = useState<"7d" | "30d" | "all">("30d");
   const [stats, setStats] = useState<UserUsageStat[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const load = useCallback((p: "7d" | "30d" | "90d") => {
+  const load = useCallback((p: "7d" | "30d" | "all") => {
     setLoading(true);
     const { from, to } = getDateRange(p);
     getUsageStats(from, to).then((s) => {
@@ -135,7 +138,7 @@ export function UsageStatsTab() {
       {/* 날짜 범위 선택 */}
       <div className="flex items-center gap-2 border-b px-4 py-3">
         <span className="text-xs text-muted-foreground">기간:</span>
-        {(["7d", "30d", "90d"] as const).map((p) => (
+        {(["7d", "30d", "all"] as const).map((p) => (
           <Button
             key={p}
             variant={preset === p ? "secondary" : "ghost"}
@@ -143,7 +146,7 @@ export function UsageStatsTab() {
             className="h-7 text-xs"
             onClick={() => setPreset(p)}
           >
-            {p === "7d" ? "최근 7일" : p === "30d" ? "최근 30일" : "최근 90일"}
+            {p === "7d" ? "최근 7일" : p === "30d" ? "최근 30일" : "전체"}
           </Button>
         ))}
       </div>
