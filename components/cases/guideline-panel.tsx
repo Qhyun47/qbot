@@ -9,15 +9,20 @@ import {
 } from "@/lib/guidelines/actions";
 import type { TemplateContent } from "@/lib/guidelines/actions";
 import { cn } from "@/lib/utils";
+import dynamic from "next/dynamic";
 import { MarkdownPreview } from "@/components/ui/markdown-preview";
 import { HtmlPreview } from "@/components/ui/html-preview";
-import { PdfViewer } from "@/components/ui/pdf-viewer";
 import ccListRaw from "@/lib/ai/resources/cc-list.json";
 import templateListRaw from "@/lib/ai/resources/template-list.json";
 import guideListRaw from "@/lib/ai/resources/guide-list.json";
 import categoriesRaw from "@/lib/ai/resources/template-categories.json";
 import type { CcListEntry } from "@/lib/ai/resources/cc-types";
 import { mergeCcTemplateEntries } from "@/lib/ai/resources/cc-types";
+
+const PdfViewer = dynamic(
+  () => import("@/components/ui/pdf-viewer").then((m) => m.PdfViewer),
+  { ssr: false }
+);
 
 interface TemplateListEntry {
   templateKey: string;
