@@ -245,6 +245,8 @@ export const MOCK_CASE_RESULTS: CaseResult[] = [
     antithrombotic_at: null,
     underlying_disease: null,
     underlying_disease_at: null,
+    med_raw_text: null,
+    med_organized_list: null,
   },
   {
     id: "r1b2c3d4-e5f6-4a7b-8c9d-000000000004",
@@ -267,6 +269,8 @@ export const MOCK_CASE_RESULTS: CaseResult[] = [
     antithrombotic_at: null,
     underlying_disease: null,
     underlying_disease_at: null,
+    med_raw_text: null,
+    med_organized_list: null,
   },
 ];
 

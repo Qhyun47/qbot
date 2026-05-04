@@ -15,6 +15,8 @@ interface MedicationTriggerButtonProps {
   caseId?: string;
   defaultPastHx?: string;
   currentHistory?: string;
+  initialRawText?: string;
+  initialOrganizedList?: string;
   size?: "default" | "sm";
 }
 
@@ -22,6 +24,8 @@ export function MedicationTriggerButton({
   caseId,
   defaultPastHx,
   currentHistory,
+  initialRawText,
+  initialOrganizedList,
   size = "default",
 }: MedicationTriggerButtonProps) {
   const [open, setOpen] = useState(false);
@@ -50,6 +54,8 @@ export function MedicationTriggerButton({
         caseId={caseId}
         defaultPastHx={defaultPastHx}
         currentHistory={currentHistory}
+        initialRawText={initialRawText}
+        initialOrganizedList={initialOrganizedList}
       />
     </>
   );

@@ -5,6 +5,31 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentResult } from "@/lib/cases/queries";
 import { insertMedListToHistory } from "@/lib/medication/text-utils";
 
+export async function saveMedState(
+  caseId: string,
+  rawText: string,
+  organizedList: string
+): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("인증이 필요합니다.");
+
+  const { data: caseRow } = await supabase
+    .from("cases")
+    .select("current_result_id")
+    .eq("id", caseId)
+    .eq("user_id", user.id)
+    .single();
+  if (!caseRow?.current_result_id) return;
+
+  await supabase
+    .from("case_results")
+    .update({ med_raw_text: rawText, med_organized_list: organizedList })
+    .eq("id", caseRow.current_result_id);
+}
+
 export async function appendMedListToCase(
   caseId: string,
   medListText: string

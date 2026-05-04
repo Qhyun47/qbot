@@ -221,6 +221,8 @@ async function CaseContent({
           defaultPastHx={extractPastHx(
             result?.history_edited ?? result?.history_draft ?? ""
           )}
+          initialRawText={result?.med_raw_text ?? ""}
+          initialOrganizedList={result?.med_organized_list ?? ""}
         />
         <RecordingTriggerButton caseId={caseData.id} />
       </header>

@@ -217,6 +217,8 @@ export type Database = {
           history_draft: string;
           history_edited: string | null;
           id: string;
+          med_organized_list: string | null;
+          med_raw_text: string | null;
           model_version: string;
           pe_draft: string;
           pe_edited: string | null;
@@ -239,6 +241,8 @@ export type Database = {
           history_draft: string;
           history_edited?: string | null;
           id?: string;
+          med_organized_list?: string | null;
+          med_raw_text?: string | null;
           model_version: string;
           pe_draft?: string;
           pe_edited?: string | null;
@@ -261,6 +265,8 @@ export type Database = {
           history_draft?: string;
           history_edited?: string | null;
           id?: string;
+          med_organized_list?: string | null;
+          med_raw_text?: string | null;
           model_version?: string;
           pe_draft?: string;
           pe_edited?: string | null;

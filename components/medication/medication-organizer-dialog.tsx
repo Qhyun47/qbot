@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Info } from "lucide-react";
 import {
@@ -15,7 +15,7 @@ import { MedicationResultPanel } from "@/components/medication/medication-result
 import { WarningAnalysisCard } from "@/components/medication/warning-analysis-card";
 import { DiseaseAnalysisCard } from "@/components/medication/disease-analysis-card";
 import { processMedicationText } from "@/lib/medication/parser";
-import { appendMedListToCase } from "@/lib/medication/actions";
+import { appendMedListToCase, saveMedState } from "@/lib/medication/actions";
 
 interface MedicationOrganizerDialogProps {
   open: boolean;
@@ -23,6 +23,8 @@ interface MedicationOrganizerDialogProps {
   caseId?: string;
   defaultPastHx?: string;
   currentHistory?: string;
+  initialRawText?: string;
+  initialOrganizedList?: string;
 }
 
 export function MedicationOrganizerDialog({
@@ -31,10 +33,23 @@ export function MedicationOrganizerDialog({
   caseId,
   defaultPastHx,
   currentHistory: _currentHistory,
+  initialRawText = "",
+  initialOrganizedList = "",
 }: MedicationOrganizerDialogProps) {
-  const [rawText, setRawText] = useState("");
-  const [organizedText, setOrganizedText] = useState("");
+  const [rawText, setRawText] = useState(initialRawText);
+  const [organizedText, setOrganizedText] = useState(initialOrganizedList);
+  const rawTextRef = useRef(rawText);
   const [excludeEnded, setExcludeEnded] = useState(true);
+
+  useEffect(() => {
+    rawTextRef.current = rawText;
+  }, [rawText]);
+
+  useEffect(() => {
+    if (!caseId || open) return;
+    saveMedState(caseId, rawTextRef.current, organizedText).catch(() => {});
+  }, [open, caseId, organizedText]);
+
   const [includeDetails, setIncludeDetails] = useState(() => {
     if (typeof window === "undefined") return true;
     const stored = localStorage.getItem("medication-include-details");
@@ -52,6 +67,9 @@ export function MedicationOrganizerDialog({
       includeDetails,
     });
     setOrganizedText(result);
+    if (caseId) {
+      saveMedState(caseId, rawText, result).catch(() => {});
+    }
   }
 
   function handleReset() {
