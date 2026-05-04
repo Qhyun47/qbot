@@ -11,6 +11,7 @@ import {
   Zap,
   Loader2,
   X,
+  ScanText,
 } from "lucide-react";
 import { ResizableSplit } from "@/components/cases/resizable-split";
 import { CardInputBar } from "@/components/cases/card-input-bar";
@@ -488,13 +489,13 @@ export function CaseInputView({
           <button
             type="button"
             onClick={() => setCcEditing(true)}
-            className="rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors hover:bg-muted"
+            className="min-w-0 flex-1 truncate rounded-full border px-2.5 py-0.5 text-left text-xs font-medium transition-colors hover:bg-muted"
             aria-label="C.C 편집"
           >
             {cc ?? <span className="text-muted-foreground">C.C 입력</span>}
           </button>
 
-          <div className="flex flex-1 items-center justify-end gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <div className="hidden items-center gap-0.5 rounded-md border p-0.5 is-desktop:flex">
               {LAYOUT_OPTIONS.map(({ value, Icon, label }) => (
                 <button
@@ -525,8 +526,10 @@ export function CaseInputView({
                   `/cases/${caseId}?view=result${from ? `&from=${from}` : ""}`
                 )
               }
+              className="gap-1.5"
             >
-              AI 차팅 보기
+              <ScanText className="size-3.5" />
+              <span className="hidden sm:inline">AI 차팅 보기</span>
             </Button>
 
             <Button
@@ -536,11 +539,13 @@ export function CaseInputView({
               className="gap-1.5"
             >
               <Zap className="size-3.5" />
-              {generating
-                ? "생성 중..."
-                : status === "draft"
-                  ? "차팅 생성"
-                  : "재생성"}
+              <span className="hidden sm:inline">
+                {generating
+                  ? "생성 중..."
+                  : status === "draft"
+                    ? "차팅 생성"
+                    : "재생성"}
+              </span>
             </Button>
           </div>
         </header>

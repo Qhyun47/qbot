@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import type { RecordingButtonHandle } from "@/components/cases/recording-button";
 import { useVisualViewport } from "@/hooks/use-visual-viewport";
 import { useRouter } from "next/navigation";
 import {
@@ -127,6 +128,7 @@ export function NewCaseForm({
   const [setupExiting, setSetupExiting] = useState(false);
   const [autoStartSignal, setAutoStartSignal] = useState(false);
   const [, startTransition] = useTransition();
+  const recordingButtonRef = useRef<RecordingButtonHandle>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   useVisualViewport(containerRef);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -235,6 +237,9 @@ export function NewCaseForm({
 
     if (hasBed && hasCC && hasCards) {
       setNavigatingBack(true);
+      if (recordingButtonRef.current?.isRecording) {
+        await recordingButtonRef.current.stopAndUpload();
+      }
       navigateToDashboard();
       return;
     }
@@ -373,6 +378,9 @@ export function NewCaseForm({
   const handleGenerate = async () => {
     if (!caseId || cards.length === 0) return;
     setGenerating(true);
+    if (recordingButtonRef.current?.isRecording) {
+      await recordingButtonRef.current.stopAndUpload();
+    }
     try {
       const res = await fetch(`/api/cases/${caseId}/generate`, {
         method: "POST",
@@ -467,9 +475,12 @@ export function NewCaseForm({
               삭제
             </AlertDialogAction>
             <AlertDialogAction
-              onClick={() => {
+              onClick={async () => {
                 setShowSaveDialog(false);
                 setNavigatingBack(true);
+                if (recordingButtonRef.current?.isRecording) {
+                  await recordingButtonRef.current.stopAndUpload();
+                }
                 navigateToDashboard();
               }}
             >
@@ -670,7 +681,7 @@ export function NewCaseForm({
               className="flex min-w-0 flex-1 items-center gap-0.5 overflow-hidden rounded-full border px-2 py-0.5 text-left hover:bg-muted"
               aria-label="C.C 변경"
             >
-              <span className="shrink-0 text-xs">{ccs[0]}</span>
+              <span className="min-w-0 truncate text-xs">{ccs[0]}</span>
               {ccs.length > 1 && (
                 <span className="min-w-0 truncate text-xs text-muted-foreground">
                   , {ccs.slice(1).join(", ")}
@@ -681,6 +692,7 @@ export function NewCaseForm({
 
           <div className="flex shrink-0 items-center justify-end gap-2">
             <RecordingButton
+              ref={recordingButtonRef}
               caseId={caseId}
               autoStartSignal={autoStartSignal}
             />
