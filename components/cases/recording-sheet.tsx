@@ -45,6 +45,7 @@ export function RecordingSheet({
   const audioRef = useRef<HTMLAudioElement>(null);
   const segmentRefs = useRef<(HTMLDivElement | null)[]>([]);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollCountRef = useRef(0);
 
   const fetchRecordings = useCallback(async () => {
     const res = await fetch(`/api/cases/${caseId}/recordings`);
@@ -69,7 +70,15 @@ export function RecordingSheet({
     );
 
     if (hasPending && open) {
+      pollCountRef.current = 0;
       pollRef.current = setInterval(() => {
+        pollCountRef.current += 1;
+        // 최대 60회(5분) 폴링 후 강제 중단
+        if (pollCountRef.current > 60) {
+          clearInterval(pollRef.current!);
+          pollRef.current = null;
+          return;
+        }
         fetchRecordings().then((data) => {
           if (!data) return;
           const stillPending = data.some(
@@ -216,9 +225,14 @@ export function RecordingSheet({
                   ref={audioRef}
                   src={selected.url ?? undefined}
                   onTimeUpdate={handleTimeUpdate}
-                  onLoadedMetadata={() =>
-                    setDuration(audioRef.current?.duration ?? 0)
-                  }
+                  onLoadedMetadata={() => {
+                    const d = audioRef.current?.duration;
+                    setDuration(
+                      isFinite(d ?? NaN)
+                        ? (d ?? 0)
+                        : (selected?.duration_seconds ?? 0)
+                    );
+                  }}
                   onPlay={() => setIsPlaying(true)}
                   onPause={() => setIsPlaying(false)}
                   onEnded={() => setIsPlaying(false)}

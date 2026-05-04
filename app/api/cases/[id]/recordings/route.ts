@@ -131,10 +131,12 @@ export async function POST(
 
   // 업로드 완료 후 STT 트리거 (fire-and-forget)
   const baseUrl = req.nextUrl.origin;
+  const cookieHeader = req.headers.get("cookie");
   fetch(
     `${baseUrl}/api/cases/${caseId}/recordings/${recording.id}/transcribe`,
     {
       method: "POST",
+      headers: cookieHeader ? { cookie: cookieHeader } : {},
     }
   ).catch(() => {});
 
