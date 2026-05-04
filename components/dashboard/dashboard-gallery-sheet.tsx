@@ -526,73 +526,80 @@ export function DashboardGallerySheet() {
                 <Loader2 className="size-4 animate-spin" />
                 불러오는 중...
               </div>
-            ) : photos.length === 0 ? (
-              <p className="py-4 text-center text-sm text-muted-foreground">
-                저장된 사진이 없습니다.
-              </p>
             ) : (
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6">
-                {photos.map((photo, idx) => (
-                  <div key={photo.id} className="relative aspect-square">
-                    {photo.url ? (
-                      <button
-                        type="button"
-                        className="h-full w-full"
-                        onClick={() => setViewingIndex(idx)}
-                        aria-label="사진 확대"
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={photo.url}
-                          alt={photo.file_name}
-                          className="h-full w-full rounded object-cover"
-                        />
-                      </button>
-                    ) : (
-                      <div className="h-full w-full rounded bg-muted" />
-                    )}
-                    {savingPhotoId === photo.id && (
-                      <div className="absolute inset-0 flex items-center justify-center rounded bg-black/40">
-                        <Loader2 className="size-6 animate-spin text-white" />
+              <>
+                <p className="text-xs font-medium text-muted-foreground">
+                  일반 사진
+                </p>
+                {photos.length === 0 ? (
+                  <p className="py-4 text-center text-sm text-muted-foreground">
+                    저장된 사진이 없습니다.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+                    {photos.map((photo, idx) => (
+                      <div key={photo.id} className="relative aspect-square">
+                        {photo.url ? (
+                          <button
+                            type="button"
+                            className="h-full w-full"
+                            onClick={() => setViewingIndex(idx)}
+                            aria-label="사진 확대"
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={photo.url}
+                              alt={photo.file_name}
+                              className="h-full w-full rounded object-cover"
+                            />
+                          </button>
+                        ) : (
+                          <div className="h-full w-full rounded bg-muted" />
+                        )}
+                        {savingPhotoId === photo.id && (
+                          <div className="absolute inset-0 flex items-center justify-center rounded bg-black/40">
+                            <Loader2 className="size-6 animate-spin text-white" />
+                          </div>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setDeleteTarget(photo)}
+                          className="absolute right-0.5 top-0.5 flex size-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+                          aria-label="삭제"
+                        >
+                          <X className="size-3.5" />
+                        </button>
+                        {photo.url && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => handleShare(photo)}
+                              disabled={!!sharingPhotoId}
+                              className="absolute bottom-0.5 left-0.5 flex size-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
+                              aria-label="공유"
+                            >
+                              {sharingPhotoId === photo.id ? (
+                                <Loader2 className="size-3.5 animate-spin" />
+                              ) : (
+                                <Share2 className="size-3.5" />
+                              )}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => triggerDownload(photo)}
+                              disabled={savingPhotoId === photo.id}
+                              className="absolute bottom-0.5 right-0.5 flex size-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
+                              aria-label="다운로드"
+                            >
+                              <Download className="size-3.5" />
+                            </button>
+                          </>
+                        )}
                       </div>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => setDeleteTarget(photo)}
-                      className="absolute right-0.5 top-0.5 flex size-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
-                      aria-label="삭제"
-                    >
-                      <X className="size-3.5" />
-                    </button>
-                    {photo.url && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => handleShare(photo)}
-                          disabled={!!sharingPhotoId}
-                          className="absolute bottom-0.5 left-0.5 flex size-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
-                          aria-label="공유"
-                        >
-                          {sharingPhotoId === photo.id ? (
-                            <Loader2 className="size-3.5 animate-spin" />
-                          ) : (
-                            <Share2 className="size-3.5" />
-                          )}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => triggerDownload(photo)}
-                          disabled={savingPhotoId === photo.id}
-                          className="absolute bottom-0.5 right-0.5 flex size-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
-                          aria-label="다운로드"
-                        >
-                          <Download className="size-3.5" />
-                        </button>
-                      </>
-                    )}
+                    ))}
                   </div>
-                ))}
-              </div>
+                )}
+              </>
             )}
 
             {/* 케이스 사진 섹션 */}

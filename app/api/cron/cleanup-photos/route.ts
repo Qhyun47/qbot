@@ -71,5 +71,32 @@ export async function GET(req: NextRequest) {
     // 대시보드 사진 삭제 실패는 전체 응답에 영향 없음
   }
 
-  return NextResponse.json({ deleted: photos.length, dashboardDeleted });
+  // 12시간 이상 된 공유 사진 삭제
+  let sharedDeleted = 0;
+  try {
+    const { data: sharedPhotos } = await supabase
+      .from("shared_photos")
+      .select("id, storage_path")
+      .lt(
+        "created_at",
+        new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
+      );
+
+    if (sharedPhotos && sharedPhotos.length > 0) {
+      const sharedPaths = sharedPhotos.map((p) => p.storage_path);
+      const sharedIds = sharedPhotos.map((p) => p.id);
+
+      await supabase.storage.from("case-photos").remove(sharedPaths);
+      await supabase.from("shared_photos").delete().in("id", sharedIds);
+      sharedDeleted = sharedPhotos.length;
+    }
+  } catch {
+    // 공유 사진 삭제 실패는 전체 응답에 영향 없음
+  }
+
+  return NextResponse.json({
+    deleted: photos.length,
+    dashboardDeleted,
+    sharedDeleted,
+  });
 }
