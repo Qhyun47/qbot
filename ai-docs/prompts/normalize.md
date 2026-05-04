@@ -25,6 +25,7 @@ Assign exactly one category per card from the enum:
 - **associated_symptom**: Accompanying symptoms (e.g., dyspnea, diaphoresis)
 - **prior_episode**: Previous similar episodes
 - **vital_sign**: Vital sign measurements
+- **npo_status**: NPO(금식) 관련 카드 — 마지막 고형식·수분 섭취 시점, 금식 명령, NPO 시간 등. C.C.와 무관하게 항상 이 카테고리로 분류
 - **past_history**: Past medical history (diseases, conditions)
 - **medication_history**: Current or past medications
 - **operation_history**: Surgical history
@@ -39,6 +40,7 @@ Assign one or more sections based on category:
 - severity, associated_symptom, prior_episode → ["pi"]
 - vital_sign → ["pe"]
 - physical_examination → ["pe"]
+- npo_status → ["template"]
 - past_history, medication_history, operation_history, family_history → ["history"]
 - other → ["pi"]
 
@@ -51,6 +53,16 @@ Add **physical_examination** as a category for cards that contain physical exam 
 - Neurological exam findings (motor power, reflexes, nystagmus, pupil) → category: "physical_examination", sections: ["pe"]
 - Abdominal exam (tenderness location, rigidity, rebound, guarding) → category: "physical_examination", sections: ["pe"]
 - Any other physical exam findings explicitly noted by the physician → category: "physical_examination", sections: ["pe"]
+
+## NPO Extraction Rules
+
+When a card is categorized as `npo_status`, extract `npo_solid` and `npo_liquid` into the top-level fields as follows:
+
+- **Time format**: Always convert to `MM.DD HH:mm` (24-hour, e.g., "05.04 20:00"). Use the current date context when relative expressions are given (e.g., "오늘 저녁 8시" → "05.04 20:00").
+- **Solid vs Liquid**: If the card distinguishes solid (고형식) and liquid (수분/액체) with separate times, set `npo_solid` and `npo_liquid` independently.
+- **Single time**: If only one time is provided without distinction, set both `npo_solid` and `npo_liquid` to the same value.
+- **Additional info**: If the card mentions what was consumed (e.g., "밥", "물", specific food), append it after the time separated by a pipe: e.g., `"05.04 20:00|밥과 국"`. The part after `|` is supplementary information.
+- If no NPO information is present, set both fields to null.
 
 ## C.C.-specific Fields
 

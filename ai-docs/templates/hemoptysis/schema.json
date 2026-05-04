@@ -43,6 +43,7 @@
               "medication_history",
               "operation_history",
               "family_history",
+              "npo_status",
               "other"
             ]
           },
@@ -128,6 +129,14 @@
       "items": {
         "type": "string"
       }
+    },
+    "npo_solid": {
+      "type": ["string", "null"],
+      "description": "마지막 고형식 섭취 시점 (MM.DD HH:mm 형식). '|' 뒤에 추가 정보 포함 가능. 없으면 null."
+    },
+    "npo_liquid": {
+      "type": ["string", "null"],
+      "description": "마지막 수분 섭취 시점 (MM.DD HH:mm 형식). '|' 뒤에 추가 정보 포함 가능. 없으면 null."
     }
   }
 }

@@ -41,6 +41,7 @@
               "past_history",
               "medication_history",
               "operation_history",
+              "npo_status",
               "other"
             ]
           },
@@ -107,17 +108,23 @@
     "past_history": {
       "type": ["array", "null"],
       "description": "과거력 목록. 없으면 null.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "medication_history": {
       "type": ["array", "null"],
       "description": "복용 약물 목록. 없으면 null.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "operation_history": {
       "type": ["array", "null"],
       "description": "수술력 목록. 없으면 null.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     }
   }
 }

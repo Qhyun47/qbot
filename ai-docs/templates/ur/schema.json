@@ -43,6 +43,7 @@
               "past_history",
               "medication_history",
               "operation_history",
+              "npo_status",
               "other"
             ]
           },
@@ -104,10 +105,22 @@
       "type": ["object", "null"],
       "description": "비뇨기 증상 체크. 없으면 null.",
       "properties": {
-        "frequency": { "type": ["boolean", "null"], "description": "빈뇨" },
-        "urgency": { "type": ["boolean", "null"], "description": "절박뇨" },
-        "nocturia": { "type": ["boolean", "null"], "description": "야간뇨" },
-        "dysuria": { "type": ["boolean", "null"], "description": "배뇨통" }
+        "frequency": {
+          "type": ["boolean", "null"],
+          "description": "빈뇨"
+        },
+        "urgency": {
+          "type": ["boolean", "null"],
+          "description": "절박뇨"
+        },
+        "nocturia": {
+          "type": ["boolean", "null"],
+          "description": "야간뇨"
+        },
+        "dysuria": {
+          "type": ["boolean", "null"],
+          "description": "배뇨통"
+        }
       }
     },
     "voiding_difficulty": {
@@ -132,10 +145,18 @@
       "type": ["object", "null"],
       "description": "음낭/고환 증상. 없으면 null.",
       "properties": {
-        "pain": { "type": ["boolean", "null"] },
-        "swelling": { "type": ["boolean", "null"] },
-        "redness": { "type": ["boolean", "null"] },
-        "tenderness": { "type": ["boolean", "null"] },
+        "pain": {
+          "type": ["boolean", "null"]
+        },
+        "swelling": {
+          "type": ["boolean", "null"]
+        },
+        "redness": {
+          "type": ["boolean", "null"]
+        },
+        "tenderness": {
+          "type": ["boolean", "null"]
+        },
         "cremasteric_reflex": {
           "type": ["boolean", "null"],
           "description": "정상이면 true(+), 소실이면 false(-)."
@@ -171,7 +192,9 @@
     "associated_symptoms": {
       "type": ["array", "null"],
       "description": "동반 증상 목록. 없으면 null.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "prior_episode": {
       "type": ["string", "null"],
@@ -180,17 +203,31 @@
     "past_history": {
       "type": ["array", "null"],
       "description": "과거력 목록. History 출력 시 항상 포함; 내용 없으면 null → 공란.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "medication_history": {
       "type": ["array", "null"],
       "description": "복용 약물 목록. History 출력 시 항상 포함; 내용 없으면 null → 공란.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "operation_history": {
       "type": ["array", "null"],
       "description": "수술력 목록. History 출력 시 항상 포함; 내용 없으면 null → 공란.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
+    },
+    "npo_solid": {
+      "type": ["string", "null"],
+      "description": "마지막 고형식 섭취 시점 (MM.DD HH:mm 형식). '|' 뒤에 추가 정보 포함 가능. 없으면 null."
+    },
+    "npo_liquid": {
+      "type": ["string", "null"],
+      "description": "마지막 수분 섭취 시점 (MM.DD HH:mm 형식). '|' 뒤에 추가 정보 포함 가능. 없으면 null."
     }
   }
 }

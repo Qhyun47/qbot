@@ -56,6 +56,31 @@
   예: `vaginal discharge(+)`, `facial swelling(+)` 등 표준 의학 표기 형식으로 작성
 - 출력은 완성된 상용구 텍스트만 반환하고, 다른 설명이나 주석을 붙이지 않습니다
 
+## NPO 블록 고정 포맷 규칙
+
+ccSpecificFields에 `npo_solid` 또는 `npo_liquid`가 null이 아닌 값으로 있을 경우, 반드시 아래 고정 포맷으로 NPO 블록을 출력한다.
+
+**NPO 블록 포맷:**
+
+```
+NPO: Solid - MM.DD HH:mm (추가정보)
+      Liquid - MM.DD HH:mm (추가정보)
+```
+
+**세부 규칙:**
+
+- `NPO:` 뒤 바로 `Solid`, `Liquid`는 6칸 들여쓰기로 정렬 (`      Liquid`)
+- 시간은 반드시 `MM.DD HH:mm` 형식으로 기재 (예: `05.04 20:00`)
+- npo_solid/npo_liquid 값이 `|`를 포함하는 경우 (`"05.04 20:00|밥과 국"` 형태): `|` 앞은 시간, `|` 뒤는 추가 정보로 괄호 안에 기재 → `05.04 20:00 (밥과 국)`
+- 추가 정보가 없으면 괄호 없이 시간만 기재
+- npo_solid와 npo_liquid 값이 동일하면 양쪽 모두 같은 값으로 출력
+- npo_solid 또는 npo_liquid 중 하나가 null인 경우: null이 아닌 값을 양쪽 모두에 사용
+
+**위치 결정:**
+
+- template fields에 `npo_solid` 키가 있는 경우: `output_example`의 해당 NPO 줄(Solid/Liquid가 있는 위치)에 위 포맷으로 삽입
+- template fields에 `npo_solid` 키가 없는 경우: 상용구 출력의 **맨 마지막**에 빈 줄 하나를 두고 NPO 블록을 추가
+
 ## 절대 금지 사항
 
 - 입력에 없는 사실을 추론하거나 지어내는 것

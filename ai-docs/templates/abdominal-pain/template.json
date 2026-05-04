@@ -164,13 +164,13 @@
       "key": "npo_solid",
       "label": "NPO Solid",
       "type": "open",
-      "description": "고형식 마지막 섭취 시점. 정보 없으면 빈 문자열."
+      "description": "고형식 마지막 섭취 시점 (MM.DD HH:mm 형식, 예: '05.04 20:00'). 추가 정보는 '|'로 구분 (예: '05.04 20:00|밥'). 정보 없으면 빈 문자열."
     },
     {
       "key": "npo_liquid",
       "label": "NPO Liquid",
       "type": "open",
-      "description": "수분 마지막 섭취 시점. 정보 없으면 빈 문자열."
+      "description": "수분 마지막 섭취 시점 (MM.DD HH:mm 형식, 예: '05.04 21:00'). 추가 정보는 '|'로 구분. 정보 없으면 빈 문자열."
     },
     {
       "key": "gas_out",
@@ -197,7 +197,7 @@
       "description": "과거 대장내시경 시행 여부 및 결과. 정보 없으면 빈 문자열."
     }
   ],
-  "output_example": "* Abdominal Pain\nCharacter : \nLocation : \nIntensity : \nDuration : \nAgg.relieving factor : \n\n임신 가능성 (가임기 여성 환자) : 있음/없음\n\n최근URI(-) , F/C(-/-),  C/S/R(-/-/-)\nA/N/V/D/C(-/-/-/-/-) \nUrinary symptom(-)\n\nNPO : Solid -\n        Liquid -\nGas out : \nLast defecation time : \n\n과거 EGDS : \n과거 colonoscopy : ",
+  "output_example": "* Abdominal Pain\nCharacter : \nLocation : \nIntensity : \nDuration : \nAgg.relieving factor : \n\n임신 가능성 (가임기 여성 환자) : 있음/없음\n\n최근URI(-) , F/C(-/-),  C/S/R(-/-/-)\nA/N/V/D/C(-/-/-/-/-) \nUrinary symptom(-)\n\nNPO: Solid - \n      Liquid -\nGas out : \nLast defecation time : \n\n과거 EGDS : \n과거 colonoscopy : ",
   "pe": {
     "fields": [
       {

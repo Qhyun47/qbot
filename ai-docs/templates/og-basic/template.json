@@ -3,7 +3,7 @@
   "cc": "Vaginal bleeding",
   "description": "산부인과 기본 EMR 상용구 템플릿",
   "hpi_hints": "주 호소 및 관련 증상 서술. EDC/임신 주수, LMP 등 산부인과 기본 정보 포함.",
-  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 \u0027open\u0027인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 \u0027symptom_check\u0027인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 \u0027+\u0027, 언급 없으면 반드시 \u0027-\u0027를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라. output_example의 모든 줄을 위에서부터 순서대로 빠짐없이 출력하라. 값이 없어도 라벨 줄 자체는 절대 삭제하거나 생략하지 않는다.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. format 문자열의 변수를 교체해 출력하라. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라. output_example의 모든 줄을 위에서부터 순서대로 빠짐없이 출력하라. 값이 없어도 라벨 줄 자체는 절대 삭제하거나 생략하지 않는다.",
   "fields": [
     {
       "key": "fever_chill",
@@ -129,7 +129,7 @@
       "key": "gestational_age",
       "label": "임신시 주수",
       "type": "open",
-      "description": "내원 시 임신 주수 (예: \u002732+3주\u0027). 정보 없으면 빈 문자열."
+      "description": "내원 시 임신 주수 (예: '32+3주'). 정보 없으면 빈 문자열."
     },
     {
       "key": "lmp",
@@ -153,7 +153,7 @@
       "key": "obstetric_history",
       "label": "출산력",
       "type": "open",
-      "description": "산과력(G-P-A-L 형식, 예: \u00272-1-0-1\u0027) 및 마지막 분만일(LD). 정보 없으면 빈 문자열."
+      "description": "산과력(G-P-A-L 형식, 예: '2-1-0-1') 및 마지막 분만일(LD). 정보 없으면 빈 문자열."
     },
     {
       "key": "menstrual_history",
@@ -195,13 +195,19 @@
       "description": "마지막 자궁경부암 검사(pap smear) 날짜 및 결과. 정보 없으면 빈 문자열."
     },
     {
-      "key": "npo",
-      "label": "NPO",
+      "key": "npo_solid",
+      "label": "NPO Solid",
       "type": "open",
-      "description": "금식 시작 시각. 정보 없으면 빈 문자열."
+      "description": "마지막 고형식 섭취 시점 (MM.DD HH:mm 형식, 예: '05.04 20:00'). 추가 정보는 '|'로 구분. 정보 없으면 빈 문자열."
+    },
+    {
+      "key": "npo_liquid",
+      "label": "NPO Liquid",
+      "type": "open",
+      "description": "마지막 수분 섭취 시점 (MM.DD HH:mm 형식, 예: '05.04 21:00'). 추가 정보는 '|'로 구분. 정보 없으면 빈 문자열."
     }
   ],
-  "output_example": "F/C(-/-)  C/S/R(-/-/-)  A/N/V/D/C(-/-/-/-/-)\nDizziness (-) Dyspnea (-) Abd.pain (-)  \n\n출산예정일(EDC) :\n임신시 주수 : \n\n최종월경일(LMP) :\n직전월경일(PMP) :\n\nmarital status : virgin / single / married / divorced / widowed\n출산력 0-0-0-0 , LD: \n생리력 interval :  일  regular / irregular \nduration :   일 \namount :  scanty / moderate / profuse \nMenarche:  세\nVaginal discharge / Vaginal  bleeding(-/-)\n마지막 성관계/피임법\n\nlast pap : \n\nNPO :",
+  "output_example": "F/C(-/-)  C/S/R(-/-/-)  A/N/V/D/C(-/-/-/-/-)\nDizziness (-) Dyspnea (-) Abd.pain (-)  \n\n출산예정일(EDC) :\n임신시 주수 : \n\n최종월경일(LMP) :\n직전월경일(PMP) :\n\nmarital status : virgin / single / married / divorced / widowed\n출산력 0-0-0-0 , LD: \n생리력 interval :  일  regular / irregular \nduration :   일 \namount :  scanty / moderate / profuse \nMenarche:  세\nVaginal discharge / Vaginal  bleeding(-/-)\n마지막 성관계/피임법\n\nlast pap : \n\nNPO: Solid - \n      Liquid -",
   "pe": {
     "fields": [
       {

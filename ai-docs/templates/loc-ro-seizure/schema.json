@@ -46,6 +46,7 @@
               "medication_history",
               "operation_history",
               "family_history",
+              "npo_status",
               "other"
             ]
           },
@@ -92,12 +93,16 @@
     "pre_syncope_symptoms": {
       "type": ["array", "null"],
       "description": "의식소실 전 증상 목록 (예: lightheadedness, dizziness, diaphoresis, nausea, palpitation, chest_pain, epigastric_rise, deja_vu, visual_hallucination, blurred_vision, black_out, presyncope, hyperventilation 등). 없으면 null.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "during_loc_findings": {
       "type": ["array", "null"],
       "description": "의식소실 중 소견 목록 (예: seizure, convulsive_movement, flaccid, drooling, eyeball_deviation, tongue_bite, pale_appearance, trauma, urination, defecation, headache, nausea_vomiting, abnormal_behavior 등). 없으면 null.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "post_loc_findings": {
       "type": ["object", "null"],
@@ -123,33 +128,54 @@
           "type": ["boolean", "null"],
           "description": "심한 두통 여부"
         },
-        "myalgia": { "type": ["boolean", "null"], "description": "근육통 여부" }
+        "myalgia": {
+          "type": ["boolean", "null"],
+          "description": "근육통 여부"
+        }
       }
     },
     "associated_symptoms": {
       "type": ["array", "null"],
       "description": "동반 증상 목록 (예: chest_pain, palpitation, DOE, SOB, ABD_pain, back_pain, nausea, vomiting, diarrhea, GI_bleeding, dizziness, headache, focal_neurologic_deficit 등). 없으면 null.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "past_history": {
       "type": ["array", "null"],
       "description": "과거력 목록 (예: ['고혈압', '당뇨', '뇌전증', '심방세동']). History 출력 시 항상 포함; 내용 없으면 null → (-)로 출력.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "medication_history": {
       "type": ["array", "null"],
       "description": "복용 약물 목록. 특히 HTN 약, BPH 약, 약 변동사항 확인. History 출력 시 항상 포함; 없으면 null.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "operation_history": {
       "type": ["array", "null"],
       "description": "수술력 목록. History 출력 시 항상 포함; 없으면 null.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "family_history": {
       "type": ["array", "null"],
       "description": "가족력 목록. null이면 History 출력 시 해당 항목 전체 생략.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
+    },
+    "npo_solid": {
+      "type": ["string", "null"],
+      "description": "마지막 고형식 섭취 시점 (MM.DD HH:mm 형식). '|' 뒤에 추가 정보 포함 가능. 없으면 null."
+    },
+    "npo_liquid": {
+      "type": ["string", "null"],
+      "description": "마지막 수분 섭취 시점 (MM.DD HH:mm 형식). '|' 뒤에 추가 정보 포함 가능. 없으면 null."
     }
   }
 }

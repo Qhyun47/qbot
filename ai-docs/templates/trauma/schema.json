@@ -45,6 +45,7 @@
               "medication_history",
               "operation_history",
               "family_history",
+              "npo_status",
               "other"
             ]
           },

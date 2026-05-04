@@ -97,11 +97,11 @@
     },
     "npo_solid": {
       "type": ["string", "null"],
-      "description": "마지막 고형식 섭취 시점 (예: '어제 저녁', '6시간 전'). 없으면 null."
+      "description": "마지막 고형식 섭취 시점 (MM.DD HH:mm 형식). '|' 뒤에 추가 정보 포함 가능 (예: '05.04 20:00|밥과 국'). 없으면 null."
     },
     "npo_liquid": {
       "type": ["string", "null"],
-      "description": "마지막 수분 섭취 시점 (예: '2시간 전'). 없으면 null."
+      "description": "마지막 수분 섭취 시점 (MM.DD HH:mm 형식). '|' 뒤에 추가 정보 포함 가능 (예: '05.04 21:00|물'). 없으면 null."
     },
     "gas_out": {
       "type": ["string", "null"],

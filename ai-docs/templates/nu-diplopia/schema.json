@@ -43,6 +43,7 @@
               "medication_history",
               "operation_history",
               "family_history",
+              "npo_status",
               "other"
             ]
           },
@@ -97,32 +98,52 @@
     "associated_symptoms": {
       "type": ["array", "null"],
       "description": "동반 증상 목록 (예: 'blurred vision', 'vertigo', 'oscillopsia', 'ptosis', 'headache'). 없으면 null.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "specific_ocular_history": {
       "type": ["array", "null"],
       "description": "안과/복시 관련 특이 병력 (예: '사시', '안구차폐', '시력저하', '갑상선 질환', '당뇨'). 없으면 null.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "past_history": {
       "type": ["array", "null"],
       "description": "과거력 목록. History 출력 시 항상 포함; 없으면 null → (-)로 출력.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "medication_history": {
       "type": ["array", "null"],
       "description": "복용 약물 목록. History 출력 시 항상 포함; 없으면 null → (-)로 출력.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "operation_history": {
       "type": ["array", "null"],
       "description": "수술력 목록. History 출력 시 항상 포함; 없으면 null → (-)로 출력.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "family_history": {
       "type": ["array", "null"],
       "description": "가족력 목록. null이면 History 출력 시 해당 항목 생략.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
+    },
+    "npo_solid": {
+      "type": ["string", "null"],
+      "description": "마지막 고형식 섭취 시점 (MM.DD HH:mm 형식). '|' 뒤에 추가 정보 포함 가능. 없으면 null."
+    },
+    "npo_liquid": {
+      "type": ["string", "null"],
+      "description": "마지막 수분 섭취 시점 (MM.DD HH:mm 형식). '|' 뒤에 추가 정보 포함 가능. 없으면 null."
     }
   }
 }

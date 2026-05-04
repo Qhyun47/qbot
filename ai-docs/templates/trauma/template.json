@@ -3,7 +3,7 @@
   "cc": "Trauma",
   "description": "외상 환자 EMR 상용구 템플릿",
   "hpi_hints": "손상 기전, 손상 부위, 발생 시점을 반드시 포함. 동반 증상(LOC, 두통, 어지럼증)이 확인된 경우 포함.",
-  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 \u0027open\u0027인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 \u0027symptom_check\u0027인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 \u0027+\u0027, 언급 없으면 반드시 \u0027-\u0027를 유지하라. output_example의 $ 마커: \u0027$text\u0027 형태로 표시된 곳은 해당 설명에 맞게 자유 형식으로 채워라. 정보가 없으면 $ 기호만 제거하고 원문 텍스트를 그대로 출력. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라. output_example의 모든 줄을 위에서부터 순서대로 빠짐없이 출력하라. 값이 없어도 라벨 줄 자체는 절대 삭제하거나 생략하지 않는다.",
+  "instructions": "이 템플릿의 각 field를 structured JSON 입력에서 채워라. type이 'open'인 field: 관련 정보가 있으면 채우고, 없으면 반드시 빈 문자열(\"\")로 남겨라. 절대 추론하거나 지어내지 말 것. type이 'symptom_check'인 field: 각 slot은 입력에 명시적 양성 언급이 있을 때만 '+', 언급 없으면 반드시 '-'를 유지하라. output_example의 $ 마커: '$text' 형태로 표시된 곳은 해당 설명에 맞게 자유 형식으로 채워라. 정보가 없으면 $ 기호만 제거하고 원문 텍스트를 그대로 출력. 출력 형식은 output_example을 따르라. 줄 순서, 공백, 구두점을 그대로 유지하라. output_example의 모든 줄을 위에서부터 순서대로 빠짐없이 출력하라. 값이 없어도 라벨 줄 자체는 절대 삭제하거나 생략하지 않는다.",
   "fields": [
     {
       "key": "os_common",
@@ -93,16 +93,16 @@
       "key": "npo_solid",
       "label": "NPO Solid",
       "type": "open",
-      "description": "마지막 고형식 섭취 시간. 정보 없으면 빈 문자열."
+      "description": "마지막 고형식 섭취 시점 (MM.DD HH:mm 형식, 예: '05.04 20:00'). 추가 정보는 '|'로 구분. 없으면 빈 문자열."
     },
     {
       "key": "npo_liquid",
       "label": "NPO Liquid",
       "type": "open",
-      "description": "마지막 액체 섭취 시간. 정보 없으면 빈 문자열."
+      "description": "마지막 음료 섭취 시점 (MM.DD HH:mm 형식, 예: '05.04 21:00'). 추가 정보는 '|'로 구분. 없으면 빈 문자열."
     }
   ],
-  "output_example": "* OS Trauma 의심 시\n- 공통 : $직업, LOM/ROM, 해당 부위 Sensory / Motor, NPO\n- 수부 : $주 손잡이, 손 많이 사용하는 환자?\n- 하지 : $평소 Ambulation (Self ambulation, Cane, Walker, 휠체어, Bed-Ridden), Claudication\n- 골다공증 : $(주사 치료 여부) / 평소 침이나 통증 주사 맞으러 다녔는지\n\nInitial V/S : \n\nLOC(-) N/V(-/-)\nHeadache(-) Dizziness(-)\n\n\nLaceration : \n\nNPO : Solid - \n     Liquid - ",
+  "output_example": "* OS Trauma 의심 시\n- 공통 : $직업, LOM/ROM, 해당 부위 Sensory / Motor, NPO\n- 수부 : $주 손잡이, 손 많이 사용하는 환자?\n- 하지 : $평소 Ambulation (Self ambulation, Cane, Walker, 휠체어, Bed-Ridden), Claudication\n- 골다공증 : $(주사 치료 여부) / 평소 침이나 통증 주사 맞으러 다녔는지\n\nInitial V/S : \n\nLOC(-) N/V(-/-)\nHeadache(-) Dizziness(-)\n\n\nLaceration : \n\nNPO: Solid - \n      Liquid -",
   "pe": {
     "fields": [
       {
