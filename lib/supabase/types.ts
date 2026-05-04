@@ -414,6 +414,74 @@ export type Database = {
           },
         ];
       };
+      shared_photo_hides: {
+        Row: {
+          shared_photo_id: string;
+          user_id: string;
+        };
+        Insert: {
+          shared_photo_id: string;
+          user_id: string;
+        };
+        Update: {
+          shared_photo_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "shared_photo_hides_shared_photo_id_fkey";
+            columns: ["shared_photo_id"];
+            isOneToOne: false;
+            referencedRelation: "shared_photos";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "shared_photo_hides_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      shared_photos: {
+        Row: {
+          created_at: string;
+          file_name: string;
+          file_size: number;
+          id: string;
+          mime_type: string;
+          shared_by: string;
+          storage_path: string;
+        };
+        Insert: {
+          created_at?: string;
+          file_name: string;
+          file_size: number;
+          id?: string;
+          mime_type: string;
+          shared_by: string;
+          storage_path: string;
+        };
+        Update: {
+          created_at?: string;
+          file_name?: string;
+          file_size?: number;
+          id?: string;
+          mime_type?: string;
+          shared_by?: string;
+          storage_path?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "shared_photos_shared_by_fkey";
+            columns: ["shared_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       error_logs: {
         Row: {
           created_at: string;
@@ -739,6 +807,8 @@ export type CaseInput = Tables<"case_inputs">;
 export type CaseResult = Tables<"case_results">;
 export type CasePhoto = Tables<"case_photos">;
 export type DashboardPhoto = Tables<"dashboard_photos">;
+export type SharedPhoto = Tables<"shared_photos">;
+export type SharedPhotoHide = Tables<"shared_photo_hides">;
 export type Guideline = Tables<"interview_guidelines">;
 export type ErrorLog = Tables<"error_logs">;
 export type CaseRecording = Tables<"case_recordings">;

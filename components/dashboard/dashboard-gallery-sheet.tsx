@@ -7,10 +7,12 @@ import {
   ChevronRight,
   Download,
   DownloadCloud,
+  EyeOff,
   ImagePlus,
   Loader2,
   RotateCcw,
   RotateCw,
+  Share2,
   Trash2,
   X,
 } from "lucide-react";
@@ -34,7 +36,11 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import type { CasePhoto, DashboardPhoto } from "@/lib/supabase/types";
+import type {
+  CasePhoto,
+  DashboardPhoto,
+  SharedPhoto,
+} from "@/lib/supabase/types";
 import { normalizeImageOrientation } from "@/lib/utils/image";
 
 type DashboardPhotoWithUrl = DashboardPhoto & { url: string | null };
@@ -47,6 +53,10 @@ type CasePhotoGroup = {
   photos: CasePhotoWithUrl[];
 };
 type CaseViewingState = { groupIdx: number; photoIdx: number };
+type SharedPhotoWithUrl = SharedPhoto & {
+  url: string | null;
+  is_owner: boolean;
+};
 
 async function triggerDownload(photo: {
   url: string | null;
@@ -109,6 +119,14 @@ export function DashboardGallerySheet() {
   const albumInputRef = useRef<HTMLInputElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
 
+  // 공유 사진 상태
+  const [sharedPhotos, setSharedPhotos] = useState<SharedPhotoWithUrl[]>([]);
+  const [sharedViewingIndex, setSharedViewingIndex] = useState<number | null>(
+    null
+  );
+  const [sharingPhotoId, setSharingPhotoId] = useState<string | null>(null);
+  const sharedImgRef = useRef<HTMLImageElement>(null);
+
   // 케이스 사진 상태
   const [casePhotoGroups, setCasePhotoGroups] = useState<CasePhotoGroup[]>([]);
   const [caseViewingState, setCaseViewingState] =
@@ -149,12 +167,14 @@ export function DashboardGallerySheet() {
     setLoading(true);
     try {
       await fetch("/api/photos/cleanup-expired", { method: "POST" });
-      const [dashRes, caseRes] = await Promise.all([
+      const [dashRes, caseRes, sharedRes] = await Promise.all([
         fetch("/api/dashboard/photos"),
         fetch("/api/cases/all-photos"),
+        fetch("/api/shared-photos"),
       ]);
       if (dashRes.ok) setPhotos(await dashRes.json());
       if (caseRes.ok) setCasePhotoGroups(await caseRes.json());
+      if (sharedRes.ok) setSharedPhotos(await sharedRes.json());
     } finally {
       setLoading(false);
     }
@@ -281,6 +301,65 @@ export function DashboardGallerySheet() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [viewingIndex, showPrev, showNext]);
+
+  const handleShare = async (photo: {
+    url: string | null;
+    file_name: string;
+    id: string;
+  }) => {
+    if (!photo.url || sharingPhotoId) return;
+    setSharingPhotoId(photo.id);
+    try {
+      const res = await fetch(photo.url);
+      const blob = await res.blob();
+      const formData = new FormData();
+      formData.append(
+        "file",
+        new File([blob], photo.file_name, { type: blob.type || "image/jpeg" })
+      );
+      const shareRes = await fetch("/api/shared-photos", {
+        method: "POST",
+        body: formData,
+      });
+      if (shareRes.ok) {
+        const newPhoto = await shareRes.json();
+        setSharedPhotos((prev) => [...prev, newPhoto]);
+        toast.success("사진이 공유되었습니다.");
+      } else {
+        const err = await shareRes.json().catch(() => ({}));
+        toast.error(err.error ?? "공유에 실패했습니다.");
+      }
+    } catch {
+      toast.error("공유에 실패했습니다.");
+    } finally {
+      setSharingPhotoId(null);
+    }
+  };
+
+  const handleSharedDelete = async (photo: SharedPhotoWithUrl) => {
+    const res = await fetch(`/api/shared-photos/${photo.id}`, {
+      method: "DELETE",
+    });
+    if (res.ok) {
+      setSharedPhotos((prev) => prev.filter((p) => p.id !== photo.id));
+      if (sharedViewingIndex !== null) setSharedViewingIndex(null);
+    } else {
+      toast.error("삭제에 실패했습니다.");
+    }
+  };
+
+  const handleSharedHide = async (photo: SharedPhotoWithUrl) => {
+    const res = await fetch(`/api/shared-photos/${photo.id}/hide`, {
+      method: "POST",
+    });
+    if (res.ok) {
+      setSharedPhotos((prev) => prev.filter((p) => p.id !== photo.id));
+      if (sharedViewingIndex !== null) setSharedViewingIndex(null);
+      toast("이 사진을 숨겼습니다.");
+    } else {
+      toast.error("숨기기에 실패했습니다.");
+    }
+  };
 
   // 케이스 사진 헬퍼
   function formatCaseHeader(group: CasePhotoGroup): string {
@@ -486,15 +565,30 @@ export function DashboardGallerySheet() {
                       <X className="size-3.5" />
                     </button>
                     {photo.url && (
-                      <button
-                        type="button"
-                        onClick={() => triggerDownload(photo)}
-                        disabled={savingPhotoId === photo.id}
-                        className="absolute bottom-0.5 right-0.5 flex size-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
-                        aria-label="다운로드"
-                      >
-                        <Download className="size-3.5" />
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleShare(photo)}
+                          disabled={!!sharingPhotoId}
+                          className="absolute bottom-0.5 left-0.5 flex size-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
+                          aria-label="공유"
+                        >
+                          {sharingPhotoId === photo.id ? (
+                            <Loader2 className="size-3.5 animate-spin" />
+                          ) : (
+                            <Share2 className="size-3.5" />
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => triggerDownload(photo)}
+                          disabled={savingPhotoId === photo.id}
+                          className="absolute bottom-0.5 right-0.5 flex size-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
+                          aria-label="다운로드"
+                        >
+                          <Download className="size-3.5" />
+                        </button>
+                      </>
                     )}
                   </div>
                 ))}
@@ -554,21 +648,98 @@ export function DashboardGallerySheet() {
                             <X className="size-3" />
                           </button>
                           {photo.url && (
-                            <button
-                              type="button"
-                              onClick={() => triggerDownload(photo)}
-                              disabled={caseSavingPhotoId === photo.id}
-                              className="absolute bottom-1 right-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
-                              aria-label="다운로드"
-                            >
-                              <Download className="size-3" />
-                            </button>
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => handleShare(photo)}
+                                disabled={!!sharingPhotoId}
+                                className="absolute bottom-1 left-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
+                                aria-label="공유"
+                              >
+                                {sharingPhotoId === photo.id ? (
+                                  <Loader2 className="size-3 animate-spin" />
+                                ) : (
+                                  <Share2 className="size-3" />
+                                )}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => triggerDownload(photo)}
+                                disabled={caseSavingPhotoId === photo.id}
+                                className="absolute bottom-1 right-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
+                                aria-label="다운로드"
+                              >
+                                <Download className="size-3" />
+                              </button>
+                            </>
                           )}
                         </div>
                       ))}
                     </div>
                   </div>
                 ))}
+              </>
+            )}
+
+            {/* 공유 사진 섹션 */}
+            {!loading && sharedPhotos.length > 0 && (
+              <>
+                <div className="h-px bg-border" />
+                <p className="text-xs font-medium text-muted-foreground">
+                  공유 사진
+                </p>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+                  {sharedPhotos.map((photo, idx) => (
+                    <div key={photo.id} className="relative aspect-square">
+                      {photo.url ? (
+                        <button
+                          type="button"
+                          className="h-full w-full"
+                          onClick={() => setSharedViewingIndex(idx)}
+                          aria-label="사진 확대"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={photo.url}
+                            alt={photo.file_name}
+                            className="h-full w-full rounded object-cover"
+                          />
+                        </button>
+                      ) : (
+                        <div className="h-full w-full rounded bg-muted" />
+                      )}
+                      {photo.is_owner ? (
+                        <button
+                          type="button"
+                          onClick={() => handleSharedDelete(photo)}
+                          className="absolute right-0.5 top-0.5 flex size-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+                          aria-label="삭제"
+                        >
+                          <X className="size-3.5" />
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleSharedHide(photo)}
+                          className="absolute right-0.5 top-0.5 flex size-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+                          aria-label="숨기기"
+                        >
+                          <EyeOff className="size-3.5" />
+                        </button>
+                      )}
+                      {photo.url && (
+                        <button
+                          type="button"
+                          onClick={() => triggerDownload(photo)}
+                          className="absolute bottom-0.5 right-0.5 flex size-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+                          aria-label="다운로드"
+                        >
+                          <Download className="size-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </>
             )}
 
@@ -689,20 +860,36 @@ export function DashboardGallerySheet() {
                 <span className="text-sm text-muted-foreground">
                   {(viewingIndex ?? 0) + 1} / {photos.length}
                 </span>
-                <button
-                  type="button"
-                  onClick={handleLightboxDownload}
-                  disabled={isDownloading}
-                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
-                  aria-label="다운로드"
-                >
-                  {isDownloading ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <Download className="size-4" />
-                  )}
-                  다운로드
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => viewingPhoto && handleShare(viewingPhoto)}
+                    disabled={!!sharingPhotoId}
+                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
+                    aria-label="공유"
+                  >
+                    {sharingPhotoId === viewingPhoto.id ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Share2 className="size-4" />
+                    )}
+                    공유
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleLightboxDownload}
+                    disabled={isDownloading}
+                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
+                    aria-label="다운로드"
+                  >
+                    {isDownloading ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Download className="size-4" />
+                    )}
+                    다운로드
+                  </button>
+                </div>
               </div>
               <div className="relative flex flex-1 items-center justify-center overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -805,20 +992,38 @@ export function DashboardGallerySheet() {
                   {(caseViewingState?.photoIdx ?? 0) + 1} /{" "}
                   {caseViewingGroup.photos.length}
                 </span>
-                <button
-                  type="button"
-                  onClick={handleCaseLightboxDownload}
-                  disabled={caseIsDownloading}
-                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
-                  aria-label="다운로드"
-                >
-                  {caseIsDownloading ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <Download className="size-4" />
-                  )}
-                  다운로드
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      caseViewingPhoto && handleShare(caseViewingPhoto)
+                    }
+                    disabled={!!sharingPhotoId}
+                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
+                    aria-label="공유"
+                  >
+                    {sharingPhotoId === caseViewingPhoto.id ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Share2 className="size-4" />
+                    )}
+                    공유
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCaseLightboxDownload}
+                    disabled={caseIsDownloading}
+                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
+                    aria-label="다운로드"
+                  >
+                    {caseIsDownloading ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Download className="size-4" />
+                    )}
+                    다운로드
+                  </button>
+                </div>
               </div>
               <div className="relative flex flex-1 items-center justify-center overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -876,6 +1081,107 @@ export function DashboardGallerySheet() {
               </div>
             </>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* 공유 사진 라이트박스 */}
+      <Dialog
+        open={sharedViewingIndex !== null}
+        onOpenChange={(open) => {
+          if (!open) setSharedViewingIndex(null);
+        }}
+      >
+        <DialogContent className="flex max-h-[90vh] max-w-[90vw] flex-col gap-3 p-4">
+          {sharedViewingIndex !== null &&
+            sharedPhotos[sharedViewingIndex] &&
+            (() => {
+              const photo = sharedPhotos[sharedViewingIndex];
+              return (
+                <>
+                  <div className="flex items-center justify-between pr-8">
+                    <span className="text-sm text-muted-foreground">
+                      {sharedViewingIndex + 1} / {sharedPhotos.length}
+                    </span>
+                    <div className="flex items-center gap-3">
+                      {photo.is_owner ? (
+                        <button
+                          type="button"
+                          onClick={() => handleSharedDelete(photo)}
+                          className="flex items-center gap-1.5 text-sm text-destructive hover:text-destructive/80"
+                          aria-label="삭제"
+                        >
+                          <X className="size-4" />
+                          삭제
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleSharedHide(photo)}
+                          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+                          aria-label="숨기기"
+                        >
+                          <EyeOff className="size-4" />
+                          숨기기
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => triggerDownload(photo)}
+                        className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+                        aria-label="다운로드"
+                      >
+                        <Download className="size-4" />
+                        다운로드
+                      </button>
+                    </div>
+                  </div>
+                  <div className="relative flex flex-1 items-center justify-center overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      ref={sharedImgRef}
+                      src={photo.url ?? ""}
+                      alt={photo.file_name}
+                      crossOrigin="anonymous"
+                      className="max-h-[75vh] max-w-full rounded-md object-contain"
+                    />
+                    {sharedPhotos.length > 1 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setSharedViewingIndex((i) =>
+                              i !== null && i > 0 ? i - 1 : i
+                            )
+                          }
+                          disabled={sharedViewingIndex === 0}
+                          className="absolute left-2 flex size-8 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 disabled:opacity-30"
+                          aria-label="이전 사진"
+                        >
+                          <ChevronLeft className="size-5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setSharedViewingIndex((i) =>
+                              i !== null && i < sharedPhotos.length - 1
+                                ? i + 1
+                                : i
+                            )
+                          }
+                          disabled={
+                            sharedViewingIndex === sharedPhotos.length - 1
+                          }
+                          className="absolute right-2 flex size-8 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 disabled:opacity-30"
+                          aria-label="다음 사진"
+                        >
+                          <ChevronRight className="size-5" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </>
+              );
+            })()}
         </DialogContent>
       </Dialog>
 

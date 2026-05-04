@@ -9,8 +9,10 @@ import {
   Loader2,
   RotateCcw,
   RotateCw,
+  Share2,
   X,
 } from "lucide-react";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -80,6 +82,7 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
   const [rotation, setRotation] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
   const [savingPhotoId, setSavingPhotoId] = useState<string | null>(null);
+  const [sharingPhotoId, setSharingPhotoId] = useState<string | null>(null);
   const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
@@ -130,6 +133,34 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
       method: "PATCH",
       body: formData,
     });
+  };
+
+  const handleShare = async (photo: CasePhotoWithUrl) => {
+    if (!photo.url || sharingPhotoId) return;
+    setSharingPhotoId(photo.id);
+    try {
+      const res = await fetch(photo.url);
+      const blob = await res.blob();
+      const formData = new FormData();
+      formData.append(
+        "file",
+        new File([blob], photo.file_name, { type: blob.type || "image/jpeg" })
+      );
+      const shareRes = await fetch("/api/shared-photos", {
+        method: "POST",
+        body: formData,
+      });
+      if (shareRes.ok) {
+        toast.success("사진이 공유되었습니다.");
+      } else {
+        const err = await shareRes.json().catch(() => ({}));
+        toast.error(err.error ?? "공유에 실패했습니다.");
+      }
+    } catch {
+      toast.error("공유에 실패했습니다.");
+    } finally {
+      setSharingPhotoId(null);
+    }
   };
 
   const handleDelete = async () => {
@@ -235,19 +266,34 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
                   <X className="size-3" />
                 </button>
                 {photo.url && (
-                  <button
-                    type="button"
-                    onClick={() => triggerDownload(photo)}
-                    disabled={savingPhotoId === photo.id}
-                    className="absolute bottom-1 right-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
-                    aria-label="다운로드"
-                  >
-                    {savingPhotoId === photo.id ? (
-                      <Loader2 className="size-3 animate-spin" />
-                    ) : (
-                      <Download className="size-3" />
-                    )}
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleShare(photo)}
+                      disabled={!!sharingPhotoId}
+                      className="absolute bottom-1 left-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
+                      aria-label="공유"
+                    >
+                      {sharingPhotoId === photo.id ? (
+                        <Loader2 className="size-3 animate-spin" />
+                      ) : (
+                        <Share2 className="size-3" />
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => triggerDownload(photo)}
+                      disabled={savingPhotoId === photo.id}
+                      className="absolute bottom-1 right-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
+                      aria-label="다운로드"
+                    >
+                      {savingPhotoId === photo.id ? (
+                        <Loader2 className="size-3 animate-spin" />
+                      ) : (
+                        <Download className="size-3" />
+                      )}
+                    </button>
+                  </>
                 )}
               </div>
             ))}
@@ -296,20 +342,36 @@ export function CasePhotosSection({ caseId }: CasePhotosSectionProps) {
                 <span className="text-sm text-muted-foreground">
                   {(viewingIndex ?? 0) + 1} / {photos.length}
                 </span>
-                <button
-                  type="button"
-                  onClick={handleLightboxDownload}
-                  disabled={isDownloading}
-                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
-                  aria-label="다운로드"
-                >
-                  {isDownloading ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <Download className="size-4" />
-                  )}
-                  다운로드
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => viewingPhoto && handleShare(viewingPhoto)}
+                    disabled={!!sharingPhotoId}
+                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
+                    aria-label="공유"
+                  >
+                    {sharingPhotoId === viewingPhoto?.id ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Share2 className="size-4" />
+                    )}
+                    공유
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleLightboxDownload}
+                    disabled={isDownloading}
+                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
+                    aria-label="다운로드"
+                  >
+                    {isDownloading ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Download className="size-4" />
+                    )}
+                    다운로드
+                  </button>
+                </div>
               </div>
               <div className="relative flex flex-1 items-center justify-center overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
