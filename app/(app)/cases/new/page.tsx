@@ -19,6 +19,7 @@ async function NewCaseFormLoader({
       foldCaseInputFontSize,
       guidelineFontSize,
       foldGuidelineFontSize,
+      autoRecord,
     },
     status,
     { fresh },
@@ -40,6 +41,7 @@ async function NewCaseFormLoader({
       guidelineFontSize={guidelineFontSize}
       foldGuidelineFontSize={foldGuidelineFontSize}
       canUseAi={status === "approved"}
+      autoRecord={autoRecord}
     />
   );
 }

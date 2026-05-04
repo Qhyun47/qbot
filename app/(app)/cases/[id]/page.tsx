@@ -27,6 +27,7 @@ import { AiWarningBanner } from "@/components/cases/ai-warning-banner";
 import { CasePhotosSection } from "@/components/cases/case-photos-section";
 import { MedicationTriggerButton } from "@/components/medication/medication-trigger-button";
 import { MedicationAnalysisSection } from "@/components/medication/medication-analysis-section";
+import { RecordingTriggerButton } from "@/components/cases/recording-trigger-button";
 import { extractPastHx } from "@/lib/medication/text-utils";
 import type { CaseStatus, BedZone } from "@/lib/supabase/types";
 import { ENABLE_HPI } from "@/lib/ai/feature-flags";
@@ -221,6 +222,7 @@ async function CaseContent({
             result?.history_edited ?? result?.history_draft ?? ""
           )}
         />
+        <RecordingTriggerButton caseId={caseData.id} />
       </header>
 
       {/* 본문: 차팅 결과 영역 */}

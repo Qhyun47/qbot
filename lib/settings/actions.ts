@@ -128,13 +128,14 @@ export async function getLayoutSettings(): Promise<{
   guidelineFontSize: number;
   foldGuidelineFontSize: number;
   fullscreenMode: boolean;
+  autoRecord: boolean;
 }> {
   const { supabase, user } = await getAuthUser();
 
   const { data } = await supabase
     .from("profiles")
     .select(
-      "input_layout, split_ratio, mobile_font_size, case_input_font_size, fold_auto_switch, fold_fallback_layout, fold_case_input_font_size, guideline_font_size, fold_guideline_font_size, fullscreen_mode"
+      "input_layout, split_ratio, mobile_font_size, case_input_font_size, fold_auto_switch, fold_fallback_layout, fold_case_input_font_size, guideline_font_size, fold_guideline_font_size, fullscreen_mode, auto_record"
     )
     .eq("id", user.id)
     .maybeSingle();
@@ -153,7 +154,22 @@ export async function getLayoutSettings(): Promise<{
     guidelineFontSize,
     foldGuidelineFontSize: data?.fold_guideline_font_size ?? guidelineFontSize,
     fullscreenMode: data?.fullscreen_mode ?? false,
+    autoRecord: data?.auto_record ?? false,
   };
+}
+
+export async function updateAutoRecord(enabled: boolean): Promise<void> {
+  const parsed = z.boolean().parse(enabled);
+  const { supabase, user } = await getAuthUser();
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ auto_record: parsed })
+    .eq("id", user.id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/settings");
 }
 
 export async function updateFullscreenMode(enabled: boolean): Promise<void> {

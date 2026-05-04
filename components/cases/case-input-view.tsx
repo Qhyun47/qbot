@@ -42,6 +42,7 @@ import type {
   FoldFallbackLayout,
   InputLayout,
 } from "@/lib/supabase/types";
+import { RecordingTriggerButton } from "@/components/cases/recording-trigger-button";
 
 const LAYOUT_OPTIONS: {
   value: InputLayout;
@@ -513,6 +514,8 @@ export function CaseInputView({
                 </button>
               ))}
             </div>
+
+            <RecordingTriggerButton caseId={caseId} size="sm" />
 
             <Button
               variant="outline"

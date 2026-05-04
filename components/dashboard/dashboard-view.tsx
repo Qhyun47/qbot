@@ -33,13 +33,15 @@ export function DashboardView({ cases }: DashboardViewProps) {
   return (
     <section className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-y-1">
-        <h2 className="shrink-0 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          현황판
-        </h2>
+        <div className="flex shrink-0 items-center gap-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            현황판
+          </h2>
+          <CompactModeToggle />
+        </div>
         <div className="flex flex-wrap items-center justify-end gap-1">
           <RefreshButton />
           <HideAllFromBoardButton />
-          <CompactModeToggle />
           <Link
             href="/cases"
             className="flex shrink-0 items-center gap-0.5 whitespace-nowrap text-xs text-muted-foreground transition-colors hover:text-foreground"

@@ -159,6 +159,54 @@ export type Database = {
           },
         ];
       };
+      case_recordings: {
+        Row: {
+          id: string;
+          case_id: string;
+          user_id: string;
+          storage_path: string;
+          duration_seconds: number | null;
+          transcript: Json | null;
+          transcript_status: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          case_id: string;
+          user_id: string;
+          storage_path: string;
+          duration_seconds?: number | null;
+          transcript?: Json | null;
+          transcript_status?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          case_id?: string;
+          user_id?: string;
+          storage_path?: string;
+          duration_seconds?: number | null;
+          transcript?: Json | null;
+          transcript_status?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "case_recordings_case_id_fkey";
+            columns: ["case_id"];
+            isOneToOne: false;
+            referencedRelation: "cases";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "case_recordings_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       case_results: {
         Row: {
           antithrombotic_at: string | null;
@@ -461,6 +509,7 @@ export type Database = {
       };
       profiles: {
         Row: {
+          auto_record: boolean;
           avatar_url: string | null;
           case_input_font_size: number;
           created_at: string;
@@ -480,6 +529,7 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
+          auto_record?: boolean;
           avatar_url?: string | null;
           case_input_font_size?: number;
           created_at?: string;
@@ -499,6 +549,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          auto_record?: boolean;
           avatar_url?: string | null;
           case_input_font_size?: number;
           created_at?: string;
@@ -690,4 +741,8 @@ export type CasePhoto = Tables<"case_photos">;
 export type DashboardPhoto = Tables<"dashboard_photos">;
 export type Guideline = Tables<"interview_guidelines">;
 export type ErrorLog = Tables<"error_logs">;
+export type CaseRecording = Tables<"case_recordings">;
 export type ServiceAccessStatus = string;
+
+export type TranscriptSegment = { text: string; start: number; end: number };
+export type Recording = CaseRecording & { url?: string | null };

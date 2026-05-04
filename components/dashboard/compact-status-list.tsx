@@ -46,7 +46,7 @@ const ZONE_LABELS: Record<BedZone, string> = {
 const ZONE_ORDER: BedZone[] = ["A", "B", "R"];
 
 const NOTIFY_OPTIONS: { value: NotifyStatus; label: string }[] = [
-  { value: null, label: "— 미확인" },
+  { value: null, label: "미확인" },
   { value: "예정", label: "예정" },
   { value: "완료", label: "완료" },
   { value: "불필요", label: "불필요" },
@@ -103,7 +103,7 @@ function NotifyCell({
       <DropdownMenuTrigger asChild>
         <button
           onClick={(e) => e.stopPropagation()}
-          className="shrink-0 rounded p-0.5 hover:bg-muted"
+          className="shrink-0 rounded p-2 hover:bg-muted"
           aria-label="노티 상태 변경"
         >
           <NotifyIcon status={status} />
@@ -169,7 +169,7 @@ function MemoCell({ caseId, initial }: { caseId: string; initial: string }) {
           <PopoverTrigger asChild>
             <button
               onClick={(e) => e.stopPropagation()}
-              className="w-[25%] min-w-14 max-w-36 shrink-0 text-left"
+              className="min-w-14 flex-1 text-left"
               aria-label="메모 편집"
             >
               <span className="line-clamp-2 block text-xs leading-tight text-muted-foreground">
@@ -220,7 +220,7 @@ function CompactRow({ case: c }: { case: Case }) {
       tabIndex={0}
       onClick={() => router.push(`/cases/${c.id}`)}
       onKeyDown={handleKeyDown}
-      className="flex cursor-pointer items-center gap-1.5 border-b px-3 py-2 transition-colors hover:bg-muted/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="flex cursor-pointer items-center gap-2 border-b px-3 py-2.5 transition-colors hover:bg-muted/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <BedBadge
         bedZone={c.bed_zone as BedZone}
@@ -229,25 +229,26 @@ function CompactRow({ case: c }: { case: Case }) {
         size="sm"
       />
 
-      <div className="flex min-w-0 flex-1 items-center gap-1">
-        <span className="min-w-0 truncate text-xs font-medium">
+      <div className="flex w-48 min-w-0 shrink items-center gap-1.5">
+        <span className="min-w-0 truncate text-sm font-medium">
           {cc ?? (
             <span className="italic text-muted-foreground">C.C 미입력</span>
           )}
         </span>
         {extraCount > 0 && (
-          <span className="shrink-0 rounded-full bg-muted px-1 py-0.5 text-[10px] text-muted-foreground">
+          <span className="shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
             +{extraCount}
           </span>
         )}
       </div>
 
-      <StatusIcon status={c.status as CaseStatus} />
-
-      <NotifyCell
-        caseId={c.id}
-        initial={(c.notify_status as NotifyStatus) ?? null}
-      />
+      <div className="flex shrink-0 items-center gap-2 px-2">
+        <StatusIcon status={c.status as CaseStatus} />
+        <NotifyCell
+          caseId={c.id}
+          initial={(c.notify_status as NotifyStatus) ?? null}
+        />
+      </div>
 
       <MemoCell caseId={c.id} initial={c.memo ?? ""} />
     </div>
@@ -280,9 +281,12 @@ export function CompactStatusList({ cases }: CompactStatusListProps) {
       <div className="flex flex-col">
         {ZONE_ORDER.filter((zone) => grouped[zone].length > 0).map((zone) => (
           <div key={zone}>
-            <p className="sticky top-0 z-10 border-b bg-muted/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground backdrop-blur">
-              {ZONE_LABELS[zone]}
-            </p>
+            <div className="sticky top-0 z-10 flex items-center gap-2 border-b bg-muted/80 px-3 py-1.5 backdrop-blur">
+              <span className="h-3 w-0.5 rounded-full bg-foreground/30" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                {ZONE_LABELS[zone]}
+              </span>
+            </div>
             {grouped[zone].map((c) => (
               <CompactRow key={c.id} case={c} />
             ))}

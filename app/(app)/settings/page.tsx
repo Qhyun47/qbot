@@ -4,6 +4,7 @@ import { getLayoutSettings } from "@/lib/settings/actions";
 import { Separator } from "@/components/ui/separator";
 import { InstallSection } from "@/components/settings/install-section";
 import { FullscreenSection } from "@/components/settings/fullscreen-section";
+import { AutoRecordSection } from "@/components/settings/auto-record-section";
 
 async function SettingsContent() {
   const {
@@ -37,6 +38,11 @@ async function FullscreenSectionWrapper() {
   return <FullscreenSection defaultFullscreenMode={fullscreenMode} />;
 }
 
+async function AutoRecordSectionWrapper() {
+  const { autoRecord } = await getLayoutSettings();
+  return <AutoRecordSection defaultAutoRecord={autoRecord} />;
+}
+
 export default function SettingsPage() {
   return (
     <div className="p-4 md:p-8">
@@ -57,6 +63,10 @@ export default function SettingsPage() {
         <Separator />
         <Suspense fallback={null}>
           <FullscreenSectionWrapper />
+        </Suspense>
+        <Separator />
+        <Suspense fallback={null}>
+          <AutoRecordSectionWrapper />
         </Suspense>
         <Separator />
         <InstallSection />

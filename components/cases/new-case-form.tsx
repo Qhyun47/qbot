@@ -63,6 +63,7 @@ import type {
   FoldFallbackLayout,
   InputLayout,
 } from "@/lib/supabase/types";
+import { RecordingButton } from "@/components/cases/recording-button";
 
 const ccList = ccListRaw as CcListEntry[];
 
@@ -86,6 +87,7 @@ interface NewCaseFormProps {
   guidelineFontSize?: number;
   foldGuidelineFontSize?: number;
   canUseAi?: boolean;
+  autoRecord?: boolean;
 }
 
 export function NewCaseForm({
@@ -98,6 +100,7 @@ export function NewCaseForm({
   guidelineFontSize,
   foldGuidelineFontSize,
   canUseAi = false,
+  autoRecord = false,
 }: NewCaseFormProps) {
   const router = useRouter();
   const [caseId, setCaseId] = useState<string | null>(null);
@@ -122,6 +125,7 @@ export function NewCaseForm({
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [setupDone, setSetupDone] = useState(false);
   const [setupExiting, setSetupExiting] = useState(false);
+  const [autoStartSignal, setAutoStartSignal] = useState(false);
   const [, startTransition] = useTransition();
   const containerRef = useRef<HTMLDivElement>(null);
   useVisualViewport(containerRef);
@@ -247,6 +251,7 @@ export function NewCaseForm({
       pendingCcsRef.current = { ccs: finalCcs, templateKeys };
     }
     setPendingTemplateKeys(null);
+    if (autoRecord) setAutoStartSignal((v) => !v);
     setSetupExiting(true);
   };
 
@@ -266,6 +271,7 @@ export function NewCaseForm({
   };
 
   const handleSetupSkip = () => {
+    if (autoRecord) setAutoStartSignal((v) => !v);
     setSetupExiting(true);
   };
 
@@ -674,6 +680,11 @@ export function NewCaseForm({
           )}
 
           <div className="flex shrink-0 items-center justify-end gap-2">
+            <RecordingButton
+              caseId={caseId}
+              autoStartSignal={autoStartSignal}
+            />
+
             {/* 레이아웃 전환 토글 */}
             <div className="hidden items-center gap-0.5 rounded-md border p-0.5 is-desktop:flex">
               {LAYOUT_OPTIONS.map(({ value, Icon, label }) => (
