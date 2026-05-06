@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Plus } from "lucide-react";
+import { Bell, ChevronDown, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -37,6 +37,7 @@ export function AlarmBottomSheet({ alarms, cases, open, onOpenChange }: Props) {
   const completed = alarms.filter((a) => a.is_confirmed);
   const isEmpty =
     unconfirmed.length === 0 && upcoming.length === 0 && completed.length === 0;
+  const showUpcomingLabel = upcoming.length > 0 && unconfirmed.length > 0;
 
   function handleConfirm(id: string) {
     startTransition(() => {
@@ -66,11 +67,23 @@ export function AlarmBottomSheet({ alarms, cases, open, onOpenChange }: Props) {
         <DrawerContent>
           <DrawerHeader>
             <div className="flex items-center justify-between pr-2">
-              <DrawerTitle>알람</DrawerTitle>
+              <div className="flex items-center gap-2">
+                <DrawerTitle>알람</DrawerTitle>
+                {unconfirmed.length > 0 && (
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-bold text-white">
+                    {unconfirmed.length}
+                  </span>
+                )}
+                {upcoming.length > 0 && (
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-100 px-1.5 text-[11px] font-semibold text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
+                    {upcoming.length}
+                  </span>
+                )}
+              </div>
               <Button
                 size="sm"
                 variant="ghost"
-                className="h-7 gap-1 px-2 text-xs"
+                className="h-7 gap-1 px-2 text-xs text-muted-foreground"
                 onClick={handleNewAlarm}
               >
                 <Plus className="h-3.5 w-3.5" />새 알람
@@ -78,21 +91,41 @@ export function AlarmBottomSheet({ alarms, cases, open, onOpenChange }: Props) {
             </div>
           </DrawerHeader>
 
-          <div className="overflow-y-auto px-4 pb-8">
+          <div className="flex flex-col gap-1 overflow-y-auto px-2 pb-8 pt-1">
+            {/* 빈 상태 */}
             {isEmpty && (
-              <div className="flex flex-col items-center gap-2 py-8 text-center">
-                <p className="text-sm text-muted-foreground">
-                  예정된 알람이 없습니다
-                </p>
-                <Button size="sm" variant="outline" onClick={handleNewAlarm}>
+              <div className="flex flex-col items-center gap-3 py-10 text-center">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
+                  <Bell className="h-7 w-7 text-muted-foreground/40" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    예정된 알람이 없습니다
+                  </p>
+                  <p className="text-xs text-muted-foreground/60">
+                    새 알람을 만들어 중요한 일정을 놓치지 마세요
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="rounded-full"
+                  onClick={handleNewAlarm}
+                >
                   <Plus className="mr-1.5 h-3.5 w-3.5" />새 알람 만들기
                 </Button>
               </div>
             )}
 
-            {/* 미확인 섹션 */}
+            {/* 지금 확인 필요 */}
             {unconfirmed.length > 0 && (
-              <div className="mb-2 rounded-md bg-amber-50 px-3 py-1 dark:bg-amber-950/30">
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-1.5 px-1 pb-0.5 pt-1">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" />
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-red-500">
+                    지금 확인 필요
+                  </span>
+                </div>
                 {unconfirmed.map((alarm) => (
                   <AlarmListItem
                     key={alarm.id}
@@ -100,14 +133,23 @@ export function AlarmBottomSheet({ alarms, cases, open, onOpenChange }: Props) {
                     onConfirm={handleConfirm}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    alwaysShowActions
                   />
                 ))}
               </div>
             )}
 
-            {/* 예정 섹션 */}
+            {/* 예정된 알람 */}
             {upcoming.length > 0 && (
-              <div className="divide-y">
+              <div className="space-y-0.5">
+                {showUpcomingLabel && (
+                  <div className="flex items-center gap-1.5 px-1 pb-0.5 pt-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
+                    <span className="text-[11px] font-semibold uppercase tracking-wide text-blue-500 dark:text-blue-400">
+                      예정된 알람
+                    </span>
+                  </div>
+                )}
                 {upcoming.map((alarm) => (
                   <AlarmListItem
                     key={alarm.id}
@@ -115,6 +157,7 @@ export function AlarmBottomSheet({ alarms, cases, open, onOpenChange }: Props) {
                     onConfirm={handleConfirm}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    alwaysShowActions
                   />
                 ))}
               </div>
@@ -122,17 +165,21 @@ export function AlarmBottomSheet({ alarms, cases, open, onOpenChange }: Props) {
 
             {/* 완료 섹션 */}
             {completed.length > 0 && (
-              <div className="mt-2 border-t pt-1">
+              <div>
                 <button
                   type="button"
                   onClick={() => setCompletedExpanded((v) => !v)}
-                  className="flex w-full items-center gap-1 py-1.5 text-xs text-muted-foreground"
+                  className="flex w-full items-center gap-1.5 rounded-md px-2 py-2 text-xs text-muted-foreground transition-colors hover:bg-muted/50"
                 >
-                  {completedExpanded ? "▼" : "▶"} 완료된 알람 {completed.length}
-                  개
+                  {completedExpanded ? (
+                    <ChevronDown className="h-3 w-3" />
+                  ) : (
+                    <ChevronRight className="h-3 w-3" />
+                  )}
+                  완료된 알람 {completed.length}개
                 </button>
                 {completedExpanded && (
-                  <div className="divide-y">
+                  <div className="mt-0.5 space-y-0.5">
                     {completed.map((alarm) => (
                       <AlarmListItem key={alarm.id} alarm={alarm} />
                     ))}
