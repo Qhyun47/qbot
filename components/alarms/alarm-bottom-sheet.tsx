@@ -98,14 +98,9 @@ export function AlarmBottomSheet({ alarms, cases, open, onOpenChange }: Props) {
                 <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
                   <Bell className="h-7 w-7 text-muted-foreground/40" />
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    예정된 알람이 없습니다
-                  </p>
-                  <p className="text-xs text-muted-foreground/60">
-                    새 알람을 만들어 중요한 일정을 놓치지 마세요
-                  </p>
-                </div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  예정된 알람이 없습니다
+                </p>
                 <Button
                   size="sm"
                   variant="outline"
