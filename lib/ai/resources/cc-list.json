@@ -574,6 +574,30 @@
     "aliasOf": "Orbital pain"
   },
   {
+    "cc": "Periorbital pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Orbital pain"
+  },
+  {
+    "cc": "Lt. periorbital pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Orbital pain"
+  },
+  {
+    "cc": "Rt. periorbital pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Orbital pain"
+  },
+  {
+    "cc": "Both periorbital pain",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Orbital pain"
+  },
+  {
     "cc": "Facial pain",
     "guideKeys": [
       { "key": "ps", "rank": 1 },
@@ -785,6 +809,30 @@
   },
   {
     "cc": "Both mandible laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Periorbital laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Lt. periorbital laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Rt. periorbital laceration",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial laceration"
+  },
+  {
+    "cc": "Both periorbital laceration",
     "guideKeys": [],
     "templateKeys": [],
     "aliasOf": "Facial laceration"
@@ -2190,5 +2238,293 @@
     "guideKeys": [],
     "templateKeys": [],
     "aliasOf": "Tinnitus"
+  },
+  {
+    "cc": "** swelling",
+    "guideKeys": [{ "key": "trauma-traffic-accident", "rank": 0 }],
+    "templateKeys": [{ "key": "trauma", "rank": 0 }]
+  },
+  {
+    "cc": "Elbow swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** swelling"
+  },
+  {
+    "cc": "Lt. elbow swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** swelling"
+  },
+  {
+    "cc": "Rt. elbow swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** swelling"
+  },
+  {
+    "cc": "Hand swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** swelling"
+  },
+  {
+    "cc": "Lt. hand swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** swelling"
+  },
+  {
+    "cc": "Rt. hand swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** swelling"
+  },
+  {
+    "cc": "Knee swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** swelling"
+  },
+  {
+    "cc": "Lt. knee swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** swelling"
+  },
+  {
+    "cc": "Rt. knee swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** swelling"
+  },
+  {
+    "cc": "Both knee swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** swelling"
+  },
+  {
+    "cc": "Ankle swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** swelling"
+  },
+  {
+    "cc": "Lt. ankle swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** swelling"
+  },
+  {
+    "cc": "Rt. ankle swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** swelling"
+  },
+  {
+    "cc": "Both ankle swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "patternOf": "** swelling"
+  },
+  {
+    "cc": "Facial swelling",
+    "guideKeys": [
+      { "key": "ps", "rank": 1 },
+      { "key": "trauma-traffic-accident", "rank": 2 }
+    ],
+    "templateKeys": [
+      { "key": "ps", "rank": 1 },
+      { "key": "trauma", "rank": 2 }
+    ]
+  },
+  {
+    "cc": "Lt. facial swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Rt. facial swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Zygoma swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Lt. zygoma swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Rt. zygoma swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Both zygoma swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Periorbital swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Lt. periorbital swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Rt. periorbital swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Both periorbital swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Orbital swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Lt. orbital swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Rt. orbital swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Both orbital swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Nasal swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Maxillary swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Lt. maxillary swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Rt. maxillary swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Both maxillary swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Mandible swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Lt. mandible swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Rt. mandible swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Both mandible swelling",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Facial swelling"
+  },
+  {
+    "cc": "Palpitation",
+    "guideKeys": [
+      { "key": "im-basic", "rank": 0 },
+      { "key": "chest-pain", "rank": 1 },
+      { "key": "pc", "rank": 2 }
+    ],
+    "templateKeys": [
+      { "key": "im-basic", "rank": 0 },
+      { "key": "chest-pain", "rank": 1 },
+      { "key": "pc-hx", "rank": 2 }
+    ]
+  },
+  {
+    "cc": "Hiccup",
+    "guideKeys": [{ "key": "im-basic", "rank": 0 }],
+    "templateKeys": [{ "key": "im-basic", "rank": 0 }]
+  },
+  {
+    "cc": "Tongue pain",
+    "guideKeys": [
+      { "key": "dt", "rank": 0 },
+      { "key": "ps", "rank": 1 }
+    ],
+    "templateKeys": [{ "key": "ps", "rank": 0 }]
+  },
+  {
+    "cc": "Tongue laceration",
+    "guideKeys": [
+      { "key": "dt", "rank": 0 },
+      { "key": "ps", "rank": 1 }
+    ],
+    "templateKeys": [{ "key": "ps", "rank": 0 }]
+  },
+  {
+    "cc": "Tongue swelling",
+    "guideKeys": [
+      { "key": "dt", "rank": 0 },
+      { "key": "ps", "rank": 1 }
+    ],
+    "templateKeys": [{ "key": "ps", "rank": 0 }]
+  },
+  {
+    "cc": "Tongue bite",
+    "guideKeys": [
+      { "key": "dt", "rank": 0 },
+      { "key": "ps", "rank": 1 }
+    ],
+    "templateKeys": [{ "key": "ps", "rank": 0 }]
   }
 ]
