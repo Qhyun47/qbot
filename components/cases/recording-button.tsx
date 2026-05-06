@@ -43,10 +43,19 @@ export const RecordingButton = forwardRef<
   const isFirstSignalRef = useRef(true);
   const elapsedSecondsRef = useRef(elapsedSeconds);
   elapsedSecondsRef.current = elapsedSeconds;
+  const isRecordingRef = useRef(isRecording);
+  isRecordingRef.current = isRecording;
+  // React 상태와 별개로 동기적으로 관리하는 업로드 플래그 (race condition 방지)
+  const isUploadingFlagRef = useRef(false);
+  const pendingUploadRef = useRef<{ blob: Blob; seconds: number } | null>(null);
+  const hiddenTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const performUpload = useCallback(
     async (blob: Blob, seconds: number) => {
-      if (!caseId) return;
+      if (!caseId || blob.size === 0) return;
+      // fetch 전 동기적으로 플래그 세팅 (race condition 방지)
+      isUploadingFlagRef.current = true;
+      pendingUploadRef.current = { blob, seconds };
       setIsUploading(true);
       try {
         const ext = blob.type.includes("mp4") ? "mp4" : "webm";
@@ -65,13 +74,16 @@ export const RecordingButton = forwardRef<
         }
 
         const recording = await res.json();
+        pendingUploadRef.current = null;
         onUploadComplete?.(recording.id);
         toast.success("녹음이 저장되었습니다.");
       } catch (err) {
+        // pendingUploadRef는 이미 위에서 세팅됨 — 화면 복귀 시 재시도됨
         toast.error(
           err instanceof Error ? err.message : "업로드에 실패했습니다."
         );
       } finally {
+        isUploadingFlagRef.current = false;
         setIsUploading(false);
       }
     },
@@ -93,6 +105,42 @@ export const RecordingButton = forwardRef<
     }),
     [isRecording, caseId, stopRecording, performUpload]
   );
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // 알림 배너·짧은 앱 전환은 무시하고, 10초간 숨긴 상태가 지속될 때만 녹음 중지
+        hiddenTimerRef.current = setTimeout(async () => {
+          hiddenTimerRef.current = null;
+          if (!isRecordingRef.current || isUploadingFlagRef.current) return;
+          const seconds = elapsedSecondsRef.current;
+          const blob = await stopRecording();
+          if (!blob || blob.size === 0) return;
+          performUpload(blob, seconds);
+        }, 10_000);
+      } else {
+        // 10초 이내에 화면이 돌아오면 타이머 취소 (녹음 계속)
+        if (hiddenTimerRef.current) {
+          clearTimeout(hiddenTimerRef.current);
+          hiddenTimerRef.current = null;
+        }
+        // 이전 업로드가 실패한 경우 화면 복귀 시 재시도
+        if (pendingUploadRef.current && !isUploadingFlagRef.current) {
+          const { blob, seconds } = pendingUploadRef.current;
+          performUpload(blob, seconds);
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      if (hiddenTimerRef.current) {
+        clearTimeout(hiddenTimerRef.current);
+        hiddenTimerRef.current = null;
+      }
+    };
+  }, [stopRecording, performUpload]);
 
   useEffect(() => {
     if (isFirstSignalRef.current) {

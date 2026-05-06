@@ -51,7 +51,7 @@ export function ResultSection({
         value={localValue}
         onChange={handleChange}
         rows={9}
-        className="resize-none rounded-none border-0 font-mono text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+        className="result-section-content resize-none rounded-none border-0 font-mono focus-visible:ring-0 focus-visible:ring-offset-0"
       />
     </div>
   );

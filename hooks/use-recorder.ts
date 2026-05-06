@@ -42,7 +42,7 @@ export function useRecorder(): UseRecorderReturn {
         if (e.data.size > 0) chunksRef.current.push(e.data);
       };
 
-      mediaRecorder.start(1000);
+      mediaRecorder.start(500);
       setIsRecording(true);
 
       timerRef.current = setInterval(() => {

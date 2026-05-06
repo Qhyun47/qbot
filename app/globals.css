@@ -29,6 +29,11 @@ body {
   font-size: 1em;
 }
 
+/* AI 차팅 결과 본문: 사용자 글자 크기 설정에 비례해서 크기 조정 */
+.result-section-content {
+  font-size: calc(var(--mobile-font-size) * 0.8125);
+}
+
 /* ───── 뷰 모드 강제 오버라이드 ───── */
 
 /* 모바일 강제: 데스크탑에서 lg: 반응형 무력화 */
