@@ -8,13 +8,16 @@ import { CompactStatusList } from "@/components/dashboard/compact-status-list";
 import { StatusBoard } from "@/components/cases/status-board";
 import { RefreshButton } from "@/components/dashboard/refresh-button";
 import { HideAllFromBoardButton } from "@/components/cases/hide-all-from-board-button";
-import type { Case } from "@/lib/supabase/types";
+import { AlarmSection } from "@/components/alarms/alarm-section";
+import { AlarmFab } from "@/components/alarms/alarm-fab";
+import type { Alarm, Case } from "@/lib/supabase/types";
 
 interface DashboardViewProps {
   cases: Case[];
+  alarms: Alarm[];
 }
 
-export function DashboardView({ cases }: DashboardViewProps) {
+export function DashboardView({ cases, alarms }: DashboardViewProps) {
   const { isCompact } = useCompactMode();
 
   if (isCompact) {
@@ -26,6 +29,7 @@ export function DashboardView({ cases }: DashboardViewProps) {
         <div className="flex-1 overflow-y-auto">
           <CompactStatusList cases={cases} />
         </div>
+        <AlarmFab alarms={alarms} cases={cases} />
       </div>
     );
   }
@@ -52,6 +56,7 @@ export function DashboardView({ cases }: DashboardViewProps) {
         </div>
       </div>
       <StatusBoard cases={cases} />
+      <AlarmSection alarms={alarms} cases={cases} />
     </section>
   );
 }

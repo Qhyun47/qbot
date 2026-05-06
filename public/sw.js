@@ -28,3 +28,25 @@ self.addEventListener('fetch', (event) => {
     );
   }
 });
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const alarmId = event.notification.data && event.notification.data.alarmId;
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (clientList) {
+      for (var i = 0; i < clientList.length; i++) {
+        var client = clientList[i];
+        if (client.url.includes('/dashboard') && 'focus' in client) {
+          client.focus();
+          if (alarmId) client.postMessage({ type: 'ALARM_CONFIRMED', alarmId: alarmId });
+          return;
+        }
+      }
+      if (clients.openWindow) {
+        var url = '/dashboard';
+        if (alarmId) url += '?confirmAlarm=' + alarmId;
+        return clients.openWindow(url);
+      }
+    })
+  );
+});

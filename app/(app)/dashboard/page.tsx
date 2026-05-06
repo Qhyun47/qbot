@@ -5,14 +5,21 @@ import { DashboardView } from "@/components/dashboard/dashboard-view";
 import { DashboardPageShell } from "@/components/dashboard/dashboard-page-shell";
 import { CompactHide } from "@/components/compact-hide";
 import { listCasesByBed } from "@/lib/cases/queries";
+import { listAlarms } from "@/lib/alarms/queries";
 import { getIsAdmin } from "@/lib/auth/is-admin";
 import { getPendingCount } from "@/lib/admin/user-access-actions";
 import { AdminPendingAlert } from "@/components/ai-access/admin-pending-alert";
 import { RealtimeRefresh } from "@/components/cases/realtime-refresh";
+import { AlarmScheduler } from "@/components/alarms/alarm-scheduler";
 
-async function CasesSection() {
-  const cases = await listCasesByBed();
-  return <DashboardView cases={cases} />;
+async function CasesAndAlarmsSection() {
+  const [cases, alarms] = await Promise.all([listCasesByBed(), listAlarms()]);
+  return (
+    <>
+      <AlarmScheduler initialAlarms={alarms} />
+      <DashboardView cases={cases} alarms={alarms} />
+    </>
+  );
 }
 
 async function AdminAlertSection() {
@@ -37,6 +44,7 @@ export default function DashboardPage() {
   return (
     <DashboardPageShell>
       <RealtimeRefresh table="cases" />
+      <RealtimeRefresh table="alarms" />
 
       <CompactHide>
         <Suspense fallback={null}>
@@ -50,7 +58,7 @@ export default function DashboardPage() {
           <p className="p-4 text-sm text-muted-foreground">불러오는 중...</p>
         }
       >
-        <CasesSection />
+        <CasesAndAlarmsSection />
       </Suspense>
 
       <CompactHide>

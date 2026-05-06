@@ -63,6 +63,69 @@ export type Database = {
           },
         ];
       };
+      alarms: {
+        Row: {
+          bed_number: number | null;
+          bed_zone: string | null;
+          confirmed_at: string | null;
+          created_at: string;
+          id: string;
+          is_confirmed: boolean;
+          remaining_repeat_count: number | null;
+          repeat_count: number | null;
+          repeat_interval_minutes: number | null;
+          scheduled_at: string;
+          title: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          bed_number?: number | null;
+          bed_zone?: string | null;
+          confirmed_at?: string | null;
+          created_at?: string;
+          id?: string;
+          is_confirmed?: boolean;
+          remaining_repeat_count?: number | null;
+          repeat_count?: number | null;
+          repeat_interval_minutes?: number | null;
+          scheduled_at: string;
+          title: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          bed_number?: number | null;
+          bed_zone?: string | null;
+          confirmed_at?: string | null;
+          created_at?: string;
+          id?: string;
+          is_confirmed?: boolean;
+          remaining_repeat_count?: number | null;
+          repeat_count?: number | null;
+          repeat_interval_minutes?: number | null;
+          scheduled_at?: string;
+          title?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "alarms_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "alarms_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "service_access_requests";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       case_inputs: {
         Row: {
           case_id: string;
@@ -808,6 +871,7 @@ export type CaseStatus = Database["public"]["Enums"]["case_status"];
 export type InputLayout = Database["public"]["Enums"]["input_layout"];
 export type FoldFallbackLayout = "single" | "split_vertical";
 
+export type Alarm = Tables<"alarms">;
 export type Case = Tables<"cases">;
 export type CaseInput = Tables<"case_inputs">;
 export type CaseResult = Tables<"case_results">;
