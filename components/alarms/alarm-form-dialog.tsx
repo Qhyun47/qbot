@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Bell, Clock, Minus, Plus, RefreshCw, Timer } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { TimeInput } from "@/components/ui/time-input";
 import {
   Dialog,
   DialogContent,
@@ -50,15 +52,11 @@ const schema = z
         });
         return;
       }
+      // parseSpecificTime은 과거 시각을 자동으로 내일로 보정하므로
+      // scheduled > now는 항상 참 — 24시간 초과 여부만 검증
       const scheduled = parseSpecificTime(val.specificTime);
       const now = new Date();
-      if (scheduled <= now) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["specificTime"],
-          message: "현재 시각 이후로 설정해주세요",
-        });
-      } else if (scheduled.getTime() - now.getTime() > 24 * 60 * 60 * 1000) {
+      if (scheduled.getTime() - now.getTime() > 24 * 60 * 60 * 1000) {
         ctx.addIssue({
           code: "custom",
           path: ["specificTime"],
@@ -167,6 +165,7 @@ export function AlarmFormDialog({
   const {
     register,
     handleSubmit,
+    control,
     watch,
     setValue,
     reset,
@@ -228,6 +227,8 @@ export function AlarmFormDialog({
       onOpenChange(false);
       onSuccess?.();
       reset();
+    } catch {
+      toast.error("알람 저장에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setSubmitting(false);
     }
@@ -372,10 +373,15 @@ export function AlarmFormDialog({
         {/* specific 모드 */}
         {timeMode === "specific" && (
           <div className="space-y-1.5">
-            <Input
-              type="time"
-              className="h-10 text-base tabular-nums"
-              {...register("specificTime")}
+            <Controller
+              control={control}
+              name="specificTime"
+              render={({ field }) => (
+                <TimeInput
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                />
+              )}
             />
             <p className="text-xs text-muted-foreground">
               현재 시각 이후 ~ 24시간 이내
