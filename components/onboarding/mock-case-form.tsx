@@ -1,9 +1,19 @@
 "use client";
 
-import { ArrowLeft, Camera, Mic, SendHorizontal, Zap } from "lucide-react";
+import {
+  ArrowLeft,
+  BookOpen,
+  Camera,
+  FileText,
+  Mic,
+  SendHorizontal,
+  Zap,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoachMark } from "@/components/onboarding/coach-mark";
 import { BedBadge } from "@/components/cases/bed-badge";
+import { CardTimeline } from "@/components/cases/card-timeline";
+import type { CaseInput } from "@/lib/supabase/types";
 
 export type MockTab = "가이드라인" | "상용구";
 export type HighlightTarget =
@@ -15,7 +25,7 @@ export type HighlightTarget =
   | "gallery"
   | null;
 
-interface MockCard {
+export interface MockCard {
   text: string;
   timeTag?: string;
 }
@@ -32,6 +42,21 @@ interface MockCaseFormProps {
   children?: React.ReactNode;
 }
 
+function toInputCards(mockCards: MockCard[]): CaseInput[] {
+  return mockCards.map((card, i) => ({
+    id: `mock-${i}`,
+    case_id: "mock-case",
+    raw_text: card.text,
+    time_tag: card.timeTag ?? null,
+    time_offset_minutes: card.timeTag ? -720 : null,
+    section_override: null,
+    display_order: i + 1,
+    created_at: new Date(
+      Date.now() - (mockCards.length - i) * 60000
+    ).toISOString(),
+  }));
+}
+
 export function MockCaseForm({
   activeTab,
   cards = [],
@@ -45,24 +70,25 @@ export function MockCaseForm({
 }: MockCaseFormProps) {
   const getTooltip = (target: HighlightTarget): React.ReactNode =>
     highlightTarget === target ? (tooltipNode ?? highlightTooltip) : "";
+
+  const inputCards = toInputCards(cards);
+
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-background">
-      {/* 헤더 */}
-      <header className="flex shrink-0 items-center gap-2 border-b px-3 py-2">
+      {/* 헤더 — 실제 NewCaseForm 헤더와 동일한 구조 */}
+      <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
         <Button
           variant="ghost"
           size="icon"
-          className="pointer-events-none size-8"
+          className="pointer-events-none shrink-0"
         >
           <ArrowLeft className="size-4" />
         </Button>
-        <div className="flex flex-1 items-center gap-1.5 overflow-hidden">
-          <BedBadge bedZone="A" bedNumber={1} size="sm" />
-          <span className="truncate rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-xs text-primary">
-            Abdominal pain
-          </span>
-        </div>
-        <div className="flex shrink-0 items-center gap-1">
+        <BedBadge bedZone="A" bedNumber={1} size="sm" />
+        <button className="pointer-events-none flex min-w-0 flex-1 items-center overflow-hidden rounded-full border px-2 py-0.5 text-left">
+          <span className="min-w-0 truncate text-xs">Abdominal pain</span>
+        </button>
+        <div className="flex shrink-0 items-center gap-2">
           <CoachMark
             tooltip={getTooltip("mic")}
             tooltipPosition="bottom"
@@ -81,71 +107,86 @@ export function MockCaseForm({
             tooltipPosition="bottom"
             active={highlightTarget === "zap"}
           >
-            <Button size="sm" className="pointer-events-none h-7 gap-1 text-xs">
-              <Zap className="size-3" />
+            <Button size="sm" className="pointer-events-none gap-1.5" disabled>
+              <Zap className="size-3.5" />
               차팅 생성
             </Button>
           </CoachMark>
         </div>
       </header>
 
-      {/* 가이드라인 패널 */}
-      <div className="flex flex-col border-b" style={{ height: "45%" }}>
-        {/* 탭 */}
-        <div className="flex shrink-0 items-center gap-1 px-3 pb-1 pt-2">
+      {/* 가이드라인 패널 — 실제 GuidelinePanel과 동일한 구조 */}
+      <div
+        className="flex flex-col overflow-hidden bg-muted/30"
+        style={{ height: "45%" }}
+      >
+        {/* 탭 바 — border-b-2 언더라인 스타일 */}
+        <div className="flex border-b bg-muted/20">
           <CoachMark
             tooltip={getTooltip("guideline-tab")}
             tooltipPosition="bottom"
             active={highlightTarget === "guideline-tab"}
+            wrapperClassName="flex flex-1"
           >
             <button
-              className={`pointer-events-none rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+              className={[
+                "pointer-events-none flex flex-1 select-none flex-col items-start gap-0.5 border-b-2 px-3 py-2.5 text-left",
                 activeTab === "가이드라인"
-                  ? "bg-primary text-primary-foreground"
-                  : "border text-muted-foreground"
-              }`}
+                  ? "border-foreground text-foreground"
+                  : "border-transparent text-muted-foreground",
+              ].join(" ")}
             >
-              가이드라인
+              <div className="flex items-center gap-1.5">
+                <BookOpen className="size-3 shrink-0" />
+                <span className="text-xs font-semibold uppercase tracking-wider">
+                  가이드라인
+                </span>
+              </div>
+              <span className="w-full truncate text-xs font-normal normal-case text-muted-foreground">
+                {activeTab === "가이드라인" ? "Abdominal pain" : "선택 안 됨"}
+              </span>
             </button>
           </CoachMark>
+
+          <div className="w-px shrink-0 self-stretch bg-border" />
+
           <CoachMark
             tooltip={getTooltip("template-tab")}
             tooltipPosition="bottom"
             active={highlightTarget === "template-tab"}
+            wrapperClassName="flex flex-1"
           >
             <button
-              className={`pointer-events-none rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+              className={[
+                "pointer-events-none flex flex-1 select-none flex-col items-start gap-0.5 border-b-2 px-3 py-2.5 text-left",
                 activeTab === "상용구"
-                  ? "bg-primary text-primary-foreground"
-                  : "border text-muted-foreground"
-              }`}
+                  ? "border-foreground text-foreground"
+                  : "border-transparent text-muted-foreground",
+              ].join(" ")}
             >
-              상용구
+              <div className="flex items-center gap-1.5">
+                <FileText className="size-3 shrink-0" />
+                <span className="text-xs font-semibold uppercase tracking-wider">
+                  상용구
+                </span>
+              </div>
+              <span className="w-full truncate text-xs font-normal normal-case text-muted-foreground">
+                상용구 없음
+              </span>
             </button>
           </CoachMark>
         </div>
 
-        {/* 탭 컨텐츠 */}
-        <div className="flex-1 overflow-hidden px-3 py-2 text-xs text-muted-foreground">
+        {/* 탭 콘텐츠 */}
+        <div className="flex-1 overflow-hidden p-4 text-xs text-muted-foreground">
           {guidelineContent ?? (
-            <div className="space-y-1.5 opacity-40">
-              {activeTab === "가이드라인" ? (
-                <>
-                  <div className="h-2.5 w-3/4 rounded bg-muted" />
-                  <div className="h-2.5 w-full rounded bg-muted" />
-                  <div className="h-2.5 w-5/6 rounded bg-muted" />
-                  <div className="h-2.5 w-2/3 rounded bg-muted" />
-                  <div className="h-2.5 w-full rounded bg-muted" />
-                  <div className="h-2.5 w-4/5 rounded bg-muted" />
-                </>
-              ) : (
-                <>
-                  <div className="h-2.5 w-1/2 rounded bg-muted" />
-                  <div className="h-2.5 w-full rounded bg-muted" />
-                  <div className="h-2.5 w-3/4 rounded bg-muted" />
-                  <div className="h-2.5 w-5/6 rounded bg-muted" />
-                </>
-              )}
+            <div className="space-y-1.5 opacity-30">
+              <div className="h-2.5 w-3/4 rounded bg-muted-foreground" />
+              <div className="h-2.5 w-full rounded bg-muted-foreground" />
+              <div className="h-2.5 w-5/6 rounded bg-muted-foreground" />
+              <div className="h-2.5 w-2/3 rounded bg-muted-foreground" />
+              <div className="h-2.5 w-full rounded bg-muted-foreground" />
+              <div className="h-2.5 w-4/5 rounded bg-muted-foreground" />
             </div>
           )}
         </div>
@@ -153,33 +194,24 @@ export function MockCaseForm({
 
       {/* 카드 타임라인 + 입력바 */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        {/* 시간 감지 배너 */}
-        {showTimeBanner && (
-          <div className="mx-3 mt-2 shrink-0 rounded-lg border border-blue-500/20 bg-blue-500/10 px-3 py-1.5 text-xs text-blue-600 dark:text-blue-400">
-            감지된 시간: 어제
-          </div>
-        )}
-
         {/* 카드 목록 */}
-        <div className="flex-1 space-y-1.5 overflow-y-auto px-3 py-2">
-          {cards.map((card, i) => (
-            <div
-              key={i}
-              className="rounded-lg border bg-card px-3 py-2 text-sm"
-            >
-              {card.timeTag && (
-                <span className="mr-1.5 text-xs text-blue-500">
-                  {card.timeTag}
-                </span>
-              )}
-              {card.text}
-            </div>
-          ))}
+        <div className="case-input-font-scope flex-1 overflow-y-auto overscroll-y-contain">
+          <div className="p-4">
+            <CardTimeline cards={inputCards} readOnly />
+          </div>
         </div>
 
-        {/* 입력바 */}
-        <div className="shrink-0 border-t px-3 pb-4 pt-2">
-          <div className="flex items-center gap-2 rounded-xl border bg-muted/30 px-3 py-2">
+        {/* 입력바 — 실제 CardInputBar와 동일한 구조 */}
+        <div className="pointer-events-none shrink-0 border-t bg-background">
+          {showTimeBanner && (
+            <div className="flex items-center gap-1.5 border-b bg-blue-50 px-3 py-1.5 text-xs dark:bg-blue-950">
+              <span className="text-muted-foreground">감지된 시간:</span>
+              <span className="rounded bg-blue-100 px-1.5 py-0.5 font-medium text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                어제
+              </span>
+            </div>
+          )}
+          <div className="flex items-end gap-2 p-3">
             <CoachMark
               tooltip={getTooltip("camera")}
               tooltipPosition="top"
@@ -188,21 +220,22 @@ export function MockCaseForm({
               <Button
                 variant="ghost"
                 size="icon"
-                className="pointer-events-none size-7 shrink-0"
+                className="pointer-events-none shrink-0"
               >
                 <Camera className="size-4" />
               </Button>
             </CoachMark>
-            <div className="min-h-5 flex-1 text-sm">
+            <div className="min-h-[36px] flex-1 overflow-hidden rounded-md border bg-background px-3 py-2 text-sm">
               {inputText}
               {inputText && (
                 <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-foreground align-middle" />
               )}
             </div>
             <Button
-              variant="ghost"
               size="icon"
-              className="pointer-events-none size-7 shrink-0"
+              variant="ghost"
+              className="pointer-events-none shrink-0"
+              disabled
             >
               <SendHorizontal className="size-4" />
             </Button>

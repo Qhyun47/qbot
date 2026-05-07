@@ -9,6 +9,7 @@ interface CoachMarkProps {
   tooltip: ReactNode;
   tooltipPosition?: TooltipPosition;
   active?: boolean;
+  wrapperClassName?: string;
 }
 
 const arrowStyles: Record<TooltipPosition, string> = {
@@ -32,13 +33,16 @@ export function CoachMark({
   tooltip,
   tooltipPosition = "bottom",
   active = false,
+  wrapperClassName,
 }: CoachMarkProps) {
   return (
     <>
       {active && (
         <div className="pointer-events-none fixed inset-0 z-40 bg-black/50" />
       )}
-      <div className={`relative inline-block ${active ? "z-50" : ""}`}>
+      <div
+        className={`relative ${wrapperClassName ?? "inline-block"} ${active ? "z-50" : ""}`}
+      >
         <div
           className={
             active ? "animate-pulse rounded-lg ring-2 ring-primary" : undefined
