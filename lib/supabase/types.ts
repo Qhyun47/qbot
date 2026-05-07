@@ -71,6 +71,7 @@ export type Database = {
           created_at: string;
           id: string;
           is_confirmed: boolean;
+          last_fired_at: string | null;
           remaining_repeat_count: number | null;
           repeat_count: number | null;
           repeat_interval_minutes: number | null;
@@ -86,6 +87,7 @@ export type Database = {
           created_at?: string;
           id?: string;
           is_confirmed?: boolean;
+          last_fired_at?: string | null;
           remaining_repeat_count?: number | null;
           repeat_count?: number | null;
           repeat_interval_minutes?: number | null;
@@ -101,6 +103,7 @@ export type Database = {
           created_at?: string;
           id?: string;
           is_confirmed?: boolean;
+          last_fired_at?: string | null;
           remaining_repeat_count?: number | null;
           repeat_count?: number | null;
           repeat_interval_minutes?: number | null;

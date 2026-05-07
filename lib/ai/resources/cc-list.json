@@ -2526,5 +2526,29 @@
       { "key": "ps", "rank": 1 }
     ],
     "templateKeys": [{ "key": "ps", "rank": 0 }]
+  },
+  {
+    "cc": "Gingiva pain",
+    "guideKeys": [
+      { "key": "dt", "rank": 0 },
+      { "key": "ps", "rank": 1 }
+    ],
+    "templateKeys": [{ "key": "ps", "rank": 0 }]
+  },
+  {
+    "cc": "Gingiva laceration",
+    "guideKeys": [
+      { "key": "dt", "rank": 0 },
+      { "key": "ps", "rank": 1 }
+    ],
+    "templateKeys": [{ "key": "ps", "rank": 0 }]
+  },
+  {
+    "cc": "Gingiva swelling",
+    "guideKeys": [
+      { "key": "dt", "rank": 0 },
+      { "key": "ps", "rank": 1 }
+    ],
+    "templateKeys": [{ "key": "ps", "rank": 0 }]
   }
 ]

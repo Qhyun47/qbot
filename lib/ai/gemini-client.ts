@@ -34,14 +34,31 @@ function extractJson(text: string): string {
 export async function generateText(
   prompt: string,
   systemInstruction: string,
-  maxOutputTokens?: number
+  maxOutputTokens?: number,
+  thinkingBudget?: number
 ): Promise<{ text: string } & TokenUsage> {
   const client = createClient();
   const result = await client.models.generateContent({
     model: MODEL,
     contents: prompt,
-    config: { systemInstruction, ...(maxOutputTokens && { maxOutputTokens }) },
+    config: {
+      systemInstruction,
+      ...(maxOutputTokens && { maxOutputTokens }),
+      ...(thinkingBudget !== undefined && {
+        thinkingConfig: { thinkingBudget },
+      }),
+    },
   });
+
+  const finishReason = result.candidates?.[0]?.finishReason;
+  if (
+    finishReason &&
+    finishReason !== "STOP" &&
+    finishReason !== "FINISH_REASON_UNSPECIFIED"
+  ) {
+    throw new Error(`생성 중단 (finishReason: ${finishReason})`);
+  }
+
   return {
     text: result.text ?? "",
     inputTokens: result.usageMetadata?.promptTokenCount ?? 0,

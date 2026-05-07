@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import type { Alarm } from "@/lib/supabase/types";
 
 export type CreateAlarmInput = {
   title: string;
@@ -109,6 +110,25 @@ export async function confirmAlarm(id: string): Promise<void> {
   revalidatePath("/dashboard");
 }
 
+export async function fetchPastAlarms(
+  cursor?: string,
+  limit = 20
+): Promise<Alarm[]> {
+  const { supabase, user } = await getAuthUser();
+
+  const { data, error } = await supabase
+    .from("alarms")
+    .select("*")
+    .eq("user_id", user.id)
+    .eq("is_confirmed", true)
+    .lt("confirmed_at", cursor ?? new Date().toISOString())
+    .order("confirmed_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
 export async function fireAlarm(id: string): Promise<void> {
   const { supabase, user } = await getAuthUser();
 
@@ -122,10 +142,12 @@ export async function fireAlarm(id: string): Promise<void> {
   if (fetchError || !alarm)
     throw new Error(fetchError?.message ?? "알람을 찾을 수 없습니다");
 
+  const now = new Date().toISOString();
   const remaining = (alarm.remaining_repeat_count ?? 0) - 1;
 
   let updateError;
   if (remaining > 0) {
+    // 반복 알람: 다음 예약 시간으로 전진
     const intervalMs = (alarm.repeat_interval_minutes ?? 0) * 60 * 1000;
     const nextScheduledAt = new Date(
       new Date(alarm.scheduled_at).getTime() + intervalMs
@@ -135,23 +157,23 @@ export async function fireAlarm(id: string): Promise<void> {
       .update({
         remaining_repeat_count: remaining,
         scheduled_at: nextScheduledAt,
+        last_fired_at: now,
       })
       .eq("id", id)
       .eq("user_id", user.id));
   } else {
+    // 마지막 반복이거나 반복 없는 알람: last_fired_at만 기록, 사용자가 직접 확인해야 함
     ({ error: updateError } = await supabase
       .from("alarms")
       .update({
-        remaining_repeat_count: 0,
-        is_confirmed: true,
-        confirmed_at: new Date().toISOString(),
+        remaining_repeat_count:
+          alarm.remaining_repeat_count !== null ? 0 : null,
+        last_fired_at: now,
       })
       .eq("id", id)
       .eq("user_id", user.id));
   }
 
-  const error = updateError;
-
-  if (error) throw new Error(error.message);
+  if (updateError) throw new Error(updateError.message);
   revalidatePath("/dashboard");
 }

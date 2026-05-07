@@ -19,3 +19,28 @@ export async function listAlarms(): Promise<Alarm[]> {
 
   return data ?? [];
 }
+
+export async function listPastAlarms(
+  cursor?: string,
+  limit = 20
+): Promise<Alarm[]> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+  const query = supabase
+    .from("alarms")
+    .select("*")
+    .eq("user_id", user.id)
+    .eq("is_confirmed", true)
+    .lt("confirmed_at", cursor ?? since24h)
+    .order("confirmed_at", { ascending: false })
+    .limit(limit);
+
+  const { data } = await query;
+  return data ?? [];
+}

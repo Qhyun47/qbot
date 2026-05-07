@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { DashboardDesktopHeader } from "@/components/dashboard/dashboard-desktop-header";
 import { DashboardGallerySheet } from "@/components/dashboard/dashboard-gallery-sheet";
 import { DashboardView } from "@/components/dashboard/dashboard-view";
 import { DashboardPageShell } from "@/components/dashboard/dashboard-page-shell";
@@ -50,7 +49,6 @@ export default function DashboardPage() {
         <Suspense fallback={null}>
           <AdminAlertSection />
         </Suspense>
-        <DashboardDesktopHeader />
       </CompactHide>
 
       <Suspense

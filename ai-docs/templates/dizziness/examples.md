@@ -22,7 +22,9 @@ Asso.sx. : Nystagmus(-) / Gait disturbance(-)
            쓰러질 것 같은 느낌(-) 특히 오랜 시간 서 있는 중(-), 대소변(-)
            * neurologic Sx (-) : limb weakness, sensory change, diplopia, dysarthria, ataxia
 
-Agg/relieving fx.: 자세변화 : 고개옆으로 돌릴 때, 누웠다 앉을 때
+Agg/relieving fx.: 자세변화 : 누울때(-) 고개옆으로 돌릴 때(+) 누웠다 앉을 때(+) 기립시(-)
+               - 그 외, 피로(-) 스트레스(-) 걸을때(-) 안정시(-) 오래 서있을 때(-) 불면(-)
+               쉬면 완화(-) 감기증상/컨디션저하(-) 식사량저하(-)
 
 Previous dizziness Hx. : 이전 어지럼증 경험(-) 평소 기립성 어지럼증 경험(-)
 
@@ -81,7 +83,9 @@ Asso.sx. : Nystagmus(+) / Gait disturbance(-)
            쓰러질 것 같은 느낌(-) 특히 오랜 시간 서 있는 중(-), 대소변(-)
            * neurologic Sx (-) : limb weakness, sensory change, diplopia, dysarthria, ataxia
 
-Agg/relieving fx.: 고개옆으로 돌릴 때, 누웠다 앉을 때, 악화
+Agg/relieving fx.: 자세변화 : 누울때(-) 고개옆으로 돌릴 때(+) 누웠다 앉을 때(+) 기립시(-)
+               - 그 외, 피로(-) 스트레스(-) 걸을때(-) 안정시(-) 오래 서있을 때(-) 불면(-)
+               쉬면 완화(-) 감기증상/컨디션저하(-) 식사량저하(-)
 
 Previous dizziness Hx. : 이전 어지럼증 경험(+) 평소 기립성 어지럼증 경험(-)
 
@@ -145,8 +149,9 @@ Asso.sx. : Nystagmus(-) / Gait disturbance(-)
            쓰러질 것 같은 느낌(-) 특히 오랜 시간 서 있는 중(-), 대소변(-)
            * neurologic Sx (-) : limb weakness, sensory change, diplopia, dysarthria, ataxia
 
-Agg/relieving fx.: 자세변화와 관계없다 대중 없이 발생.
-누워있을 때도 머리가 빈것 같은 느낌으로 발생 후 소실, 특정 자세 시 더 어지러운 건 없다.
+Agg/relieving fx.: 자세변화 : 누울때(-) 고개옆으로 돌릴 때(-) 누웠다 앉을 때(-) 기립시(-)
+               - 그 외, 피로(-) 스트레스(-) 걸을때(-) 안정시(-) 오래 서있을 때(-) 불면(-)
+               쉬면 완화(-) 감기증상/컨디션저하(-) 식사량저하(-) : 자세변화와 관계없이 대중없이 발생
 
 Previous dizziness Hx. : 이전 어지럼증 경험(-) 평소 기립성 어지럼증 경험(-)
                          약 복용/변경(-)
@@ -204,7 +209,9 @@ Asso.sx. : Nystagmus(-) / Gait disturbance(-)
            쓰러질 것 같은 느낌(-) 특히 오랜 시간 서 있는 중(-), 대소변(-)
            * neurologic Sx (-) : limb weakness, sensory change, diplopia, dysarthria, ataxia
 
-Agg/relieving fx.: 자세변화 : 누웠다 앉을 때, 앉아있다가 누울 때
+Agg/relieving fx.: 자세변화 : 누울때(-) 고개옆으로 돌릴 때(-) 누웠다 앉을 때(+) 기립시(-)
+               - 그 외, 피로(-) 스트레스(-) 걸을때(-) 안정시(-) 오래 서있을 때(-) 불면(-)
+               쉬면 완화(-) 감기증상/컨디션저하(-) 식사량저하(-)
 
 Previous dizziness Hx. : 이전 어지럼증 경험(+) 평소 기립성 어지럼증 경험(-)
                          약 복용/변경(-)
@@ -264,7 +271,9 @@ Asso.sx. : Nystagmus(-) / Gait disturbance(+)
            쓰러질 것 같은 느낌(-) 특히 오랜 시간 서 있는 중(-), 대소변(-)
            * neurologic Sx (-) : limb weakness, sensory change, diplopia, dysarthria, ataxia
 
-Agg/relieving fx.: (-)
+Agg/relieving fx.: 자세변화 : 누울때(-) 고개옆으로 돌릴 때(-) 누웠다 앉을 때(-) 기립시(-)
+               - 그 외, 피로(-) 스트레스(-) 걸을때(-) 안정시(-) 오래 서있을 때(-) 불면(-)
+               쉬면 완화(-) 감기증상/컨디션저하(-) 식사량저하(-)
 
 Previous dizziness Hx. : 이전 어지럼증 경험(+) 평소 기립성 어지럼증 경험(+)
                          약 복용/변경(-)
@@ -322,7 +331,9 @@ Asso.sx. : Nystagmus(-) / Gait disturbance(+, 왼쪽으로 쏠림)
            쓰러질 것 같은 느낌(-) 특히 오랜 시간 서 있는 중(-), 대소변(-)
            * neurologic Sx (-) : limb weakness, sensory change, diplopia, dysarthria, ataxia
 
-Agg/relieving fx.: 자세변화 : 누울때, 고개옆으로 돌릴 때 등 움직일 때 악화
+Agg/relieving fx.: 자세변화 : 누울때(+) 고개옆으로 돌릴 때(+) 누웠다 앉을 때(-) 기립시(-)
+               - 그 외, 피로(-) 스트레스(-) 걸을때(+) 안정시(-) 오래 서있을 때(-) 불면(-)
+               쉬면 완화(-) 감기증상/컨디션저하(-) 식사량저하(-)
 
 Previous dizziness Hx. : 이전 어지럼증 경험(+, 2년 전 BPPV 있었으며, 당시 초기 증상과 현재 증상 비슷한 것 같다고 함)
 평소 기립성 어지럼증 경험(-)

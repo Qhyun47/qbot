@@ -39,7 +39,8 @@ export async function generateTemplate(
   const { text, inputTokens, outputTokens } = await generateText(
     userPrompt,
     systemPrompt,
-    5000
+    16000,
+    2048
   );
   if (!text) throw new Error("상용구 생성 실패: 빈 응답");
   return { text, inputTokens, outputTokens };

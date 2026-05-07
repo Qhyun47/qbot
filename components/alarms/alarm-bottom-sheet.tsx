@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { Bell, ChevronDown, ChevronRight, Plus } from "lucide-react";
+import { useRef, useState, useTransition } from "react";
+import { Bell, ChevronDown, ChevronRight, Loader2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -11,7 +11,11 @@ import {
 } from "@/components/ui/drawer";
 import { AlarmListItem } from "@/components/alarms/alarm-list-item";
 import { AlarmFormDialog } from "@/components/alarms/alarm-form-dialog";
-import { confirmAlarm, deleteAlarm } from "@/lib/alarms/actions";
+import {
+  confirmAlarm,
+  deleteAlarm,
+  fetchPastAlarms,
+} from "@/lib/alarms/actions";
 import type { Alarm, Case } from "@/lib/supabase/types";
 
 interface Props {
@@ -25,6 +29,10 @@ export function AlarmBottomSheet({ alarms, cases, open, onOpenChange }: Props) {
   const [formOpen, setFormOpen] = useState(false);
   const [editingAlarm, setEditingAlarm] = useState<Alarm | undefined>();
   const [completedExpanded, setCompletedExpanded] = useState(false);
+  const [pastAlarms, setPastAlarms] = useState<Alarm[]>([]);
+  const [loadingPast, setLoadingPast] = useState(false);
+  const [hasMorePast, setHasMorePast] = useState(true);
+  const loadingPastRef = useRef(false);
   const [, startTransition] = useTransition();
 
   const now = new Date();
@@ -36,7 +44,10 @@ export function AlarmBottomSheet({ alarms, cases, open, onOpenChange }: Props) {
   );
   const completed = alarms.filter((a) => a.is_confirmed);
   const isEmpty =
-    unconfirmed.length === 0 && upcoming.length === 0 && completed.length === 0;
+    unconfirmed.length === 0 &&
+    upcoming.length === 0 &&
+    completed.length === 0 &&
+    pastAlarms.length === 0;
   const showUpcomingLabel = upcoming.length > 0 && unconfirmed.length > 0;
 
   function handleConfirm(id: string) {
@@ -59,6 +70,30 @@ export function AlarmBottomSheet({ alarms, cases, open, onOpenChange }: Props) {
   function handleNewAlarm() {
     setEditingAlarm(undefined);
     setFormOpen(true);
+  }
+
+  async function handleLoadMorePast() {
+    if (loadingPastRef.current) return;
+    loadingPastRef.current = true;
+    setLoadingPast(true);
+    try {
+      const allPast = [...completed, ...pastAlarms];
+      const oldest = allPast.reduce<Alarm | undefined>((prev, cur) => {
+        if (!prev) return cur;
+        return (cur.confirmed_at ?? "") < (prev.confirmed_at ?? "")
+          ? cur
+          : prev;
+      }, undefined);
+      const cursor = oldest?.confirmed_at ?? undefined;
+      const more = await fetchPastAlarms(cursor);
+      if (more.length < 20) setHasMorePast(false);
+      setPastAlarms((prev) => [...prev, ...more]);
+    } catch {
+      // 오류 시 hasMorePast 유지 — 재시도 가능
+    } finally {
+      setLoadingPast(false);
+      loadingPastRef.current = false;
+    }
   }
 
   return (
@@ -158,30 +193,55 @@ export function AlarmBottomSheet({ alarms, cases, open, onOpenChange }: Props) {
               </div>
             )}
 
-            {/* 완료 섹션 */}
-            {completed.length > 0 && (
-              <div>
-                <button
-                  type="button"
-                  onClick={() => setCompletedExpanded((v) => !v)}
-                  className="flex w-full items-center gap-1.5 rounded-md px-2 py-2 text-xs text-muted-foreground transition-colors hover:bg-muted/50"
-                >
-                  {completedExpanded ? (
-                    <ChevronDown className="h-3 w-3" />
-                  ) : (
-                    <ChevronRight className="h-3 w-3" />
-                  )}
-                  완료된 알람 {completed.length}개
-                </button>
-                {completedExpanded && (
-                  <div className="mt-0.5 space-y-0.5">
-                    {completed.map((alarm) => (
-                      <AlarmListItem key={alarm.id} alarm={alarm} />
-                    ))}
-                  </div>
+            {/* 완료 및 이전 알람 섹션 — completed가 없어도 항상 접근 가능 */}
+            <div>
+              <button
+                type="button"
+                onClick={() => setCompletedExpanded((v) => !v)}
+                className="flex w-full items-center gap-1.5 rounded-md px-2 py-2 text-xs text-muted-foreground transition-colors hover:bg-muted/50"
+              >
+                {completedExpanded ? (
+                  <ChevronDown className="h-3 w-3" />
+                ) : (
+                  <ChevronRight className="h-3 w-3" />
                 )}
-              </div>
-            )}
+                {completed.length > 0
+                  ? `완료된 알람 ${completed.length}개`
+                  : "이전 알람 기록"}
+              </button>
+              {completedExpanded && (
+                <div className="mt-0.5 space-y-0.5">
+                  {completed.map((alarm) => (
+                    <AlarmListItem key={alarm.id} alarm={alarm} />
+                  ))}
+                  {pastAlarms.map((alarm) => (
+                    <AlarmListItem key={alarm.id} alarm={alarm} />
+                  ))}
+                  {completed.length === 0 &&
+                    pastAlarms.length === 0 &&
+                    !loadingPast && (
+                      <p className="px-2 py-3 text-center text-xs text-muted-foreground">
+                        이전 알람 기록이 없습니다
+                      </p>
+                    )}
+                  {hasMorePast && (
+                    <button
+                      type="button"
+                      onClick={handleLoadMorePast}
+                      disabled={loadingPast}
+                      className="flex w-full items-center justify-center gap-1.5 rounded-md px-2 py-2 text-xs text-muted-foreground transition-colors hover:bg-muted/50 disabled:opacity-50"
+                    >
+                      {loadingPast ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <ChevronDown className="h-3 w-3" />
+                      )}
+                      이전 알람 더 보기
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </DrawerContent>
       </Drawer>
