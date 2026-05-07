@@ -22,6 +22,7 @@ export function Step06Camera({ onNext, onPrev, totalSteps }: Step06Props) {
         cards={DEMO_CARDS}
         highlightTarget="camera"
         highlightTooltip="카메라 버튼으로 문진 중 사진을 촬영할 수 있습니다."
+        extraBottomPadding={120}
       />
       <div className="absolute inset-x-0 bottom-0 z-50 border-t bg-background px-6 pb-8 pt-3">
         <StepIndicator total={totalSteps} current={5} />

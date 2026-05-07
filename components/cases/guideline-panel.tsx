@@ -57,6 +57,10 @@ interface GuidelinePanelProps {
   defaultActiveView?: "guide" | "template";
   coachMarkGuidelineTab?: React.ReactNode;
   coachMarkTemplateTab?: React.ReactNode;
+  /** 온보딩 데모 전용: 외부에서 강제로 탭 전환 */
+  forceActiveView?: "guide" | "template";
+  /** 온보딩 데모 전용: 외부에서 selector 열기/닫기 제어 */
+  forceShowSelector?: boolean;
 }
 
 function getGuideLabel(guideKey: string): string {
@@ -161,6 +165,8 @@ export function GuidelinePanel({
   defaultActiveView,
   coachMarkGuidelineTab,
   coachMarkTemplateTab,
+  forceActiveView,
+  forceShowSelector,
 }: GuidelinePanelProps) {
   const [activeView, setActiveView] = useState<"guide" | "template">(
     defaultActiveView ?? "guide"
@@ -259,6 +265,14 @@ export function GuidelinePanel({
       .finally(() => setIsTemplateLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateKeysKey]);
+
+  useEffect(() => {
+    if (forceActiveView !== undefined) setActiveView(forceActiveView);
+  }, [forceActiveView]);
+
+  useEffect(() => {
+    if (forceShowSelector !== undefined) setShowSelector(forceShowSelector);
+  }, [forceShowSelector]);
 
   const closeSelector = () => {
     setShowSelector(false);

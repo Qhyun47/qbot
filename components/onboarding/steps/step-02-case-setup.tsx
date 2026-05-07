@@ -70,7 +70,7 @@ export function Step02CaseSetup({ onNext, onPrev, totalSteps }: Step02Props) {
 
       {/* 실제 "확인" 버튼 자리를 온보딩 네비로 대체 */}
       <div className="shrink-0 space-y-3 border-t p-4">
-        <p className="text-center text-xs leading-relaxed text-muted-foreground">
+        <p className="rounded-lg border bg-muted/60 px-3 py-2 text-center text-sm leading-relaxed text-foreground">
           베드 번호와 C.C(주요 증상)를 선택하면 케이스가 생성됩니다.
         </p>
         <StepIndicator total={totalSteps} current={1} />

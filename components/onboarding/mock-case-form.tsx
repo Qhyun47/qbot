@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { ArrowLeft, Mic, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoachMark } from "@/components/onboarding/coach-mark";
@@ -29,6 +30,8 @@ interface MockCaseFormProps {
   highlightTooltip?: string;
   tooltipNode?: React.ReactNode;
   demoCcs?: string[];
+  /** 온보딩 네비 바 높이만큼 MockCaseForm 높이를 줄여 카메라 버튼이 가리지 않도록 */
+  extraBottomPadding?: number;
   children?: React.ReactNode;
 }
 
@@ -53,21 +56,73 @@ export function MockCaseForm({
   highlightTooltip = "",
   tooltipNode,
   demoCcs = ["Abdominal pain"],
+  extraBottomPadding,
   children,
 }: MockCaseFormProps) {
+  // 가이드라인·상용구 탭 애니메이션용 상태
+  const [forceActiveView, setForceActiveView] = useState<
+    "guide" | "template" | undefined
+  >(undefined);
+  const [forceShowSelector, setForceShowSelector] = useState<
+    boolean | undefined
+  >(undefined);
+  const [demoTemplateKeys, setDemoTemplateKeys] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (highlightTarget === "guideline-tab") {
+      // 2.5s 후 가이드라인 selector 열기, 5.5s 후 닫기
+      const t1 = setTimeout(() => setForceShowSelector(true), 2500);
+      const t2 = setTimeout(() => setForceShowSelector(false), 5500);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
+    }
+    if (highlightTarget === "template-tab") {
+      // 2s 후 상용구 탭으로 전환 + abdominal-pain 템플릿 로드
+      // 4s 후 selector 열기, 7s 후 닫기
+      const t1 = setTimeout(() => {
+        setForceActiveView("template");
+        setDemoTemplateKeys(["abdominal-pain"]);
+      }, 2000);
+      const t2 = setTimeout(() => setForceShowSelector(true), 4000);
+      const t3 = setTimeout(() => setForceShowSelector(false), 7000);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+        clearTimeout(t3);
+      };
+    }
+  }, [highlightTarget]);
+
+  // selector가 열려 있으면 CoachMark 비활성화 (오버레이가 리스트를 가리지 않도록)
+  const isShowingSelector = forceShowSelector === true;
+  const effectiveHighlightTarget: HighlightTarget = isShowingSelector
+    ? null
+    : highlightTarget;
+
   const tooltip = (target: HighlightTarget): React.ReactNode =>
-    highlightTarget === target ? (tooltipNode ?? highlightTooltip) : undefined;
+    effectiveHighlightTarget === target
+      ? (tooltipNode ?? highlightTooltip)
+      : undefined;
 
   const inputCards = toInputCards(cards);
 
+  const formHeight = extraBottomPadding
+    ? `calc(100vh - ${extraBottomPadding}px)`
+    : "100vh";
+
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-background">
+    <div
+      className="flex flex-col overflow-hidden bg-background"
+      style={{ height: formHeight }}
+    >
       {/* 헤더 — 실제 NewCaseForm 헤더와 동일한 구조 */}
       <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
         <CoachMark
           tooltip={tooltip("back") ?? ""}
           tooltipPosition="bottom"
-          active={highlightTarget === "back"}
+          active={effectiveHighlightTarget === "back"}
         >
           <Button
             variant="ghost"
@@ -85,7 +140,7 @@ export function MockCaseForm({
           <CoachMark
             tooltip={tooltip("mic") ?? ""}
             tooltipPosition="bottom"
-            active={highlightTarget === "mic"}
+            active={effectiveHighlightTarget === "mic"}
           >
             <Button
               variant="ghost"
@@ -98,7 +153,7 @@ export function MockCaseForm({
           <CoachMark
             tooltip={tooltip("zap") ?? ""}
             tooltipPosition="bottom"
-            active={highlightTarget === "zap"}
+            active={effectiveHighlightTarget === "zap"}
           >
             <Button size="sm" className="pointer-events-none gap-1.5" disabled>
               <Zap className="size-3.5" />
@@ -112,12 +167,12 @@ export function MockCaseForm({
       <div style={{ height: "45%" }} className="overflow-hidden">
         <GuidelinePanel
           ccs={demoCcs}
-          templateKeys={[]}
+          templateKeys={demoTemplateKeys}
           onGuidelineChange={() => {}}
           onTemplateChange={() => {}}
-          defaultActiveView={
-            highlightTarget === "template-tab" ? "template" : "guide"
-          }
+          defaultActiveView="guide"
+          forceActiveView={forceActiveView}
+          forceShowSelector={forceShowSelector}
           coachMarkGuidelineTab={tooltip("guideline-tab")}
           coachMarkTemplateTab={tooltip("template-tab")}
         />
