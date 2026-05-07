@@ -22,30 +22,39 @@ export function OnboardingClient() {
     });
   };
 
-  if (step === 0) {
-    return (
+  const content =
+    step === 0 ? (
       <WelcomeScreen
         onSkip={finish}
         onStart={() => setStep(1)}
         isPending={isPending}
       />
+    ) : (
+      <TourStep
+        step={step}
+        totalSteps={TOTAL_STEPS}
+        onNext={() => {
+          if (step < TOTAL_STEPS) {
+            setStep((s) => s + 1);
+          } else {
+            finish();
+          }
+        }}
+        onPrev={() => setStep((s) => Math.max(1, s - 1))}
+        onComplete={finish}
+        isPending={isPending}
+      />
     );
-  }
 
   return (
-    <TourStep
-      step={step}
-      totalSteps={TOTAL_STEPS}
-      onNext={() => {
-        if (step < TOTAL_STEPS) {
-          setStep((s) => s + 1);
-        } else {
-          finish();
-        }
-      }}
-      onPrev={() => setStep((s) => Math.max(1, s - 1))}
-      onComplete={finish}
-      isPending={isPending}
-    />
+    <>
+      <div className="flex flex-1 flex-col md:hidden">{content}</div>
+      <div className="hidden flex-1 flex-col items-center justify-center gap-3 p-8 text-center md:flex">
+        <p className="text-base font-medium">모바일 기기에서 이용해주세요.</p>
+        <p className="text-sm text-muted-foreground">
+          규봇 사용 가이드는 모바일 환경에서만 동작합니다.
+        </p>
+      </div>
+    </>
   );
 }

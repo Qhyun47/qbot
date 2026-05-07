@@ -11,6 +11,7 @@ export function ConditionalHeader({ children }: { children: ReactNode }) {
 
   const isInputView =
     pathname === "/cases/new" ||
+    pathname === "/onboarding" ||
     (!!pathname.match(/^\/cases\/[^/]+$/) &&
       searchParams.get("view") !== "result");
 

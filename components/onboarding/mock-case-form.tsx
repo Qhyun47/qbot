@@ -3,6 +3,7 @@
 import { ArrowLeft, Camera, Mic, SendHorizontal, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoachMark } from "@/components/onboarding/coach-mark";
+import { BedBadge } from "@/components/cases/bed-badge";
 
 export type MockTab = "가이드라인" | "상용구";
 export type HighlightTarget =
@@ -56,9 +57,7 @@ export function MockCaseForm({
           <ArrowLeft className="size-4" />
         </Button>
         <div className="flex flex-1 items-center gap-1.5 overflow-hidden">
-          <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
-            A01
-          </span>
+          <BedBadge bedZone="A" bedNumber={1} size="sm" />
           <span className="truncate rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-xs text-primary">
             Abdominal pain
           </span>
