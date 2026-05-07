@@ -5,9 +5,6 @@ import { createClient } from "@/lib/supabase/server";
 import { PwaInstallButton } from "@/components/pwa/pwa-install-button";
 import { Logo } from "@/components/icons/logo";
 
-// 로그인된 사용자를 대시보드로 리다이렉트하는 서버 컴포넌트
-// getUser()를 사용해 Supabase 서버에서 실제 토큰 유효성을 검증
-// cacheComponents 모드에서는 Suspense 안에서만 동적 데이터 접근 가능
 async function AuthRedirect() {
   const supabase = await createClient();
   const {
@@ -21,28 +18,52 @@ async function AuthRedirect() {
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6">
-      {/* 로그인 감지 후 /dashboard 리다이렉트 (Suspense로 cacheComponents 호환) */}
+    <main className="flex min-h-screen flex-col items-center justify-center gap-8 px-6">
       <Suspense fallback={null}>
         <AuthRedirect />
       </Suspense>
-      <Logo className="size-16" />
-      <h1 className="text-2xl font-bold">규봇</h1>
-      <div className="flex gap-4">
-        <Link
-          href="/auth/login"
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-        >
-          로그인
-        </Link>
-        <Link
-          href="/auth/sign-up"
-          className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-accent"
-        >
-          회원가입
-        </Link>
+
+      {/* 로고 + 타이틀 */}
+      <div className="flex flex-col items-center gap-3">
+        <Logo className="size-16" />
+        <div className="text-center">
+          <h1 className="text-2xl font-bold">규봇</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            문진은 폰에서, 확인은 컴퓨터로
+          </p>
+        </div>
       </div>
-      <PwaInstallButton />
+
+      {/* 앱 설치 — 주 CTA */}
+      <div className="flex w-full max-w-xs flex-col items-center gap-3">
+        <p className="text-center text-sm text-muted-foreground">
+          홈 화면에 설치하면 앱처럼 빠르게 실행할 수 있습니다
+        </p>
+        <PwaInstallButton
+          buttonSize="default"
+          buttonVariant="default"
+          className="w-full"
+        />
+      </div>
+
+      {/* 로그인 / 회원가입 — 부 링크 */}
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-xs text-muted-foreground">이미 설치하셨나요?</p>
+        <div className="flex gap-4">
+          <Link
+            href="/auth/login"
+            className="text-sm underline underline-offset-4"
+          >
+            로그인
+          </Link>
+          <Link
+            href="/auth/sign-up"
+            className="text-sm underline underline-offset-4"
+          >
+            회원가입
+          </Link>
+        </div>
+      </div>
     </main>
   );
 }

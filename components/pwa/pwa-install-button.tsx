@@ -20,7 +20,15 @@ type InstallState =
   | "fallback" // beforeinstallprompt 미발생 — 가이드 fallback
   | "installed"; // 이미 설치됨
 
-export function PwaInstallButton() {
+export function PwaInstallButton({
+  buttonSize = "sm",
+  buttonVariant = "outline",
+  className,
+}: {
+  buttonSize?: "sm" | "default" | "lg";
+  buttonVariant?: "default" | "outline" | "ghost";
+  className?: string;
+}) {
   const [state, setState] = useState<InstallState>("loading");
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
@@ -72,7 +80,12 @@ export function PwaInstallButton() {
 
   if (state === "android") {
     return (
-      <Button variant="outline" size="sm" onClick={handleAndroidInstall}>
+      <Button
+        variant={buttonVariant}
+        size={buttonSize}
+        className={className}
+        onClick={handleAndroidInstall}
+      >
         <Download className="size-4" />앱 설치
       </Button>
     );
@@ -82,8 +95,9 @@ export function PwaInstallButton() {
     return (
       <>
         <Button
-          variant="outline"
-          size="sm"
+          variant={buttonVariant}
+          size={buttonSize}
+          className={className}
           onClick={() => setIosGuideOpen(true)}
         >
           <Smartphone className="size-4" />

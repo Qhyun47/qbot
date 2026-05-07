@@ -655,12 +655,12 @@ export function DashboardGallerySheet() {
                             <X className="size-3" />
                           </button>
                           {photo.url && (
-                            <>
+                            <div className="absolute bottom-1 right-1 flex items-center gap-1">
                               <button
                                 type="button"
                                 onClick={() => handleShare(photo)}
                                 disabled={!!sharingPhotoId}
-                                className="absolute bottom-1 left-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
+                                className="flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
                                 aria-label="공유"
                               >
                                 {sharingPhotoId === photo.id ? (
@@ -673,12 +673,12 @@ export function DashboardGallerySheet() {
                                 type="button"
                                 onClick={() => triggerDownload(photo)}
                                 disabled={caseSavingPhotoId === photo.id}
-                                className="absolute bottom-1 right-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
+                                className="flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-60"
                                 aria-label="다운로드"
                               >
                                 <Download className="size-3" />
                               </button>
-                            </>
+                            </div>
                           )}
                         </div>
                       ))}

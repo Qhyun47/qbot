@@ -12,6 +12,7 @@ import {
   ChevronUp,
   Download,
   MoreHorizontal,
+  ShieldAlert,
 } from "lucide-react";
 import { isStandalone } from "@/lib/pwa/is-standalone";
 import { Button } from "@/components/ui/button";
@@ -76,6 +77,12 @@ const ANDROID_MANUAL_STEPS = [
     icon: CheckCircle,
     title: "'추가' 또는 '설치'를 탭하세요",
     description: "확인 창에서 추가를 탭하면 홈 화면에 규봇 아이콘이 생깁니다.",
+  },
+  {
+    icon: ShieldAlert,
+    title: "경고창이 뜨면 당황하지 마세요",
+    description:
+      "Google이 새로운 앱을 처음 설치할 때 '안전하지 않은 앱 차단됨' 경고를 표시할 수 있습니다. '세부정보 더보기' → '무시하고 설치하기'를 탭하면 정상적으로 설치됩니다.",
   },
 ];
 

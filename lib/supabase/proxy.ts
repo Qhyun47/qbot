@@ -44,6 +44,19 @@ export async function updateSession(request: NextRequest) {
 
   // IMPORTANT: If you remove getClaims() and you use server-side rendering
   // with the Supabase client, your users may be randomly logged out.
+  // KakaoTalk 인앱브라우저 감지 — 설치 불가 환경이므로 안내 페이지로 차단
+  const requestUa = request.headers.get("user-agent") ?? "";
+  const isKakaoInApp = /KAKAOTALK/i.test(requestUa);
+  const isOpenInBrowserPath =
+    request.nextUrl.pathname.startsWith("/open-in-browser");
+
+  if (isKakaoInApp && !isOpenInBrowserPath) {
+    const kakaoRedirect = request.nextUrl.clone();
+    kakaoRedirect.pathname = "/open-in-browser";
+    kakaoRedirect.searchParams.set("from", request.nextUrl.href);
+    return NextResponse.redirect(kakaoRedirect);
+  }
+
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
@@ -52,7 +65,9 @@ export async function updateSession(request: NextRequest) {
     !user &&
     !request.nextUrl.pathname.startsWith("/login") &&
     !request.nextUrl.pathname.startsWith("/auth") &&
-    !request.nextUrl.pathname.startsWith("/offline")
+    !request.nextUrl.pathname.startsWith("/offline") &&
+    !request.nextUrl.pathname.startsWith("/open-in-browser") &&
+    !request.nextUrl.pathname.startsWith("/getting-started")
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();

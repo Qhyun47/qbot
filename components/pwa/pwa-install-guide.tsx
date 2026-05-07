@@ -11,6 +11,7 @@ import {
   Download,
   ExternalLink,
   Info,
+  ShieldAlert,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -82,6 +83,13 @@ const ANDROID_STEPS: Step[] = [
     title: "'추가' 또는 '설치'를 탭하세요",
     description:
       "확인 창이 나타나면 추가 또는 설치를 탭합니다. 홈 화면에 규봇 아이콘이 생깁니다!",
+  },
+  {
+    icon: ShieldAlert,
+    title: "경고창이 뜨면 당황하지 마세요",
+    description:
+      "Google이 새로운 앱을 처음 설치할 때 '안전하지 않은 앱 차단됨' 경고를 표시할 수 있습니다. 규봇은 안전한 서비스이며 이 경고는 일시적입니다.",
+    tip: "'세부정보 더보기'를 탭한 다음 '무시하고 설치하기'를 탭하면 정상적으로 설치됩니다.",
   },
 ];
 
