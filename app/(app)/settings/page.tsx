@@ -1,10 +1,12 @@
 import { Suspense } from "react";
+import { RotateCcw } from "lucide-react";
 import { LayoutSettings } from "@/components/settings/layout-settings";
 import { getLayoutSettings } from "@/lib/settings/actions";
 import { Separator } from "@/components/ui/separator";
 import { InstallSection } from "@/components/settings/install-section";
 import { FullscreenSection } from "@/components/settings/fullscreen-section";
 import { AutoRecordSection } from "@/components/settings/auto-record-section";
+import { resetOnboarding } from "@/lib/onboarding/actions";
 
 async function SettingsContent() {
   const {
@@ -70,6 +72,22 @@ export default function SettingsPage() {
         </Suspense>
         <Separator />
         <InstallSection />
+        <Separator />
+        <div className="space-y-2">
+          <h2 className="text-base font-semibold">가이드</h2>
+          <p className="text-sm text-muted-foreground">
+            규봇 기본 사용법 가이드를 다시 확인합니다.
+          </p>
+          <form action={resetOnboarding}>
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
+              <RotateCcw className="size-4" />
+              온보딩 다시 보기
+            </button>
+          </form>
+        </div>
         <Separator />
         <p className="text-center text-xs text-muted-foreground">
           버전{" "}

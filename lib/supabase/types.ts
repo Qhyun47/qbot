@@ -664,6 +664,7 @@ export type Database = {
           input_layout: Database["public"]["Enums"]["input_layout"];
           is_admin: boolean;
           mobile_font_size: number;
+          onboarding_completed: boolean;
           service_access_status: string;
           split_ratio: number;
           updated_at: string;
@@ -684,6 +685,7 @@ export type Database = {
           input_layout?: Database["public"]["Enums"]["input_layout"];
           is_admin?: boolean;
           mobile_font_size?: number;
+          onboarding_completed?: boolean;
           service_access_status?: string;
           split_ratio?: number;
           updated_at?: string;
@@ -704,6 +706,7 @@ export type Database = {
           input_layout?: Database["public"]["Enums"]["input_layout"];
           is_admin?: boolean;
           mobile_font_size?: number;
+          onboarding_completed?: boolean;
           service_access_status?: string;
           split_ratio?: number;
           updated_at?: string;
