@@ -80,14 +80,25 @@ export function PwaInstallButton({
 
   if (state === "android") {
     return (
-      <Button
-        variant={buttonVariant}
-        size={buttonSize}
-        className={className}
-        onClick={handleAndroidInstall}
-      >
-        <Download className="size-4" />앱 설치
-      </Button>
+      <div className="flex w-full flex-col items-center gap-3">
+        <Button
+          variant={buttonVariant}
+          size={buttonSize}
+          className={className}
+          onClick={handleAndroidInstall}
+        >
+          <Download className="size-4" />앱 설치
+        </Button>
+        <p className="text-center text-xs text-muted-foreground">
+          설치 중{" "}
+          <strong className="text-foreground">
+            &apos;안전하지 않은 앱 차단됨&apos;
+          </strong>
+          이 뜨면
+          <br />
+          세부정보 더보기 → 무시하고 설치하기
+        </p>
+      </div>
     );
   }
 

@@ -28,9 +28,6 @@ export default function Home() {
         <Logo className="size-16" />
         <div className="text-center">
           <h1 className="text-2xl font-bold">규봇</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            문진은 폰에서, 확인은 컴퓨터로
-          </p>
         </div>
       </div>
 
