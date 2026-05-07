@@ -19,7 +19,6 @@ export function Step06Camera({ onNext, onPrev, totalSteps }: Step06Props) {
   return (
     <div className="relative flex h-screen flex-col">
       <MockCaseForm
-        activeTab="가이드라인"
         cards={DEMO_CARDS}
         highlightTarget="camera"
         highlightTooltip="카메라 버튼으로 문진 중 사진을 촬영할 수 있습니다."

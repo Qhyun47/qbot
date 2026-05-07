@@ -14,32 +14,86 @@ import { Button } from "@/components/ui/button";
 import { CoachMark } from "@/components/onboarding/coach-mark";
 import { StepIndicator } from "@/components/onboarding/step-indicator";
 import { OnboardingNav } from "@/components/onboarding/onboarding-nav";
-import { BedBadge } from "@/components/cases/bed-badge";
-import { StatusBadge } from "@/components/cases/status-badge";
-import type { BedZone, CaseStatus } from "@/lib/supabase/types";
+import { StatusBoardCard } from "@/components/cases/status-board-card";
+import type { BedZone, Case } from "@/lib/supabase/types";
 
-const MOCK_ZONES: {
-  zone: BedZone;
-  cases: { bed: number; cc: string; status: CaseStatus; time: string }[];
-}[] = [
+const NOW = new Date().toISOString();
+
+const MOCK_CASES: Case[] = [
   {
-    zone: "A",
-    cases: [
-      { bed: 1, cc: "Chest pain", status: "draft", time: "00:21" },
-      { bed: 3, cc: "Dyspnea", status: "completed", time: "01:05" },
-    ],
+    id: "mock-g1",
+    bed_zone: "A" as BedZone,
+    bed_number: 1,
+    bed_explicitly_set: true,
+    cc: "Chest pain",
+    ccs: ["Chest pain"],
+    status: "draft",
+    created_at: new Date(Date.now() - 21 * 60000).toISOString(),
+    memo: null,
+    notify_status: null,
+    cc_has_template: false,
+    template_key: null,
+    template_keys: [],
+    has_inputs: false,
+    current_result_id: null,
+    board_hidden_at: null,
+    updated_at: NOW,
+    user_id: "mock-user",
   },
   {
-    zone: "R",
-    cases: [{ bed: 2, cc: "Abdominal pain", status: "draft", time: "00:48" }],
+    id: "mock-g2",
+    bed_zone: "A" as BedZone,
+    bed_number: 3,
+    bed_explicitly_set: true,
+    cc: "Dyspnea",
+    ccs: ["Dyspnea"],
+    status: "completed",
+    created_at: new Date(Date.now() - 65 * 60000).toISOString(),
+    memo: null,
+    notify_status: "완료",
+    cc_has_template: false,
+    template_key: null,
+    template_keys: [],
+    has_inputs: true,
+    current_result_id: "mock-result",
+    board_hidden_at: null,
+    updated_at: NOW,
+    user_id: "mock-user",
+  },
+  {
+    id: "mock-g3",
+    bed_zone: "R" as BedZone,
+    bed_number: 2,
+    bed_explicitly_set: true,
+    cc: "Abdominal pain",
+    ccs: ["Abdominal pain"],
+    status: "draft",
+    created_at: new Date(Date.now() - 48 * 60000).toISOString(),
+    memo: null,
+    notify_status: null,
+    cc_has_template: true,
+    template_key: "abdominal-pain",
+    template_keys: ["abdominal-pain"],
+    has_inputs: false,
+    current_result_id: null,
+    board_hidden_at: null,
+    updated_at: NOW,
+    user_id: "mock-user",
   },
 ];
 
-const ZONE_LABELS: Record<BedZone, string> = {
-  A: "A구역",
-  B: "B구역",
-  R: "R구역",
-};
+const GROUPED: { zone: BedZone; label: string; cases: Case[] }[] = [
+  {
+    zone: "A",
+    label: "A구역",
+    cases: MOCK_CASES.filter((c) => c.bed_zone === "A"),
+  },
+  {
+    zone: "R",
+    label: "R구역",
+    cases: MOCK_CASES.filter((c) => c.bed_zone === "R"),
+  },
+];
 
 const GalleryTooltip = (
   <div className="max-w-[220px] space-y-1.5">
@@ -112,37 +166,17 @@ export function Step09Gallery({
         </div>
       </div>
 
-      {/* 현황판 */}
+      {/* 현황판 — 실제 StatusBoardCard 사용 */}
       <main className="flex-1 space-y-4 overflow-y-auto p-3">
-        {MOCK_ZONES.map(({ zone, cases }) => (
+        {GROUPED.map(({ zone, label, cases }) => (
           <div key={zone} className="flex flex-col gap-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              {ZONE_LABELS[zone]}
+              {label}
             </p>
             <div className="grid grid-cols-2 gap-3">
               {cases.map((c) => (
-                <div
-                  key={`${zone}${c.bed}`}
-                  className="pointer-events-none flex flex-col gap-2 rounded-lg border bg-card p-3 opacity-40"
-                >
-                  <div className="flex items-center justify-between">
-                    <BedBadge bedZone={zone} bedNumber={c.bed} size="sm" />
-                    <StatusBadge status={c.status} />
-                  </div>
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="truncate text-sm font-medium leading-snug">
-                      {c.cc}
-                    </p>
-                    <span className="shrink-0 text-xs text-muted-foreground/70">
-                      {c.time}
-                    </span>
-                  </div>
-                  <div className="h-8 rounded-md border bg-background/50" />
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground/50">
-                      노티 —
-                    </span>
-                  </div>
+                <div key={c.id} className="pointer-events-none opacity-40">
+                  <StatusBoardCard case={c} />
                 </div>
               ))}
             </div>
@@ -170,7 +204,6 @@ export function Step09Gallery({
             <h3 className="text-base font-semibold">사진 갤러리</h3>
           </div>
 
-          {/* 빈 사진 영역 */}
           <div className="flex min-h-[120px] flex-col items-center justify-center gap-2 px-5 py-6">
             <div className="flex size-12 items-center justify-center rounded-full bg-muted">
               <ImagePlus className="size-5 text-muted-foreground" />
@@ -180,7 +213,6 @@ export function Step09Gallery({
             </p>
           </div>
 
-          {/* 하단 버튼 + 네비 */}
           <div className="space-y-3 border-t px-5 pb-8 pt-2">
             <div className="flex gap-2">
               <Button variant="outline" className="flex-1 gap-2" disabled>
@@ -203,7 +235,6 @@ export function Step09Gallery({
         </div>
       )}
 
-      {/* 드로어 표시 전 하단 네비 */}
       {!showDrawer && (
         <div className="fixed inset-x-0 bottom-0 z-50 border-t bg-background px-6 pb-8 pt-3">
           <StepIndicator total={totalSteps} current={8} />

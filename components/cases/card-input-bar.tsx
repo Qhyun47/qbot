@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { parseTimeTag } from "@/lib/time/parse-time-tag";
 import { cn } from "@/lib/utils";
 import { PhotoBottomSheet } from "@/components/cases/photo-bottom-sheet";
+import { CoachMark } from "@/components/onboarding/coach-mark";
 
 interface CardInputBarProps {
   onSubmit: (
@@ -15,9 +16,14 @@ interface CardInputBarProps {
     timeOffsetMinutes: number | null
   ) => void;
   caseId?: string;
+  coachMarkCamera?: React.ReactNode;
 }
 
-export function CardInputBar({ onSubmit, caseId }: CardInputBarProps) {
+export function CardInputBar({
+  onSubmit,
+  caseId,
+  coachMarkCamera,
+}: CardInputBarProps) {
   const [text, setText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const parsed = parseTimeTag(text);
@@ -60,7 +66,13 @@ export function CardInputBar({ onSubmit, caseId }: CardInputBarProps) {
       )}
       <div className="flex items-end gap-2 p-3">
         <div className="flex is-desktop:hidden">
-          <PhotoBottomSheet caseId={caseId ?? null} />
+          <CoachMark
+            tooltip={coachMarkCamera ?? ""}
+            tooltipPosition="top"
+            active={coachMarkCamera != null}
+          >
+            <PhotoBottomSheet caseId={caseId ?? null} />
+          </CoachMark>
         </div>
         <Textarea
           ref={textareaRef}

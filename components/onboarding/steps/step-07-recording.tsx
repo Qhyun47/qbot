@@ -19,7 +19,6 @@ export function Step07Recording({ onNext, onPrev, totalSteps }: Step07Props) {
   return (
     <div className="relative flex h-screen flex-col">
       <MockCaseForm
-        activeTab="가이드라인"
         cards={DEMO_CARDS}
         highlightTarget="mic"
         highlightTooltip="녹음 버튼으로 음성을 녹음할 수 있습니다. 텍스트로 변환되어 나중에 확인 가능합니다."

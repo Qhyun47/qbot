@@ -35,7 +35,6 @@ export function Step04TemplateChip({
   return (
     <div className="relative flex h-screen flex-col">
       <MockCaseForm
-        activeTab="상용구"
         highlightTarget="template-tab"
         highlightTooltip="상용구 칩을 탭하면 활성화, 한 번 더 탭하면 변경·다중 선택이 가능합니다."
       />

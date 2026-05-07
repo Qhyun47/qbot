@@ -28,7 +28,6 @@ export function Step08Generate({ onNext, onPrev, totalSteps }: Step08Props) {
   return (
     <div className="relative flex h-screen flex-col">
       <MockCaseForm
-        activeTab="가이드라인"
         cards={DEMO_CARDS}
         highlightTarget="zap"
         tooltipNode={GenerateTooltip}

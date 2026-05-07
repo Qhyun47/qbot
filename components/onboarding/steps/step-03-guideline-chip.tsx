@@ -27,7 +27,6 @@ export function Step03GuidelineChip({
   return (
     <div className="relative flex h-screen flex-col">
       <MockCaseForm
-        activeTab="가이드라인"
         highlightTarget="guideline-tab"
         highlightTooltip="가이드라인 칩을 눌러 가이드라인을 변경할 수 있습니다."
       />

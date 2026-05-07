@@ -2,6 +2,7 @@
 
 import { Fragment, useEffect, useState } from "react";
 import { BookOpen, FileText, Layers } from "lucide-react";
+import { CoachMark } from "@/components/onboarding/coach-mark";
 import {
   loadGuideline,
   loadGuideByKey,
@@ -53,6 +54,9 @@ interface GuidelinePanelProps {
   onGuidelineChange: (guideKey: string) => void;
   onTemplateChange: (templateKeys: string[]) => void;
   guidelineFontSize?: number;
+  defaultActiveView?: "guide" | "template";
+  coachMarkGuidelineTab?: React.ReactNode;
+  coachMarkTemplateTab?: React.ReactNode;
 }
 
 function getGuideLabel(guideKey: string): string {
@@ -154,8 +158,13 @@ export function GuidelinePanel({
   onGuidelineChange,
   onTemplateChange,
   guidelineFontSize,
+  defaultActiveView,
+  coachMarkGuidelineTab,
+  coachMarkTemplateTab,
 }: GuidelinePanelProps) {
-  const [activeView, setActiveView] = useState<"guide" | "template">("guide");
+  const [activeView, setActiveView] = useState<"guide" | "template">(
+    defaultActiveView ?? "guide"
+  );
   const [showSelector, setShowSelector] = useState(false);
 
   const [guideContent, setGuideContent] = useState<string | null>(null);
@@ -419,23 +428,37 @@ export function GuidelinePanel({
 
   const tabBar = (
     <div className="flex border-b bg-muted/20">
-      <TabButton
-        icon={<BookOpen className="size-3 shrink-0" />}
-        label="가이드라인"
-        subLabel={activeGuideKey ? getGuideLabel(activeGuideKey) : undefined}
-        active={activeView === "guide"}
-        disabled={ccs.length === 0}
-        onClick={handleGuideTabClick}
-      />
+      <CoachMark
+        tooltip={coachMarkGuidelineTab ?? ""}
+        tooltipPosition="bottom"
+        active={coachMarkGuidelineTab != null}
+        wrapperClassName="flex flex-1"
+      >
+        <TabButton
+          icon={<BookOpen className="size-3 shrink-0" />}
+          label="가이드라인"
+          subLabel={activeGuideKey ? getGuideLabel(activeGuideKey) : undefined}
+          active={activeView === "guide"}
+          disabled={ccs.length === 0}
+          onClick={handleGuideTabClick}
+        />
+      </CoachMark>
       <div className="w-px shrink-0 self-stretch bg-border" />
-      <TabButton
-        icon={<FileText className="size-3 shrink-0" />}
-        label="상용구"
-        subLabel={templateSubLabel}
-        active={activeView === "template"}
-        disabled={ccs.length === 0}
-        onClick={handleTemplateTabClick}
-      />
+      <CoachMark
+        tooltip={coachMarkTemplateTab ?? ""}
+        tooltipPosition="bottom"
+        active={coachMarkTemplateTab != null}
+        wrapperClassName="flex flex-1"
+      >
+        <TabButton
+          icon={<FileText className="size-3 shrink-0" />}
+          label="상용구"
+          subLabel={templateSubLabel}
+          active={activeView === "template"}
+          disabled={ccs.length === 0}
+          onClick={handleTemplateTabClick}
+        />
+      </CoachMark>
     </div>
   );
 

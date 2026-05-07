@@ -5,42 +5,96 @@ import { Button } from "@/components/ui/button";
 import { CoachMark } from "@/components/onboarding/coach-mark";
 import { StepIndicator } from "@/components/onboarding/step-indicator";
 import { OnboardingNav } from "@/components/onboarding/onboarding-nav";
-import { BedBadge } from "@/components/cases/bed-badge";
-import { StatusBadge } from "@/components/cases/status-badge";
-import type { BedZone, CaseStatus } from "@/lib/supabase/types";
+import { StatusBoardCard } from "@/components/cases/status-board-card";
+import type { BedZone, Case } from "@/lib/supabase/types";
 
 interface Step01Props {
   onNext: () => void;
   totalSteps: number;
 }
 
-const MOCK_ZONES: {
-  zone: BedZone;
-  cases: { bed: number; cc: string; status: CaseStatus; time: string }[];
-}[] = [
+const NOW = new Date().toISOString();
+
+const MOCK_CASES: Case[] = [
   {
-    zone: "A",
-    cases: [
-      { bed: 1, cc: "Chest pain", status: "draft", time: "00:21" },
-      { bed: 3, cc: "Dyspnea", status: "completed", time: "01:05" },
-    ],
+    id: "mock-1",
+    bed_zone: "A" as BedZone,
+    bed_number: 1,
+    bed_explicitly_set: true,
+    cc: "Chest pain",
+    ccs: ["Chest pain"],
+    status: "draft",
+    created_at: new Date(Date.now() - 21 * 60000).toISOString(),
+    memo: null,
+    notify_status: null,
+    cc_has_template: false,
+    template_key: null,
+    template_keys: [],
+    has_inputs: false,
+    current_result_id: null,
+    board_hidden_at: null,
+    updated_at: NOW,
+    user_id: "mock-user",
   },
   {
-    zone: "R",
-    cases: [{ bed: 2, cc: "Abdominal pain", status: "draft", time: "00:48" }],
+    id: "mock-2",
+    bed_zone: "A" as BedZone,
+    bed_number: 3,
+    bed_explicitly_set: true,
+    cc: "Dyspnea",
+    ccs: ["Dyspnea"],
+    status: "completed",
+    created_at: new Date(Date.now() - 65 * 60000).toISOString(),
+    memo: null,
+    notify_status: "완료",
+    cc_has_template: false,
+    template_key: null,
+    template_keys: [],
+    has_inputs: true,
+    current_result_id: "mock-result",
+    board_hidden_at: null,
+    updated_at: NOW,
+    user_id: "mock-user",
+  },
+  {
+    id: "mock-3",
+    bed_zone: "R" as BedZone,
+    bed_number: 2,
+    bed_explicitly_set: true,
+    cc: "Abdominal pain",
+    ccs: ["Abdominal pain"],
+    status: "draft",
+    created_at: new Date(Date.now() - 48 * 60000).toISOString(),
+    memo: null,
+    notify_status: null,
+    cc_has_template: true,
+    template_key: "abdominal-pain",
+    template_keys: ["abdominal-pain"],
+    has_inputs: false,
+    current_result_id: null,
+    board_hidden_at: null,
+    updated_at: NOW,
+    user_id: "mock-user",
   },
 ];
 
-const ZONE_LABELS: Record<BedZone, string> = {
-  A: "A구역",
-  B: "B구역",
-  R: "R구역",
-};
+const GROUPED: { zone: BedZone; label: string; cases: Case[] }[] = [
+  {
+    zone: "A",
+    label: "A구역",
+    cases: MOCK_CASES.filter((c) => c.bed_zone === "A"),
+  },
+  {
+    zone: "R",
+    label: "R구역",
+    cases: MOCK_CASES.filter((c) => c.bed_zone === "R"),
+  },
+];
 
 export function Step01Dashboard({ onNext, totalSteps }: Step01Props) {
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      {/* 컨트롤 바 */}
+      {/* 컨트롤 바 — 실제 대시보드와 동일한 구조 */}
       <div className="pointer-events-none flex flex-wrap items-center gap-y-1.5 border-b px-3 py-2">
         <div className="flex shrink-0 items-center gap-1">
           <button className="rounded border px-2 py-1 text-xs font-medium">
@@ -81,37 +135,17 @@ export function Step01Dashboard({ onNext, totalSteps }: Step01Props) {
         </div>
       </div>
 
-      {/* 현황판 */}
+      {/* 현황판 — 실제 StatusBoardCard 사용 */}
       <main className="flex-1 space-y-4 overflow-y-auto p-3">
-        {MOCK_ZONES.map(({ zone, cases }) => (
+        {GROUPED.map(({ zone, label, cases }) => (
           <div key={zone} className="flex flex-col gap-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              {ZONE_LABELS[zone]}
+              {label}
             </p>
             <div className="grid grid-cols-2 gap-3">
               {cases.map((c) => (
-                <div
-                  key={`${zone}${c.bed}`}
-                  className="pointer-events-none flex flex-col gap-2 rounded-lg border bg-card p-3 opacity-40"
-                >
-                  <div className="flex items-center justify-between">
-                    <BedBadge bedZone={zone} bedNumber={c.bed} size="sm" />
-                    <StatusBadge status={c.status} />
-                  </div>
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="truncate text-sm font-medium leading-snug">
-                      {c.cc}
-                    </p>
-                    <span className="shrink-0 text-xs text-muted-foreground/70">
-                      {c.time}
-                    </span>
-                  </div>
-                  <div className="h-8 rounded-md border bg-background/50" />
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground/50">
-                      노티 —
-                    </span>
-                  </div>
+                <div key={c.id} className="pointer-events-none opacity-40">
+                  <StatusBoardCard case={c} />
                 </div>
               ))}
             </div>
