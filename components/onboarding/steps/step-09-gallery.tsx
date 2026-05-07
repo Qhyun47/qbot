@@ -5,13 +5,13 @@ import {
   Bell,
   Camera,
   ChevronRight,
-  ImagePlus,
   Plus,
   RefreshCw,
   Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoachMark } from "@/components/onboarding/coach-mark";
+import { MockCaseForm } from "@/components/onboarding/mock-case-form";
 import { StepIndicator } from "@/components/onboarding/step-indicator";
 import { OnboardingNav } from "@/components/onboarding/onboarding-nav";
 import { StatusBoardCard } from "@/components/cases/status-board-card";
@@ -95,6 +95,12 @@ const GROUPED: { zone: BedZone; label: string; cases: Case[] }[] = [
   },
 ];
 
+const DEMO_CARDS = [
+  { text: "어제 통증 시작", timeTag: "어제" },
+  { text: "LLQ" },
+  { text: "npo 고형 11시 액체 13시" },
+];
+
 const GalleryTooltip = (
   <div className="max-w-[220px] space-y-1.5">
     <p>촬영한 사진 확인 및 추가 업로드가 가능합니다.</p>
@@ -118,16 +124,24 @@ export function Step09Gallery({
   totalSteps,
   isPending: _isPending,
 }: Step09Props) {
-  const [showDrawer, setShowDrawer] = useState(false);
-  const [showCoachMark, setShowCoachMark] = useState(true);
+  const [phase, setPhase] = useState<"form" | "dashboard">("form");
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      setShowCoachMark(false);
-      setShowDrawer(true);
-    }, 1000);
+    const t = setTimeout(() => setPhase("dashboard"), 2500);
     return () => clearTimeout(t);
   }, []);
+
+  if (phase === "form") {
+    return (
+      <div className="relative flex h-screen flex-col">
+        <MockCaseForm
+          cards={DEMO_CARDS}
+          highlightTarget="back"
+          highlightTooltip="케이스 작성 후 뒤로가기를 눌러 대시보드로 돌아갑니다."
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -167,7 +181,7 @@ export function Step09Gallery({
       </div>
 
       {/* 현황판 — 실제 StatusBoardCard 사용 */}
-      <main className="flex-1 space-y-4 overflow-y-auto p-3">
+      <main className="flex-1 space-y-4 overflow-y-auto p-3 pb-32">
         {GROUPED.map(({ zone, label, cases }) => (
           <div key={zone} className="flex flex-col gap-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -184,68 +198,25 @@ export function Step09Gallery({
         ))}
       </main>
 
-      {/* 갤러리 FAB */}
-      <div className="fixed bottom-6 right-4 z-50">
-        <CoachMark
-          tooltip={GalleryTooltip}
-          tooltipPosition="top"
-          active={showCoachMark}
-        >
+      {/* 갤러리 FAB — CoachMark 항상 활성, 드로어 열리지 않음 */}
+      <div className="fixed bottom-28 right-4 z-50">
+        <CoachMark tooltip={GalleryTooltip} tooltipPosition="top" active={true}>
           <button className="pointer-events-none flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg">
             <Camera className="size-7" />
           </button>
         </CoachMark>
       </div>
 
-      {/* 갤러리 드로어 시뮬레이션 */}
-      {showDrawer && (
-        <div className="fixed inset-x-0 bottom-0 z-40 rounded-t-2xl border-t bg-background shadow-2xl duration-300 animate-in slide-in-from-bottom">
-          <div className="flex items-center justify-between px-5 pb-2 pt-4">
-            <h3 className="text-base font-semibold">사진 갤러리</h3>
-          </div>
-
-          <div className="flex min-h-[120px] flex-col items-center justify-center gap-2 px-5 py-6">
-            <div className="flex size-12 items-center justify-center rounded-full bg-muted">
-              <ImagePlus className="size-5 text-muted-foreground" />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              아직 저장된 사진이 없습니다.
-            </p>
-          </div>
-
-          <div className="space-y-3 border-t px-5 pb-8 pt-2">
-            <div className="flex gap-2">
-              <Button variant="outline" className="flex-1 gap-2" disabled>
-                <Camera className="size-4" />
-                카메라
-              </Button>
-              <Button variant="outline" className="flex-1 gap-2" disabled>
-                <ImagePlus className="size-4" />
-                갤러리
-              </Button>
-            </div>
-            <StepIndicator total={totalSteps} current={8} />
-            <OnboardingNav
-              onNext={onComplete}
-              onPrev={onPrev}
-              nextLabel="완료"
-              showPrev
-            />
-          </div>
-        </div>
-      )}
-
-      {!showDrawer && (
-        <div className="fixed inset-x-0 bottom-0 z-50 border-t bg-background px-6 pb-8 pt-3">
-          <StepIndicator total={totalSteps} current={8} />
-          <OnboardingNav
-            onNext={onComplete}
-            onPrev={onPrev}
-            nextLabel="완료"
-            showPrev
-          />
-        </div>
-      )}
+      {/* 하단 네비게이션 항상 표시 */}
+      <div className="fixed inset-x-0 bottom-0 z-50 border-t bg-background px-6 pb-8 pt-3">
+        <StepIndicator total={totalSteps} current={8} />
+        <OnboardingNav
+          onNext={onComplete}
+          onPrev={onPrev}
+          nextLabel="완료"
+          showPrev
+        />
+      </div>
     </div>
   );
 }

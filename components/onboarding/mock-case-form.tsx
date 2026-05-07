@@ -15,6 +15,7 @@ export type HighlightTarget =
   | "mic"
   | "zap"
   | "camera"
+  | "back"
   | null;
 
 export interface MockCard {
@@ -63,13 +64,19 @@ export function MockCaseForm({
     <div className="flex h-screen flex-col overflow-hidden bg-background">
       {/* 헤더 — 실제 NewCaseForm 헤더와 동일한 구조 */}
       <header className="flex shrink-0 items-center gap-2 border-b px-2 py-2.5">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="pointer-events-none shrink-0"
+        <CoachMark
+          tooltip={tooltip("back") ?? ""}
+          tooltipPosition="bottom"
+          active={highlightTarget === "back"}
         >
-          <ArrowLeft className="size-4" />
-        </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="pointer-events-none shrink-0"
+          >
+            <ArrowLeft className="size-4" />
+          </Button>
+        </CoachMark>
         <BedBadge bedZone="A" bedNumber={1} size="sm" />
         <button className="pointer-events-none flex min-w-0 flex-1 items-center overflow-hidden rounded-full border px-2 py-0.5 text-left">
           <span className="min-w-0 truncate text-xs">Abdominal pain</span>

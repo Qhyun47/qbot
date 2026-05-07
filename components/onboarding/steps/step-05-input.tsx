@@ -28,7 +28,11 @@ export function Step05Input({ onNext, onPrev, totalSteps }: Step05Props) {
       () => setCards((prev) => [...prev, { text: "LLQ" }]),
       1800
     );
-    return () => [t1, t2].forEach(clearTimeout);
+    const t3 = setTimeout(
+      () => setCards((prev) => [...prev, { text: "npo 고형 11시 액체 13시" }]),
+      2800
+    );
+    return () => [t1, t2, t3].forEach(clearTimeout);
   }, []);
 
   return (
