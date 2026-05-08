@@ -489,6 +489,7 @@ export function CaseInputView({
           <button
             type="button"
             onClick={() => setCcEditing(true)}
+            title={cc ?? undefined}
             className="min-w-0 flex-1 truncate rounded-full border px-2.5 py-0.5 text-left text-xs font-medium transition-colors hover:bg-muted"
             aria-label="C.C 편집"
           >

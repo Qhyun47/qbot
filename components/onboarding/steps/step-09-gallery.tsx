@@ -122,7 +122,7 @@ export function Step09Gallery({
   onComplete,
   onPrev,
   totalSteps,
-  isPending: _isPending,
+  isPending,
 }: Step09Props) {
   const [phase, setPhase] = useState<"form" | "dashboard">("form");
 
@@ -215,6 +215,7 @@ export function Step09Gallery({
           onPrev={onPrev}
           nextLabel="완료"
           showPrev
+          isPending={isPending}
         />
       </div>
     </div>

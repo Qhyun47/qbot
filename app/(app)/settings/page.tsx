@@ -55,39 +55,60 @@ export default function SettingsPage() {
         </p>
       </div>
       <div className="flex flex-col gap-6">
-        <Suspense
-          fallback={
-            <p className="text-sm text-muted-foreground">불러오는 중...</p>
-          }
-        >
-          <SettingsContent />
-        </Suspense>
-        <Separator />
-        <Suspense fallback={null}>
-          <AutoRecordSectionWrapper />
-        </Suspense>
-        <Separator />
-        <Suspense fallback={null}>
-          <FullscreenSectionWrapper />
-        </Suspense>
-        <Separator />
-        <div className="space-y-2">
-          <h2 className="text-base font-semibold">가이드</h2>
-          <p className="text-sm text-muted-foreground">
-            규봇 기본 사용법 가이드를 다시 확인합니다.
-          </p>
-          <form action={resetOnboarding}>
-            <button
-              type="submit"
-              className="inline-flex items-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
-            >
-              <RotateCcw className="size-4" />
-              온보딩 다시 보기
-            </button>
-          </form>
+        {/* 화면 설정 */}
+        <div className="flex flex-col gap-1">
+          <p className="text-sm font-medium text-muted-foreground">화면 설정</p>
+          <Separator className="mb-2" />
+          <Suspense
+            fallback={
+              <p className="text-sm text-muted-foreground">불러오는 중...</p>
+            }
+          >
+            <SettingsContent />
+          </Suspense>
         </div>
-        <Separator />
-        <InstallSection />
+
+        {/* 입력 설정 */}
+        <div className="flex flex-col gap-1">
+          <p className="text-sm font-medium text-muted-foreground">입력 설정</p>
+          <Separator className="mb-2" />
+          <Suspense fallback={null}>
+            <AutoRecordSectionWrapper />
+          </Suspense>
+        </div>
+
+        {/* 앱 */}
+        <div className="flex flex-col gap-1">
+          <p className="text-sm font-medium text-muted-foreground">앱</p>
+          <Separator className="mb-2" />
+          <div className="flex flex-col gap-4">
+            <Suspense fallback={null}>
+              <FullscreenSectionWrapper />
+            </Suspense>
+            <InstallSection />
+          </div>
+        </div>
+
+        {/* 안내 */}
+        <div className="flex flex-col gap-1">
+          <p className="text-sm font-medium text-muted-foreground">안내</p>
+          <Separator className="mb-2" />
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">
+              규봇 기본 사용법 가이드를 다시 확인합니다.
+            </p>
+            <form action={resetOnboarding}>
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+              >
+                <RotateCcw className="size-4" />
+                온보딩 다시 보기
+              </button>
+            </form>
+          </div>
+        </div>
+
         <Separator />
         <p className="text-center text-xs text-muted-foreground">
           버전{" "}

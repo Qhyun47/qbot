@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { OnboardingClient } from "@/components/onboarding/onboarding-client";
 
@@ -22,6 +23,10 @@ export default async function OnboardingPage() {
   ) {
     redirect("/waiting");
   }
+
+  const cookieStore = await cookies();
+  const deviceType = cookieStore.get("x-device-type")?.value;
+  if (deviceType === "desktop") redirect("/dashboard");
 
   return <OnboardingClient />;
 }

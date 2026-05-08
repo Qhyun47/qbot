@@ -105,7 +105,7 @@ export function NewCaseForm({
 }: NewCaseFormProps) {
   const router = useRouter();
   const [caseId, setCaseId] = useState<string | null>(null);
-  const [bedZone, setBedZone] = useState<BedZone>("A");
+  const [bedZone, setBedZone] = useState<BedZone | null>(null);
   const [bedNumber, setBedNumber] = useState<number | null>(null);
   const [ccs, setCcs] = useState<string[]>([]);
   const [setupCcs, setSetupCcs] = useState<string[]>([]);
@@ -669,7 +669,7 @@ export function NewCaseForm({
               className="shrink-0"
               aria-label="베드 선택 변경"
             >
-              <BedBadge bedZone={bedZone} bedNumber={bedNumber} size="sm" />
+              <BedBadge bedZone={bedZone!} bedNumber={bedNumber} size="sm" />
             </button>
           )}
 

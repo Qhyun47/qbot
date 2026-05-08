@@ -180,9 +180,14 @@ export function StatusBoardCard({ case: c }: StatusBoardCardProps) {
           onClick={(e) => e.stopPropagation()}
           onBlur={handleMemoBlur}
           placeholder="메모..."
-          rows={2}
+          rows={1}
           className="resize-none text-xs text-muted-foreground placeholder:text-muted-foreground/50"
         />
+
+        {/* 완료 케이스 결과 힌트 */}
+        {c.status === "completed" && (
+          <p className="text-xs text-muted-foreground">결과 보기 →</p>
+        )}
 
         {/* 하단: 노티 상태 + 삭제 버튼 */}
         <div className="flex items-center justify-between">

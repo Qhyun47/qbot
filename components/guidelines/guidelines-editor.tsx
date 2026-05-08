@@ -389,7 +389,7 @@ export function GuidelinesEditor({
               value="text"
               className="rounded-r-none px-3 text-xs"
             >
-              Text
+              일반 텍스트
             </ToggleGroupItem>
             <ToggleGroupItem
               value="markdown"
@@ -407,7 +407,7 @@ export function GuidelinesEditor({
               value="pdf"
               className="rounded-l-none px-3 text-xs"
             >
-              PDF
+              PDF 업로드
             </ToggleGroupItem>
           </ToggleGroup>
         </div>

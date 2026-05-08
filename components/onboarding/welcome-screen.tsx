@@ -1,5 +1,6 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
 import { Logo } from "@/components/icons/logo";
 import { Button } from "@/components/ui/button";
 
@@ -25,6 +26,7 @@ export function WelcomeScreen({
       </div>
       <div className="flex w-full max-w-xs flex-col gap-3">
         <Button onClick={onStart} disabled={isPending}>
+          {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
           시작하기
         </Button>
         <Button variant="ghost" onClick={onSkip} disabled={isPending}>

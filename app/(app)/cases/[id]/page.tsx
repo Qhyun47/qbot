@@ -289,9 +289,30 @@ async function CaseContent({
           <CasePhotosSection caseId={caseData.id} />
         </div>
 
-        <Separator className="my-2" />
+        {!isDesktopDevice && (
+          <>
+            <Separator className="my-2" />
+            <div className="flex flex-col gap-2 pb-4 pt-4">
+              <h2 className="text-sm font-semibold text-muted-foreground">
+                문진 정보
+              </h2>
+              <CardInputSection
+                caseId={caseData.id}
+                initialCards={inputs}
+                generatedAt={result?.generated_at ?? undefined}
+              />
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
 
-        <div className="flex flex-col gap-2 pb-4 pt-4">
+  if (isDesktopDevice) {
+    return (
+      <div className="flex h-[calc(100vh-3.5rem)] flex-row overflow-hidden">
+        {/* 왼쪽: 문진 정보 */}
+        <div className="flex w-[360px] shrink-0 flex-col gap-2 overflow-y-auto border-r p-4">
           <h2 className="text-sm font-semibold text-muted-foreground">
             문진 정보
           </h2>
@@ -301,14 +322,16 @@ async function CaseContent({
             generatedAt={result?.generated_at ?? undefined}
           />
         </div>
+        {/* 오른쪽: AI 차팅 결과 */}
+        <div className="flex-1 overflow-hidden">{ResultView}</div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
     <>
-      {/* 모바일 입력 화면: 데스크탑에서는 렌더링하지 않음 */}
-      {!isDesktopDevice && !showResultView && (
+      {/* 모바일 입력 화면 */}
+      {!showResultView && (
         <CaseInputView
           caseId={caseData.id}
           defaultBedZone={caseData.bed_zone as BedZone}
@@ -331,8 +354,8 @@ async function CaseContent({
         />
       )}
 
-      {/* AI 결과 화면: 데스크탑은 항상, 모바일은 view=result일 때만 */}
-      {(isDesktopDevice || showResultView) && ResultView}
+      {/* 모바일: view=result일 때 AI 결과 화면 */}
+      {showResultView && ResultView}
     </>
   );
 }

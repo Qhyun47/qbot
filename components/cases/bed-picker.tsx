@@ -6,7 +6,7 @@ import { BED_NUMBERS_BY_ZONE } from "@/lib/cases/bed-config";
 import type { BedZone } from "@/lib/supabase/types";
 
 interface BedPickerProps {
-  bedZone: BedZone;
+  bedZone: BedZone | null;
   bedNumber: number | null;
   onChange: (zone: BedZone, number: number | null) => void;
 }
@@ -20,7 +20,9 @@ export function BedPicker({ bedZone, bedNumber, onChange }: BedPickerProps) {
         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           베드 선택
         </span>
-        <BedBadge bedZone={bedZone} bedNumber={bedNumber} size="sm" />
+        {bedZone !== null && (
+          <BedBadge bedZone={bedZone} bedNumber={bedNumber} size="sm" />
+        )}
       </div>
 
       {/* 구역 토글 */}
@@ -43,25 +45,34 @@ export function BedPicker({ bedZone, bedNumber, onChange }: BedPickerProps) {
         ))}
       </div>
 
+      {/* 단계별 안내 텍스트 */}
+      {bedZone === null ? (
+        <p className="text-xs text-muted-foreground">구역을 먼저 선택하세요.</p>
+      ) : bedNumber === null ? (
+        <p className="text-xs text-muted-foreground">번호를 선택하세요.</p>
+      ) : null}
+
       {/* 번호 그리드 */}
-      <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-6">
-        {BED_NUMBERS_BY_ZONE[bedZone].map((num) => (
-          <button
-            key={num}
-            type="button"
-            aria-label={`${bedZone}구역 ${num}번 베드 선택`}
-            onClick={() => onChange(bedZone, num)}
-            className={cn(
-              "h-10 w-full rounded-md border text-sm font-medium transition-all",
-              bedNumber !== null && num === bedNumber
-                ? "border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-neutral-900"
-                : "border-border text-neutral-900 hover:border-neutral-400 dark:text-neutral-100 dark:hover:border-neutral-500"
-            )}
-          >
-            {num}
-          </button>
-        ))}
-      </div>
+      {bedZone !== null && (
+        <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-6">
+          {BED_NUMBERS_BY_ZONE[bedZone].map((num) => (
+            <button
+              key={num}
+              type="button"
+              aria-label={`${bedZone}구역 ${num}번 베드 선택`}
+              onClick={() => onChange(bedZone, num)}
+              className={cn(
+                "h-10 w-full rounded-md border text-sm font-medium transition-all",
+                bedNumber !== null && num === bedNumber
+                  ? "border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-neutral-900"
+                  : "border-border text-neutral-900 hover:border-neutral-400 dark:text-neutral-100 dark:hover:border-neutral-500"
+              )}
+            >
+              {num}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

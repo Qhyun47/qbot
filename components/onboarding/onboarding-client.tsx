@@ -18,7 +18,7 @@ export function OnboardingClient() {
     startTransition(async () => {
       await completeOnboarding();
       router.push("/dashboard");
-      toast("설정에서 이 가이드를 다시 볼 수 있습니다.");
+      toast("가이드는 설정에서 다시 볼 수 있어요.");
     });
   };
 
@@ -46,15 +46,5 @@ export function OnboardingClient() {
       />
     );
 
-  return (
-    <>
-      <div className="flex flex-1 flex-col md:hidden">{content}</div>
-      <div className="hidden flex-1 flex-col items-center justify-center gap-3 p-8 text-center md:flex">
-        <p className="text-base font-medium">모바일 기기에서 이용해주세요.</p>
-        <p className="text-sm text-muted-foreground">
-          규봇 사용 가이드는 모바일 환경에서만 동작합니다.
-        </p>
-      </div>
-    </>
-  );
+  return <div className="flex flex-1 flex-col">{content}</div>;
 }
