@@ -25,7 +25,7 @@ function to24h(h12: number, period: Period): number {
   return h12 === 12 ? 12 : h12 + 12;
 }
 
-// 12 이하 숫자 입력 시 현재 시각 기준으로 더 가까운 오전/오후 자동 감지
+// 시+분 기준으로 현재 시각과 가장 가까운 오전/오후 감지
 function detectNearestPeriod(h12: number, m: number): Period {
   const now = new Date();
   const nowTotal = now.getHours() * 60 + now.getMinutes();
@@ -36,6 +36,16 @@ function detectNearestPeriod(h12: number, m: number): Period {
   const diffPM =
     pmTotal > nowTotal ? pmTotal - nowTotal : pmTotal - nowTotal + 24 * 60;
   return diffAM <= diffPM ? "AM" : "PM";
+}
+
+// 시(hour)만 입력된 단계: 현재 시각의 시와 같으면 현재 오전/오후 유지, 다르면 가까운 쪽 선택
+function detectPeriodForHoursEntry(h12: number): Period {
+  const now = new Date();
+  const nowH24 = now.getHours();
+  const nowH12 = nowH24 === 0 ? 12 : nowH24 > 12 ? nowH24 - 12 : nowH24;
+  const nowPeriod: Period = nowH24 < 12 ? "AM" : "PM";
+  if (h12 === nowH12) return nowPeriod;
+  return detectNearestPeriod(h12, 0);
 }
 
 function parseValue(v: string) {
@@ -92,7 +102,7 @@ export function TimeInput({
       if (d >= 2) {
         // 2–9: 앞에 0 붙여 완성, 오전/오후 자동 감지
         const h = "0" + d;
-        const p = detectNearestPeriod(d, minutes ? Number(minutes) : 0);
+        const p = detectPeriodForHoursEntry(d);
         setHours(h);
         setPeriod(p);
         commit(h, minutes, p);
@@ -111,7 +121,7 @@ export function TimeInput({
     if (val >= 1 && val <= 12) {
       // 유효한 12시간제 값 → 오전/오후 자동 감지
       const h = String(val).padStart(2, "0");
-      const p = detectNearestPeriod(val, minutes ? Number(minutes) : 0);
+      const p = detectPeriodForHoursEntry(val);
       setHours(h);
       setPeriod(p);
       commit(h, minutes, p);
@@ -131,7 +141,7 @@ export function TimeInput({
       const lastD = Number(digits.slice(-1));
       if (lastD >= 2) {
         const h = "0" + lastD;
-        const p = detectNearestPeriod(lastD, minutes ? Number(minutes) : 0);
+        const p = detectPeriodForHoursEntry(lastD);
         setHours(h);
         setPeriod(p);
         commit(h, minutes, p);
@@ -152,12 +162,22 @@ export function TimeInput({
       return;
     }
 
+    function commitWithPeriodRedetect(h: string, m: string) {
+      if (h.length === 2) {
+        const newP = detectNearestPeriod(Number(h), Number(m));
+        setPeriod(newP);
+        commit(h, m, newP);
+      } else {
+        commit(h, m, period);
+      }
+    }
+
     if (digits.length === 1) {
       const d = Number(digits);
       if (d >= 6) {
         const m = "0" + d;
         setMinutes(m);
-        commit(hours, m, period);
+        commitWithPeriodRedetect(hours, m);
       } else {
         setMinutes(digits);
       }
@@ -169,13 +189,13 @@ export function TimeInput({
     if (val <= 59) {
       const m = two.padStart(2, "0");
       setMinutes(m);
-      commit(hours, m, period);
+      commitWithPeriodRedetect(hours, m);
     } else {
       const lastD = Number(digits.slice(-1));
       if (lastD >= 6) {
         const m = "0" + lastD;
         setMinutes(m);
-        commit(hours, m, period);
+        commitWithPeriodRedetect(hours, m);
       } else {
         setMinutes(String(lastD));
       }
