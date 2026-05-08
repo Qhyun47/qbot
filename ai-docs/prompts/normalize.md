@@ -58,10 +58,21 @@ Add **physical_examination** as a category for cards that contain physical exam 
 
 When a card is categorized as `npo_status`, extract `npo_solid` and `npo_liquid` into the top-level fields as follows:
 
-- **Time format**: Always convert to `MM.DD HH:mm` (24-hour, e.g., "05.04 20:00"). Use the current date context when relative expressions are given (e.g., "오늘 저녁 8시" → "05.04 20:00").
-- **Solid vs Liquid**: If the card distinguishes solid (고형식) and liquid (수분/액체) with separate times, set `npo_solid` and `npo_liquid` independently.
-- **Single time**: If only one time is provided without distinction, set both `npo_solid` and `npo_liquid` to the same value.
-- **Additional info**: If the card mentions what was consumed (e.g., "밥", "물", specific food), append it after the time separated by a pipe: e.g., `"05.04 20:00|밥과 국"`. The part after `|` is supplementary information.
+- **Time format**: Always convert to `MM.DD HH:mm` (24-hour). Use today's date when no date is specified.
+  - `HHMM` (4 digits without colon) → `HH:mm` (e.g., `1300` → `13:00`, `0900` → `09:00`)
+  - Standard formats (`HH:mm`, "8시", "오전 10시") → convert to `HH:mm` as usual
+  - `mn` → special value `"MN NPO"` (see below)
+  - "어제" + time → yesterday's date + that time (e.g., "어제 1800" → `"05.07 18:00"` if today is 05.08)
+  - "어제" without a specific time → special value `"MN NPO"` (see below)
+- **MN NPO**: When the input is `mn`, or "어제" without a time, store the string `"MN NPO"` as the field value. This indicates the patient has been NPO since midnight with no specific time to record.
+- **Solid vs Liquid shorthand**: In NPO cards, `s` (or `solid`) refers to solid food (npo_solid); `l` (or `liquid`) refers to liquid intake (npo_liquid). Parse them independently.
+  - e.g., `npo s 1100 l 1300` → `npo_solid: "05.08 11:00"`, `npo_liquid: "05.08 13:00"`
+  - e.g., `npo s mn l 1000` → `npo_solid: "MN NPO"`, `npo_liquid: "05.08 10:00"`
+  - e.g., `npo s 어제 1800 l 1000` → `npo_solid: "05.07 18:00"`, `npo_liquid: "05.08 10:00"`
+  - e.g., `npo s 어제 l 1000` → `npo_solid: "MN NPO"`, `npo_liquid: "05.08 10:00"`
+- **Single time**: If no `s`/`l` distinction is given and only one time is provided, set both `npo_solid` and `npo_liquid` to the same value.
+  - e.g., `npo 1100` → `npo_solid: "05.08 11:00"`, `npo_liquid: "05.08 11:00"`
+- **Additional info**: If the card mentions what was consumed (e.g., "밥", "물", specific food), append it after the time separated by a pipe: e.g., `"05.04 20:00|밥과 국"`. The part after `|` is supplementary information. Do not append to `"MN NPO"` values.
 - If no NPO information is present, set both fields to null.
 
 ## C.C.-specific Fields

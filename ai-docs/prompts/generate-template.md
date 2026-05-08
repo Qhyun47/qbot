@@ -63,14 +63,15 @@ ccSpecificFields에 `npo_solid` 또는 `npo_liquid`가 null이 아닌 값으로 
 **NPO 블록 포맷:**
 
 ```
-NPO: Solid - MM.DD HH:mm (추가정보)
-      Liquid - MM.DD HH:mm (추가정보)
+NPO : Solid - MM.DD HH:mm
+     Liquid - MM.DD HH:mm
 ```
 
 **세부 규칙:**
 
-- `NPO:` 뒤 바로 `Solid`, `Liquid`는 6칸 들여쓰기로 정렬 (`      Liquid`)
+- `NPO :` 이후 `Solid`를 바로 이어 쓰고, `Liquid`는 앞에 5칸 공백으로 정렬 (`     Liquid`)
 - 시간은 반드시 `MM.DD HH:mm` 형식으로 기재 (예: `05.04 20:00`)
+- npo_solid/npo_liquid 값이 `"MN NPO"`인 경우: 날짜/시간 없이 `MN NPO`를 그대로 출력 (예: `NPO : Solid - MN NPO`)
 - npo_solid/npo_liquid 값이 `|`를 포함하는 경우 (`"05.04 20:00|밥과 국"` 형태): `|` 앞은 시간, `|` 뒤는 추가 정보로 괄호 안에 기재 → `05.04 20:00 (밥과 국)`
 - 추가 정보가 없으면 괄호 없이 시간만 기재
 - npo_solid와 npo_liquid 값이 동일하면 양쪽 모두 같은 값으로 출력
