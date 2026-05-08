@@ -9,21 +9,21 @@ const BG = "#18181b";
 const TEXT_COLOR = "#e4e4e7";
 const TAGLINE_COLOR = "#a1a1aa";
 
-// 아이콘 요소 (배경 rect 없이, 512×512 viewBox 기준)
+// 아이콘 요소 — components/icons/logo.tsx와 동일한 SVG (100×100 viewBox 기준)
 // 투명 PNG 합성 없이 스플래시 SVG에 직접 삽입하여 흰 테두리 artifact 방지
 const ICON_CONTENT = `
   <path
-    fill="none"
+    d="M8 11 Q8 4 15 4 L70 4 Q78 4 78 11 L78 57 Q78 65 70 65 L31 65 L18 81 L18 65 Q8 65 8 57 Z"
     stroke="#ffffff"
-    stroke-width="32"
+    stroke-width="5.5"
     stroke-linejoin="round"
     stroke-linecap="round"
-    d="M 95 55 H 340 Q 390 55 390 105 V 295 Q 390 345 340 345 H 210 L 78 430 L 103 345 H 95 Q 45 345 45 295 V 105 Q 45 55 95 55 Z"
+    fill="none"
   />
-  <rect x="103" y="162" width="190" height="26" rx="13" fill="#d4d4d8"/>
-  <rect x="103" y="215" width="148" height="26" rx="13" fill="#e5534b"/>
-  <rect x="360" y="373" width="110" height="44" rx="10" fill="#e5534b"/>
-  <rect x="393" y="340" width="44" height="110" rx="10" fill="#e5534b"/>
+  <line x1="22" y1="28" x2="64" y2="28" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+  <line x1="22" y1="44" x2="50" y2="44" stroke="#E8473F" stroke-width="5" stroke-linecap="round"/>
+  <line x1="78" y1="62" x2="78" y2="86" stroke="#E8473F" stroke-width="7" stroke-linecap="round"/>
+  <line x1="66" y1="74" x2="90" y2="74" stroke="#E8473F" stroke-width="7" stroke-linecap="round"/>
 `;
 
 const DIMENSIONS = [
@@ -40,8 +40,8 @@ const DIMENSIONS = [
 // ── 커스텀 스플래시 PNG (iOS apple-touch-startup-image) ──────────────────────
 for (const { w, h, file } of DIMENSIONS) {
   const iconSize = Math.floor(w * 0.32);
-  const scale = iconSize / 512;
-  const iconLeft = w / 2 - 256 * scale;
+  const scale = iconSize / 100; // 100×100 viewBox 기준
+  const iconLeft = w / 2 - 50 * scale;
   const iconTop = Math.floor(h * 0.35);
 
   const titleSize = Math.floor(w * 0.088);
