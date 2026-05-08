@@ -127,7 +127,11 @@ export function Step01Dashboard({ onNext, totalSteps }: Step01Props) {
             tooltipPosition="left"
             active
           >
-            <Button size="sm" className="pointer-events-none gap-1">
+            <Button
+              size="sm"
+              className="pointer-events-auto cursor-pointer gap-1"
+              onClick={onNext}
+            >
               <Plus className="size-4" />
               환자 추가
             </Button>

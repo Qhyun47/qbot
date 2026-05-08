@@ -482,6 +482,9 @@ export function NewCaseForm({
               onClick={async () => {
                 setShowSaveDialog(false);
                 setNavigatingBack(true);
+                if (recordingButtonRef.current?.isRecording) {
+                  await recordingButtonRef.current.stopAndUpload();
+                }
                 await handleDeleteCase();
               }}
             >

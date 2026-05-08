@@ -2,6 +2,7 @@
 
 import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { cn } from "@/lib/utils";
 
 type TooltipPosition = "top" | "bottom" | "left" | "right";
 
@@ -169,9 +170,10 @@ export function CoachMark({
         className={`relative ${wrapperClassName ?? "inline-block"} ${active ? "z-50" : ""}`}
       >
         <div
-          className={
-            active ? "animate-pulse rounded-lg ring-2 ring-primary" : undefined
-          }
+          className={cn(
+            "w-full",
+            active && "animate-pulse rounded-lg ring-2 ring-primary"
+          )}
         >
           {children}
         </div>

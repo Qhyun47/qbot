@@ -107,6 +107,15 @@ export const RecordingButton = forwardRef<
   );
 
   useEffect(() => {
+    return () => {
+      if (isRecordingRef.current) {
+        stopRecording();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
         // 알림 배너·짧은 앱 전환은 무시하고, 10초간 숨긴 상태가 지속될 때만 녹음 중지

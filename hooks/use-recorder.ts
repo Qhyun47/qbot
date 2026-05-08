@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 
 interface UseRecorderReturn {
   isRecording: boolean;
@@ -80,6 +80,17 @@ export function useRecorder(): UseRecorderReturn {
 
       setIsRecording(false);
     });
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
   }, []);
 
   return { isRecording, elapsedSeconds, startRecording, stopRecording, error };
