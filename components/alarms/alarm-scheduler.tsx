@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useRef } from "react";
 import { toast } from "sonner";
 import { fireAlarm } from "@/lib/alarms/actions";
 import type { Alarm } from "@/lib/supabase/types";
@@ -33,6 +33,8 @@ export function requestAlarmNotificationPermission() {
 }
 
 export function AlarmScheduler({ initialAlarms }: Props) {
+  const firingIds = useRef<Set<string>>(new Set());
+
   const showNotification = useCallback(async (alarm: Alarm) => {
     if (
       typeof Notification === "undefined" ||
@@ -80,8 +82,14 @@ export function AlarmScheduler({ initialAlarms }: Props) {
         return true;
       });
       for (const alarm of due) {
-        await showNotification(alarm).catch(() => null);
-        await fireAlarm(alarm.id).catch(() => null);
+        if (firingIds.current.has(alarm.id)) continue;
+        firingIds.current.add(alarm.id);
+        try {
+          await showNotification(alarm).catch(() => null);
+          await fireAlarm(alarm.id).catch(() => null);
+        } finally {
+          firingIds.current.delete(alarm.id);
+        }
       }
     }
 

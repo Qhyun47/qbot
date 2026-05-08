@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { DashboardGallerySheet } from "@/components/dashboard/dashboard-gallery-sheet";
 import { DashboardView } from "@/components/dashboard/dashboard-view";
 import { DashboardPageShell } from "@/components/dashboard/dashboard-page-shell";
@@ -42,6 +43,11 @@ async function VersionBadge() {
 }
 
 async function OnboardingGuard() {
+  const cookieStore = await cookies();
+  const deviceType = cookieStore.get("x-device-type")?.value;
+  // 데스크탑은 모바일 전용 온보딩 불필요 — /onboarding이 즉시 /dashboard로 되돌리므로 루프 방지
+  if (deviceType === "desktop") return null;
+
   const supabase = await createClient();
   const {
     data: { user },

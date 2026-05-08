@@ -175,5 +175,4 @@ export async function fireAlarm(id: string): Promise<void> {
   }
 
   if (updateError) throw new Error(updateError.message);
-  revalidatePath("/dashboard");
 }

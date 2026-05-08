@@ -3,11 +3,46 @@
 import { useEffect, useRef, useState, KeyboardEvent } from "react";
 import { cn } from "@/lib/utils";
 
+type Period = "AM" | "PM";
+
 interface TimeInputProps {
-  value?: string; // "HH:MM" or ""
+  value?: string; // "HH:MM" 24h format or ""
   onChange?: (value: string) => void;
   className?: string;
   disabled?: boolean;
+}
+
+function to12h(hh24: string): { hours: string; period: Period } {
+  const h = parseInt(hh24, 10);
+  if (h === 0) return { hours: "12", period: "AM" };
+  if (h < 12) return { hours: String(h).padStart(2, "0"), period: "AM" };
+  if (h === 12) return { hours: "12", period: "PM" };
+  return { hours: String(h - 12).padStart(2, "0"), period: "PM" };
+}
+
+function to24h(h12: number, period: Period): number {
+  if (period === "AM") return h12 === 12 ? 0 : h12;
+  return h12 === 12 ? 12 : h12 + 12;
+}
+
+// 12 이하 숫자 입력 시 현재 시각 기준으로 더 가까운 오전/오후 자동 감지
+function detectNearestPeriod(h12: number, m: number): Period {
+  const now = new Date();
+  const nowTotal = now.getHours() * 60 + now.getMinutes();
+  const amTotal = to24h(h12, "AM") * 60 + m;
+  const pmTotal = to24h(h12, "PM") * 60 + m;
+  const diffAM =
+    amTotal > nowTotal ? amTotal - nowTotal : amTotal - nowTotal + 24 * 60;
+  const diffPM =
+    pmTotal > nowTotal ? pmTotal - nowTotal : pmTotal - nowTotal + 24 * 60;
+  return diffAM <= diffPM ? "AM" : "PM";
+}
+
+function parseValue(v: string) {
+  if (!v) return { hours: "", minutes: "", period: "AM" as Period };
+  const parts = v.split(":");
+  const { hours, period } = to12h(parts[0] ?? "00");
+  return { hours, minutes: parts[1] ?? "", period };
 }
 
 export function TimeInput({
@@ -20,26 +55,24 @@ export function TimeInput({
   const minutesRef = useRef<HTMLInputElement>(null);
   const lastEmitted = useRef(value ?? "");
 
-  const [hours, setHours] = useState(() => (value ? value.slice(0, 2) : ""));
-  const [minutes, setMinutes] = useState(() =>
-    value ? value.slice(3, 5) : ""
-  );
+  const [hours, setHours] = useState(() => parseValue(value).hours);
+  const [minutes, setMinutes] = useState(() => parseValue(value).minutes);
+  const [period, setPeriod] = useState<Period>(() => parseValue(value).period);
 
-  // 외부 value 변경(폼 리셋 등)을 로컬 상태에 반영
   useEffect(() => {
     if ((value ?? "") === lastEmitted.current) return;
     lastEmitted.current = value ?? "";
-    if (!value) {
-      setHours("");
-      setMinutes("");
-    } else {
-      setHours(value.slice(0, 2));
-      setMinutes(value.slice(3, 5));
-    }
+    const parsed = parseValue(value ?? "");
+    setHours(parsed.hours);
+    setMinutes(parsed.minutes);
+    setPeriod(parsed.period);
   }, [value]);
 
-  function commit(h: string, m: string) {
-    const newVal = h.length === 2 && m.length === 2 ? `${h}:${m}` : "";
+  function commit(h: string, m: string, p: Period) {
+    const newVal =
+      h.length === 2 && m.length === 2
+        ? `${String(to24h(Number(h), p)).padStart(2, "0")}:${m}`
+        : "";
     if (newVal === lastEmitted.current) return;
     lastEmitted.current = newVal;
     onChange?.(newVal);
@@ -50,21 +83,23 @@ export function TimeInput({
 
     if (digits === "") {
       setHours("");
-      commit("", minutes);
+      commit("", minutes, period);
       return;
     }
 
     if (digits.length === 1) {
       const d = Number(digits);
-      if (d >= 3) {
-        // 3–9 → 자동 완성 후 분으로 이동
+      if (d >= 2) {
+        // 2–9: 앞에 0 붙여 완성, 오전/오후 자동 감지
         const h = "0" + d;
+        const p = detectNearestPeriod(d, minutes ? Number(minutes) : 0);
         setHours(h);
-        commit(h, minutes);
+        setPeriod(p);
+        commit(h, minutes, p);
         minutesRef.current?.focus();
         minutesRef.current?.select();
       } else {
-        // 0–2 → 두 번째 자리 대기
+        // 0, 1: 두 번째 자리 대기
         setHours(digits);
       }
       return;
@@ -72,19 +107,34 @@ export function TimeInput({
 
     const two = digits.slice(-2);
     const val = Number(two);
-    if (val <= 23) {
-      const h = two.padStart(2, "0");
+
+    if (val >= 1 && val <= 12) {
+      // 유효한 12시간제 값 → 오전/오후 자동 감지
+      const h = String(val).padStart(2, "0");
+      const p = detectNearestPeriod(val, minutes ? Number(minutes) : 0);
       setHours(h);
-      commit(h, minutes);
+      setPeriod(p);
+      commit(h, minutes, p);
+      minutesRef.current?.focus();
+      minutesRef.current?.select();
+    } else if (val >= 13 && val <= 23) {
+      // 13–23 입력 시 오후로 자동 변환 (예: 15 → 오후 3시)
+      const h12 = val - 12;
+      const h = String(h12).padStart(2, "0");
+      setHours(h);
+      setPeriod("PM");
+      commit(h, minutes, "PM");
       minutesRef.current?.focus();
       minutesRef.current?.select();
     } else {
-      // 유효하지 않은 두 자리 → 마지막 한 자리로 재시작
+      // 0 또는 24 초과: 마지막 한 자리로 재시작
       const lastD = Number(digits.slice(-1));
-      if (lastD >= 3) {
+      if (lastD >= 2) {
         const h = "0" + lastD;
+        const p = detectNearestPeriod(lastD, minutes ? Number(minutes) : 0);
         setHours(h);
-        commit(h, minutes);
+        setPeriod(p);
+        commit(h, minutes, p);
         minutesRef.current?.focus();
         minutesRef.current?.select();
       } else {
@@ -98,7 +148,7 @@ export function TimeInput({
 
     if (digits === "") {
       setMinutes("");
-      commit(hours, "");
+      commit(hours, "", period);
       return;
     }
 
@@ -107,7 +157,7 @@ export function TimeInput({
       if (d >= 6) {
         const m = "0" + d;
         setMinutes(m);
-        commit(hours, m);
+        commit(hours, m, period);
       } else {
         setMinutes(digits);
       }
@@ -119,13 +169,13 @@ export function TimeInput({
     if (val <= 59) {
       const m = two.padStart(2, "0");
       setMinutes(m);
-      commit(hours, m);
+      commit(hours, m, period);
     } else {
       const lastD = Number(digits.slice(-1));
       if (lastD >= 6) {
         const m = "0" + lastD;
         setMinutes(m);
-        commit(hours, m);
+        commit(hours, m, period);
       } else {
         setMinutes(String(lastD));
       }
@@ -137,30 +187,31 @@ export function TimeInput({
 
     if (e.key === "ArrowUp") {
       e.preventDefault();
-      const current = hours.length === 2 ? Number(hours) : 0;
-      const h = String((current + 1) % 24).padStart(2, "0");
+      const current = hours.length === 2 ? Number(hours) : 12;
+      const next = current === 12 ? 1 : current + 1;
+      const h = String(next).padStart(2, "0");
       setHours(h);
-      commit(h, minutes);
+      commit(h, minutes, period);
       return;
     }
 
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      const current = hours.length === 2 ? Number(hours) : 0;
-      const h = String((current - 1 + 24) % 24).padStart(2, "0");
+      const current = hours.length === 2 ? Number(hours) : 1;
+      const next = current === 1 ? 12 : current - 1;
+      const h = String(next).padStart(2, "0");
       setHours(h);
-      commit(h, minutes);
+      commit(h, minutes, period);
       return;
     }
 
     if (e.key === "Backspace" || e.key === "Delete") {
       e.preventDefault();
       setHours("");
-      commit("", minutes);
+      commit("", minutes, period);
       return;
     }
 
-    // 완성된 상태에서 새 숫자 입력 시 전체 선택 → 덮어쓰기
     if (e.key >= "0" && e.key <= "9" && hours.length === 2) {
       e.currentTarget.select();
     }
@@ -180,7 +231,7 @@ export function TimeInput({
       const current = minutes.length === 2 ? Number(minutes) : 0;
       const m = String((current + 1) % 60).padStart(2, "0");
       setMinutes(m);
-      commit(hours, m);
+      commit(hours, m, period);
       return;
     }
 
@@ -189,20 +240,25 @@ export function TimeInput({
       const current = minutes.length === 2 ? Number(minutes) : 0;
       const m = String((current - 1 + 60) % 60).padStart(2, "0");
       setMinutes(m);
-      commit(hours, m);
+      commit(hours, m, period);
       return;
     }
 
     if (e.key === "Backspace" || e.key === "Delete") {
       e.preventDefault();
       setMinutes("");
-      commit(hours, "");
+      commit(hours, "", period);
       return;
     }
 
     if (e.key >= "0" && e.key <= "9" && minutes.length === 2) {
       e.currentTarget.select();
     }
+  }
+
+  function handlePeriodChange(p: Period) {
+    setPeriod(p);
+    commit(hours, minutes, p);
   }
 
   const segmentClass = cn(
@@ -224,39 +280,61 @@ export function TimeInput({
         className
       )}
     >
-      <input
-        ref={hoursRef}
-        type="text"
-        inputMode="numeric"
-        pattern="[0-9]*"
-        value={hours}
-        placeholder="--"
-        disabled={disabled}
-        maxLength={2}
-        aria-label="시"
-        onChange={(e) => processHoursInput(e.target.value)}
-        onKeyDown={handleHoursKeyDown}
-        onFocus={(e) => e.currentTarget.select()}
-        onClick={(e) => e.currentTarget.select()}
-        className={segmentClass}
-      />
-      <span className="select-none px-0.5 text-muted-foreground">:</span>
-      <input
-        ref={minutesRef}
-        type="text"
-        inputMode="numeric"
-        pattern="[0-9]*"
-        value={minutes}
-        placeholder="--"
-        disabled={disabled}
-        maxLength={2}
-        aria-label="분"
-        onChange={(e) => processMinutesInput(e.target.value)}
-        onKeyDown={handleMinutesKeyDown}
-        onFocus={(e) => e.currentTarget.select()}
-        onClick={(e) => e.currentTarget.select()}
-        className={segmentClass}
-      />
+      <div className="flex flex-1 items-center">
+        <input
+          ref={hoursRef}
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          value={hours}
+          placeholder="--"
+          disabled={disabled}
+          maxLength={2}
+          aria-label="시"
+          onChange={(e) => processHoursInput(e.target.value)}
+          onKeyDown={handleHoursKeyDown}
+          onFocus={(e) => e.currentTarget.select()}
+          onClick={(e) => e.currentTarget.select()}
+          className={segmentClass}
+        />
+        <span className="select-none px-0.5 text-muted-foreground">:</span>
+        <input
+          ref={minutesRef}
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          value={minutes}
+          placeholder="--"
+          disabled={disabled}
+          maxLength={2}
+          aria-label="분"
+          onChange={(e) => processMinutesInput(e.target.value)}
+          onKeyDown={handleMinutesKeyDown}
+          onFocus={(e) => e.currentTarget.select()}
+          onClick={(e) => e.currentTarget.select()}
+          className={segmentClass}
+        />
+      </div>
+
+      {/* 오전/오후 토글 */}
+      <div className="ml-2 flex shrink-0 overflow-hidden rounded border border-input">
+        {(["AM", "PM"] as const).map((p) => (
+          <button
+            key={p}
+            type="button"
+            disabled={disabled}
+            onClick={() => handlePeriodChange(p)}
+            className={cn(
+              "px-2.5 py-0.5 text-xs font-medium transition-colors",
+              period === p
+                ? "bg-primary text-primary-foreground"
+                : "bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
+            )}
+          >
+            {p === "AM" ? "오전" : "오후"}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
