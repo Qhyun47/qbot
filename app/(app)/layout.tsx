@@ -2,14 +2,15 @@ import { Suspense, type ReactNode } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/icons/logo";
 import { Toaster } from "sonner";
-import { LogoutButton } from "@/components/logout-button";
 import { HeaderNewCaseButton } from "@/components/layout/header-new-case-button";
+import { UserAccountButton } from "@/components/layout/user-account-button";
 import { MobileNav } from "@/components/mobile-nav";
 import { NavLinks } from "@/components/nav-links";
 import { FontSizeInit } from "@/components/font-size-init";
 import { ConditionalHeader } from "@/components/layout/conditional-header";
 import { CompactModeProvider } from "@/components/compact-mode-provider";
 import { getIsAdmin } from "@/lib/auth/is-admin";
+import { getCurrentUser } from "@/lib/auth/get-current-user";
 import { getLayoutSettings } from "@/lib/settings/actions";
 import { getServiceAccessStatus } from "@/lib/auth/service-access";
 import { redirect } from "next/navigation";
@@ -24,6 +25,12 @@ import { ScreenGuard } from "@/components/screen-guard";
 async function NavLinksWithAdmin() {
   const isAdmin = await getIsAdmin();
   return <NavLinks isAdmin={isAdmin} />;
+}
+
+async function UserAccountButtonWithData() {
+  const user = await getCurrentUser();
+  if (!user) return null;
+  return <UserAccountButton user={user} />;
 }
 
 /**
@@ -82,9 +89,13 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               <div className="ml-auto flex items-center gap-2">
                 {/* 모바일 환경에서만 표시되는 환자 추가 버튼 (viewMode 기반) */}
                 <HeaderNewCaseButton />
-                {/* 넓은 화면(1024px 이상): 로그아웃 버튼 */}
+                {/* 넓은 화면(1024px 이상): 계정 아바타 + 드롭다운 */}
                 <div className="hidden lg:block">
-                  <LogoutButton />
+                  <Suspense
+                    fallback={<div className="size-8 rounded-full bg-muted" />}
+                  >
+                    <UserAccountButtonWithData />
+                  </Suspense>
                 </div>
               </div>
             </header>
