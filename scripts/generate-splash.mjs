@@ -1,4 +1,5 @@
 import sharp from "sharp";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -86,15 +87,21 @@ console.log("\n스플래시 이미지 생성 완료!");
 const iconSrc = path.join(ROOT, "public/icons/icon.svg");
 const maskableSrc = path.join(ROOT, "public/icons/icon-maskable.svg");
 
-await sharp(iconSrc)
+// 배경 rect 제거 → 투명 배경 아이콘 (안드로이드 스플래시 흰 테두리 방지)
+const iconSvgRaw = fs.readFileSync(iconSrc, "utf8");
+const transparentIconSvg = Buffer.from(
+  iconSvgRaw.replace(/<rect[^>]*fill="#18181b"[^>]*\/>/, "")
+);
+
+await sharp(transparentIconSvg)
   .resize(192, 192)
   .png()
   .toFile(path.join(ROOT, "public/icons/icon-192.png"));
-await sharp(iconSrc)
+await sharp(transparentIconSvg)
   .resize(512, 512)
   .png()
   .toFile(path.join(ROOT, "public/icons/icon-512.png"));
-console.log("✓ icon-192.png, icon-512.png 재생성 완료");
+console.log("✓ icon-192.png, icon-512.png 재생성 완료 (투명 배경)");
 
 await sharp(maskableSrc)
   .resize(512, 512)
