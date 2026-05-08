@@ -33,7 +33,7 @@ export function NewCaseSetupDialog({ onClose }: NewCaseSetupDialogProps) {
   const [, startTransition] = useTransition();
 
   const [caseId, setCaseId] = useState<string | null>(null);
-  const [bedZone, setBedZone] = useState<BedZone | null>(null);
+  const [bedZone, setBedZone] = useState<BedZone | null>("A");
   const [bedNumber, setBedNumber] = useState<number | null>(null);
   const [setupCcs, setSetupCcs] = useState<string[]>([]);
   const [pendingTemplateKeys, setPendingTemplateKeys] = useState<
@@ -48,25 +48,27 @@ export function NewCaseSetupDialog({ onClose }: NewCaseSetupDialogProps) {
     templateKeys: string[];
   } | null>(null);
   const freshRef = useRef(Date.now());
+  // createCase() 프로미스를 보관해 클릭 시점에 await할 수 있도록 함
+  const caseIdPromiseRef = useRef<Promise<string> | null>(null);
 
   useEffect(() => {
-    createCase().then((id) => setCaseId(id));
+    const promise = createCase();
+    caseIdPromiseRef.current = promise;
+    promise.then((id) => {
+      setCaseId(id);
+      // caseId가 준비되면 임시 보관된 베드/CC를 즉시 저장
+      if (pendingBedRef.current) {
+        const { zone, number } = pendingBedRef.current;
+        pendingBedRef.current = null;
+        startTransition(() => updateCaseBed(id, zone, number));
+      }
+      if (pendingCcsRef.current) {
+        const { ccs, templateKeys } = pendingCcsRef.current;
+        pendingCcsRef.current = null;
+        startTransition(() => updateCaseCcs(id, ccs, templateKeys));
+      }
+    });
   }, []);
-
-  // caseId가 준비되면 임시 보관된 베드/CC를 즉시 저장
-  useEffect(() => {
-    if (!caseId) return;
-    if (pendingBedRef.current) {
-      const { zone, number } = pendingBedRef.current;
-      pendingBedRef.current = null;
-      startTransition(() => updateCaseBed(caseId, zone, number));
-    }
-    if (pendingCcsRef.current) {
-      const { ccs, templateKeys } = pendingCcsRef.current;
-      pendingCcsRef.current = null;
-      startTransition(() => updateCaseCcs(caseId, ccs, templateKeys));
-    }
-  }, [caseId]);
 
   const handleBedChange = (zone: BedZone, number: number | null) => {
     setBedZone(zone);
@@ -98,23 +100,32 @@ export function NewCaseSetupDialog({ onClose }: NewCaseSetupDialogProps) {
     router.push(`/cases/new?${params.toString()}`);
   };
 
-  const finalizeSetup = (finalCcs: string[], templateKeys: string[]) => {
-    if (!caseId) return;
-    setNavigating(true);
-
-    if (finalCcs.length > 0) {
-      startTransition(() => updateCaseCcs(caseId, finalCcs, templateKeys));
-    }
-
-    navigateToForm(finalCcs, templateKeys, caseId);
+  // caseId가 준비될 때까지 기다리는 헬퍼 (이미 준비됐으면 즉시 반환)
+  const resolveCaseId = async (): Promise<string> => {
+    if (caseId) return caseId;
+    return caseIdPromiseRef.current!;
   };
 
-  const handleSetupConfirm = () => {
-    if (!caseId) return;
+  const finalizeSetup = async (finalCcs: string[], templateKeys: string[]) => {
+    setNavigating(true);
+    const resolvedCaseId = await resolveCaseId();
+
+    if (finalCcs.length > 0) {
+      startTransition(() =>
+        updateCaseCcs(resolvedCaseId, finalCcs, templateKeys)
+      );
+    }
+
+    navigateToForm(finalCcs, templateKeys, resolvedCaseId);
+  };
+
+  const handleSetupConfirm = async () => {
+    if (navigating || closing) return;
 
     if (setupCcs.length === 0) {
       setNavigating(true);
-      navigateToForm([], [], caseId);
+      const resolvedCaseId = await resolveCaseId();
+      navigateToForm([], [], resolvedCaseId);
       return;
     }
 
@@ -122,16 +133,17 @@ export function NewCaseSetupDialog({ onClose }: NewCaseSetupDialogProps) {
     const rank0 = mergedEntries.find((e) => e.rank === 0);
     if (mergedEntries.length === 0 || mergedEntries.length === 1 || rank0) {
       const key = rank0?.key ?? mergedEntries[0]?.key ?? null;
-      finalizeSetup(setupCcs, key ? [key] : []);
+      await finalizeSetup(setupCcs, key ? [key] : []);
     } else {
       setPendingTemplateKeys(mergedEntries.map((e) => e.key));
     }
   };
 
-  const handleSetupSkip = () => {
-    if (!caseId) return;
+  const handleSetupSkip = async () => {
+    if (navigating || closing) return;
     setNavigating(true);
-    navigateToForm([], [], caseId);
+    const resolvedCaseId = await resolveCaseId();
+    navigateToForm([], [], resolvedCaseId);
   };
 
   const handleTemplateKeyConfirm = (key: string | null) => {
@@ -141,9 +153,10 @@ export function NewCaseSetupDialog({ onClose }: NewCaseSetupDialogProps) {
   const handleBack = async () => {
     if (closing) return;
     setClosing(true);
-    if (caseId) {
+    const resolvedCaseId = caseId ?? (await caseIdPromiseRef.current) ?? null;
+    if (resolvedCaseId) {
       try {
-        await deleteCase(caseId);
+        await deleteCase(resolvedCaseId);
       } catch {
         // 삭제 실패해도 닫기 진행
       }
@@ -151,7 +164,7 @@ export function NewCaseSetupDialog({ onClose }: NewCaseSetupDialogProps) {
     onClose();
   };
 
-  const isConfirmDisabled = !caseId || navigating || closing;
+  const isConfirmDisabled = navigating || closing;
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-background">
@@ -263,16 +276,7 @@ export function NewCaseSetupDialog({ onClose }: NewCaseSetupDialogProps) {
             onClick={handleSetupConfirm}
             disabled={isConfirmDisabled}
           >
-            {navigating ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : !caseId ? (
-              <>
-                <Loader2 className="size-4 animate-spin" />
-                준비 중...
-              </>
-            ) : (
-              "확인"
-            )}
+            {navigating ? <Loader2 className="size-4 animate-spin" /> : "확인"}
           </Button>
         </div>
       )}

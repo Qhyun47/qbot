@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NewCaseSetupDialog } from "@/components/cases/new-case-setup-dialog";
@@ -21,9 +22,11 @@ export function NewCaseButton({ children, ...props }: NewCaseButtonProps) {
           </>
         )}
       </Button>
-      {dialogOpen && (
-        <NewCaseSetupDialog onClose={() => setDialogOpen(false)} />
-      )}
+      {dialogOpen &&
+        createPortal(
+          <NewCaseSetupDialog onClose={() => setDialogOpen(false)} />,
+          document.body
+        )}
     </>
   );
 }
