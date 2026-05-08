@@ -4,6 +4,12 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { Bell, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useCompactMode } from "@/components/compact-mode-provider";
 import { CompactModeToggle } from "@/components/dashboard/compact-mode-toggle";
 import { CompactStatusList } from "@/components/dashboard/compact-status-list";
@@ -92,15 +98,22 @@ export function DashboardView({ cases, alarms }: DashboardViewProps) {
         </div>
         {/* 우측: 글로벌 액션 */}
         <div className="ml-auto flex shrink-0 items-center gap-1">
-          <Button
-            size="sm"
-            variant="outline"
-            className="gap-1"
-            onClick={handleNewAlarm}
-          >
-            <Bell className="h-3.5 w-3.5" />
-            알람 추가
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-1"
+                  onClick={handleNewAlarm}
+                >
+                  <Bell className="h-3.5 w-3.5" />
+                  <span className="hidden lg:inline">알람 추가</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="lg:hidden">알람 추가</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <MedicationTriggerButton size="sm" />
           {viewMode !== "mobile" && (
             <NewCaseButton size="sm" className="gap-1.5" />
