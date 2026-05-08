@@ -8,7 +8,10 @@ import {
   loadGuideByKey,
   loadTemplateContent,
 } from "@/lib/guidelines/actions";
-import type { TemplateContent } from "@/lib/guidelines/actions";
+import type {
+  TemplateContent,
+  GuidelineResult,
+} from "@/lib/guidelines/actions";
 import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 import { MarkdownPreview } from "@/components/ui/markdown-preview";
@@ -44,6 +47,9 @@ const allCategories = categoriesRaw as string[];
 
 const CIRCLED = ["①", "②", "③"];
 
+// 세션 내 가이드라인 캐시 — 같은 CC로 다시 마운트해도 서버 재요청 없이 즉시 사용
+const guidelineCache = new Map<string, GuidelineResult>();
+
 function getCategoryLabel(category: string): string {
   return category.replace(/^\d+\.\s*/, "");
 }
@@ -61,6 +67,8 @@ interface GuidelinePanelProps {
   forceActiveView?: "guide" | "template";
   /** 온보딩 데모 전용: 외부에서 selector 열기/닫기 제어 */
   forceShowSelector?: boolean;
+  /** selector 표시 상태 변경 시 호출되는 콜백 */
+  onShowSelectorChange?: (showing: boolean) => void;
 }
 
 function getGuideLabel(guideKey: string): string {
@@ -167,6 +175,7 @@ export function GuidelinePanel({
   coachMarkTemplateTab,
   forceActiveView,
   forceShowSelector,
+  onShowSelectorChange,
 }: GuidelinePanelProps) {
   const [activeView, setActiveView] = useState<"guide" | "template">(
     defaultActiveView ?? "guide"
@@ -213,28 +222,40 @@ export function GuidelinePanel({
     setActiveView("guide");
     setShowSelector(false);
     setMultiSelectMode(false);
+
+    const applyResult = (result: GuidelineResult) => {
+      if (result.mode === "auto") {
+        setGuideContent(result.content);
+        setGuidePdfUrl(result.pdfSignedUrl);
+        setActiveGuideKey(result.guideKey);
+        setAdditionalGuideKeys(result.additionalSuggestions);
+        setRecommendedGuideKeys([]);
+      } else if (result.mode === "recommendations") {
+        setGuideContent(null);
+        setGuidePdfUrl(null);
+        setActiveGuideKey(null);
+        setAdditionalGuideKeys([]);
+        setRecommendedGuideKeys(result.suggestions);
+      } else {
+        setGuideContent(null);
+        setGuidePdfUrl(null);
+        setActiveGuideKey(null);
+        setAdditionalGuideKeys([]);
+        setRecommendedGuideKeys([]);
+      }
+    };
+
+    const cached = guidelineCache.get(ccsKey);
+    if (cached) {
+      applyResult(cached);
+      return;
+    }
+
     setIsGuideLoading(true);
     loadGuideline(ccs)
       .then((result) => {
-        if (result.mode === "auto") {
-          setGuideContent(result.content);
-          setGuidePdfUrl(result.pdfSignedUrl);
-          setActiveGuideKey(result.guideKey);
-          setAdditionalGuideKeys(result.additionalSuggestions);
-          setRecommendedGuideKeys([]);
-        } else if (result.mode === "recommendations") {
-          setGuideContent(null);
-          setGuidePdfUrl(null);
-          setActiveGuideKey(null);
-          setAdditionalGuideKeys([]);
-          setRecommendedGuideKeys(result.suggestions);
-        } else {
-          setGuideContent(null);
-          setGuidePdfUrl(null);
-          setActiveGuideKey(null);
-          setAdditionalGuideKeys([]);
-          setRecommendedGuideKeys([]);
-        }
+        guidelineCache.set(ccsKey, result);
+        applyResult(result);
       })
       .catch(() => {
         setGuideContent(null);
@@ -273,6 +294,10 @@ export function GuidelinePanel({
   useEffect(() => {
     if (forceShowSelector !== undefined) setShowSelector(forceShowSelector);
   }, [forceShowSelector]);
+
+  useEffect(() => {
+    onShowSelectorChange?.(showSelector);
+  }, [showSelector, onShowSelectorChange]);
 
   const closeSelector = () => {
     setShowSelector(false);

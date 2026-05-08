@@ -15,6 +15,7 @@ import { AlarmFab } from "@/components/alarms/alarm-fab";
 import { AlarmFormDialog } from "@/components/alarms/alarm-form-dialog";
 import { MedicationTriggerButton } from "@/components/medication/medication-trigger-button";
 import { NewCaseButton } from "@/components/cases/new-case-button";
+import { useViewMode } from "@/lib/hooks/use-view-mode";
 import { confirmAlarm, deleteAlarm } from "@/lib/alarms/actions";
 import type { Alarm, Case } from "@/lib/supabase/types";
 
@@ -25,6 +26,7 @@ interface DashboardViewProps {
 
 export function DashboardView({ cases, alarms }: DashboardViewProps) {
   const { isCompact } = useCompactMode();
+  const { viewMode } = useViewMode();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingAlarm, setEditingAlarm] = useState<Alarm | undefined>();
   const [, startTransition] = useTransition();
@@ -94,7 +96,9 @@ export function DashboardView({ cases, alarms }: DashboardViewProps) {
             알람 추가
           </Button>
           <MedicationTriggerButton size="sm" />
-          <NewCaseButton size="sm" className="gap-1.5" />
+          {viewMode !== "mobile" && (
+            <NewCaseButton size="sm" className="gap-1.5" />
+          )}
         </div>
       </div>
 

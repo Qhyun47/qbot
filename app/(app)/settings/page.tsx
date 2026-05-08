@@ -64,14 +64,12 @@ export default function SettingsPage() {
         </Suspense>
         <Separator />
         <Suspense fallback={null}>
-          <FullscreenSectionWrapper />
-        </Suspense>
-        <Separator />
-        <Suspense fallback={null}>
           <AutoRecordSectionWrapper />
         </Suspense>
         <Separator />
-        <InstallSection />
+        <Suspense fallback={null}>
+          <FullscreenSectionWrapper />
+        </Suspense>
         <Separator />
         <div className="space-y-2">
           <h2 className="text-base font-semibold">가이드</h2>
@@ -88,6 +86,8 @@ export default function SettingsPage() {
             </button>
           </form>
         </div>
+        <Separator />
+        <InstallSection />
         <Separator />
         <p className="text-center text-xs text-muted-foreground">
           버전{" "}

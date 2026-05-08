@@ -67,6 +67,8 @@ export function MockCaseForm({
     boolean | undefined
   >(undefined);
   const [demoTemplateKeys, setDemoTemplateKeys] = useState<string[]>([]);
+  // 사용자가 직접 탭을 클릭해서 selector가 열렸는지 추적
+  const [actualSelectorShowing, setActualSelectorShowing] = useState(false);
 
   useEffect(() => {
     if (highlightTarget === "guideline-tab") {
@@ -96,7 +98,8 @@ export function MockCaseForm({
   }, [highlightTarget]);
 
   // selector가 열려 있으면 CoachMark 비활성화 (오버레이가 리스트를 가리지 않도록)
-  const isShowingSelector = forceShowSelector === true;
+  // 타이머로 열린 경우(forceShowSelector)와 직접 클릭으로 열린 경우(actualSelectorShowing) 모두 처리
+  const isShowingSelector = forceShowSelector === true || actualSelectorShowing;
   const effectiveHighlightTarget: HighlightTarget = isShowingSelector
     ? null
     : highlightTarget;
@@ -173,6 +176,7 @@ export function MockCaseForm({
           defaultActiveView="guide"
           forceActiveView={forceActiveView}
           forceShowSelector={forceShowSelector}
+          onShowSelectorChange={setActualSelectorShowing}
           coachMarkGuidelineTab={tooltip("guideline-tab")}
           coachMarkTemplateTab={tooltip("template-tab")}
         />

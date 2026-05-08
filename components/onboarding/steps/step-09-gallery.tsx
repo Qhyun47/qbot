@@ -105,8 +105,8 @@ const GalleryTooltip = (
   <div className="max-w-[220px] space-y-1.5">
     <p>촬영한 사진 확인 및 추가 업로드가 가능합니다.</p>
     <p className="text-xs font-normal leading-relaxed text-gray-500">
-      * 규봇으로 저장한 사진은 편집 없이 바로 EMR에 올려도, 회전되지 않고
-      정상적으로 등록됩니다.
+      규봇으로 저장한 사진은 편집 없이 바로 EMR에 올려도, 사진이 돌아가지 않고
+      정상적으로 올라갑니다.
     </p>
   </div>
 );
