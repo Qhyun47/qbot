@@ -21,7 +21,7 @@ function formatAlarmTime(scheduledAt: string): string {
   );
   const abs = Math.abs(diff);
 
-  if (abs < 60) return "방금";
+  if (abs < 60) return diff > 0 ? "1분 뒤" : "방금";
   if (abs < 3600) {
     const mins = Math.round(abs / 60);
     return diff > 0 ? `${mins}분 뒤` : `${mins}분 전`;

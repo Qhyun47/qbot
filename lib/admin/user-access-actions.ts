@@ -185,3 +185,19 @@ export async function updateServiceAccessStatus(
   revalidatePath("/admin/users");
   return {};
 }
+
+export async function deleteUser(userId: string): Promise<{ error?: string }> {
+  const isAdmin = await getIsAdmin();
+  if (!isAdmin) return { error: "권한이 없습니다." };
+
+  try {
+    const supabase = createAdminClient();
+    const { error } = await supabase.auth.admin.deleteUser(userId);
+    if (error) return { error: "사용자 삭제에 실패했습니다." };
+  } catch {
+    return { error: "사용자 삭제에 실패했습니다." };
+  }
+
+  revalidatePath("/admin/users");
+  return {};
+}

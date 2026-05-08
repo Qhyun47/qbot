@@ -9,9 +9,20 @@ import { MoreHorizontal, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -28,6 +39,7 @@ import {
   denyServiceAccess,
   holdServiceAccess,
   updateServiceAccessStatus,
+  deleteUser,
 } from "@/lib/admin/user-access-actions";
 import type { ServiceAccessUser } from "@/lib/admin/user-access-actions";
 import type { ServiceAccessStatus } from "@/lib/supabase/types";
@@ -186,6 +198,7 @@ function PendingUserRow({ user }: { user: ServiceAccessUser }) {
 function AllUserRow({ user }: { user: ServiceAccessUser }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const displayName = user.full_name ?? user.email ?? user.id;
 
   function handleStatusChange(status: ServiceAccessStatus) {
@@ -200,67 +213,111 @@ function AllUserRow({ user }: { user: ServiceAccessUser }) {
     });
   }
 
+  function handleDelete() {
+    startTransition(async () => {
+      const result = await deleteUser(user.id);
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success(`${displayName}님을 삭제했습니다.`);
+        router.refresh();
+      }
+    });
+  }
+
   return (
-    <TableRow>
-      <TableCell className="font-medium">
-        <div className="flex items-center gap-1.5">
-          {user.full_name ?? "-"}
-          {user.is_admin && (
-            <Badge variant="outline" className="text-xs">
-              관리자
-            </Badge>
-          )}
-        </div>
-      </TableCell>
-      <TableCell className="text-muted-foreground">
-        {user.email ?? "-"}
-      </TableCell>
-      <TableCell className="text-muted-foreground">
-        {user.created_at
-          ? format(new Date(user.created_at), "MM/dd HH:mm", { locale: ko })
-          : "-"}
-      </TableCell>
-      <TableCell>
-        <Badge variant={STATUS_VARIANTS[user.service_access_status]}>
-          {STATUS_LABELS[user.service_access_status]}
-        </Badge>
-      </TableCell>
-      <TableCell>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild disabled={user.is_admin || isPending}>
-            <Button size="sm" variant="ghost" className="size-8 p-0">
-              {isPending ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <MoreHorizontal className="size-4" />
-              )}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onSelect={() => handleStatusChange("approved")}>
-              승인
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={() => handleStatusChange("ai_excluded")}
+    <>
+      <TableRow>
+        <TableCell className="font-medium">
+          <div className="flex items-center gap-1.5">
+            {user.full_name ?? "-"}
+            {user.is_admin && (
+              <Badge variant="outline" className="text-xs">
+                관리자
+              </Badge>
+            )}
+          </div>
+        </TableCell>
+        <TableCell className="text-muted-foreground">
+          {user.email ?? "-"}
+        </TableCell>
+        <TableCell className="text-muted-foreground">
+          {user.created_at
+            ? format(new Date(user.created_at), "MM/dd HH:mm", { locale: ko })
+            : "-"}
+        </TableCell>
+        <TableCell>
+          <Badge variant={STATUS_VARIANTS[user.service_access_status]}>
+            {STATUS_LABELS[user.service_access_status]}
+          </Badge>
+        </TableCell>
+        <TableCell>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild disabled={user.is_admin || isPending}>
+              <Button size="sm" variant="ghost" className="size-8 p-0">
+                {isPending ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <MoreHorizontal className="size-4" />
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => handleStatusChange("approved")}>
+                승인
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() => handleStatusChange("ai_excluded")}
+              >
+                AI 제외 승인
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => handleStatusChange("held")}>
+                보류
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-destructive focus:text-destructive"
+                onSelect={() => handleStatusChange("denied")}
+              >
+                거절
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => handleStatusChange("pending")}>
+                대기 중으로 되돌리기
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="text-destructive focus:text-destructive"
+                onSelect={() => setShowDeleteDialog(true)}
+              >
+                삭제
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </TableCell>
+      </TableRow>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>사용자를 삭제하시겠습니까?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <span className="font-medium text-foreground">{displayName}</span>
+              님의 계정이 완전히 삭제됩니다. 이 작업은 되돌릴 수 없으며, 해당
+              사용자는 다시 가입 후 승인 요청을 해야 서비스를 이용할 수
+              있습니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>취소</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={handleDelete}
             >
-              AI 제외 승인
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => handleStatusChange("held")}>
-              보류
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-destructive focus:text-destructive"
-              onSelect={() => handleStatusChange("denied")}
-            >
-              거절
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => handleStatusChange("pending")}>
-              대기 중으로 되돌리기
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </TableCell>
-    </TableRow>
+              삭제
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 
