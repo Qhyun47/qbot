@@ -156,6 +156,12 @@ export function NewCaseForm({
     createCase().then((id) => setCaseId(id));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // 다이얼로그 경유 시 설정 화면을 건너뛰므로 finalizeSetup이 호출되지 않음
+  // autoRecord가 켜진 경우 마운트 시 직접 신호를 보냄
+  useEffect(() => {
+    if (initialCaseId && autoRecord) setAutoStartSignal((v) => !v);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // caseId가 생기면 임시 보관된 베드/CC를 즉시 저장
   useEffect(() => {
     if (!caseId) return;
@@ -711,6 +717,7 @@ export function NewCaseForm({
               ref={recordingButtonRef}
               caseId={caseId}
               autoStartSignal={autoStartSignal}
+              autoRecord={autoRecord}
             />
 
             {/* 레이아웃 전환 토글 */}

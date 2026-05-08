@@ -31,16 +31,23 @@ interface RecordingButtonProps {
   caseId: string | null;
   onUploadComplete?: (recordingId: string) => void;
   autoStartSignal?: boolean;
+  autoRecord?: boolean;
 }
 
 export const RecordingButton = forwardRef<
   RecordingButtonHandle,
   RecordingButtonProps
->(function RecordingButton({ caseId, onUploadComplete, autoStartSignal }, ref) {
+>(function RecordingButton(
+  { caseId, onUploadComplete, autoStartSignal, autoRecord },
+  ref
+) {
   const { isRecording, elapsedSeconds, startRecording, stopRecording, error } =
     useRecorder();
   const [isUploading, setIsUploading] = useState(false);
   const isFirstSignalRef = useRef(true);
+  const autoRecordRef = useRef(autoRecord);
+  autoRecordRef.current = autoRecord;
+  const wasAutoStoppedRef = useRef(false);
   const elapsedSecondsRef = useRef(elapsedSeconds);
   elapsedSecondsRef.current = elapsedSeconds;
   const isRecordingRef = useRef(isRecording);
@@ -125,6 +132,7 @@ export const RecordingButton = forwardRef<
           const seconds = elapsedSecondsRef.current;
           const blob = await stopRecording();
           if (!blob || blob.size === 0) return;
+          if (autoRecordRef.current) wasAutoStoppedRef.current = true;
           performUpload(blob, seconds);
         }, 10_000);
       } else {
@@ -137,6 +145,15 @@ export const RecordingButton = forwardRef<
         if (pendingUploadRef.current && !isUploadingFlagRef.current) {
           const { blob, seconds } = pendingUploadRef.current;
           performUpload(blob, seconds);
+        }
+        // 자동 중지 후 복귀 시 새 녹음 파일 자동 시작
+        if (
+          wasAutoStoppedRef.current &&
+          autoRecordRef.current &&
+          !isRecordingRef.current
+        ) {
+          wasAutoStoppedRef.current = false;
+          startRecording();
         }
       }
     };
