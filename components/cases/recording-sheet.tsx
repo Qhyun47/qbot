@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Recording, TranscriptSegment } from "@/lib/supabase/types";
+import { CopyButton } from "@/components/cases/copy-button";
 
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60)
@@ -270,6 +271,15 @@ export function RecordingSheet({
                 {selected.transcript_status === "done" &&
                   segments.length > 0 && (
                     <div className="flex flex-col gap-1">
+                      <div className="mb-1 flex items-center justify-between">
+                        <span className="text-xs font-medium text-muted-foreground">
+                          대화록
+                        </span>
+                        <CopyButton
+                          text={segments.map((s) => s.text).join("\n")}
+                          label="전체 복사"
+                        />
+                      </div>
                       {segments.map((seg, i) => (
                         <div
                           key={i}
