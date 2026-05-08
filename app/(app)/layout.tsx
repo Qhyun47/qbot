@@ -27,6 +27,10 @@ async function NavLinksWithAdmin() {
   return <NavLinks isAdmin={isAdmin} />;
 }
 
+/**
+ * 현재 로그인된 사용자 정보를 서버에서 조회해 UserAccountButton에 주입합니다.
+ * Suspense 내부에서 렌더링되어 non-blocking 처리됩니다.
+ */
 async function UserAccountButtonWithData() {
   const user = await getCurrentUser();
   if (!user) return null;
