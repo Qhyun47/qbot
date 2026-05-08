@@ -34,6 +34,16 @@ export const metadata: Metadata = {
     title: "규봇",
     startupImage: [
       {
+        url: "/splash/splash-1320x2868.png",
+        media:
+          "(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3)",
+      },
+      {
+        url: "/splash/splash-1206x2622.png",
+        media:
+          "(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3)",
+      },
+      {
         url: "/splash/splash-1290x2796.png",
         media:
           "(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)",

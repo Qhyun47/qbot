@@ -11,12 +11,14 @@ const TEXT_COLOR = "#52525b";
 const TAGLINE_COLOR = "#3f3f46";
 
 const DIMENSIONS = [
-  { w: 1290, h: 2796, file: "splash-1290x2796.png" },
-  { w: 1179, h: 2556, file: "splash-1179x2556.png" },
-  { w: 1170, h: 2532, file: "splash-1170x2532.png" },
-  { w: 1125, h: 2436, file: "splash-1125x2436.png" },
-  { w: 828, h: 1792, file: "splash-828x1792.png" },
-  { w: 750, h: 1334, file: "splash-750x1334.png" },
+  { w: 1320, h: 2868, file: "splash-1320x2868.png" }, // iPhone 16 Pro Max
+  { w: 1206, h: 2622, file: "splash-1206x2622.png" }, // iPhone 16 Pro
+  { w: 1290, h: 2796, file: "splash-1290x2796.png" }, // iPhone 14/15/16 Plus/Pro Max
+  { w: 1179, h: 2556, file: "splash-1179x2556.png" }, // iPhone 14/15/16 Pro, Pixel 6
+  { w: 1170, h: 2532, file: "splash-1170x2532.png" }, // iPhone 14
+  { w: 1125, h: 2436, file: "splash-1125x2436.png" }, // iPhone 12/13 Pro
+  { w: 828, h: 1792, file: "splash-828x1792.png" }, // iPhone 8 Plus/XR/11
+  { w: 750, h: 1334, file: "splash-750x1334.png" }, // iPhone 8
 ];
 
 const iconSrc = path.join(ROOT, "public/icons/icon.svg");
@@ -83,17 +85,26 @@ console.log("\n스플래시 이미지 생성 완료!");
 
 // ── PWA 아이콘 재생성 ────────────────────────────────────────────────────────
 
-// icon-192 / icon-512: 투명 배경 → Android/Chrome이 manifest.background_color 위에 올려서
-// 사각형 경계 없이 아이콘만 보임
-await sharp(transparentSvgBuf)
+// icon-192 / icon-512: 다크 배경 고정
+// 투명 배경 사용 시 일부 Android/Chrome 버전이 manifest.background_color를 적용하지 않아
+// 체스판 패턴이나 흰 배경이 노출되는 문제가 있으므로, 배경을 직접 포함
+await sharp(iconSrc)
   .resize(192, 192)
   .png()
   .toFile(path.join(ROOT, "public/icons/icon-192.png"));
-await sharp(transparentSvgBuf)
+await sharp(iconSrc)
   .resize(512, 512)
   .png()
   .toFile(path.join(ROOT, "public/icons/icon-512.png"));
-console.log("✓ icon-192.png, icon-512.png (투명 배경) 재생성 완료");
+console.log("✓ icon-192.png, icon-512.png (다크 배경) 재생성 완료");
+
+// icon-maskable-512: Android 적응형 아이콘 (안전 영역 내 콘텐츠, 다크 배경)
+const maskableSrc = path.join(ROOT, "public/icons/icon-maskable.svg");
+await sharp(maskableSrc)
+  .resize(512, 512)
+  .png()
+  .toFile(path.join(ROOT, "public/icons/icon-maskable-512.png"));
+console.log("✓ icon-maskable-512.png (적응형 아이콘) 재생성 완료");
 
 // apple-touch-icon: 어두운 배경 유지 (iOS가 기본 흰 배경을 깔지 않도록)
 await sharp(iconSrc)
