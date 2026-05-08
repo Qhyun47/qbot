@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useTransition } from "react";
-import { Bell, ChevronRight } from "lucide-react";
+import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -88,13 +87,6 @@ export function DashboardView({ cases, alarms }: DashboardViewProps) {
           <div className="mx-1.5 h-4 w-px bg-border/60" />
           <RefreshButton />
           <HideAllFromBoardButton />
-          <Link
-            href="/cases"
-            className="flex shrink-0 items-center gap-0.5 whitespace-nowrap text-xs text-muted-foreground transition-colors hover:text-foreground"
-          >
-            전체 보기
-            <ChevronRight className="size-3" />
-          </Link>
         </div>
         {/* 우측: 글로벌 액션 */}
         <div className="ml-auto flex shrink-0 items-center gap-1">
