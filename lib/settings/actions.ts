@@ -184,3 +184,17 @@ export async function updateFullscreenMode(enabled: boolean): Promise<void> {
 
   revalidatePath("/settings");
 }
+
+export async function updateFullName(fullName: string): Promise<void> {
+  const parsed = z.string().min(1).max(50).parse(fullName.trim());
+  const { supabase, user } = await getAuthUser();
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ full_name: parsed })
+    .eq("id", user.id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/", "layout");
+}
