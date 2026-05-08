@@ -99,7 +99,7 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
         aria-label="메뉴 열기"
         className="size-8"
       >
-        {open ? <X className="size-4" /> : <Menu className="size-4" />}
+        {open ? <X className="size-5" /> : <Menu className="size-5" />}
       </Button>
 
       {open && (
