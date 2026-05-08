@@ -87,8 +87,8 @@ export default function DashboardPage() {
         <Suspense fallback={null}>
           <VersionBadge />
         </Suspense>
-        <DashboardGallerySheet />
       </CompactHide>
+      <DashboardGallerySheet />
     </DashboardPageShell>
   );
 }

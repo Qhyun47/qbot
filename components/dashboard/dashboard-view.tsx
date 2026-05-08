@@ -11,7 +11,6 @@ import { StatusBoard } from "@/components/cases/status-board";
 import { RefreshButton } from "@/components/dashboard/refresh-button";
 import { HideAllFromBoardButton } from "@/components/cases/hide-all-from-board-button";
 import { AlarmBar } from "@/components/alarms/alarm-bar";
-import { AlarmFab } from "@/components/alarms/alarm-fab";
 import { AlarmFormDialog } from "@/components/alarms/alarm-form-dialog";
 import { MedicationTriggerButton } from "@/components/medication/medication-trigger-button";
 import { NewCaseButton } from "@/components/cases/new-case-button";
@@ -60,9 +59,16 @@ export function DashboardView({ cases, alarms }: DashboardViewProps) {
           <CompactModeToggle />
         </div>
         <div className="flex-1 overflow-y-auto">
+          <div className="px-3 pt-2">
+            <AlarmBar
+              alarms={alarms}
+              onConfirm={handleConfirm}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          </div>
           <CompactStatusList cases={cases} />
         </div>
-        <AlarmFab alarms={alarms} cases={cases} />
       </div>
     );
   }

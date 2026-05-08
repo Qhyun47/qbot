@@ -89,6 +89,12 @@ interface NewCaseFormProps {
   foldGuidelineFontSize?: number;
   canUseAi?: boolean;
   autoRecord?: boolean;
+  // 다이얼로그에서 사전 생성된 케이스 데이터 (있으면 설정 화면 건너뜀)
+  initialCaseId?: string | null;
+  initialBedZone?: BedZone | null;
+  initialBedNumber?: number | null;
+  initialCcs?: string[];
+  initialTemplateKeys?: string[];
 }
 
 export function NewCaseForm({
@@ -102,16 +108,20 @@ export function NewCaseForm({
   foldGuidelineFontSize,
   canUseAi = false,
   autoRecord = false,
+  initialCaseId = null,
+  initialBedZone = null,
+  initialBedNumber = null,
+  initialCcs = [],
+  initialTemplateKeys = [],
 }: NewCaseFormProps) {
   const router = useRouter();
-  const [caseId, setCaseId] = useState<string | null>(null);
-  const [bedZone, setBedZone] = useState<BedZone | null>(null);
-  const [bedNumber, setBedNumber] = useState<number | null>(null);
-  const [ccs, setCcs] = useState<string[]>([]);
+  const [caseId, setCaseId] = useState<string | null>(initialCaseId);
+  const [bedZone, setBedZone] = useState<BedZone | null>(initialBedZone);
+  const [bedNumber, setBedNumber] = useState<number | null>(initialBedNumber);
+  const [ccs, setCcs] = useState<string[]>(initialCcs);
   const [setupCcs, setSetupCcs] = useState<string[]>([]);
-  const [selectedTemplateKeys, setSelectedTemplateKeys] = useState<string[]>(
-    []
-  );
+  const [selectedTemplateKeys, setSelectedTemplateKeys] =
+    useState<string[]>(initialTemplateKeys);
   const [pendingTemplateKeys, setPendingTemplateKeys] = useState<
     string[] | null
   >(null);
@@ -124,7 +134,8 @@ export function NewCaseForm({
   const [generating, setGenerating] = useState(false);
   const [navigatingBack, setNavigatingBack] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
-  const [setupDone, setSetupDone] = useState(false);
+  // 다이얼로그 경유 시 설정 화면을 건너뜀
+  const [setupDone, setSetupDone] = useState(initialCaseId !== null);
   const [setupExiting, setSetupExiting] = useState(false);
   const [autoStartSignal, setAutoStartSignal] = useState(false);
   const [, startTransition] = useTransition();
@@ -139,9 +150,11 @@ export function NewCaseForm({
     templateKeys: string[];
   } | null>(null);
 
+  // 다이얼로그 경유 시 createCase()를 건너뜀 (이미 생성되어 있음)
   useEffect(() => {
+    if (initialCaseId) return;
     createCase().then((id) => setCaseId(id));
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // caseId가 생기면 임시 보관된 베드/CC를 즉시 저장
   useEffect(() => {

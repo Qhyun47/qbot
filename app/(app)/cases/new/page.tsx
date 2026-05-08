@@ -3,11 +3,19 @@ import { Suspense } from "react";
 import { getLayoutSettings } from "@/lib/settings/actions";
 import { getServiceAccessStatus } from "@/lib/auth/service-access";
 import { NewCaseForm } from "@/components/cases/new-case-form";
+import type { BedZone } from "@/lib/supabase/types";
 
 async function NewCaseFormLoader({
   searchParams,
 }: {
-  searchParams: Promise<{ fresh?: string }>;
+  searchParams: Promise<{
+    fresh?: string;
+    caseId?: string;
+    bedZone?: string;
+    bedNumber?: string;
+    ccs?: string;
+    templateKeys?: string;
+  }>;
 }) {
   const [
     {
@@ -22,16 +30,22 @@ async function NewCaseFormLoader({
       autoRecord,
     },
     status,
-    { fresh },
+    { caseId, bedZone, bedNumber, ccs, templateKeys },
   ] = await Promise.all([
     getLayoutSettings(),
     getServiceAccessStatus(),
     searchParams,
   ]);
 
+  const initialBedZone = (bedZone as BedZone) ?? null;
+  const initialBedNumber = bedNumber ? Number(bedNumber) : null;
+  const initialCcs = ccs ? ccs.split(",").filter(Boolean) : [];
+  const initialTemplateKeys = templateKeys
+    ? templateKeys.split(",").filter(Boolean)
+    : [];
+
   return (
     <NewCaseForm
-      key={fresh}
       defaultLayout={layout}
       defaultSplitRatio={splitRatio}
       foldAutoSwitch={foldAutoSwitch}
@@ -42,6 +56,11 @@ async function NewCaseFormLoader({
       foldGuidelineFontSize={foldGuidelineFontSize}
       canUseAi={status === "approved"}
       autoRecord={autoRecord}
+      initialCaseId={caseId ?? null}
+      initialBedZone={initialBedZone}
+      initialBedNumber={initialBedNumber}
+      initialCcs={initialCcs}
+      initialTemplateKeys={initialTemplateKeys}
     />
   );
 }
@@ -49,7 +68,14 @@ async function NewCaseFormLoader({
 export default async function NewCasePage({
   searchParams,
 }: {
-  searchParams: Promise<{ fresh?: string }>;
+  searchParams: Promise<{
+    fresh?: string;
+    caseId?: string;
+    bedZone?: string;
+    bedNumber?: string;
+    ccs?: string;
+    templateKeys?: string;
+  }>;
 }) {
   const { fresh } = await searchParams;
 
