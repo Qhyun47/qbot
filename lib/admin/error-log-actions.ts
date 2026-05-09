@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getIsAdmin } from "@/lib/auth/is-admin";
 import type { ErrorLog } from "@/lib/supabase/types";
 
@@ -32,7 +33,8 @@ export async function getErrorLogs(): Promise<ErrorLogWithEmail[]> {
 
   let emailMap: Record<string, string> = {};
   if (userIds.length > 0) {
-    const { data: views } = await supabase
+    const adminClient = createAdminClient();
+    const { data: views } = await adminClient
       .from("service_access_requests")
       .select("id, email")
       .in("id", userIds);
