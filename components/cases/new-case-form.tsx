@@ -281,6 +281,7 @@ export function NewCaseForm({
 
   const handleSetupConfirm = () => {
     if (setupCcs.length === 0) {
+      if (autoRecord) setAutoStartSignal((v) => !v);
       setSetupExiting(true);
       return;
     }

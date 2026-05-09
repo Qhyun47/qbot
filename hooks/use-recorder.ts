@@ -5,7 +5,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 interface UseRecorderReturn {
   isRecording: boolean;
   elapsedSeconds: number;
-  startRecording: () => Promise<void>;
+  startRecording: () => Promise<string | null>;
   stopRecording: () => Promise<Blob | null>;
   error: string | null;
 }
@@ -21,7 +21,7 @@ export function useRecorder(): UseRecorderReturn {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const mimeTypeRef = useRef<string>("audio/webm");
 
-  const startRecording = useCallback(async () => {
+  const startRecording = useCallback(async (): Promise<string | null> => {
     setError(null);
     setElapsedSeconds(0);
     chunksRef.current = [];
@@ -48,10 +48,13 @@ export function useRecorder(): UseRecorderReturn {
       timerRef.current = setInterval(() => {
         setElapsedSeconds((s) => s + 1);
       }, 1000);
+
+      return null;
     } catch {
-      setError(
-        "마이크 권한이 필요합니다. 브라우저 설정에서 마이크 접근을 허용해주세요."
-      );
+      const msg =
+        "마이크 권한이 필요합니다. 브라우저 설정에서 마이크 접근을 허용해주세요.";
+      setError(msg);
+      return msg;
     }
   }, []);
 

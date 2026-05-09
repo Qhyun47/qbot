@@ -41,7 +41,7 @@ export const RecordingButton = forwardRef<
   { caseId, onUploadComplete, autoStartSignal, autoRecord },
   ref
 ) {
-  const { isRecording, elapsedSeconds, startRecording, stopRecording, error } =
+  const { isRecording, elapsedSeconds, startRecording, stopRecording } =
     useRecorder();
   const [isUploading, setIsUploading] = useState(false);
   const isFirstSignalRef = useRef(true);
@@ -174,8 +174,8 @@ export const RecordingButton = forwardRef<
       return;
     }
     if (!isRecording && !isUploading) {
-      startRecording().then(() => {
-        if (error) toast.error(error);
+      startRecording().then((errMsg) => {
+        if (errMsg) toast.error(errMsg);
       });
     }
     // autoStartSignal 변경 시만 트리거
@@ -195,8 +195,8 @@ export const RecordingButton = forwardRef<
       if (!blob) return;
       await performUpload(blob, elapsedSecondsRef.current);
     } else {
-      await startRecording();
-      if (error) toast.error(error);
+      const errMsg = await startRecording();
+      if (errMsg) toast.error(errMsg);
     }
   }
 
