@@ -77,8 +77,20 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+      // 라이트모드: 원본 투명 아이콘 (짙은 말풍선)
+      {
+        url: "/icons/icon-512-transparent.png",
+        sizes: "512x512",
+        type: "image/png",
+        media: "(prefers-color-scheme: light)",
+      },
+      // 다크모드: 흰 말풍선 + 짙은 배경 (부유하는 밝은 배경 방지)
+      {
+        url: "/icons/icon-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        media: "(prefers-color-scheme: dark)",
+      },
     ],
     apple: "/icons/apple-touch-icon.png",
   },
