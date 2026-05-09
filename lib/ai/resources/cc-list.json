@@ -308,6 +308,48 @@
     "aliasOf": "Visual disturbance"
   },
   {
+    "cc": "Blurred vision",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual disturbance"
+  },
+  {
+    "cc": "Lt. blurred vision",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual disturbance"
+  },
+  {
+    "cc": "Rt. blurred vision",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual disturbance"
+  },
+  {
+    "cc": "Both blurred vision",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual disturbance"
+  },
+  {
+    "cc": "Blurred vision(OS)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual disturbance"
+  },
+  {
+    "cc": "Blurred vision(OD)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual disturbance"
+  },
+  {
+    "cc": "Blurred vision(OU)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Visual disturbance"
+  },
+  {
     "cc": "Facial palsy",
     "guideKeys": [
       { "key": "nu-code-red", "rank": 0 },
@@ -1897,6 +1939,30 @@
   },
   {
     "cc": "Foreign body in eye(OU)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Foreign body in eye"
+  },
+  {
+    "cc": "F.B in eye",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Foreign body in eye"
+  },
+  {
+    "cc": "F.B in eye(OS)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Foreign body in eye"
+  },
+  {
+    "cc": "F.B in eye(OD)",
+    "guideKeys": [],
+    "templateKeys": [],
+    "aliasOf": "Foreign body in eye"
+  },
+  {
+    "cc": "F.B in eye(OU)",
     "guideKeys": [],
     "templateKeys": [],
     "aliasOf": "Foreign body in eye"
