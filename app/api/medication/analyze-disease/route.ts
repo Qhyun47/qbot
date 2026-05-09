@@ -23,6 +23,45 @@ export async function POST(req: NextRequest) {
     caseId?: string;
   };
 
+  if (!medList || typeof medList !== "string") {
+    return NextResponse.json(
+      { error: "약물 목록이 없습니다." },
+      { status: 400 }
+    );
+  }
+  if (medList.length > 5000) {
+    return NextResponse.json(
+      { error: "약물 목록이 너무 깁니다. (최대 5000자)" },
+      { status: 400 }
+    );
+  }
+
+  // caseId 소유권 검증
+  if (caseId) {
+    const { data: caseRow } = await supabase
+      .from("cases")
+      .select("user_id")
+      .eq("id", caseId)
+      .single();
+    if (!caseRow || caseRow.user_id !== user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+  }
+
+  // 5초 이내 중복 요청 방지
+  const fiveSecondsAgo = new Date(Date.now() - 5_000);
+  const { count: recentCount } = await supabase
+    .from("ai_usage_logs")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .gte("created_at", fiveSecondsAgo.toISOString());
+  if ((recentCount ?? 0) > 0) {
+    return NextResponse.json(
+      { error: "너무 빠른 재시도입니다. 잠시 후 다시 시도해주세요." },
+      { status: 429 }
+    );
+  }
+
   const prompt =
     "다음은 환자의 현재 약물 목록입니다:\n" +
     medList +

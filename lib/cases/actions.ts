@@ -141,7 +141,15 @@ export async function addCaseInput(
   timeTag: string | null,
   timeOffsetMinutes: number | null
 ): Promise<CaseInput> {
-  const { supabase } = await getAuthUser();
+  const { supabase, user } = await getAuthUser();
+
+  const { data: caseRow } = await supabase
+    .from("cases")
+    .select("id")
+    .eq("id", caseId)
+    .eq("user_id", user.id)
+    .single();
+  if (!caseRow) throw new Error("권한이 없습니다");
 
   const { count } = await supabase
     .from("case_inputs")
@@ -171,11 +179,33 @@ export async function addCaseInput(
   return data;
 }
 
+async function verifyResultOwnership(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  resultId: string,
+  userId: string
+): Promise<void> {
+  const { data: resultRow } = await supabase
+    .from("case_results")
+    .select("case_id")
+    .eq("id", resultId)
+    .single();
+  if (!resultRow) throw new Error("결과를 찾을 수 없습니다");
+
+  const { data: caseRow } = await supabase
+    .from("cases")
+    .select("id")
+    .eq("id", resultRow.case_id)
+    .eq("user_id", userId)
+    .single();
+  if (!caseRow) throw new Error("권한이 없습니다");
+}
+
 export async function updatePiEdited(
   resultId: string,
   text: string
 ): Promise<void> {
-  const { supabase } = await getAuthUser();
+  const { supabase, user } = await getAuthUser();
+  await verifyResultOwnership(supabase, resultId, user.id);
 
   const { error } = await supabase
     .from("case_results")
@@ -189,7 +219,8 @@ export async function updatePeEdited(
   resultId: string,
   text: string
 ): Promise<void> {
-  const { supabase } = await getAuthUser();
+  const { supabase, user } = await getAuthUser();
+  await verifyResultOwnership(supabase, resultId, user.id);
 
   const { error } = await supabase
     .from("case_results")
@@ -203,7 +234,8 @@ export async function updateTemplateEdited(
   resultId: string,
   text: string
 ): Promise<void> {
-  const { supabase } = await getAuthUser();
+  const { supabase, user } = await getAuthUser();
+  await verifyResultOwnership(supabase, resultId, user.id);
 
   const { error } = await supabase
     .from("case_results")
@@ -217,7 +249,8 @@ export async function updateHistoryEdited(
   resultId: string,
   text: string
 ): Promise<void> {
-  const { supabase } = await getAuthUser();
+  const { supabase, user } = await getAuthUser();
+  await verifyResultOwnership(supabase, resultId, user.id);
 
   const { error } = await supabase
     .from("case_results")
@@ -330,10 +363,33 @@ export async function restoreToBoard(caseId: string): Promise<void> {
   revalidatePath("/cases");
 }
 
+async function verifyCaseInputOwnership(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  cardId: string,
+  userId: string
+): Promise<void> {
+  const { data: inputRow } = await supabase
+    .from("case_inputs")
+    .select("case_id")
+    .eq("id", cardId)
+    .single();
+  if (!inputRow) throw new Error("입력을 찾을 수 없습니다");
+
+  const { data: caseRow } = await supabase
+    .from("cases")
+    .select("id")
+    .eq("id", inputRow.case_id)
+    .eq("user_id", userId)
+    .single();
+  if (!caseRow) throw new Error("권한이 없습니다");
+}
+
 export async function reorderCaseInputs(
   updates: { id: string; displayOrder: number }[]
 ): Promise<void> {
-  const { supabase } = await getAuthUser();
+  const { supabase, user } = await getAuthUser();
+  if (updates.length === 0) return;
+  await verifyCaseInputOwnership(supabase, updates[0].id, user.id);
   await Promise.all(
     updates.map(({ id, displayOrder }) =>
       supabase
@@ -348,7 +404,8 @@ export async function moveCaseInputSection(
   cardId: string,
   targetSection: "timed" | "untimed"
 ): Promise<void> {
-  const { supabase } = await getAuthUser();
+  const { supabase, user } = await getAuthUser();
+  await verifyCaseInputOwnership(supabase, cardId, user.id);
   const { error } = await supabase
     .from("case_inputs")
     .update(
@@ -391,7 +448,8 @@ export async function deleteCase(caseId: string): Promise<void> {
 }
 
 export async function deleteCaseInput(cardId: string): Promise<void> {
-  const { supabase } = await getAuthUser();
+  const { supabase, user } = await getAuthUser();
+  await verifyCaseInputOwnership(supabase, cardId, user.id);
   const { error } = await supabase
     .from("case_inputs")
     .delete()
@@ -403,7 +461,8 @@ export async function updateCaseInputText(
   cardId: string,
   rawText: string
 ): Promise<CaseInput> {
-  const { supabase } = await getAuthUser();
+  const { supabase, user } = await getAuthUser();
+  await verifyCaseInputOwnership(supabase, cardId, user.id);
   const { data, error } = await supabase
     .from("case_inputs")
     .update({ raw_text: rawText })
