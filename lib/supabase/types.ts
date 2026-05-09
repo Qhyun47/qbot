@@ -227,34 +227,34 @@ export type Database = {
       };
       case_recordings: {
         Row: {
-          id: string;
           case_id: string;
-          user_id: string;
-          storage_path: string;
+          created_at: string;
           duration_seconds: number | null;
+          id: string;
+          storage_path: string;
           transcript: Json | null;
           transcript_status: string;
-          created_at: string;
+          user_id: string;
         };
         Insert: {
-          id?: string;
           case_id: string;
-          user_id: string;
-          storage_path: string;
+          created_at?: string;
           duration_seconds?: number | null;
+          id?: string;
+          storage_path: string;
           transcript?: Json | null;
           transcript_status?: string;
-          created_at?: string;
+          user_id: string;
         };
         Update: {
-          id?: string;
           case_id?: string;
-          user_id?: string;
-          storage_path?: string;
+          created_at?: string;
           duration_seconds?: number | null;
+          id?: string;
+          storage_path?: string;
           transcript?: Json | null;
           transcript_status?: string;
-          created_at?: string;
+          user_id?: string;
         };
         Relationships: [
           {
@@ -269,6 +269,13 @@ export type Database = {
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "case_recordings_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "service_access_requests";
             referencedColumns: ["id"];
           },
         ];
@@ -486,74 +493,6 @@ export type Database = {
           },
         ];
       };
-      shared_photo_hides: {
-        Row: {
-          shared_photo_id: string;
-          user_id: string;
-        };
-        Insert: {
-          shared_photo_id: string;
-          user_id: string;
-        };
-        Update: {
-          shared_photo_id?: string;
-          user_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "shared_photo_hides_shared_photo_id_fkey";
-            columns: ["shared_photo_id"];
-            isOneToOne: false;
-            referencedRelation: "shared_photos";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "shared_photo_hides_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      shared_photos: {
-        Row: {
-          created_at: string;
-          file_name: string;
-          file_size: number;
-          id: string;
-          mime_type: string;
-          shared_by: string;
-          storage_path: string;
-        };
-        Insert: {
-          created_at?: string;
-          file_name: string;
-          file_size: number;
-          id?: string;
-          mime_type: string;
-          shared_by: string;
-          storage_path: string;
-        };
-        Update: {
-          created_at?: string;
-          file_name?: string;
-          file_size?: number;
-          id?: string;
-          mime_type?: string;
-          shared_by?: string;
-          storage_path?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "shared_photos_shared_by_fkey";
-            columns: ["shared_by"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
       error_logs: {
         Row: {
           created_at: string;
@@ -649,10 +588,11 @@ export type Database = {
       };
       profiles: {
         Row: {
-          auto_record: boolean;
+          auto_record: boolean | null;
           avatar_url: string | null;
           case_input_font_size: number;
           created_at: string;
+          email: string | null;
           fold_auto_switch: boolean;
           fold_case_input_font_size: number;
           fold_fallback_layout: string;
@@ -670,10 +610,11 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
-          auto_record?: boolean;
+          auto_record?: boolean | null;
           avatar_url?: string | null;
           case_input_font_size?: number;
           created_at?: string;
+          email?: string | null;
           fold_auto_switch?: boolean;
           fold_case_input_font_size?: number;
           fold_fallback_layout?: string;
@@ -691,10 +632,11 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
-          auto_record?: boolean;
+          auto_record?: boolean | null;
           avatar_url?: string | null;
           case_input_font_size?: number;
           created_at?: string;
+          email?: string | null;
           fold_auto_switch?: boolean;
           fold_case_input_font_size?: number;
           fold_fallback_layout?: string;
@@ -713,6 +655,88 @@ export type Database = {
         };
         Relationships: [];
       };
+      shared_photo_hides: {
+        Row: {
+          shared_photo_id: string;
+          user_id: string;
+        };
+        Insert: {
+          shared_photo_id: string;
+          user_id: string;
+        };
+        Update: {
+          shared_photo_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "shared_photo_hides_shared_photo_id_fkey";
+            columns: ["shared_photo_id"];
+            isOneToOne: false;
+            referencedRelation: "shared_photos";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "shared_photo_hides_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "shared_photo_hides_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "service_access_requests";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      shared_photos: {
+        Row: {
+          created_at: string;
+          file_name: string;
+          file_size: number;
+          id: string;
+          mime_type: string;
+          shared_by: string;
+          storage_path: string;
+        };
+        Insert: {
+          created_at?: string;
+          file_name: string;
+          file_size: number;
+          id?: string;
+          mime_type: string;
+          shared_by: string;
+          storage_path: string;
+        };
+        Update: {
+          created_at?: string;
+          file_name?: string;
+          file_size?: number;
+          id?: string;
+          mime_type?: string;
+          shared_by?: string;
+          storage_path?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "shared_photos_shared_by_fkey";
+            columns: ["shared_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "shared_photos_shared_by_fkey";
+            columns: ["shared_by"];
+            isOneToOne: false;
+            referencedRelation: "service_access_requests";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       service_access_requests: {
@@ -723,6 +747,22 @@ export type Database = {
           id: string | null;
           is_admin: boolean | null;
           service_access_status: string | null;
+        };
+        Insert: {
+          created_at?: string | null;
+          email?: string | null;
+          full_name?: string | null;
+          id?: string | null;
+          is_admin?: boolean | null;
+          service_access_status?: string | null;
+        };
+        Update: {
+          created_at?: string | null;
+          email?: string | null;
+          full_name?: string | null;
+          id?: string | null;
+          is_admin?: boolean | null;
+          service_access_status?: string | null;
         };
         Relationships: [];
       };
@@ -861,22 +901,10 @@ export type CompositeTypes<
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never;
 
-export const Constants = {
-  public: {
-    Enums: {
-      bed_zone: ["A", "B", "R"],
-      case_status: ["draft", "generating", "completed", "failed"],
-      input_layout: ["single", "split_vertical", "split_horizontal"],
-    },
-  },
-} as const;
-
-// 편의 타입 별칭
 export type BedZone = Database["public"]["Enums"]["bed_zone"];
 export type CaseStatus = Database["public"]["Enums"]["case_status"];
 export type InputLayout = Database["public"]["Enums"]["input_layout"];
 export type FoldFallbackLayout = "single" | "split_vertical";
-
 export type Alarm = Tables<"alarms">;
 export type Case = Tables<"cases">;
 export type CaseInput = Tables<"case_inputs">;
@@ -889,6 +917,15 @@ export type Guideline = Tables<"interview_guidelines">;
 export type ErrorLog = Tables<"error_logs">;
 export type CaseRecording = Tables<"case_recordings">;
 export type ServiceAccessStatus = string;
-
 export type TranscriptSegment = { text: string; start: number; end: number };
 export type Recording = CaseRecording & { url?: string | null };
+
+export const Constants = {
+  public: {
+    Enums: {
+      bed_zone: ["A", "B", "R"],
+      case_status: ["draft", "generating", "completed", "failed"],
+      input_layout: ["single", "split_vertical", "split_horizontal"],
+    },
+  },
+} as const;
