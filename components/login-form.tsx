@@ -77,6 +77,7 @@ export function LoginForm({
                   <Link
                     href="/auth/forgot-password"
                     className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                    tabIndex={-1}
                   >
                     비밀번호 찾기
                   </Link>
